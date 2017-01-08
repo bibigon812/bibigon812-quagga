@@ -9,10 +9,10 @@ Puppet::Type.newtype(:network_interface) do
   end
 
   newproperty(:type) do
-    desc %q{ Type of the network interface.
-      - 'ethernet'
-      - 'bonding'
-      - 'bridge'
+    desc %q{ Type of the network interface:
+      - ethernet
+      - bonding
+      - bridge
     }
 
     newvalues(:bonding)
