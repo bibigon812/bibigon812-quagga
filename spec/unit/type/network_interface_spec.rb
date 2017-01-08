@@ -55,20 +55,20 @@ describe Puppet::Type.type(:network_interface) do
 
     describe 'type' do
       it 'should contain bonding' do
-        expect(described_class.new(:name => 'bond0', :type => 'bOnding')[:type]).to match Regexp.new('bonding')
+        expect(described_class.new(:name => 'bond0', :type => 'bonding')[:type]).to match Regexp.new('bonding')
       end
 
       it 'should contain ethernet' do
-        expect(described_class.new(:name => 'eth0', :type => 'etheRnet')[:type]).to match Regexp.new('ethernet')
+        expect(described_class.new(:name => 'eth0', :type => 'ethernet')[:type]).to match Regexp.new('ethernet')
       end
 
-      it 'should contain bonding' do
-        expect(described_class.new(:name => 'br0', :type => 'BriDge')[:type]).to match Regexp.new('bridge')
+      it 'should contain bridge' do
+        expect(described_class.new(:name => 'br0', :type => 'bridge')[:type]).to match Regexp.new('bridge')
       end
 
-      # it 'should not support other values' do
-      #   expect(described_class.new(:name => 'foo', :type => 'foo')[:type]).to raise_error(Puppet::Error, /Valid values match/)
-      # end
+      it 'should not support other values' do
+        expect { described_class.new(:name => 'foo', :type => 'foo') }.to raise_error(Puppet::Error, /Invalid value/)
+      end
     end
   end
 end

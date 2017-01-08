@@ -1,8 +1,6 @@
 Puppet::Type.newtype(:network_interface) do
-  @doc = <<-EOS
-    This type provides the capability to manage network interfaces within
-    puppet.
-  EOS
+  @doc = %q{This type provides the capability to manage network interfaces within
+  puppet.}
 
   ensurable
 
@@ -16,10 +14,11 @@ Puppet::Type.newtype(:network_interface) do
       - 'bonding'
       - 'bridge'
     }
-    newvalues(/\A([Ee][Tt][Hh][Ee][Rr][Nn][Ee][Tt]|[Bb][Oo][Nn][Dd][Ii][Nn][Gg]|[Bb][Rr][Ii][Dd][Gg][Ee])\Z/)
 
-    munge do |value|
-      value.downcase
-    end
+    newvalues(:bonding)
+    newvalues(:bridge)
+    newvalues(:ethernet)
+
+    defaultto(:ethernet)
   end
 end
