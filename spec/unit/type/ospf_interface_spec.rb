@@ -38,12 +38,12 @@ describe Puppet::Type.type(:ospf_interface) do
 
   describe 'when validating values' do
     describe 'ensure' do
-      it 'should support up as a value' do
-        expect { described_class.new(:name => 'foo', :ensure => :present) }.to_not raise_error
+      it 'should support enabled as a value' do
+        expect { described_class.new(:name => 'foo', :ensure => :enabled) }.to_not raise_error
       end
 
-      it 'should support absent as a value' do
-        expect { described_class.new(:name => 'foo', :ensure => :absent) }.to_not raise_error
+      it 'should support disabled as a value' do
+        expect { described_class.new(:name => 'foo', :ensure => :disabled) }.to_not raise_error
       end
 
       it 'should not support other values' do
@@ -63,6 +63,14 @@ describe Puppet::Type.type(:ospf_interface) do
       it 'should not support 65536 as a value' do
         expect { described_class.new(:name => 'foo', :cost => 65536) }.to raise_error(Puppet::Error, /Cost: 1-65535/)
       end
+
+      it 'should contain 50' do
+        expect(described_class.new(:name => 'foo', :cost => 50)[:cost]).to eq(50)
+      end
+
+      it 'should contain 51' do
+        expect(described_class.new(:name => 'foo', :cost => '51')[:cost]).to eq(51)
+      end
     end
 
     describe 'dead_interval' do
@@ -76,6 +84,36 @@ describe Puppet::Type.type(:ospf_interface) do
 
       it 'should not support 65536 as a value' do
         expect { described_class.new(:name => 'foo', :dead_interval => 65536) }.to raise_error(Puppet::Error, /Interval after which a neighbor is declared dead: 1-65535 seconds/)
+      end
+
+      it 'should contain 50' do
+        expect(described_class.new(:name => 'foo', :dead_interval => 50)[:dead_interval]).to eq(50)
+      end
+
+      it 'should contain 51' do
+        expect(described_class.new(:name => 'foo', :dead_interval => '51')[:dead_interval]).to eq(51)
+      end
+    end
+
+    describe 'hello_interval' do
+      it 'should support 100 as a value' do
+        expect { described_class.new(:name => 'foo', :hello_interval => 100) }.to_not raise_error
+      end
+
+      it 'should not support 0 as a value' do
+        expect { described_class.new(:name => 'foo', :hello_interval => 0) }.to raise_error(Puppet::Error, /Time between HELLO packets: 1-65535 seconds/)
+      end
+
+      it 'should not support 65536 as a value' do
+        expect { described_class.new(:name => 'foo', :hello_interval => 65536) }.to raise_error(Puppet::Error, /Time between HELLO packets: 1-65535 seconds/)
+      end
+
+      it 'should contain 50' do
+        expect(described_class.new(:name => 'foo', :hello_interval => 50)[:hello_interval]).to eq(50)
+      end
+
+      it 'should contain 51' do
+        expect(described_class.new(:name => 'foo', :hello_interval => '51')[:hello_interval]).to eq(51)
       end
     end
 
@@ -98,6 +136,10 @@ describe Puppet::Type.type(:ospf_interface) do
 
       it 'should not support foo as a value' do
         expect { described_class.new(:name => 'foo', :mtu_ignore => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+      end
+
+      it 'should contain true' do
+        expect(described_class.new(:name => 'foo', :mtu_ignore => 'true')[:mtu_ignore]).to eq(:true)
       end
     end
 
@@ -129,6 +171,10 @@ describe Puppet::Type.type(:ospf_interface) do
       it 'should support point-to-point as value' do
         expect { described_class.new(:name => 'foo', :network_type => 'point-to-point') }.to_not raise_error
       end
+
+      it 'should contain point_to_point' do
+        expect(described_class.new(:name => 'foo', :network_type => 'point-to-point')[:network_type]).to eq(:point_to_point)
+      end
     end
 
     describe 'priority' do
@@ -142,6 +188,14 @@ describe Puppet::Type.type(:ospf_interface) do
 
       it 'should not support 256 as a value' do
         expect { described_class.new(:name => 'foo', :priority => 256) }.to raise_error(Puppet::Error, /Priority: 0-255/)
+      end
+
+      it 'should contain 50' do
+        expect(described_class.new(:name => 'foo', :priority => 50)[:priority]).to eq(50)
+      end
+
+      it 'should contain 51' do
+        expect(described_class.new(:name => 'foo', :priority => '51')[:priority]).to eq(51)
       end
     end
 
@@ -157,6 +211,14 @@ describe Puppet::Type.type(:ospf_interface) do
       it 'should not support 65536 as a value' do
         expect { described_class.new(:name => 'foo', :retransmit_interval => 65536) }.to raise_error(Puppet::Error, /Time between retransmitting lost link state advertisements: 3-65535 seconds/)
       end
+
+      it 'should contain 50' do
+        expect(described_class.new(:name => 'foo', :retransmit_interval => 50)[:retransmit_interval]).to eq(50)
+      end
+
+      it 'should contain 51' do
+        expect(described_class.new(:name => 'foo', :retransmit_interval => '51')[:retransmit_interval]).to eq(51)
+      end
     end
 
     describe 'transmit_delay' do
@@ -170,6 +232,14 @@ describe Puppet::Type.type(:ospf_interface) do
 
       it 'should not support 65536 as a value' do
         expect { described_class.new(:name => 'foo', :transmit_delay => 65536) }.to raise_error(Puppet::Error, /Link state transmit delay: 1-65535 seconds/)
+      end
+
+      it 'should contain 50' do
+        expect(described_class.new(:name => 'foo', :transmit_delay => 50)[:transmit_delay]).to eq(50)
+      end
+
+      it 'should contain 51' do
+        expect(described_class.new(:name => 'foo', :transmit_delay => '51')[:transmit_delay]).to eq(51)
       end
     end
   end
