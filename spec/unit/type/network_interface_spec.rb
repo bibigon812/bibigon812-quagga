@@ -22,30 +22,32 @@ describe Puppet::Type.type(:network_interface) do
   end
 
   describe "when validating attributes" do
-
     [:name, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end
     end
 
-    [ :type ].each do |property|
+    [:type].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
     end
-
   end
 
   describe "when validating values" do
 
     describe "ensure" do
-      it "should support present as a value for ensure" do
-        expect { described_class.new(:name => 'foo', :ensure => :present) }.to_not raise_error
+      it "should support up as a value for ensure" do
+        expect { described_class.new(:name => 'foo', :ensure => :up) }.to_not raise_error
+      end
+
+      it "should support down as a value for ensure" do
+        expect { described_class.new(:name => 'foo', :ensure => :down) }.to_not raise_error
       end
 
       it "should support absent as a value for ensure" do
-        expect { described_class.new(:name => 'foo', :ensure => :present) }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :ensure => :absent) }.to_not raise_error
       end
 
       it "should not support other values" do
