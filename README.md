@@ -1,6 +1,6 @@
 ## Overview
 
-This module provides controls network interfaces and network protocols without 
+This module provides controls network interfaces and network protocols without
 restarting. The first release will support only CentOS/RedHat 7.0.
 
 ## Features
@@ -10,3 +10,4 @@ restarting. The first release will support only CentOS/RedHat 7.0.
 ### Community lists
 ### BGP
 ### OSPF
+- Resource ospf_interface
