@@ -1,3 +1,6 @@
 ## [Unreleased]
 ### Added
-- OSPF interface type
+- ospf_interface type
+- quagga provider for ospf_interface type
+- unit tests for ospf_interface type
+- unit tests for quagga provider
