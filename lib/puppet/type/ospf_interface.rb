@@ -1,7 +1,17 @@
 Puppet::Type.newtype(:ospf_interface) do
   @doc = %q{This type provides the capabilites to manage ospf parameters of
     network interfaces within puppet.}
-  ensurable
+  ensurable do
+    newvalues(:enabled) do
+      provider.enable
+    end
+
+    newvalues(:disabled) do
+      provider.disable
+    end
+
+    defaultto(:disabled)
+  end
 
   newparam(:name) do
     desc %q{The friendly name of the network interface.}
@@ -13,9 +23,14 @@ Puppet::Type.newtype(:ospf_interface) do
     newvalues(/\A\d+\Z/)
 
     validate do |value|
+      value = value.to_i
       if value < 1 or value > 65535
         raise ArgumentError, 'Cost: 1-65535'
       end
+    end
+
+    munge do |value|
+      value.to_i
     end
   end
 
@@ -25,9 +40,14 @@ Puppet::Type.newtype(:ospf_interface) do
     newvalues(/\A\d+\Z/)
 
     validate do |value|
+      value = value.to_i
       if value < 1 or value >  65535
         raise ArgumentError, 'Interval after which a neighbor is declared dead: 1-65535 seconds'
       end
+    end
+
+    munge do |value|
+      value.to_i
     end
   end
 
@@ -37,9 +57,14 @@ Puppet::Type.newtype(:ospf_interface) do
     newvalues(/\A\d+\Z/)
 
     validate do |value|
+      value = value.to_i
       if value < 1 or value > 65535
         raise ArgumentError, 'Time between HELLO packets: 1-65535 seconds'
       end
+    end
+
+    munge do |value|
+      value.to_i
     end
   end
 
@@ -50,7 +75,7 @@ Puppet::Type.newtype(:ospf_interface) do
     defaultto(:false)
 
     munge do |value|
-      value.to_s
+      value.to_s.to_sym
     end
   end
 
@@ -61,7 +86,7 @@ Puppet::Type.newtype(:ospf_interface) do
     newvalues('non-broadcast', 'point-to-multipoint', 'point-to-point')
 
     munge do |value|
-      value.to_s.gsub(/-/, '_')
+      value.to_s.gsub(/-/, '_').to_sym
     end
   end
 
@@ -71,9 +96,14 @@ Puppet::Type.newtype(:ospf_interface) do
     newvalues(/\A\d+\Z/)
 
     validate do |value|
+      value = value.to_i
       if value < 0 or value > 255
         raise ArgumentError, 'Priority: 0-255'
       end
+    end
+
+    munge do |value|
+      value.to_i
     end
   end
 
@@ -83,10 +113,14 @@ Puppet::Type.newtype(:ospf_interface) do
     newvalues(/\A\d+\Z/)
 
     validate do |value|
-      value_i = value.to_i
-      if value_i < 3 or value_i > 65535
+      value = value.to_i
+      if value < 3 or value > 65535
         raise ArgumentError, 'Time between retransmitting lost link state advertisements: 3-65535 seconds'
       end
+    end
+
+    munge do |value|
+      value.to_i
     end
   end
 
@@ -96,9 +130,14 @@ Puppet::Type.newtype(:ospf_interface) do
     newvalues(/\A\d+\Z/)
 
     validate do |value|
+      value = value.to_i
       if value < 1 or value > 65535
         raise ArgumentError, 'Link state transmit delay: 1-65535 seconds'
       end
+    end
+
+    munge do |value|
+      value.to_i
     end
   end
 end
