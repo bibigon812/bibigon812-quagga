@@ -1,12 +1,12 @@
 {
-    "name": "bibigon812-networking",
+    "name": "bibigon812-quagga",
     "version": "0.0.1",
     "author": "Dmitriy Yakovlev",
     "summary": "Manages networking on linux machines.",
     "license": "Apache-2.0",
-    "source": "https://github.com/bibigon812/bibigon812-networkung.git",
-    "project_page": "https://github.com/bibigon812/bibigon812-networking",
-    "issues_url": "https://github.com/bibigon812/bibigon812-networking/issues",
+    "source": "https://github.com/bibigon812/bibigon812-quagga.git",
+    "project_page": "https://github.com/bibigon812/bibigon812-quagga",
+    "issues_url": "https://github.com/bibigon812/bibigon812-quagga/issues",
     "dependencies": [
         {
             "name": "puppetlabs-stdlib",
