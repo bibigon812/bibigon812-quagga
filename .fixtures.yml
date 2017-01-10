@@ -2,4 +2,4 @@ fixtures:
   forge_modules:
     stdlib: 'puppetlabs-stdlib'
   symlinks:
-    networking: "#{source_dir}"
+    quagga: "#{source_dir}"
