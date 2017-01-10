@@ -1,6 +1,21 @@
 Puppet::Type.newtype(:ospf_interface) do
   @doc = %q{This type provides the capabilites to manage ospf parameters of
-    network interfaces within puppet.}
+    network interfaces within puppet.
+
+    Example:
+
+    ospf_interface { 'eth0':
+      ensure              => present,
+      cost                => 100,
+      dead_interval       => 8,
+      hello_interval      => 2,
+      mtu_ignore          => true,
+      network_type        => broadcast,
+      priority            => 100,
+      retransmit_interval => 4,
+      transmit_delay      => 1,
+    }
+  }
 
   ensurable
 
@@ -129,6 +144,24 @@ Puppet::Type.newtype(:ospf_interface) do
 
     munge do |value|
       value.to_i
+    end
+  end
+
+  autorequire(:package) do
+    case value(:provider)
+      when :quagga
+        %w{quagga}
+      else
+        []
+    end
+  end
+
+  autorequire(:service) do
+    case value(:provider)
+      when :quagga
+        %w{zebra ospfd}
+      else
+        []
     end
   end
 end
