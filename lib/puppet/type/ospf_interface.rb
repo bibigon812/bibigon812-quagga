@@ -1,17 +1,8 @@
 Puppet::Type.newtype(:ospf_interface) do
   @doc = %q{This type provides the capabilites to manage ospf parameters of
     network interfaces within puppet.}
-  ensurable do
-    newvalues(:enabled) do
-      provider.enable
-    end
 
-    newvalues(:disabled) do
-      provider.disable
-    end
-
-    defaultto(:disabled)
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{The friendly name of the network interface.}

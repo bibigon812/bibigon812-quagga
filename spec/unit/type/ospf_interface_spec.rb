@@ -38,12 +38,12 @@ describe Puppet::Type.type(:ospf_interface) do
 
   describe 'when validating values' do
     describe 'ensure' do
-      it 'should support enabled as a value' do
-        expect { described_class.new(:name => 'foo', :ensure => :enabled) }.to_not raise_error
+      it 'should support present as a value' do
+        expect { described_class.new(:name => 'foo', :ensure => :present) }.to_not raise_error
       end
 
-      it 'should support disabled as a value' do
-        expect { described_class.new(:name => 'foo', :ensure => :disabled) }.to_not raise_error
+      it 'should support absent as a value' do
+        expect { described_class.new(:name => 'foo', :ensure => :absent) }.to_not raise_error
       end
 
       it 'should not support other values' do
