@@ -67,12 +67,22 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     ospf_interfaces
   end
 
-  def self.prefetch
-
+  def self.prefetch(resources)
+    providers = instances
+    found_providers = []
+    resources.keys.each do |name|
+      if provider = providers.find { |provider| provider.name == name }
+        resources[name].provider = provider
+        found_providers << provider
+      end
+    end
+    (providers - found_providers).each do |provider|
+      provider.destroy
+    end
   end
 
   def create
-    debug 'Adding OSPF parameters for interface: %s' % @resource[:name]
+    debug 'Appling OSPF parameters for interface: %s' % @resource[:name]
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
@@ -87,7 +97,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   end
 
   def destroy
-    debug 'Deleting OSPF parameters for interface: %s' % @property_hash[:name]
+    debug 'Reseting OSPF parameters for interface: %s' % @property_hash[:name]
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
