@@ -7,10 +7,11 @@ class quagga (
   String  $package_ensure = $::quagga::params::package_ensure,
   String  $content        = $::quagga::params::content,
 ) inherits ::quagga::params {
-  
-  package { $package_name:
+
+  package { 'quagga':
     ensure => present,
-    before => Service['zebra', 'bgp', 'ospfd']
+    name   => $package_name,
+    before => Service['zebra', 'bgpd', 'ospfd']
   }
 
   file { '/etc/sysconfig/quagga':
@@ -20,7 +21,7 @@ class quagga (
     mode   => '0644',
     content => file('quagga/quagga'),
     require => Package['quagga'],
-    notify  => Service['quagga', 'bgp', 'ospfd'],
+    notify  => Service['zebra', 'bgpd', 'ospfd'],
   }
 
   file { '/etc/quagga/zebra.conf':
@@ -30,7 +31,7 @@ class quagga (
     mode    => $mode,
     content => $content,
     replace => 'no',
-    require => Package[$package_name],
+    require => Package['quagga'],
   }
 
   file { '/etc/quagga/bgpd.conf':
@@ -39,7 +40,7 @@ class quagga (
     group   => $group,
     mode    => $mode,
     replace => 'no',
-    require => Package[$package_name],
+    require => Package['quagga'],
   }
 
   file { '/etc/quagga/ospfd.conf':
@@ -48,15 +49,15 @@ class quagga (
     group   => $group,
     mode    => $mode,
     replace => 'no',
-    require => Package[$package_name],
+    require => Package['quagga'],
   }
 
   service { 'zebra':
     ensure  => running,
     enable  => true,
     require => [
-      Package[$package_name],
       File['/etc/quagga/zebra.conf'],
+      Package['quagga'],
     ],
   }
 
@@ -65,7 +66,7 @@ class quagga (
     enable  => true,
     require => [
       File['/etc/quagga/bgpd.conf'],
-      Package[$package_name],
+      Package['quagga'],
     ],
   }
 
@@ -74,7 +75,7 @@ class quagga (
     enable  => true,
     require => [
       File['/etc/quagga/ospfd.conf'],
-      Package[$package_name],
+      Package['quagga'],
     ],
   }
 }
