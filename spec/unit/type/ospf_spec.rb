@@ -87,12 +87,16 @@ describe Puppet::Type.type(:ospf) do
       expect { described_class.new(:name => 'ospf', :default_information => '{originate => }') }.to raise_error(Puppet::Error, /is not a Hash/)
     end
 
-    it 'should contain { originate => always }' do
-      expect(described_class.new(:name => 'ospf', :default_information => 'originate always')[:default_information]).to eq(:ibm)
+    it 'should support \'{originate => {metric-type => 2}}\' as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => '{originate => {metric-type => 2}}') }.to_not raise_error
     end
-    #
-    # it 'should contain standard' do
-    #   expect(described_class.new(:name => 'ospf', :default_information => 'standard')[:default_information]).to eq(:standard)
-    # end
+
+    it 'should contain { :originate => { :always => :true, :metric_type => 2, :route_map => \'ABCD\'} }' do
+      expect(described_class.new(:name => 'ospf', :default_information => 'originate always metric-type 2 route-map ABCD')[:default_information]).to eq(:originate => {:always => :true, :metric_type => 2, :route_map => 'ABCD'})
+    end
+
+    it 'should contain \'{originate => {metric-type => 2}}\'' do
+      expect(described_class.new(:name => 'ospf', :default_information => '{originate => {metric-type => 2}}')[:default_information]).to eq(:originate => {:metric_type => 2})
+    end
   end
 end
