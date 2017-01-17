@@ -44,13 +44,11 @@ Puppet::Type.newtype(:ospf) do
 
     originate_attributes = [:always, :metric, :metric_type, :route_map]
 
-    newvalues(:fasle)
-    newvalues(/\A.*\Z/)
-
     defaultto(:false)
 
     validate do |value|
-      if value.is_a?(String)
+      case value
+      when String
         if value.include?('=>')
           begin
             hash = eval(value.gsub(/([\w-]+)/, '\'\1\''))
@@ -60,7 +58,7 @@ Puppet::Type.newtype(:ospf) do
           if hash.has_key?('originate')
             hash['originate'].each_key do |key|
               unless originate_attributes.include?(key.gsub(/-/, '_').to_sym)
-                raise ArgumentError, '\'%s\' is not valid originate attribute' % key
+                raise ArgumentError, '\'%s\' is not a valid originate attribute' % key
               end
             end
           else
@@ -74,13 +72,36 @@ Puppet::Type.newtype(:ospf) do
           while not array.empty?
             attribute = array.shift.gsub(/-/, '_').to_sym
             unless originate_attributes.include?(attribute)
-              raise ArgumentError, '\'%s\' is not a valud originate attribute' % attribute
+              raise ArgumentError, '\'%s\' is not a valid originate attribute' % attribute
             end
             unless attribute == :always
               array.shift
             end
           end
         end
+      when Symbol
+        unless value == :false or value == :originate
+          raise ArgumentError, '\'%s\' is an unknown value' % value
+        end
+      when FalseClass
+      when Hash
+        if value.has_key?(:originate)
+          value[:originate].each_key do |key|
+            unless originate_attributes.include?(key.to_s.gsub(/-/, '_').to_sym)
+              raise ArgumentError, '\'%s\' is not a valid originate attribute' % key
+            end
+          end
+        elsif value.has_key?('originate')
+          value['originate'].each_key do |key|
+            unless originate_attributes.include?(key.to_s.gsub(/-/, '_').to_sym)
+              raise ArgumentError, '\'%s\' is not a valid originate attribute' % key
+            end
+          end
+        else
+          raise ArgumentError, '\'originate\' attribute not found'
+        end
+      else
+        raise ArgumentError, '\'%s\' is an unknown value' % value
       end
     end
 
@@ -132,6 +153,13 @@ Puppet::Type.newtype(:ospf) do
 
   newproperty(:network) do
     desc %q{ Enable routing on an IP network. }
+
+    # validate do |value|
+    #   case value
+    #   when String
+    #
+    # end
+
     munge do |value|
       if value.is_a?(String) and value.include?('=>')
         eval(value.gsub(/([\w\.\/:]+)/, '\'\1\''))
