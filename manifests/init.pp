@@ -15,10 +15,10 @@ class quagga (
   }
 
   file { '/etc/sysconfig/quagga':
-    ensure => present,
-    owner  => root,
-    group  => root,
-    mode   => '0644',
+    ensure  => present,
+    owner   => root,
+    group   => root,
+    mode    => '0644',
     content => file('quagga/quagga'),
     require => Package['quagga'],
     notify  => Service['zebra', 'bgpd', 'ospfd'],
