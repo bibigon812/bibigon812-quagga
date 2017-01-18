@@ -121,22 +121,62 @@ describe Puppet::Type.type(:ospf) do
   end
 
   describe 'network' do
-    it 'should support orignate as a value' do
-      expect { described_class.new(:name => 'ospf', :network => :originate) }.to_not raise_error
+    it 'should not support a Symbol as a value' do
+      expect { described_class.new(:name => 'ospf', :network => :originate) }.to raise_error(Puppet::Error, /The property should be a Hash/)
     end
 
-    # it 'should support  as a value' do
-    #   expect { described_class.new(:name => 'ospf', :network => 'originate always') }.to_not raise_error
-    # end
-    #
-    # it 'should not support \'{originate => }\' as a value' do
-    #   expect { described_class.new(:name => 'ospf', :network => '{originate => }') }.to raise_error(Puppet::Error, /is not a Hash/)
-    # end
-    #
-    # it 'should support \'{originate => {metric-type => 2}}\' as a value' do
-    #   expect { described_class.new(:name => 'ospf', :network => '{originate => {metric-type => 2}}') }.to_not raise_error
-    # end
-    #
+    it 'should support a String as a value' do
+      expect { described_class.new(:name => 'ospf', :network => '{ 10.0.0.0/24 => { area => 0.0.0.0 } }') }.to_not raise_error
+    end
+
+    it 'should support a String as a value' do
+      expect { described_class.new(:name => 'ospf', :network => '{ 10.0.0.0/24: { area: 0.0.0.0 } }') }.to_not raise_error
+    end
+
+    it 'should support a String as a value' do
+      expect { described_class.new(:name => 'ospf', :network => '{ 10.0.0.0/24: { :area => 0.0.0.0 } }') }.to_not raise_error
+    end
+
+    it 'should not support \'{ 10.0.0.0 => { area => 0 } }\' as a value' do
+      expect { described_class.new(:name => 'ospf', :network => '{ 10.0.0.0 => { area => 0 } }') }.to raise_error(Puppet::Error, /is not a valid network/)
+    end
+
+    it 'should not support \'{ 10.0.0.0/24 => { aria => 0 } }\' as a value' do
+      expect { described_class.new(:name => 'ospf', :network => '{ 10.0.0.0/24 => { aria => 0 } }') }.to raise_error(Puppet::Error, /should contain a 'area' key/)
+    end
+
+    it 'should not support \'{ 10.0.0.0/24 => { area => 0 } }\' as a value' do
+      expect { described_class.new(:name => 'ospf', :network => '{ 10.0.0.0/24 => { area => 0 } }') }.to raise_error(Puppet::Error, /is not a valid area/)
+    end
+
+    it 'should support a Hash as a value' do
+      expect { described_class.new(:name => 'ospf', :network => {'10.0.0.0/24' => {:area => '0.0.0.0'}}) }.to_not raise_error
+    end
+
+    it 'should not support { \'10.0.0.0\' => { \'area\' => \'0\' } } as a value' do
+      expect { described_class.new(:name => 'ospf', :network => { '10.0.0.0' => { 'area' => '0' } }) }.to raise_error(Puppet::Error, /is not a valid network/)
+    end
+
+    it 'should not support { \'10.0.0.0/24\' => { \'aria\' => \'0\' } } as a value' do
+      expect { described_class.new(:name => 'ospf', :network => { '10.0.0.0/24' => { 'aria' => '0' } }) }.to raise_error(Puppet::Error, /should contain a 'area' key/)
+    end
+
+    it 'should not support { \'10.0.0.0/24\' => { \'area\' => \'A\' } } as a value' do
+      expect { described_class.new(:name => 'ospf', :network => { '10.0.0.0/24' => { 'area' => '0' } }) }.to raise_error(Puppet::Error, /is not a valid area/)
+    end
+
+    it 'should contain \'{ 10.0.0.0/24 => { :area => \'0.0.0.0\' } }\'' do
+      expect(described_class.new(:name => 'ospf', :network => '{ 10.0.0.0/24 => { area => 0.0.0.0 } }')[:network]).to eq('10.0.0.0/24' => { :area => '0.0.0.0' })
+    end
+
+    it 'should contain \'{ 10.0.0.0/24 => { :area => \'0.0.0.0\' } }\'' do
+      expect(described_class.new(:name => 'ospf', :network => '{ 10.0.0.0/24: { area: 0.0.0.0 } }')[:network]).to eq('10.0.0.0/24' => { :area => '0.0.0.0' })
+    end
+
+    it 'should contain \'{ 10.0.0.0/24 => { :area => \'0.0.0.0\' } }\'' do
+      expect(described_class.new(:name => 'ospf', :network => { '10.0.0.0/24' => { 'area' => '0.0.0.0' } })[:network]).to eq('10.0.0.0/24' => { :area => '0.0.0.0' })
+    end
+
     # it 'should contain { :originate => { :always => :true, :metric_type => 2, :route_map => \'ABCD\'} }' do
     #   expect(described_class.new(:name => 'ospf', :network => 'originate always metric-type 2 route-map ABCD')[:network]).to eq(:originate => {:always => :true, :metric_type => 2, :route_map => 'ABCD'})
     # end

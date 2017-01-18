@@ -154,15 +154,71 @@ Puppet::Type.newtype(:ospf) do
   newproperty(:network) do
     desc %q{ Enable routing on an IP network. }
 
-    # validate do |value|
-    #   case value
-    #   when String
-    #
-    # end
+    validate do |value|
+      case value
+      when String
+        if value.include?('=>') or value =~ /\w:\s*([\w\{])/
+          begin
+            hash = eval(value.gsub(/(\w):\s*([\w\{])/, '\1 => \2').gsub(/:?([\w\.\/]+)/, '\'\1\''))
+          rescue SyntaxError => e
+            raise ArgumentError, '\'%s\' is not a Hash' % value
+          end
+          hash.each do |network, area|
+            unless network =~ /\A\d+\.\d+\.\d+\.\d+\/\d+\Z/
+              raise ArgumentError, '\'%s\' is not a valid network' % network
+            end
+            if area.has_key?('area')
+              unless area['area'] =~ /\A\d+\.\d+\.\d+\.\d+\Z/
+                raise ArgumentError, '\'%s\' is not a valid area' % area['area']
+              end
+            else
+              raise ArgumentError, '\'%s\' should contain a \'area\' key' % network
+            end
+          end
+        else
+          raise ArgumentError, 'The property should be a Hash'
+        end
+      when Hash
+        value.each do |network, area|
+          unless network =~ /\A\d+\.\d+\.\d+\.\d+\/\d+\Z/
+            raise ArgumentError, '\'%s\' is not a valid network' % network
+          end
+          if area.has_key?('area')
+            unless area['area'] =~ /\A\d+\.\d+\.\d+\.\d+\Z/
+              raise ArgumentError, '\'%s\' is not a valid area' % area['area']
+            end
+          elsif area.has_key?(:area)
+            unless area[:area] =~ /\A\d+\.\d+\.\d+\.\d+\Z/
+              raise ArgumentError, '\'%s\' is not a valid area' % area[:area]
+            end
+          else
+            raise ArgumentError, '\'%s\' should contain a \'area\' key' % network
+          end
+        end
+      else
+        raise ArgumentError, 'The property should be a Hash'
+      end
+    end
 
     munge do |value|
-      if value.is_a?(String) and value.include?('=>')
-        eval(value.gsub(/([\w\.\/:]+)/, '\'\1\''))
+      case value
+      when String
+        hash = eval(value.gsub(/(\w):\s*([\w\{])/, '\1 => \2').gsub(/:?([\w\.\/]+)/, '\'\1\''))
+        new_hash = {}
+        hash.each do |network, area|
+          new_hash[network] = { :area => area['area'] }
+        end
+        new_hash
+      when Hash
+        new_hash = {}
+        value.each do |network, area|
+          if area.has_key?('area')
+            new_hash[network] = { :area => area['area']}
+          else
+            new_hash[network] = area
+          end
+        end
+        new_hash
       else
         value
       end
