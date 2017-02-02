@@ -76,47 +76,55 @@ describe Puppet::Type.type(:ospf) do
 
   describe 'default_information' do
     it 'should support orignate as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => :originate) }.to_not raise_error
+      expect { described_class.new(:name => 'ospf', :default_information => { :originate => :true }) }.to_not raise_error
     end
 
-    it 'should support false as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => :false) }.to_not raise_error
-    end
-
-    it 'should support hash as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => {:originate => {:always => :true}}) }.to_not raise_error
+    it 'should support {:originate => :false} as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => { :originate => :false }) }.to_not raise_error
     end
 
     it 'should support hash as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => {'originate' => {'always' => 'true'}}) }.to_not raise_error
+      expect { described_class.new(:name => 'ospf', :default_information => { :originate => :true, :always => :true }) }.to_not raise_error
     end
 
     it 'should support hash as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => {'originate' => {'always' => true}}) }.to_not raise_error
+      expect { described_class.new(:name => 'ospf', :default_information => { 'originate' => 'true', 'always' => 'true' }) }.to_not raise_error
     end
 
-    it 'should support  as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate always') }.to_not raise_error
+    it 'should support hash as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => { 'originate' => true, 'always' => true }) }.to_not raise_error
     end
 
-    it 'should not support \'{originate => }\' as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => '{originate => }') }.to raise_error(Puppet::Error, /is not a Hash/)
+    it 'should not support :origenate as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => :origenate) }.to raise_error(Puppet::Error, /has an unsupported type/)
     end
 
-    it 'should not support \'origenate\' as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => :origenate) }.to raise_error(Puppet::Error, /unknown value/)
+    it 'should not support { :originate => true, :metric_type => \'A\' } as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => { :originate => true, :metric_type => 'A' }) }.to raise_error(Puppet::Error, /Value of metric-type must be 1 or 2 but not A/)
     end
 
-    it 'should support \'{originate => {metric-type => 2}}\' as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => '{originate => {metric-type => 2}}') }.to_not raise_error
+    it 'should not support { :originate => true, :metric_type => 3 } as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => { :originate => true, :metric_type => 3 }) }.to raise_error(Puppet::Error, /Value of metric-type must be 1 or 2 but not 3/)
     end
 
-    it 'should contain { :originate => { :always => :true, :metric_type => 2, :route_map => \'ABCD\'} }' do
-      expect(described_class.new(:name => 'ospf', :default_information => 'originate always metric-type 2 route-map ABCD')[:default_information]).to eq(:originate => {:always => :true, :metric_type => 2, :route_map => 'ABCD'})
+    it 'should not support { :originate => true, :metric => -3 } as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => { :originate => true, :metric => -3 }) }.to raise_error(Puppet::Error, /Value of metric must be between 0 and 16777214 but not -3/)
     end
 
-    it 'should contain \'{originate => {metric-type => 2}}\'' do
-      expect(described_class.new(:name => 'ospf', :default_information => '{originate => {metric-type => 2}}')[:default_information]).to eq(:originate => {:metric_type => 2})
+    it 'should not support { \'originate\' => {\'metric-type => 2}}\' as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => { 'originate' => { 'metric-type' => 2}}) }.to raise_error(Puppet::Error, /is not a boolean value/)
+    end
+
+    it 'should contain { :originate => :true , :always => :true, :metric_type => 2, :route_map => \'ABCD\' }' do
+      expect(described_class.new(:name => 'ospf', :default_information => { 'originate' => :true, 'always' => true, 'metric-type' => 2, 'route-map' => 'ABCD' })[:default_information]).to eq(:originate => :true, :always => :true, :metric_type => 2, :route_map => 'ABCD')
+    end
+
+    it 'should contain { :originate => :true, :metric_type => 2}' do
+      expect(described_class.new(:name => 'ospf', :default_information => { :originate => :true, 'metric-type' => 2 })[:default_information]).to eq(:originate => :true, :metric_type => 2)
+    end
+
+    it 'should contain { :originate => :true, :metric_type\' => 2}' do
+      expect(described_class.new(:name => 'ospf', :default_information => { :originate => :true, 'metric-type' => '2' })[:default_information]).to eq(:originate => :true, :metric_type => 2)
     end
   end
 
