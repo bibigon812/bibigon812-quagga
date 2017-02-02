@@ -25,6 +25,13 @@ Puppet::Type.newtype(:ospf) do
       router_id           => 192.168.0.1,
     }
   }
+
+  class String
+    def is_number?
+      true if Float(self) rescue false
+    end
+  end
+
   ensurable
 
   newparam(:name) do
@@ -39,117 +46,57 @@ Puppet::Type.newtype(:ospf) do
     defaultto(:cisco)
   end
 
+
   newproperty(:default_information) do
     desc %q{Control distribution of default information.}
 
-    originate_attributes = [:always, :metric, :metric_type, :route_map]
+    keys = [ :originate, :always, :metric, :metric_type, :route_map ]
 
-    defaultto(:false)
+    defaultto(:originate => :false)
 
     validate do |value|
       case value
-      when String
-        if value.include?('=>')
-          begin
-            hash = eval(value.gsub(/([\w-]+)/, '\'\1\''))
-          rescue SyntaxError => e
-            raise ArgumentError, '\'%s\' is not a Hash' % value
-          end
-          if hash.has_key?('originate')
-            hash['originate'].each_key do |key|
-              unless originate_attributes.include?(key.gsub(/-/, '_').to_sym)
-                raise ArgumentError, '\'%s\' is not a valid originate attribute' % key
-              end
-            end
-          else
-            raise ArgumentError, '\'%s\' must be \'originate\'' % hash.keys.first
-          end
-        else
-          array = value.split(/\s+/)
-          unless array.shift == 'originate'
-            raise ArgumentError, 'first word must be \'originate\''
-          end
-          while not array.empty?
-            attribute = array.shift.gsub(/-/, '_').to_sym
-            unless originate_attributes.include?(attribute)
-              raise ArgumentError, '\'%s\' is not a valid originate attribute' % attribute
-            end
-            unless attribute == :always
-              array.shift
-            end
-          end
-        end
-      when Symbol
-        unless value == :false or value == :originate
-          raise ArgumentError, '\'%s\' is an unknown value' % value
-        end
-      when FalseClass
       when Hash
-        if value.has_key?(:originate)
-          value[:originate].each_key do |key|
-            unless originate_attributes.include?(key.to_s.gsub(/-/, '_').to_sym)
-              raise ArgumentError, '\'%s\' is not a valid originate attribute' % key
+        value.each do |key, value|
+          unless keys.include?(key.to_s.gsub(/-/, '_').to_sym)
+            raise ArgumentError, '\'%s\' is not a valid originate attribute' % key
+          end
+          case key
+          when :originate, 'originate', :always, 'always'
+            unless [ :false, :true ].include?(value.to_s.to_sym)
+              raise ArgumentError, '\'%s\' is not a boolean value' % value
+            end
+          when 'metric-type', 'metric_type', :metric_type
+            unless value.to_s.is_number? and [1, 2].include?(value.to_s.to_i)
+              raise ArgumentError, 'Value of metric-type must be 1 or 2 but not %s' % value
+            end
+          when 'metric', :metric
+            unless value.to_s.is_number? and value.to_s.to_i >= 0 and value.to_s.to_i <= 16777214
+              raise ArgumentError, 'Value of metric must be between 0 and 16777214 but not %s' % value
             end
           end
-        elsif value.has_key?('originate')
-          value['originate'].each_key do |key|
-            unless originate_attributes.include?(key.to_s.gsub(/-/, '_').to_sym)
-              raise ArgumentError, '\'%s\' is not a valid originate attribute' % key
-            end
-          end
-        else
-          raise ArgumentError, '\'originate\' attribute not found'
         end
       else
-        raise ArgumentError, '\'%s\' is an unknown value' % value
+        raise ArgumentError, '\'%s\' has an unsupported type' % value
       end
     end
 
     munge do |value|
-      if value.is_a?(String)
-        if value.include?('=>')
-          hash = eval(value.gsub(/([\w-]+)/, '\'\1\''))
-          new_hash = {}
-          new_hash[:originate] = {}
-          hash['originate'].each do |key, value|
-            attribute = key.gsub(/-/, '_').to_sym
-            if originate_attributes.include?(attribute)
-              case attribute
-              when :always
-                new_hash[:originate][attribute] = :true
-              when :metric, :metric_type
-                new_hash[:originate][attribute] = value.to_i
-              else
-                new_hash[:originate][attribute] = value
-              end
-            end
-          end
-          new_hash
+      hash = {}
+      value.each do |key, value|
+        case key
+        when :originate, 'originate', :always, 'always'
+          hash[key.to_s.gsub(/-/, '_').to_sym] = value.to_s.to_sym
+        when 'metric-type', 'metric_type', :metric_type, 'metric', :metric
+          hash[key.to_s.gsub(/-/, '_').to_sym] = value.to_s.to_i
         else
-          array = value.split(/\s/)
-          new_hash = {}
-          new_hash[:originate] = {}
-          array.shift
-          while not array.empty?
-            attribute = array.shift.gsub(/-/, '_').to_sym
-            if originate_attributes.include?(attribute)
-              case attribute
-              when :always
-                new_hash[:originate][:always] = :true
-              when :metric_type, :metric
-                new_hash[:originate][attribute] = array.shift.to_i
-              else
-                new_hash[:originate][attribute] = array.shift
-              end
-            end
-          end
-          new_hash
+          hash[key.to_s.gsub(/-/, '_').to_sym] = value
         end
-      else
-        value
       end
+      hash
     end
   end
+
 
   newproperty(:network) do
     desc %q{ Enable routing on an IP network. }
