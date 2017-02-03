@@ -14,13 +14,22 @@ Puppet::Type.newtype(:ospf) do
         metric_type => 2,
         route_map   => ROUTE_MAP,
       },
-      network             => {
-        192.168.0.0 => {
-          area => 0.0.0.0,
+      area                => {
+        0.0.0.0 => {
+          network => [
+            10.0.0.0/24,
+            192.168.0.0/24,
+          ],
+          ...
+        },
+        0.0.0.1 => {
+          network => [
+            10.0.10.0/24,
+          ],
         },
       },
       redistribute        => {
-        ..
+        ...
       },
       router_id           => 192.168.0.1,
     }
@@ -77,7 +86,7 @@ Puppet::Type.newtype(:ospf) do
           end
         end
       else
-        raise ArgumentError, '\'%s\' has an unsupported type' % value
+        raise ArgumentError, 'This property should be a Hash' % value
       end
     end
 
@@ -98,77 +107,64 @@ Puppet::Type.newtype(:ospf) do
   end
 
 
-  newproperty(:network) do
-    desc %q{ Enable routing on an IP network. }
+  newproperty(:area) do
+    desc %q{Enable routing on an IP network.}
+
+    keys = [ :network ]
 
     validate do |value|
       case value
-      when String
-        if value.include?('=>') or value =~ /\w:\s*([\w\{])/
-          begin
-            hash = eval(value.gsub(/(\w):\s*([\w\{])/, '\1 => \2').gsub(/:?([\w\.\/]+)/, '\'\1\''))
-          rescue SyntaxError => e
-            raise ArgumentError, '\'%s\' is not a Hash' % value
+      when Hash
+        value.each do |key, value|
+          unless key =~ /\A\d+\.\d+\.\d+\.\d+\Z/
+            raise ArgumentError, '\'%s\' is not a valid area' % key
           end
-          hash.each do |network, area|
-            unless network =~ /\A\d+\.\d+\.\d+\.\d+\/\d+\Z/
-              raise ArgumentError, '\'%s\' is not a valid network' % network
-            end
-            if area.has_key?('area')
-              unless area['area'] =~ /\A\d+\.\d+\.\d+\.\d+\Z/
-                raise ArgumentError, '\'%s\' is not a valid area' % area['area']
+          value.each do |key, value|
+            if keys.include?(key.to_sym)
+              case value
+              when Array
+                value.each do |value|
+                  unless value =~ /\A\d+\.\d+\.\d+\.\d+\/\d+\Z/
+                    raise ArgumentError, '\'%s\' is not a valid network' % value
+                  end
+                end
+              when String
+                unless value =~ /\A\d+\.\d+\.\d+\.\d+\/\d+\Z/
+                  raise ArgumentError, '\'%s\' is not a valid network' % value
+                end
+              else
+                raise ArgumentError, '\'%s\' is not a valid network' % value
               end
             else
-              raise ArgumentError, '\'%s\' should contain a \'area\' key' % network
+              raise ArgumentError, 'OSPF area does not contain this attribute: %s' % key
             end
-          end
-        else
-          raise ArgumentError, 'The property should be a Hash'
-        end
-      when Hash
-        value.each do |network, area|
-          unless network =~ /\A\d+\.\d+\.\d+\.\d+\/\d+\Z/
-            raise ArgumentError, '\'%s\' is not a valid network' % network
-          end
-          if area.has_key?('area')
-            unless area['area'] =~ /\A\d+\.\d+\.\d+\.\d+\Z/
-              raise ArgumentError, '\'%s\' is not a valid area' % area['area']
-            end
-          elsif area.has_key?(:area)
-            unless area[:area] =~ /\A\d+\.\d+\.\d+\.\d+\Z/
-              raise ArgumentError, '\'%s\' is not a valid area' % area[:area]
-            end
-          else
-            raise ArgumentError, '\'%s\' should contain a \'area\' key' % network
           end
         end
       else
-        raise ArgumentError, 'The property should be a Hash'
+        raise ArgumentError, 'This property should be a Hash'
       end
     end
 
     munge do |value|
-      case value
-      when String
-        hash = eval(value.gsub(/(\w):\s*([\w\{])/, '\1 => \2').gsub(/:?([\w\.\/]+)/, '\'\1\''))
-        new_hash = {}
-        hash.each do |network, area|
-          new_hash[network] = { :area => area['area'] }
-        end
-        new_hash
-      when Hash
-        new_hash = {}
-        value.each do |network, area|
-          if area.has_key?('area')
-            new_hash[network] = { :area => area['area']}
+      hash = {}
+      value.each do |area, value|
+        hash[area] = {}
+        value.each do |key, value|
+          case key
+          when 'network', :network
+            case value
+            when Array
+              hash[area][:network] = value
+            else
+              hash[area][:network] ||= []
+              hash[area][:network] << value
+            end
           else
-            new_hash[network] = area
+            hash[area][key] = value
           end
         end
-        new_hash
-      else
-        value
       end
+      hash
     end
   end
 
