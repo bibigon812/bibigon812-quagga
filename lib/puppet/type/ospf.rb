@@ -182,7 +182,7 @@ Puppet::Type.newtype(:ospf) do
 
   newproperty(:router_id, :required_feature => :router_id) do
     desc %q{ router-id for the OSPF process. }
-    newvalues(/^[\d\.]+$/)
+    newvalues(/\A\d+\.\d+\.\d+\.\d+\Z/)
   end
 
   autorequire(:package) do
