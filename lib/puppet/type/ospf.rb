@@ -20,7 +20,6 @@ Puppet::Type.newtype(:ospf) do
             10.0.0.0/24,
             192.168.0.0/24,
           ],
-          ...
         },
         0.0.0.1 => {
           network => [
@@ -29,7 +28,12 @@ Puppet::Type.newtype(:ospf) do
         },
       },
       redistribute        => {
-        ...
+        bgp       => {
+          metric      => 10,
+          metric_type => 2,
+          route_map   => 'ABCD',
+        },
+        connected => true,
       },
       router_id           => 192.168.0.1,
     }
@@ -86,7 +90,7 @@ Puppet::Type.newtype(:ospf) do
           end
         end
       else
-        raise ArgumentError, 'This property should be a Hash' % value
+        raise ArgumentError, 'This property should be a Hash'
       end
     end
 
@@ -169,14 +173,65 @@ Puppet::Type.newtype(:ospf) do
   end
 
   newproperty(:redistribute) do
-
     desc %q{ Redistribute information from another routing protocol. }
-    munge do |value|
-      if value.is_a?(String)
-        eval(value.gsub(/(\w+)/, '\'\1\''))
+
+    protocols = [ :babel, :bgp, :connected, :isis, :kernel, :pim, :rip, :static ]
+    keys = [ :metric, :metric_type, :route_map ]
+
+    validate do |value|
+      case value
+      when Hash
+        value.each do |protocol, value|
+          unless protocols.include?(protocol.to_s.to_sym)
+            raise ArgumentError, "OSPF protocol does not support a redistribution of #{protocol}"
+          end
+          case value
+          when true, 'true', :true
+          when Hash
+            value.each do |key, value|
+              unless keys.include?(key.to_s.gsub(/-/, '_').to_sym)
+                raise ArgumentError, "OSPF protocol does not support #{key} redistribution parmeter of #{protocol}"
+              end
+              case key
+              when 'metric-type', 'metric_type', :metric_type
+                unless value.to_s.is_number? and [1, 2].include?(value.to_s.to_i)
+                  raise ArgumentError, 'Value of metric-type must be 1 or 2 but not %s' % value
+                end
+              when 'metric', :metric
+                unless value.to_s.is_number? and value.to_s.to_i >= 0 and value.to_s.to_i <= 16777214
+                  raise ArgumentError, 'Value of metric must be between 0 and 16777214 but not %s' % value
+                end
+              end
+            end
+          else
+            raise ArgumentError, 'The redistribution parameter is unknown: %s' % value
+          end
+        end
       else
-        value
+        raise ArgumentError, 'This property should be a Hash'
       end
+    end
+
+    munge do |value|
+      hash = {}
+      value.each do |protocol, value|
+        protocol_sym = protocol.to_s.to_sym
+        case value
+        when true, 'true', :true
+          hash[protocol_sym] = :true
+        when Hash
+          value.each do |key, value|
+            hash[protocol_sym] ||= {}
+            case key
+            when 'metric', :metric, 'metric-type', 'metric_type', :metric_type
+              hash[protocol_sym][key.to_s.gsub(/-/, '_').to_sym] = value.to_s.to_i
+            else
+              hash[protocol_sym][key.to_s.gsub(/-/, '_').to_sym] = value.to_s
+            end
+          end
+        end
+      end
+      hash
     end
   end
 
