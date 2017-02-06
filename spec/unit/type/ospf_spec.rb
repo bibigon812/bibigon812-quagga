@@ -207,4 +207,14 @@ describe Puppet::Type.type(:ospf) do
       expect(described_class.new(:name => 'ospf', :redistribute => { :bgp => { :metric => 10, :metric_type => 2, :route_map => 'ABCD' }, :connected => true })[:redistribute]).to eq({ :bgp => { :metric => 10, :metric_type => 2, :route_map => 'ABCD' }, :connected => :true })
     end
   end
+
+  describe 'router_id' do
+    it 'should support \'1.1.1.1\' as a value' do
+      expect { described_class.new(:name => 'ospf', :router_id => '1.1.1.1') }.to_not raise_error
+    end
+
+    it 'should contain { :bgp => { :metric => 10, :metric_type => 2, :route_map => \'ABCD\' }, :connected => true }' do
+      expect(described_class.new(:name => 'ospf', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
+    end
+  end
 end
