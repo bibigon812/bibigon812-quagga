@@ -59,29 +59,5 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 193.160.158.96/28 le 32'
         :router_id => "10.255.78.4",
       })
     end
-    #
-    # it 'should return the resource tun0' do
-    #   expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-    #     :ensure => :disabled,
-    #     :name => 'tun0',
-    #     :provider => :quagga,
-    #   })
-    # end
-    #
-    # it 'should return the resource tun1' do
-    #   expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-    #     :ensure => :enabled,
-    #     :name => 'tun1',
-    #     :provider => :quagga,
-    #     :cost => 100,
-    #     :dead_interval => 8,
-    #     :hello_interval => 2,
-    #     :mtu_ignore => :true,
-    #     :network_type => :broadcast,
-    #     :priority => 100,
-    #     :retransmit_interval => 4,
-    #     :transmit_delay => 1,
-    #   })
-    # end
   end
 end
