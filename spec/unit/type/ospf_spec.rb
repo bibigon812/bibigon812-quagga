@@ -28,7 +28,7 @@ describe Puppet::Type.type(:ospf) do
       end
     end
 
-    [:abr_type, :default_information, :area, :redistribute, :router_id,
+    [:abr_type, :default_information, :redistribute, :router_id,
     ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
@@ -75,136 +75,132 @@ describe Puppet::Type.type(:ospf) do
   end
 
   describe 'default_information' do
-    it 'should support orignate as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { :originate => :true }) }.to_not raise_error
+    it 'should support String as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate') }.to_not raise_error
     end
 
-    it 'should support {:originate => :false} as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { :originate => :false }) }.to_not raise_error
+    it 'should support String as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate always') }.to_not raise_error
     end
 
-    it 'should support hash as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { :originate => :true, :always => :true }) }.to_not raise_error
+    it 'should support String as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate always metric 100 metric-type 1') }.to_not raise_error
     end
 
-    it 'should support hash as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { 'originate' => 'true', 'always' => 'true' }) }.to_not raise_error
+    it 'should support String as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate always metric 100') }.to_not raise_error
     end
 
-    it 'should support hash as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { 'originate' => true, 'always' => true }) }.to_not raise_error
+    it 'should support String as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate metric 100 route-map ABCD') }.to_not raise_error
     end
 
-    it 'should not support :origenate as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => :origenate) }.to raise_error(Puppet::Error, /This property should be a Hash/)
+    it 'should support String as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate route-map ABCD') }.to_not raise_error
     end
 
-    it 'should not support { :originate => true, :metric_type => \'A\' } as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { :originate => true, :metric_type => 'A' }) }.to raise_error(Puppet::Error, /Value of metric-type must be 1 or 2 but not A/)
+    it 'should not support \'origenate\' as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'origenate') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should not support { :originate => true, :metric_type => 3 } as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { :originate => true, :metric_type => 3 }) }.to raise_error(Puppet::Error, /Value of metric-type must be 1 or 2 but not 3/)
+    it 'should not support \'originate metric-type A\' as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate metric-type A') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should not support { :originate => true, :metric => -3 } as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { :originate => true, :metric => -3 }) }.to raise_error(Puppet::Error, /Value of metric must be between 0 and 16777214 but not -3/)
+    it 'should not support \'originate metric-type 3\' as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate metric-type 3') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should not support { \'originate\' => {\'metric-type => 2}}\' as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => { 'originate' => { 'metric-type' => 2}}) }.to raise_error(Puppet::Error, /is not a boolean value/)
+    it 'should not support \'originate metric -3\' as a value' do
+      expect { described_class.new(:name => 'ospf', :default_information => 'originate metric -3') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should contain { :originate => :true , :always => :true, :metric_type => 2, :route_map => \'ABCD\' }' do
-      expect(described_class.new(:name => 'ospf', :default_information => { 'originate' => :true, 'always' => true, 'metric-type' => 2, 'route-map' => 'ABCD' })[:default_information]).to eq(:originate => :true, :always => :true, :metric_type => 2, :route_map => 'ABCD')
+    it 'should contain \'originate always metric-type 2 route_map ABCD\'' do
+      expect(described_class.new(:name => 'ospf', :default_information => 'originate always metric-type 2 route-map ABCD')[:default_information]).to eq('originate always metric-type 2 route-map ABCD')
     end
 
-    it 'should contain { :originate => :true, :metric_type => 2}' do
-      expect(described_class.new(:name => 'ospf', :default_information => { :originate => :true, 'metric-type' => 2 })[:default_information]).to eq(:originate => :true, :metric_type => 2)
-    end
-
-    it 'should contain { :originate => :true, :metric_type\' => 2}' do
-      expect(described_class.new(:name => 'ospf', :default_information => { :originate => :true, 'metric-type' => '2' })[:default_information]).to eq(:originate => :true, :metric_type => 2)
+    it 'should contain \'originate metric_type 2' do
+      expect(described_class.new(:name => 'ospf', :default_information => 'originate metric-type 2')[:default_information]).to eq('originate metric-type 2')
     end
   end
 
-  describe 'area' do
-    it 'should not support a String as a value' do
-      expect { described_class.new(:name => 'ospf', :area => '{ 0.0.0.0 => { network => 10.0.0.0/24 } }') }.to raise_error(Puppet::Error, /This property should be a Hash/)
-    end
-
-    it 'should support a Hash as a value' do
-      expect { described_class.new(:name => 'ospf', :area => { '10.0.0.0' => { :network => '10.0.0.0/24' } }) }.to_not raise_error
-    end
-
-    it 'should not support { \'0.0.0.0\' => { \'network\' => \'0.0.0.0\' } } as a value' do
-      expect { described_class.new(:name => 'ospf', :area => { '0.0.0.0' => { 'network' => '0.0.0.0' } }) }.to raise_error(Puppet::Error, /is not a valid network/)
-    end
-
-    it 'should not support { \'0.0.0.0\' => { \'netwark\' => \'10.0.0.0/24\' } } as a value' do
-      expect { described_class.new(:name => 'ospf', :area => { '0.0.0.0' => { 'netwark' => '10.0.0.0/24' } }) }.to raise_error(Puppet::Error, /OSPF area does not contain this attribute: netwark/)
-    end
-
-    it 'should not support { \'0.0.0.0\' => { \'network\' => \'10.0.0.0\' } } as a value' do
-      expect { described_class.new(:name => 'ospf', :area => { '0.0.0.0' => { :network => '10.0.0.0' } }) }.to raise_error(Puppet::Error, /is not a valid network/)
-    end
-
-    it 'should contain { \'0.0.0.0\' => { :network => \'10.0.0.0/24\' } }\'' do
-      expect(described_class.new(:name => 'ospf', :area => { '0.0.0.0' => { :network => '10.0.0.0/24' } })[:area]).to eq('0.0.0.0' => { :network => [ '10.0.0.0/24' ] })
-    end
-
-    it 'should contain { \'0.0.0.0\' => { :network => [ \'10.0.0.0/24\', \'172.16.0.0/24\' ] } }' do
-      expect(described_class.new(:name => 'ospf', :area => { '0.0.0.0' => { :network => [ '10.0.0.0/24', '172.16.0.0/24' ] } })[:area]).to eq('0.0.0.0' => { :network => [ '10.0.0.0/24', '172.16.0.0/24' ] })
-    end
-  end
+  # describe 'area' do
+  #   it 'should not support \'0.0.0.0\' as a value' do
+  #     expect { described_class.new(:name => 'ospf', :area => '0.0.0.0') }.to raise_error(Puppet::Error, /Invalid value/)
+  #   end
+  #
+  #   it 'should support \'0.0.0.0 authentication message-digest\' as a value' do
+  #     expect { described_class.new(:name => 'ospf', :area => '0.0.0.0 authentication message-digest') }.to_not raise_error
+  #   end
+  #
+  #   it 'should support \'0.0.0.0 default-cost 100\' as a value' do
+  #     expect { described_class.new(:name => 'ospf', :area => '0.0.0.0 default-cost 100') }.to_not raise_error
+  #   end
+  #
+  #   it 'should support \'0.0.0.0 export-list ABCD\' as a value' do
+  #     expect { described_class.new(:name => 'ospf', :area => '0.0.0.0 export-list ABCD') }.to_not raise_error
+  #   end
+  #
+  #   it 'should support \'0.0.0.0 filter-list prefix ABCD-EF\' as a value' do
+  #     expect { described_class.new(:name => 'ospf', :area => '0.0.0.0 filter-list prefix ABCD-EF') }.to_not raise_error
+  #   end
+  #
+  #   it 'should contain \'0.0.0.0 nssa\'' do
+  #     expect(described_class.new(:name => 'ospf', :area => '0.0.0.0 nssa')[:area]).to eq('0.0.0.0 nssa')
+  #   end
+  #
+  #   it 'should contain \'0.0.0.0 nssa translate-always no-summary\'' do
+  #     expect(described_class.new(:name => 'ospf', :area => '0.0.0.0 nssa translate-always no-summary')[:area]).to eq('0.0.0.0 nssa translate-always no-summary')
+  #   end
+  # end
 
   describe 'redistribute' do
-    it 'should not support a String as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => '{ :connected => { :route_map => \'ABCD\' } }') }.to raise_error(Puppet::Error, /This property should be a Hash/)
+    it 'should support a String as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'connected route-map ABCD-EF') }.to_not raise_error
     end
 
-    it 'should support a Hash as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => { :connected => true }) }.to_not raise_error
+    it 'should support a String as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'connected') }.to_not raise_error
     end
 
-    it 'should not support { \'bgp\' => { \'metric-type\' => \'5\' } } as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => { 'bgp' => { 'metric-type' => '5' } }) }.to raise_error(Puppet::Error, /Value of metric-type must be 1 or 2 but not 5/)
+    it 'should not support \'bgp metric-type 5\' as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'bgp metric-type 5') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should not support { \'bgp\' => { \'metric\' => \'-5\' } } as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => { 'bgp' => { 'metric' => '-5' } }) }.to raise_error(Puppet::Error, /Value of metric must be between 0 and 16777214 but not -5/)
+    it 'should support [ \'bgp metric 100\', \'connected\' ] as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => [ 'bgp metric 100', 'connected' ]) }.to_not raise_error
     end
 
-    it 'should support { :bgp => { :metric_type => 2 } } as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => { :bgp => { :metric_type => 2 } }) }.to_not raise_error
+    it 'should support [ \'bgp metric-type 2\', \'rip route-map ABCD-EF\' ] as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => [ 'bgp metric-type 2', 'rip route-map ABCD-EF' ]) }.to_not raise_error
     end
 
-    it 'should support { :bgp => { :metric => 10 } } as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => { :bgp => { :metric => 10 } }) }.to_not raise_error
+    it 'should support \'bgp metric 10\' as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'bgp metric 10') }.to_not raise_error
     end
 
-    it 'should support { :bgp => { :route_map => \'ABCD\' } } as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => { :bgp => { :route_map => 'ABCD' } }) }.to_not raise_error
+    it 'should support \'bgp route-map ABCD-EF\' as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'bgp route-map ABCD-EF') }.to_not raise_error
     end
 
-    it 'should support { :bgp => { :metric => 10, :metric_type => 2, :route_map => \'ABCD\' } } as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => { :bgp => { :metric => 10, :metric_type => 2, :route_map => 'ABCD' } }) }.to_not raise_error
+    it 'should support \'bgp metric 10 metric-type 2 route-map ABCD-EF\' as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'bgp metric 10 metric-type 2 route-map ABCD-EF') }.to_not raise_error
     end
 
-    it 'should support { :bgp => { :metric => 10 }, :connected => true } as a value' do
-      expect { described_class.new(:name => 'ospf', :redistribute => { :bgp => { :metric => 10 }, :connected => true }) }.to_not raise_error
+    it 'should support [ \'bgp metric 10\' , \'connected\' ] as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => [ 'bgp metric 10', 'connected' ]) }.to_not raise_error
     end
 
-    it 'should contain { :bgp => { :metric => 10, :metric_type => 2, :route_map => \'ABCD\' } }' do
-      expect(described_class.new(:name => 'ospf', :redistribute => { :bgp => { :metric => 10, :metric_type => 2, :route_map => 'ABCD' } })[:redistribute]).to eq(:bgp => { :metric => 10, :metric_type => 2, :route_map => 'ABCD' })
+    it 'should contain \'bgp metric 10 metric-type 2 route-map ABCD-EF\'' do
+      expect(described_class.new(:name => 'ospf', :redistribute => 'bgp metric 10 metric-type 2 route-map ABCD-EF')[:redistribute]).to eq([ 'bgp metric 10 metric-type 2 route-map ABCD-EF' ])
     end
 
-    it 'should contain { \'bgp\' => { \'metric\' => 10, \'metric-type\' => 2, \'route-map\' => \'ABCD\' } }' do
-      expect(described_class.new(:name => 'ospf', :redistribute => { 'bgp' => { 'metric' => 10, 'metric-type' => 2, 'route-map' => 'ABCD' } })[:redistribute]).to eq(:bgp => { :metric => 10, :metric_type => 2, :route_map => 'ABCD' })
+    it 'should contain \'bgp metric 10 metric-type  2 route-map ABCD-EF\'' do
+      expect(described_class.new(:name => 'ospf', :redistribute => 'bgp metric 10 metric-type 2 route-map ABCD-EF')[:redistribute]).to eq([ 'bgp metric 10 metric-type 2 route-map ABCD-EF' ])
     end
 
-    it 'should contain { :bgp => { :metric => 10, :metric_type => 2, :route_map => \'ABCD\' }, :connected => true }' do
-      expect(described_class.new(:name => 'ospf', :redistribute => { :bgp => { :metric => 10, :metric_type => 2, :route_map => 'ABCD' }, :connected => true })[:redistribute]).to eq({ :bgp => { :metric => 10, :metric_type => 2, :route_map => 'ABCD' }, :connected => :true })
+    it 'should contain [ \'bgp metric 10 metric-type 2 route-map ABCD-EF\', \'connected\' ]' do
+      expect(described_class.new(:name => 'ospf', :redistribute => [ 'bgp metric 10 metric-type 2 route-map ABCD-EF', 'connected' ])[:redistribute]).to eq([ 'bgp metric 10 metric-type 2 route-map ABCD-EF', 'connected' ])
     end
   end
 
@@ -213,7 +209,7 @@ describe Puppet::Type.type(:ospf) do
       expect { described_class.new(:name => 'ospf', :router_id => '1.1.1.1') }.to_not raise_error
     end
 
-    it 'should contain { :bgp => { :metric => 10, :metric_type => 2, :route_map => \'ABCD\' }, :connected => true }' do
+    it 'should contain \'1.1.1.1\'' do
       expect(described_class.new(:name => 'ospf', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
     end
   end
