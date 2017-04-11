@@ -18,11 +18,14 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
+  def initialize value={}
+    super(value)
+    @property_flush = {}
+  end
 
   def self.instances
     ospf_interfaces = []
-    debug 'Instances'
+    debug 'Creating instances of OSPF interfaces'
     hash = {}
     config = vtysh('-c', 'show ip ospf interface')
     config.split(/\n/).collect do |line|
@@ -102,18 +105,20 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
-    cmds << ['configure', 'terminal'].join(' ')
-    cmds << ['interface', @property_hash[:name]].join(' ')
+    cmds << "configure terminal"
+    cmds << "interface #{@property_hash[:name]}"
     resource_map.each_value do |cmd|
-      cmds << ['no', 'ip', 'ospf', cmd].join(' ')
+      cmds << "no ip ospf #{cmd}"
     end
-    cmds << 'end'
-    cmds << 'write memory'
+    cmds << "end"
+    cmds << "write memory"
 
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
 
     @property_hash.clear
   end
+
+
 
   def exists?
     @property_hash[:ensure] == :present
@@ -147,5 +152,26 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
 
     @property_hash[:needs_change].clear
+  end
+
+  def purge
+    debug 'Removing unused parameters'
+
+    resource_map = self.class.instance_variable_get('@resource_map')
+    needs_purge = false
+
+    cmds = []
+    cmds << "configure terminal"
+    cmds << "interface #{@property_hash[name]}"
+    @property_hash.each do |property, value|
+      if @resource[property].nil?
+        cmds << "no ip ospf #{resource_map[property]}"
+        needs_purge = true
+      end
+    end
+    cmds << "end"
+    cmds << "write memory"
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
   end
 end
