@@ -14,14 +14,16 @@ Puppet::Type.type(:ospf).provide :quagga do
 
   @known_booleans = [ :opaque, :rfc1583, ]
   @known_arrays = [ :network, :redistribute, ]
-  @hidden_booleans = %w{nssa}
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
+  def initialize value={}
+    super(value)
+    @property_flush = {}
+  end
 
   def self.instances
-    debug 'Instances'
+    debug 'Create an instance of the OSPF process'
     found_section = false
     ospf = []
     hash = {}
@@ -65,11 +67,105 @@ Puppet::Type.type(:ospf).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
+        provider.purge
         found_providers << provider
       end
     end
     (providers - found_providers).each do |provider|
       provider.destroy
+    end
+  end
+
+  def create
+    debug 'Starting the OSPF process'
+    @property_flush[:ensure] = :present
+  end
+
+  def destroy
+    debug 'Stopping the OSPF process'
+    @property_flush[:ensure] = :absent
+  end
+
+  def exists?
+    @property_hash[:ensure] == :present
+  end
+
+  def flush
+    debug 'Flushing changes'
+
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    cmds = []
+    cmds << "configure terminal"
+    cmds << "router ospf"
+
+    if @property_flush[:ensure] == :absent
+      remove
+      @property_flush.clear
+      @property_hash.clear
+      return
+    end
+
+    @property_flush.each do |property, value|
+      unless resource_map[property].nil?
+        [ value ].flatten.each do |line|
+          cmds << "#{resource_map[property]} #{line}"
+        end
+      end
+      @property_hash[property] = value
+    end
+    
+    @property_flush.clear
+
+    cmds << "end"
+    cmds << "write memory"
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+  end
+
+  def purge
+    debug 'Removing unused parameters'
+
+    resource_map = self.class.instance_variable_get('@resource_map')
+    needs_purge = false
+
+    cmds = []
+    cmds << "configure terminal"
+    cmds << "router ospf"
+    @property_hash.each do |property, value|
+      if @resource[property].nil?
+        cmds << "no #{resource_map[property]}"
+        needs_purge = true
+      end
+    end
+    cmds << "end"
+    cmds << "write memory"
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
+  end
+
+  def remove
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << 'no router ospf'
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+  end
+
+  @resource_map.keys.each do |property|
+    if @known_booleans.include?(property)
+      define_method "#{property}" do
+        @property_hash[property] || :false
+      end
+    else
+      define_method "#{property}" do
+        @property_hash[property] || :absent
+      end
+    end
+
+    define_method "#{property}=" do |value|
+      @property_flush[property] = value
     end
   end
 end
