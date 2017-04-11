@@ -76,6 +76,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
+        provider.purge
         found_providers << provider
       end
     end
@@ -173,5 +174,21 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     cmds << "write memory"
 
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
+  end
+
+  @resource_map.keys.each do |property|
+    if @known_booleans.include?(property)
+      define_method "#{property}" do
+        @property_hash[property] || :false
+      end
+    else
+      define_method "#{property}" do
+        @property_hash[property] || :absent
+      end
+    end
+
+    define_method "#{property}=" do |value|
+      @property_flush[property] = value
+    end
   end
 end
