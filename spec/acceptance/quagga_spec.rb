@@ -13,6 +13,10 @@ describe 'quagga' do
           network_type        => broadcast,
           retransmit_interval => 4,
         }
+        ospf { 'ospf':
+          ensure => present,
+          router_id => 1.1.1.1,
+        }
       EOS
 
       apply_manifest(pp, :catch_failures => true)
