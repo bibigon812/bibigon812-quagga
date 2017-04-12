@@ -160,8 +160,14 @@ Puppet::Type.type(:ospf).provide :quagga do
     cmds << "configure terminal"
     cmds << "router ospf"
     @property_hash.each do |property, value|
-      unless @resource.include? property
-        cmds << "no #{resource_map[property]}"
+      if @resource[property].nil?
+        if property == :default_information
+          cmds << "no #{resource_map[property]} #{value.split(/\s/).first}"
+        elsif property == :redistribute
+          # TODO:
+        else
+          cmds << "no #{resource_map[property]}"
+        end
         needs_purge = true
       end
     end
