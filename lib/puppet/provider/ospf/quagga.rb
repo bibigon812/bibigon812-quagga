@@ -79,6 +79,7 @@ Puppet::Type.type(:ospf).provide :quagga do
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
         found_providers << provider
+        provider.purge
       end
     end
     (providers - found_providers).each do |provider|
@@ -147,6 +148,27 @@ Puppet::Type.type(:ospf).provide :quagga do
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+  end
+
+  def purge
+    debug 'Removing unused parameters'
+
+    resource_map = self.class.instance_variable_get('@resource_map')
+    needs_purge = false
+
+    cmds = []
+    cmds << "configure terminal"
+    cmds << "router ospf"
+    @property_hash.each do |property, value|
+      unless @resource.include? property
+        cmds << "no #{resource_map[property]}"
+        needs_purge = true
+      end
+    end
+    cmds << "end"
+    cmds << "write memory"
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
   end
 
   def remove
