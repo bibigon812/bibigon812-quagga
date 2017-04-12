@@ -20,6 +20,7 @@ Puppet::Type.newtype(:ospf) do
 
   newparam(:name) do
     desc %q{Name must be 'ospf'.}
+
     newvalues :ospf
   end
 
