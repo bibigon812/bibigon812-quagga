@@ -2,14 +2,18 @@ Puppet::Type.type(:ospf).provide :quagga do
   @doc = %q{Manages ospf parameters using quagga}
 
   @resource_map = {
-    :router_id => 'ospf router-id',
-    :opaque => 'capability opaque',
-    :rfc1583 => 'compatible rfc1583',
-    :abr_type => 'ospf abr-type',
+    :router_id           => 'ospf router-id',
+    :opaque              => 'capability opaque',
+    :rfc1583             => 'compatible rfc1583',
+    :abr_type            => 'ospf abr-type',
     :reference_bandwidth => 'auto-cost  reference-bandwidth',
     :default_information => 'default-information',
-    :network => 'network',
-    :redistribute => 'redistribute',
+    :network             => 'network',
+    :redistribute        => 'redistribute',
+  }
+
+  @default_values = {
+    :abr_type => 'cisco',
   }
 
   @known_booleans = [ :opaque, :rfc1583, ]
@@ -57,6 +61,13 @@ Puppet::Type.type(:ospf).provide :quagga do
         end
       end
     end
+
+    @default_values.each do |property, value|
+      unless hash.include? property
+        hash[property] = value
+      end
+    end
+
     ospf << new(hash) unless hash.empty?
     ospf
   end
@@ -67,7 +78,6 @@ Puppet::Type.type(:ospf).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        provider.purge
         found_providers << provider
       end
     end
@@ -107,40 +117,36 @@ Puppet::Type.type(:ospf).provide :quagga do
     end
 
     @property_flush.each do |property, value|
-      unless resource_map[property].nil?
-        [ value ].flatten.each do |line|
-          cmds << "#{resource_map[property]} #{line}"
+      if resource_map.include? property
+        old_value = @property_hash[property]
+
+        if property == :network
+          (old_value - value).each do |line|
+            cmds << "no network #{line}"
+          end
+          (value - old_value).each do |line|
+            cmds << "network #{line}"
+          end
+
+        elsif property == :redistribute
+          (old_value - value).each do |line|
+            cmds << "no redistribute #{line.split(/\s/).first}"
+          end
+          (value - old_value).each do |line|
+            cmds << "redistribute #{line}"
+          end
+
+        else
+          cmds << "#{resource_map[property]} #{value}"
         end
       end
       @property_hash[property] = value
     end
-    
     @property_flush.clear
 
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-  end
-
-  def purge
-    debug 'Removing unused parameters'
-
-    resource_map = self.class.instance_variable_get('@resource_map')
-    needs_purge = false
-
-    cmds = []
-    cmds << "configure terminal"
-    cmds << "router ospf"
-    @property_hash.each do |property, value|
-      if @resource[property].nil?
-        cmds << "no #{resource_map[property]}"
-        needs_purge = true
-      end
-    end
-    cmds << "end"
-    cmds << "write memory"
-
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
   end
 
   def remove
