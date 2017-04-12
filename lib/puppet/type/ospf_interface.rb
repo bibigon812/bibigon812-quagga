@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:ospf_interface) do
-  @doc = %q{This type provides the capabilites to manage ospf parameters of
+  @doc = %q{ This type provides the capabilites to manage ospf parameters of
     network interfaces within puppet.
 
     Example:
@@ -20,11 +20,11 @@ Puppet::Type.newtype(:ospf_interface) do
   ensurable
 
   newparam(:name) do
-    desc %q{The friendly name of the network interface.}
+    desc %q{ The friendly name of the network interface }
   end
 
   newproperty(:cost) do
-    desc %q{Interface cost.}
+    desc %q{ Interface cost }
 
     newvalues(/\A\d+\Z/)
 
@@ -41,7 +41,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:dead_interval) do
-    desc %q{Interval after which a neighbor is declared dead.}
+    desc %q{ Interval after which a neighbor is declared dead }
 
     newvalues(/\A\d+\Z/)
 
@@ -58,7 +58,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:hello_interval) do
-    desc %q{Time between HELLO packets.}
+    desc %q{ Time between HELLO packets }
 
     newvalues(/\A\d+\Z/)
 
@@ -75,7 +75,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:mtu_ignore) do
-    desc %q{Disable mtu mismatch detection.}
+    desc %q{ Disable mtu mismatch detection }
 
     newvalues(:true, :false)
     defaultto(:false)
@@ -86,7 +86,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:network_type) do
-    desc %q{Network type.}
+    desc %q{ Network type }
 
     newvalues(:broadcast, :non_broadcast, :point_to_multipoint, :point_to_point)
     newvalues('non-broadcast', 'point-to-multipoint', 'point-to-point')
@@ -97,7 +97,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:priority) do
-    desc %q{Router priority.}
+    desc %q{ Router priority }
 
     newvalues(/\A\d+\Z/)
 
@@ -114,7 +114,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:retransmit_interval) do
-    desc %q{Time between retransmitting lost link state advertisements.}
+    desc %q{ Time between retransmitting lost link state advertisements }
 
     newvalues(/\A\d+\Z/)
 
@@ -131,7 +131,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:transmit_delay) do
-    desc %q{Link state transmit delay.}
+    desc %q{ Link state transmit delay }
 
     newvalues(/\A\d+\Z/)
 
