@@ -50,7 +50,7 @@ tun1 is up
         :dead_interval => 8,
         :hello_interval => 2,
         :mtu_ignore => :true,
-        :network_type => :broadcast,
+        :network => :broadcast,
         :priority => 100,
         :retransmit_interval => 4,
         :transmit_delay => 1,

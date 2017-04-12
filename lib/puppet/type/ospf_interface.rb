@@ -10,7 +10,7 @@ Puppet::Type.newtype(:ospf_interface) do
       dead_interval       => 8,
       hello_interval      => 2,
       mtu_ignore          => true,
-      network_type        => broadcast,
+      network             => broadcast,
       priority            => 100,
       retransmit_interval => 4,
       transmit_delay      => 1,
@@ -85,7 +85,7 @@ Puppet::Type.newtype(:ospf_interface) do
     end
   end
 
-  newproperty(:network_type) do
+  newproperty(:network) do
     desc %q{ Network type }
 
     newvalues(:broadcast, :non_broadcast, :point_to_multipoint, :point_to_point)

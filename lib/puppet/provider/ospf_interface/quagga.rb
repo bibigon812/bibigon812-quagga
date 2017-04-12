@@ -6,7 +6,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     :dead_interval        => 'dead-interval',
     :hello_interval       => 'hello-interval',
     :mtu_ignore           => 'mtu-ignore',
-    :network_type         => 'network',
+    :network              => 'network',
     :priority             => 'priority',
     :retransmit_interval  => 'retransmit-interval',
     :transmit_delay       => 'transmit-delay',
@@ -49,9 +49,9 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
           hash[:mtu_ignore] = :false
         end
       elsif line =~ /\A\s+Router\s+ID\s+(\d+\.\d+\.\d+\.\d+),\s+Network\s+Type\s+(\w+),\s+Cost:\s+(\d+)\Z/
-        network_type = $2
+        network = $2
         cost = $3
-        hash[:network_type] = network_type.downcase.gsub(/-/, '_').to_sym
+        hash[:network] = network.downcase.gsub(/-/, '_').to_sym
         hash[:cost] = cost.to_i
       elsif line =~ /\A\s+Transmit\s+Delay\s+is\s+(\d+)\s+sec,\s+State\s+(\w+),\s+Priority\s+(\d+)\Z/
         transmit_delay = $1

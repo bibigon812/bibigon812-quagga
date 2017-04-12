@@ -28,7 +28,7 @@ describe Puppet::Type.type(:ospf_interface) do
       end
     end
 
-    [:cost, :dead_interval, :hello_interval, :mtu_ignore, :network_type,
+    [:cost, :dead_interval, :hello_interval, :mtu_ignore, :network,
       :priority, :retransmit_interval, :transmit_delay].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
@@ -143,37 +143,37 @@ describe Puppet::Type.type(:ospf_interface) do
       end
     end
 
-    describe 'network_type' do
+    describe 'network' do
       it 'should support :broadcast as value' do
-        expect { described_class.new(:name => 'foo', :network_type => :broadcast) }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :network => :broadcast) }.to_not raise_error
       end
 
       it 'should support :non_broadcast as value' do
-        expect { described_class.new(:name => 'foo', :network_type => :non_broadcast) }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :network => :non_broadcast) }.to_not raise_error
       end
 
       it 'should support non-broadcast as value' do
-        expect { described_class.new(:name => 'foo', :network_type => 'non-broadcast') }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :network => 'non-broadcast') }.to_not raise_error
       end
 
       it 'should support :point_to_multipoint as value' do
-        expect { described_class.new(:name => 'foo', :network_type => :point_to_multipoint) }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :network => :point_to_multipoint) }.to_not raise_error
       end
 
       it 'should support point-to-multipoint as value' do
-        expect { described_class.new(:name => 'foo', :network_type => 'point-to-multipoint') }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :network => 'point-to-multipoint') }.to_not raise_error
       end
 
       it 'should support :point_to_point as value' do
-        expect { described_class.new(:name => 'foo', :network_type => :point_to_point) }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :network => :point_to_point) }.to_not raise_error
       end
 
       it 'should support point-to-point as value' do
-        expect { described_class.new(:name => 'foo', :network_type => 'point-to-point') }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :network => 'point-to-point') }.to_not raise_error
       end
 
       it 'should contain point_to_point' do
-        expect(described_class.new(:name => 'foo', :network_type => 'point-to-point')[:network_type]).to eq(:point_to_point)
+        expect(described_class.new(:name => 'foo', :network => 'point-to-point')[:network]).to eq(:point_to_point)
       end
     end
 
