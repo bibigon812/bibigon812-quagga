@@ -37,29 +37,13 @@ tun1 is up
   Neighbor Count is 1, Adjacent neighbor count is 1'
     end
 
-    it 'should return three resources' do
-      expect(described_class.instances.size).to eq(3)
-    end
-
-    it 'should return the resource lo' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :ensure => :disabled,
-        :name => 'lo',
-        :provider => :quagga,
-      })
-    end
-
-    it 'should return the resource tun0' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :ensure => :disabled,
-        :name => 'tun0',
-        :provider => :quagga,
-      })
+    it 'should return a resource' do
+      expect(described_class.instances.size).to eq(1)
     end
 
     it 'should return the resource tun1' do
-      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :ensure => :enabled,
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
+        :ensure => :present,
         :name => 'tun1',
         :provider => :quagga,
         :cost => 100,
