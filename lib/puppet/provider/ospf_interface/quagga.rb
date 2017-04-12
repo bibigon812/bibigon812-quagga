@@ -29,17 +29,18 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     hash = {}
     config = vtysh('-c', 'show ip ospf interface')
     config.split(/\n/).collect do |line|
-      if line =~ /\A([\w\d\.]+) .*\Z/
+      if line =~ /\A([\w\d\.]+) is (up|down)\Z/
         name = $1
         unless hash.empty?
-          ospf_interfaces << new(hash)
+          debug "OSPF #{hash[:ensure]} on #{hash[:name]}"
+          ospf_interfaces << new(hash) if hash[:ensure] == :present
         end
         hash = {}
         hash[:name] = name
         hash[:provider] = self.name
-        hash[:ensure] = :enabled
+        hash[:ensure] = :present
       elsif line =~ /\A\s+OSPF not enabled on this interface\Z/
-        hash[:ensure] = :disabled
+        hash[:ensure] = :absent
       elsif line =~ /\A\s+MTU mismatch detection:(\w+)\Z/
         case $1
         when 'disabled'
@@ -66,7 +67,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
         hash[:retransmit_interval] = retransmit_interval.to_i
       end
     end
-    ospf_interfaces << new(hash)
+    ospf_interfaces << new(hash) if hash[:ensure] == :present
     ospf_interfaces
   end
 
@@ -76,104 +77,55 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        provider.purge
         found_providers << provider
       end
-    end
-    (providers - found_providers).each do |provider|
-      provider.destroy
     end
   end
 
   def create
-    debug 'Appling OSPF parameters for interface: %s' % @resource[:name]
-
-    resource_map = self.class.instance_variable_get('@resource_map')
-
-    @property_hash[:needs_change] ||= []
-    resource_map.each_key do |property|
-      unless @resource[property].nil?
-        @property_hash[:needs_change] << property
-      end
-    end
-    @property_hash[:name] = @resource[:name]
-    @property_hash[:ensure] = :present
+    debug 'Enabling OSPF for interface: %s' % @resource[:name]
+    @property_flush[:ensure] = :enabled
   end
 
   def destroy
-    debug 'Reseting OSPF parameters for interface: %s' % @property_hash[:name]
-
-    resource_map = self.class.instance_variable_get('@resource_map')
-
-    cmds = []
-    cmds << "configure terminal"
-    cmds << "interface #{@property_hash[:name]}"
-    resource_map.each_value do |cmd|
-      cmds << "no ip ospf #{cmd}"
-    end
-    cmds << "end"
-    cmds << "write memory"
-
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-
-    @property_hash.clear
+    debug 'Disabling OSPF for interface: %s' % @property_hash[:name]
+    @property_flush[:ensure] = :absent
   end
-
-
 
   def exists?
     @property_hash[:ensure] == :present
   end
 
   def flush
-    return if @property_hash[:needs_change].nil? or @property_hash[:needs_change].empty?
+    debug 'Flushing changes'
 
-    debug 'Flushing OSPF parameters for interface: %s' % @property_hash[:name]
-
-    resource_map = self.class.instance_variable_get('@resource_map')
-    known_booleans = self.class.instance_variable_get('@known_booleans')
-
-    cmds = []
-    cmds << ['configure', 'terminal'].join(' ')
-    cmds << ['interface', @property_hash[:name]].join(' ')
-    @property_hash[:needs_change].each do |property|
-      if known_booleans.include?(property)
-        if @resource[property].to_sym == :true
-          cmds << ['ip', 'ospf', resource_map[property]].join(' ')
-        elsif @resource[property].to_sym == :false
-          cmds << ['no', 'ip', 'ospf', resource_map[property]].join(' ')
-        end
-      else
-        cmds << ['ip', 'ospf', resource_map[property], @resource[property]].join(' ')
-      end
-      @property_hash[property] = @resource[property]
+    if @property_flush[:ensure] == :absent
+      @property_flush.clear
+      @property_hash.clear
+      return
     end
-    cmds << 'end'
-    cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-
-    @property_hash[:needs_change].clear
-  end
-
-  def purge
-    debug 'Removing unused parameters'
 
     resource_map = self.class.instance_variable_get('@resource_map')
-    needs_purge = false
 
     cmds = []
     cmds << "configure terminal"
-    cmds << "interface #{@property_hash[name]}"
-    @property_hash.each do |property, value|
-      if @resource[property].nil?
+    cmds << "interface #{@property_hash[:name]}"
+
+    @property_flush.each do |property, value|
+      if value.to_sym == :true
+        cmds << "ip ospf #{resource_map[property]}"
+      elsif value.to_sym == :false
         cmds << "no ip ospf #{resource_map[property]}"
-        needs_purge = true
+      else
+        cmds << "ip ospf #{resource_map[property]} #{value}"
       end
+      @property_hash[property] = value
     end
+    @property_flush.clear
+
     cmds << "end"
     cmds << "write memory"
-
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   @resource_map.keys.each do |property|
