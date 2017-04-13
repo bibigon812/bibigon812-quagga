@@ -122,19 +122,31 @@ Puppet::Type.type(:ospf).provide :quagga do
         old_value = @property_hash[property]
 
         if property == :network
-          (old_value - value).each do |line|
-            cmds << "no network #{line}"
-          end
-          (value - old_value).each do |line|
-            cmds << "network #{line}"
+          if old_value.nil?
+            value.each do |line|
+              cmds << "netowrk #{line}"
+            end
+          else
+            (old_value - value).each do |line|
+              cmds << "no network #{line}"
+            end
+            (value - old_value).each do |line|
+              cmds << "network #{line}"
+            end
           end
 
         elsif property == :redistribute
-          (old_value - value).each do |line|
-            cmds << "no redistribute #{line.split(/\s/).first}"
-          end
-          (value - old_value).each do |line|
-            cmds << "redistribute #{line}"
+          if old_value.nil?
+            value.each do |line|
+              cmds << "redistribute #{line}"
+            end
+          else
+            (old_value - value).each do |line|
+              cmds << "no redistribute #{line.split(/\s/).first}"
+            end
+            (value - old_value).each do |line|
+              cmds << "redistribute #{line}"
+            end
           end
 
         else
@@ -162,9 +174,11 @@ Puppet::Type.type(:ospf).provide :quagga do
     @property_hash.each do |property, value|
       if @resource[property].nil?
         if property == :default_information
-          cmds << "no #{resource_map[property]} #{value.split(/\s/).first}"
+          cmds << "no default-information #{value.split(/\s/).first}"
         elsif property == :redistribute
-          # TODO:
+          value.each do |line|
+            cmds << "no redistribute #{line.split(/\s/).first}"
+          end
         else
           cmds << "no #{resource_map[property]}"
         end
