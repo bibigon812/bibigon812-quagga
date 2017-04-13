@@ -54,6 +54,14 @@ Puppet::Type.newtype(:ospf) do
     desc %q{ Enable routing on an IP network }
 
     newvalues /\A\d+\.\d+\.\d+\.\d+\/\d+ area \d+\.\d+\.\d+\.\d+\Z/
+
+    def is_to_s value
+      value.sort.inspect
+    end
+
+    def should_to_s value
+      value.sort.inspect
+    end
   end
 
   autorequire(:package) do
