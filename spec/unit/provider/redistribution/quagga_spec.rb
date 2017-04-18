@@ -68,21 +68,47 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 193.160.158.96/28 le 32'
 
     it 'should return the first resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :abr_type => 'cisco',
-        :default_information => 'originate always metric 100 metric-type 1 route-map ABCD',
         :ensure => :present,
-        :name => :ospf,
-        :network => [
-          '10.255.1.0/24 area 0.0.15.211',
-        ],
+        :name => 'bgp:197888:connected',
         :provider => :quagga,
-        :redistribute => [
-          'connected route-map CONNECTED',
-          'kernel route-map KERNEL',
-          'rip route-map RIP',
-          'static route-map STATIC',
-        ],
-        :router_id => "10.255.78.4",
+        :metric => 100,
+        :route_map => 'ABCD',
+      })
+    end
+
+    it 'should return the first resource' do
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
+        :ensure => :present,
+        :name => 'ospf::kernel',
+        :provider => :quagga,
+        :route_map => 'KERNEL',
+      })
+    end
+
+    it 'should return the first resource' do
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
+        :ensure => :present,
+        :name => 'ospf::connected',
+        :provider => :quagga,
+        :route_map => 'CONNECTED',
+      })
+    end
+
+    it 'should return the first resource' do
+      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
+        :ensure => :present,
+        :name => 'ospf::static',
+        :provider => :quagga,
+        :route_map => 'STATIC',
+      })
+    end
+
+    it 'should return the first resource' do
+      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
+        :ensure => :present,
+        :name => 'ospf::rip',
+        :provider => :quagga,
+        :route_map => 'RIP',
       })
     end
   end
