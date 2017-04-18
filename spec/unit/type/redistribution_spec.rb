@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:redistribute) do
+describe Puppet::Type.type(:redistribution) do
   let(:networking_service) do
-    @provider_class = describe_class.provide(:redistribute) {
+    @provider_class = describe_class.provide(:redistribution) {
       mk_resource_methods
     }
     @provider_class.stub(:suitable?).return true
@@ -14,7 +14,7 @@ describe Puppet::Type.type(:redistribute) do
   end
 
   after :each do
-    described_class.unprovide(:redistribute)
+    described_class.unprovide(:redistribution)
   end
 
   it 'should have :name be its namevar' do

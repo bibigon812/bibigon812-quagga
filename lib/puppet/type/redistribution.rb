@@ -1,4 +1,4 @@
-Puppet::Type.newtype(:redistribute) do
+Puppet::Type.newtype(:redistribution) do
   @doc = %q{
     Example:
 

@@ -1,4 +1,4 @@
-Puppet::Type.type(:redistribute).provide :quagga do
+Puppet::Type.type(:redistribution).provide :quagga do
   @doc = %q{ Manages redistribution using quagga }
 
   commands :vtysh => 'vtysh'
