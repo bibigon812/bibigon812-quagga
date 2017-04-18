@@ -47,6 +47,10 @@ Puppet::Type.newtype(:redistribute) do
     desc %q{ Route map reference }
 
     newvalues(/\A\w+\Z/)
+
+    munge do |value|
+      value.to_s
+    end
   end
 
   autorequire(:package) do
