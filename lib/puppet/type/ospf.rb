@@ -11,7 +11,7 @@ Puppet::Type.newtype(:ospf) do
       rfc1583             => true,
       default_information => originate,
       network             => [ '10.0.0.0/24 area 0.0.0.0', ],
-      redistribute        => 'connected route-map CONNECTED',
+      redistribute        => [ 'connected route-map CONNECTED', ],
       router_id           => '192.168.0.1',
     }
   }
