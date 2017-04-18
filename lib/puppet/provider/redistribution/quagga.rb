@@ -8,6 +8,9 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
     redistributes = []
     found_router = false
+    main_protocol = ''
+    as = ''
+
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
       next if line =~ /\A!\Z/
@@ -29,9 +32,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
         hash[:provider] = self.name
         hash[:name] = "#{main_protocol}:#{as}:#{protocol}"
         hash[:metric] = metric.to_i unless metric.nil?
-        metric_type = metric_type.to_i unless metric_type.nil?
-        metric_type = 2 if main_protocol == 'ospf' && metric_type.nil?
-        hash[:metric_type] = metric_type
+        hash[:metric_type] = metric_type unless metric_type.nil?
         hash[:route_map] = route_map
         redistributes << new(hash)
       end
