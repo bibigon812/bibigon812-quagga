@@ -17,7 +17,7 @@ Puppet::Type.newtype(:redistribute) do
   ensurable
 
   newparam(:name) do
-    desc %q{ Name contains a main protocol, a id and a redistribute protocol }
+    desc %q{ The name contains the main protocol, the id and the the protocol for redistribution }
 
     newvalues(/\Aospf::(kernel|connected|static|rip|isis|bgp)\Z/)
     newvalues(/\Abgp:\d+:(connected|kernel|ospf|rip|static)\Z/)
