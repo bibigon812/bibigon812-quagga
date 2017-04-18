@@ -1,5 +1,5 @@
 Puppet::Type.type(:ospf).provide :quagga do
-  @doc = %q{Manages ospf parameters using quagga}
+  @doc = %q{ Manages ospf parameters using quagga }
 
   @resource_map = {
     :router_id           => 'ospf router-id',
