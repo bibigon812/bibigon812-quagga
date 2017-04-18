@@ -29,7 +29,9 @@ Puppet::Type.type(:redistribute).provide :quagga do
         hash[:provider] = self.name
         hash[:name] = "#{main_protocol}:#{as}:#{protocol}"
         hash[:metric] = metric.to_i unless metric.nil?
-        hash[:metric_type] = metric_type.nil? ? 2 : metric_type.to_i
+        metric_type = metric_type.to_i unless metric_type.nil?
+        metric_type = 2 if main_protocol == 'ospf' && metric_type.nil?
+        hash[:metric_type] = metric_type
         hash[:route_map] = route_map
         redistributes << new(hash)
       end
