@@ -112,8 +112,8 @@ describe Puppet::Type.type(:redistribution) do
       expect(described_class.new(:name => 'ospf::connected', :metric_type => 1)[:metric_type]).to eq(1)
     end
 
-    it 'should contain 2' do
-      expect(described_class.new(:name => 'ospf::connected', :metric_type => '2')[:metric_type]).to eq(2)
+    it 'should contain 1' do
+      expect(described_class.new(:name => 'ospf::connected', :metric_type => '1')[:metric_type]).to eq(1)
     end
   end
 
