@@ -36,7 +36,7 @@ Puppet::Type.newtype(:redistribution) do
   newproperty(:metric_type) do
     desc %q{ OSPF exterior metric type for redistributed routes }
 
-    newvalues(/\A(1|2)\Z/)
+    newvalues(/\A1\Z/)
 
     munge do |value|
       value.to_i
