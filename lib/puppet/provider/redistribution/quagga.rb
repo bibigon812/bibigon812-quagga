@@ -46,10 +46,15 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
+    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
+        found_providers << provider
       end
+    end
+    (providers - found_providers).each do |provider|
+      provider.destroy
     end
   end
 
