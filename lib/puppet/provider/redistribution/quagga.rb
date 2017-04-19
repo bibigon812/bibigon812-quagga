@@ -45,6 +45,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   end
 
   def self.prefetch(resources)
+    debug '[prefetch]'
     providers = instances
     found_providers = []
     resources.keys.each do |name|
@@ -59,6 +60,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   end
 
   def create
+    debug '[create]'
     @property_hash[:ensure] = :present
     [:metric, :metric_type, :route_map].each do |property|
       @property_hash[property] = @resource[property]
@@ -66,10 +68,12 @@ Puppet::Type.type(:redistribution).provide :quagga do
   end
 
   def destroy
+    debug '[destroy]'
     @property_hash[:ensure] = :absent
   end
 
   def exists?
+    debug '[exists?]'
     @property_hash[:ensure] == :present
   end
 
