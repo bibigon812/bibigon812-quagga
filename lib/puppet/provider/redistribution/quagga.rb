@@ -64,7 +64,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   end
 
   def flush
-    debug 'Appling changes'
+    debug 'Applying changes'
 
     main_protocol, as, protocol = @property_hash[:name]
     cmds = []
@@ -76,7 +76,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
     else
       line = "redistribute #{protocol}"
       line << " metric #{@property_hash[:metric]}" unless @property_hash[:metric].nil?
-      line << " metric-type #{@property_hash[:metric_type]}" unless @property[:metric_type].nil?
+      line << " metric-type #{@property_hash[:metric_type]}" unless @property_hash[:metric_type].nil?
       line << " route-map #{@property_hash[:route]}" unless @property_hash[:route_map].nil?
     end
     cmd << line
