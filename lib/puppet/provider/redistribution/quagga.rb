@@ -15,6 +15,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
+      debug "Line: #{line}"
       next if line =~ /\A!\Z/
       if line =~ /\Arouter (ospf|bgp)( (\d+))?\Z/
         main_protocol = $1
