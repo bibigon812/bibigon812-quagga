@@ -3,7 +3,11 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
+  @properties = [
+    :metric,
+    :metric_type,
+    :route_map,
+  ]
 
   def self.instances
     debug 'Creating instances of redistribution resources'
@@ -86,5 +90,15 @@ Puppet::Type.type(:redistribution).provide :quagga do
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+  end
+
+  @properties.each do |property|
+    define_method "#{property}" do
+      @property_hash[property] || :absent
+    end
+
+    define_method "#{property}=" do |value|
+      @property_flush[property] = value
+    end
   end
 end
