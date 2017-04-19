@@ -82,7 +82,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
       line = "redistribute #{protocol}"
       line << " metric #{@resource[:metric]}" unless @resource[:metric].nil?
       line << " metric-type #{@resource[:metric_type]}" unless @resource[:metric_type].nil?
-      line << " route-map #{@resource[:route]}" unless @resource[:route_map].nil?
+      line << " route-map #{@resource[:route_map]}" unless @resource[:route_map].nil?
     end
     cmds << line
 
