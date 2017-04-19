@@ -70,6 +70,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   def destroy
     debug '[destroy]'
     @property_hash[:ensure] = :absent
+    flush
   end
 
   def exists?
