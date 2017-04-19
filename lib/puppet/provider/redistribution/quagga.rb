@@ -3,11 +3,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  @properties = [
-    :metric,
-    :metric_type,
-    :route_map,
-  ]
+  mk_resource_methods
 
   def self.instances
     debug 'Creating instances of redistribution resources'
@@ -38,9 +34,11 @@ Puppet::Type.type(:redistribution).provide :quagga do
         hash[:provider] = self.name
         hash[:name] = "#{main_protocol}:#{as}:#{protocol}"
         hash[:metric] = metric.to_i unless metric.nil?
-        hash[:metric_type] = metric_type unless metric_type.nil?
+        hash[:metric_type] = metric_type.to_i unless metric_type.nil?
         hash[:route_map] = route_map
         redistributes << new(hash)
+
+        debug "#{main_protocol} redistribute: #{hash.inspect}"
       end
     end
     redistributes
@@ -57,6 +55,9 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
   def create
     @property_hash[:ensure] = :present
+    [:metric, :metric_type, :route_map].each do |property|
+      @property_hash[property] = @resource[property]
+    end
   end
 
   def destroy
@@ -70,7 +71,11 @@ Puppet::Type.type(:redistribution).provide :quagga do
   def flush
     debug 'Applying changes'
 
-    main_protocol, as, protocol = @resource[:name].split(/:/)
+    main_protocol, as, protocol = (
+      @property_hash[:name].nil?
+        ? @resource[:name]
+        : @property_hash[:name]
+      ).split(/:/)
 
     cmds = []
     cmds << "configure terminal"
@@ -80,24 +85,14 @@ Puppet::Type.type(:redistribution).provide :quagga do
       line = "no redistribute #{protocol}"
     else
       line = "redistribute #{protocol}"
-      line << " metric #{@resource[:metric]}" unless @resource[:metric].nil?
-      line << " metric-type #{@resource[:metric_type]}" unless @resource[:metric_type].nil?
-      line << " route-map #{@resource[:route_map]}" unless @resource[:route_map].nil?
+      line << " metric #{@property_hash[:metric]}" unless @property_hash[:metric].nil?
+      line << " metric-type #{@property_hash[:metric_type]}" unless @property_hash[:metric_type].nil?
+      line << " route-map #{@property_hash[:route_map]}" unless @property_hash[:route_map].nil?
     end
     cmds << line
 
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-  end
-
-  @properties.each do |property|
-    define_method "#{property}" do
-      @property_hash[property] || :absent
-    end
-
-    define_method "#{property}=" do |value|
-      @property_flush[property] = value
-    end
   end
 end
