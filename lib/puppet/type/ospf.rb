@@ -38,12 +38,6 @@ Puppet::Type.newtype(:ospf) do
     newvalues /\A(originate( always)?( metric \d+)?( metric-type (1|2))?( route-map [\w-]+)?)?\Z/
   end
 
-  newproperty(:redistribute, :array_matching => :all) do
-    desc %q{ Redistribute information from another routing protocol }
-
-    newvalues /\A(kernel|connected|static|rip|isis|bgp)( metric \d+)?( metric-type (1|2))?( route-map [\w-]+)?\Z/
-  end
-
   newproperty(:router_id) do
     desc %q{ Router-id for the OSPF process }
 

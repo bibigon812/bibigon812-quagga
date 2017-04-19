@@ -9,7 +9,6 @@ Puppet::Type.type(:ospf).provide :quagga do
     :reference_bandwidth => 'auto-cost  reference-bandwidth',
     :default_information => 'default-information',
     :network             => 'network',
-    :redistribute        => 'redistribute',
   }
 
   @default_values = {
