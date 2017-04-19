@@ -6,7 +6,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   mk_resource_methods
 
   def self.instances
-    debug '[instances::begin]'
+    debug '[instances]'
 
     redistributes = []
     found_router = false
@@ -15,7 +15,6 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
-      debug "Line: #{line}"
       next if line =~ /\A!\Z/
       if line =~ /\Arouter (ospf|bgp)( (\d+))?\Z/
         main_protocol = $1
@@ -42,7 +41,6 @@ Puppet::Type.type(:redistribution).provide :quagga do
         debug "#{main_protocol} redistribute: #{hash.inspect}"
       end
     end
-    debug "[instances::end]"
     redistributes
   end
 
@@ -71,7 +69,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   end
 
   def flush
-    debug 'Applying changes'
+    debug '[flush]'
 
     main_protocol, as, protocol =
       (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
