@@ -66,7 +66,8 @@ Puppet::Type.type(:redistribution).provide :quagga do
   def flush
     debug 'Applying changes'
 
-    main_protocol, as, protocol = @property_hash[:name]
+    main_protocol, as, protocol = @property_hash[:name].split(/:/)
+
     cmds = []
     cmds << "configure terminal"
     cmds << "router #{main_protocol} #{as}".strip
@@ -80,6 +81,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
       line << " route-map #{@property_hash[:route]}" unless @property_hash[:route_map].nil?
     end
     cmds << line
+
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
