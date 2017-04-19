@@ -14,7 +14,12 @@ Puppet::Type.newtype(:redistribution) do
       }
   }
 
-  ensurable
+  ensurable do
+    newvalues(:present)
+    newvalues(:absent)
+
+    defaultto(:present)
+  end
 
   newparam(:name) do
     desc %q{ The name contains the main protocol, the id and the the protocol for redistribution }
