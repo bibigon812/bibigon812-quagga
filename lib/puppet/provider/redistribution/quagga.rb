@@ -6,7 +6,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   mk_resource_methods
 
   def self.instances
-    debug 'Creating instances of the redistribution'
+    debug 'Creating instances of redistribution resources'
 
     redistributes = []
     found_router = false
@@ -43,6 +43,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   end
 
   def self.prefetch
+    debug 'Prefetching'
     providers = instances
     found_providers = []
     resources.keys.each do |name|
