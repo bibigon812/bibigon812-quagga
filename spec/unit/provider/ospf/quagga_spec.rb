@@ -51,12 +51,6 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 193.160.158.96/28 le 32'
           '10.255.1.0/24 area 0.0.15.211',
         ],
         :provider => :quagga,
-        :redistribute => [
-          'connected route-map CONNECTED',
-          'kernel route-map KERNEL',
-          'rip route-map RIP',
-          'static route-map STATIC',
-        ],
         :router_id => "10.255.78.4",
       })
     end
