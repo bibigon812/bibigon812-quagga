@@ -42,10 +42,8 @@ Puppet::Type.type(:redistribution).provide :quagga do
     redistributes
   end
 
-  def self.prefetch
-    debug 'Prefetching'
+  def self.prefetch(resources)
     providers = instances
-    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
