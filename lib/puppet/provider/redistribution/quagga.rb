@@ -79,7 +79,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
       line << " metric-type #{@property_hash[:metric_type]}" unless @property_hash[:metric_type].nil?
       line << " route-map #{@property_hash[:route]}" unless @property_hash[:route_map].nil?
     end
-    cmd << line
+    cmds << line
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
