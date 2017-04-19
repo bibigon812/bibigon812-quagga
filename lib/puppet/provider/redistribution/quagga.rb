@@ -70,8 +70,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   def flush
     debug 'Applying changes'
 
-    main_protocol, as, protocol =
-      (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
+    main_protocol, as, protocol = @resource[:name].split(/:/)
 
     cmds = []
     cmds << "configure terminal"
@@ -81,9 +80,9 @@ Puppet::Type.type(:redistribution).provide :quagga do
       line = "no redistribute #{protocol}"
     else
       line = "redistribute #{protocol}"
-      line << " metric #{@property_hash[:metric]}" unless @property_hash[:metric].nil?
-      line << " metric-type #{@property_hash[:metric_type]}" unless @property_hash[:metric_type].nil?
-      line << " route-map #{@property_hash[:route]}" unless @property_hash[:route_map].nil?
+      line << " metric #{@resource[:metric]}" unless @resource[:metric].nil?
+      line << " metric-type #{@resource[:metric_type]}" unless @resource[:metric_type].nil?
+      line << " route-map #{@resource[:route]}" unless @resource[:route_map].nil?
     end
     cmds << line
 
