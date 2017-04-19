@@ -71,11 +71,8 @@ Puppet::Type.type(:redistribution).provide :quagga do
   def flush
     debug 'Applying changes'
 
-    main_protocol, as, protocol = (
-      @property_hash[:name].nil?
-        ? @resource[:name]
-        : @property_hash[:name]
-      ).split(/:/)
+    main_protocol, as, protocol =
+      (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
 
     cmds = []
     cmds << "configure terminal"
