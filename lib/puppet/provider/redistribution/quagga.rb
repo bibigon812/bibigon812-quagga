@@ -6,7 +6,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
   mk_resource_methods
 
   def self.instances
-    debug 'Creating instances of redistribution resources'
+    debug '[instances::begin]'
 
     redistributes = []
     found_router = false
@@ -35,12 +35,13 @@ Puppet::Type.type(:redistribution).provide :quagga do
         hash[:name] = "#{main_protocol}:#{as}:#{protocol}"
         hash[:metric] = metric.to_i unless metric.nil?
         hash[:metric_type] = metric_type.to_i unless metric_type.nil?
-        hash[:route_map] = route_map
+        hash[:route_map] = route_map unless route_map.nil?
         redistributes << new(hash)
 
         debug "#{main_protocol} redistribute: #{hash.inspect}"
       end
     end
+    debug "[instances::end]"
     redistributes
   end
 
