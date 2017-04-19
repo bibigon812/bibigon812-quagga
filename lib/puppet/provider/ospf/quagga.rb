@@ -16,7 +16,7 @@ Puppet::Type.type(:ospf).provide :quagga do
   }
 
   @known_booleans = [ :opaque, :rfc1583, ]
-  @known_arrays = [ :network, :redistribute, ]
+  @known_arrays = [ :network, ]
 
   commands :vtysh => 'vtysh'
 
@@ -134,20 +134,6 @@ Puppet::Type.type(:ospf).provide :quagga do
             end
           end
 
-        elsif property == :redistribute
-          if old_value.nil?
-            value.each do |line|
-              cmds << "redistribute #{line}"
-            end
-          else
-            (old_value - value).each do |line|
-              cmds << "no redistribute #{line.split(/\s/).first}"
-            end
-            (value - old_value).each do |line|
-              cmds << "redistribute #{line}"
-            end
-          end
-
         else
           cmds << "#{resource_map[property]} #{value}"
         end
@@ -174,10 +160,6 @@ Puppet::Type.type(:ospf).provide :quagga do
       if @resource[property].nil?
         if property == :default_information
           cmds << "no default-information #{value.split(/\s/).first}"
-        elsif property == :redistribute
-          value.each do |line|
-            cmds << "no redistribute #{line.split(/\s/).first}"
-          end
         else
           cmds << "no #{resource_map[property]}"
         end
