@@ -15,8 +15,13 @@ Puppet::Type.newtype(:redistribution) do
   }
 
   ensurable do
-    newvalues(:present)
-    newvalues(:absent)
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
 
     defaultto(:present)
   end
