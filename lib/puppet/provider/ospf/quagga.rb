@@ -7,8 +7,6 @@ Puppet::Type.type(:ospf).provide :quagga do
     :rfc1583             => 'compatible rfc1583',
     :abr_type            => 'ospf abr-type',
     :reference_bandwidth => 'auto-cost  reference-bandwidth',
-    :default_information => 'default-information',
-    :network             => 'network',
   }
 
   @default_values = {
@@ -16,7 +14,6 @@ Puppet::Type.type(:ospf).provide :quagga do
   }
 
   @known_booleans = [ :opaque, :rfc1583, ]
-  @known_arrays = [ :network, ]
 
   commands :vtysh => 'vtysh'
 
@@ -26,7 +23,7 @@ Puppet::Type.type(:ospf).provide :quagga do
   end
 
   def self.instances
-    debug 'Create an instance of the OSPF process'
+    debug '[instances]'
     found_section = false
     ospf = []
     hash = {}
@@ -47,11 +44,6 @@ Puppet::Type.type(:ospf).provide :quagga do
           if config_line.start_with? command
             if @known_booleans.include? property
               hash[property] = :true
-            elsif @known_arrays.include? property
-              hash[property] ||= []
-              config_line.slice! command
-              hash[property] << config_line.strip
-              hash[property].sort!
             else
               config_line.slice! command
               hash[property] = config_line.strip
@@ -87,13 +79,12 @@ Puppet::Type.type(:ospf).provide :quagga do
   end
 
   def create
-    debug 'Starting the OSPF process'
     @property_flush[:ensure] = :present
   end
 
   def destroy
-    debug 'Stopping the OSPF process'
     @property_flush[:ensure] = :absent
+    flush
   end
 
   def exists?
@@ -101,7 +92,7 @@ Puppet::Type.type(:ospf).provide :quagga do
   end
 
   def flush
-    debug 'Flushing changes'
+    debug '[flush]'
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
@@ -118,25 +109,7 @@ Puppet::Type.type(:ospf).provide :quagga do
 
     @property_flush.each do |property, value|
       if resource_map.include? property
-        old_value = @property_hash[property]
-
-        if property == :network
-          if old_value.nil?
-            value.each do |line|
-              cmds << "netowrk #{line}"
-            end
-          else
-            (old_value - value).each do |line|
-              cmds << "no network #{line}"
-            end
-            (value - old_value).each do |line|
-              cmds << "network #{line}"
-            end
-          end
-
-        else
-          cmds << "#{resource_map[property]} #{value}"
-        end
+        cmds << "#{resource_map[property]} #{value}"
       end
       @property_hash[property] = value
     end
@@ -148,7 +121,7 @@ Puppet::Type.type(:ospf).provide :quagga do
   end
 
   def purge
-    debug 'Removing unused parameters'
+    debug '[purge]'
 
     resource_map = self.class.instance_variable_get('@resource_map')
     needs_purge = false
@@ -158,11 +131,7 @@ Puppet::Type.type(:ospf).provide :quagga do
     cmds << "router ospf"
     @property_hash.each do |property, value|
       if @resource[property].nil?
-        if property == :default_information
-          cmds << "no default-information #{value.split(/\s/).first}"
-        else
-          cmds << "no #{resource_map[property]}"
-        end
+        cmds << "no #{resource_map[property]}"
         needs_purge = true
       end
     end
