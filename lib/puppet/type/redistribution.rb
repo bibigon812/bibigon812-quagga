@@ -2,13 +2,13 @@ Puppet::Type.newtype(:redistribution) do
   @doc = %q{
     Example:
 
-      redistribute { 'ospf::connected':
+      redistribution { 'ospf::connected':
         metric      => 100,
         metric_type => 2,
         route_map   => WORD,
       }
 
-      redistribute { 'bgp:65000:ospf':
+      redistribution { 'bgp:65000:ospf':
         metric    => 100,
         route_map => WORD,
       }
