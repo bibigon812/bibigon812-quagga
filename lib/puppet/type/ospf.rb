@@ -10,8 +10,6 @@ Puppet::Type.newtype(:ospf) do
       opaque              => true,
       rfc1583             => true,
       default_information => originate,
-      network             => [ '10.0.0.0/24 area 0.0.0.0', ],
-      redistribute        => [ 'connected route-map CONNECTED', ],
       router_id           => '192.168.0.1',
     }
   }
@@ -31,31 +29,24 @@ Puppet::Type.newtype(:ospf) do
     defaultto :cisco
   end
 
+  newproperty(:opaque) do
+    desc %q{ Enable the Opaque-LSA capability (rfc2370) }
 
-  newproperty(:default_information) do
-    desc %q{ Control distribution of default information }
+    newvalues(:false, :true)
+    defaultto(:false)
+  end
 
-    newvalues /\A(originate( always)?( metric \d+)?( metric-type (1|2))?( route-map [\w-]+)?)?\Z/
+  newproperty(:rfc1583) do
+    desc %q{ Enable the RFC1583Compatibility flag }
+
+    newvalues(:false, :true)
+    defaultto(:false)
   end
 
   newproperty(:router_id) do
     desc %q{ Router-id for the OSPF process }
 
     newvalues(/\A(\d+\.\d+\.\d+\.\d+)?\Z/)
-  end
-
-  newproperty(:network, :array_matching => :all) do
-    desc %q{ Enable routing on an IP network }
-
-    newvalues /\A\d+\.\d+\.\d+\.\d+\/\d+ area \d+\.\d+\.\d+\.\d+\Z/
-
-    def is_to_s value
-      value.sort.inspect
-    end
-
-    def should_to_s value
-      value.sort.inspect
-    end
   end
 
   autorequire(:package) do
