@@ -28,7 +28,6 @@ ospf { 'ospf':
   abr_type            => cisco,
   opaque              => true,
   rfc1583             => true,
-  default_information => originate,
   router_id           => '192.168.0.1',
 }
 
