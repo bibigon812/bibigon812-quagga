@@ -4,15 +4,12 @@ Puppet::Type.newtype(:ospf_area) do
     Example:
 
       ospf_area { '0.0.0.0':
-        default_cost => 10,
-        export_list => ABCD,
+        default_cost  => 10,
+        export_list   => ABCD,
         filter_prefix => ABCD,
-        import_list => ABCD,
-        range => [
-          '10.0.0.0/24 not-advertise',
-          '192.168.0.0/24 not-advertise',
-        ],
-        shortcut => default,
+        import_list   => ABCD,
+        network       => [ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 ],
+        shortcut      => default,
       }
 
       ospf_area { '0.0.0.1':
@@ -21,9 +18,6 @@ Puppet::Type.newtype(:ospf_area) do
 
       ospf_area { '0.0.0.2':
         stub => no-summary,
-        virtual_link => [
-          '1.1.1.1 hello-interval 2',
-        ],
       }
   }
 
