@@ -28,7 +28,7 @@ describe Puppet::Type.type(:ospf) do
       end
     end
 
-    [:abr_type, :default_information, :router_id, ].each do |property|
+    [:abr_type, :opaque, :rfc1583, :router_id, ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -73,59 +73,55 @@ describe Puppet::Type.type(:ospf) do
     end
   end
 
-  describe 'default_information' do
-    it 'should support String as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate') }.to_not raise_error
+  describe 'opaque' do
+    it 'should support true as a value' do
+      expect { described_class.new(:name => 'ospf', :opaque => true) }.to_not raise_error
     end
 
-    it 'should support String as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate always') }.to_not raise_error
+    it 'should support false as a value' do
+      expect { described_class.new(:name => 'ospf', :opaque => false) }.to_not raise_error
     end
 
-    it 'should support String as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate always metric 100 metric-type 1') }.to_not raise_error
+    it 'should support \'true\' as a value' do
+      expect { described_class.new(:name => 'ospf', :opaque => 'true') }.to_not raise_error
     end
 
-    it 'should support String as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate always metric 100') }.to_not raise_error
+    it 'should support \'false\' as a value' do
+      expect { described_class.new(:name => 'ospf', :opaque => 'false') }.to_not raise_error
     end
 
-    it 'should support String as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate metric 100 route-map ABCD') }.to_not raise_error
+    it 'should support \'tru\' as a value' do
+      expect { described_class.new(:name => 'ospf', :opaque => 'tru') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should support String as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate route-map ABCD') }.to_not raise_error
+    it 'should contain true' do
+      expect(described_class.new(:name => 'ospf', :opaque => 'true')[:opaque]).to eq(:true)
     end
 
-    it 'should not support \'origenate\' as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'origenate') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should not support \'originate metric-type A\' as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate metric-type A') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should not support \'originate metric-type 3\' as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate metric-type 3') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should not support \'originate metric -3\' as a value' do
-      expect { described_class.new(:name => 'ospf', :default_information => 'originate metric -3') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain \'originate always metric-type 2 route_map ABCD\'' do
-      expect(described_class.new(:name => 'ospf', :default_information => 'originate always metric-type 2 route-map ABCD')[:default_information]).to eq('originate always metric-type 2 route-map ABCD')
-    end
-
-    it 'should contain \'originate metric_type 2' do
-      expect(described_class.new(:name => 'ospf', :default_information => 'originate metric-type 2')[:default_information]).to eq('originate metric-type 2')
+    it 'should contain false' do
+      expect(described_class.new(:name => 'ospf', :opaque => 'false')[:opaque]).to eq(:false)
     end
   end
 
   describe 'router_id' do
     it 'should support \'1.1.1.1\' as a value' do
       expect { described_class.new(:name => 'ospf', :router_id => '1.1.1.1') }.to_not raise_error
+    end
+
+    it 'should support \'0.0.0.0\' as a value' do
+      expect { described_class.new(:name => 'ospf', :router_id => '0.0.0.0') }.to_not raise_error
+    end
+
+    it 'should support \'255.255.255.255\' as a value' do
+      expect { described_class.new(:name => 'ospf', :router_id => '255.255.255.255') }.to_not raise_error
+    end
+
+    it 'should not support \'1.1000.1.1\' as a value' do
+      expect { described_class.new(:name => 'ospf', :router_id => '1.1000.1.1') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support \'1.100.256.1\' as a value' do
+      expect { described_class.new(:name => 'ospf', :router_id => '1.100.256.1') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
     it 'should contain \'1.1.1.1\'' do
