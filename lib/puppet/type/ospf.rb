@@ -46,7 +46,10 @@ Puppet::Type.newtype(:ospf) do
   newproperty(:router_id) do
     desc %q{ Router-id for the OSPF process }
 
-    newvalues(/\A(\d+\.\d+\.\d+\.\d+)?\Z/)
+    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
+    re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
+
+    newvalues(re)
   end
 
   autorequire(:package) do
