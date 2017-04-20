@@ -28,11 +28,241 @@ describe Puppet::Type.type(:ospf_area) do
       end
     end
 
-    [ :default_cost, :list_export, :list_import, :prefix_export,
-      :prefix_import, :network, :shortcut ].each do |property|
+    [ :default_cost, :access_list_export, :access_list_import, :prefix_list_export,
+      :prefix_list_import, :network, :shortcut ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
+    end
+  end
+
+  describe 'when validating values' do
+    describe 'ensure' do
+      it 'should support present as a value' do
+        expect { described_class.new(:name => '0.0.0.0', :ensure => :present) }.to_not raise_error
+      end
+
+      it 'should support absent as a value' do
+        expect { described_class.new(:name => '0.0.0.0', :ensure => :absent) }.to_not raise_error
+      end
+
+      it 'should not support other values' do
+        expect { described_class.new(:name => '0.0.0.0', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+      end
+    end
+  end
+
+  describe 'default_cost' do
+    it 'should support 10 as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :default_cost => 10) }.to_not raise_error
+    end
+
+    it 'should support 20 as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :default_cost => '20') }.to_not raise_error
+    end
+
+    it 'should not support -1 as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :default_cost => -1) }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain 100' do
+      expect(described_class.new(:name => '0.0.0.0', :default_cost => 100)[:default_cost]).to eq(100)
+    end
+
+    it 'should contain 200' do
+      expect(described_class.new(:name => '0.0.0.0', :default_cost => '200')[:default_cost]).to eq(200)
+    end
+  end
+
+  describe 'access_list_export' do
+    it 'should support LIST-export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_export => 'LIST-export') }.to_not raise_error
+    end
+
+    it 'should support :access_list_export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_export => :access_list_export) }.to_not raise_error
+    end
+
+    it 'should not support @access_list-export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_export => '@access_list-export') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support -access_list-export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_export => '-access_list-export') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support 9-access_list-export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_export => '9-access_list-export') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain access_list_export' do
+      expect(described_class.new(:name => '0.0.0.0', :access_list_export => :access_list_export)[:access_list_export]).to eq('access_list_export')
+    end
+
+    it 'should contain access_list-export' do
+      expect(described_class.new(:name => '0.0.0.0', :access_list_export => 'access_list-export')[:access_list_export]).to eq('access_list-export')
+    end
+  end
+
+  describe 'access_list_import' do
+    it 'should support LIST-import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_import => 'LIST-import') }.to_not raise_error
+    end
+
+    it 'should support :access_list_import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_import => :access_list_import) }.to_not raise_error
+    end
+
+    it 'should not support @access_list-import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_import => '@access_list-import') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support -access_list-import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_import => '-access_list-import') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support 9-access_list-import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :access_list_import => '9-access_list-import') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain access_list_import' do
+      expect(described_class.new(:name => '0.0.0.0', :access_list_import => :access_list_import)[:access_list_import]).to eq('access_list_import')
+    end
+
+    it 'should contain access_list-import' do
+      expect(described_class.new(:name => '0.0.0.0', :access_list_import => 'access_list-import')[:access_list_import]).to eq('access_list-import')
+    end
+  end
+
+  describe 'prefix_list_export' do
+    it 'should support LIST-export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_export => 'LIST-export') }.to_not raise_error
+    end
+
+    it 'should support :prefix_list_export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_export => :prefix_list_export) }.to_not raise_error
+    end
+
+    it 'should not support @prefix_list-export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_export => '@prefix_list-export') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support -prefix_list-export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_export => '-prefix_list-export') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support 9-prefix_list-export as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_export => '9-prefix_list-export') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain prefix_list_export' do
+      expect(described_class.new(:name => '0.0.0.0', :prefix_list_export => :prefix_list_export)[:prefix_list_export]).to eq('prefix_list_export')
+    end
+
+    it 'should contain prefix_list-export' do
+      expect(described_class.new(:name => '0.0.0.0', :prefix_list_export => 'prefix_list-export')[:prefix_list_export]).to eq('prefix_list-export')
+    end
+  end
+
+  describe 'prefix_list_import' do
+    it 'should support LIST-import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => 'LIST-import') }.to_not raise_error
+    end
+
+    it 'should support :prefix_list_import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => :prefix_list_import) }.to_not raise_error
+    end
+
+    it 'should not support @prefix_list-import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => '@prefix_list-import') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support -prefix_list-import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => '-prefix_list-import') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support 9-prefix_list-import as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => '9-prefix_list-import') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain prefix_list_import' do
+      expect(described_class.new(:name => '0.0.0.0', :prefix_list_import => :prefix_list_import)[:prefix_list_import]).to eq('prefix_list_import')
+    end
+
+    it 'should contain prefix_list-import' do
+      expect(described_class.new(:name => '0.0.0.0', :prefix_list_import => 'prefix_list-import')[:prefix_list_import]).to eq('prefix_list-import')
+    end
+  end
+
+  describe 'shortcut' do
+    it 'should support true as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :shortcut => true) }.to_not raise_error
+    end
+
+    it 'should support false as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :shortcut => 'false') }.to_not raise_error
+    end
+
+    it 'should support default as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :shortcut => :default) }.to_not raise_error
+    end
+
+    it 'should not support vasya as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :shortcut => :vasya) }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain true' do
+      expect(described_class.new(:name => '0.0.0.0', :shortcut => :true)[:shortcut]).to eq(:true)
+    end
+
+    it 'should contain default' do
+      expect(described_class.new(:name => '0.0.0.0', :shortcut => 'default')[:shortcut]).to eq(:default)
+    end
+  end
+
+  describe 'stub' do
+    it 'should support true as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => true) }.to_not raise_error
+    end
+
+    it 'should support false as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => 'false') }.to_not raise_error
+    end
+
+    it 'should support no_summary as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => :no_summary) }.to_not raise_error
+    end
+
+    it 'should support no_summary as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => 'no_summary') }.to_not raise_error
+    end
+
+    it 'should support no_summary as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => 'no-summary') }.to_not raise_error
+    end
+
+    it 'should not support vasya as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => :vasya) }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support petya as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => 'petya') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain true' do
+      expect(described_class.new(:name => '0.0.0.0', :stub => :true)[:stub]).to eq(:true)
+    end
+
+    it 'should contain false' do
+      expect(described_class.new(:name => '0.0.0.0', :stub => 'false')[:stub]).to eq(:false)
+    end
+
+    it 'should contain no-summary' do
+      expect(described_class.new(:name => '0.0.0.0', :stub => 'no-summary')[:stub]).to eq('no-summary')
+    end
+
+    it 'should contain no-summary' do
+      expect(described_class.new(:name => '0.0.0.0', :stub => :no_summary)[:stub]).to eq('no-summary')
     end
   end
 end
