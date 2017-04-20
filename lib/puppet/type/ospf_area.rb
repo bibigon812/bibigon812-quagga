@@ -5,9 +5,9 @@ Puppet::Type.newtype(:ospf_area) do
 
       ospf_area { '0.0.0.0':
         default_cost  => 10,
-        export_list   => ABCD,
-        filter_prefix => ABCD,
-        import_list   => ABCD,
+        export_list   => EXPORT_ACCESS_LIST,
+        filter_prefix => FILTER_PREFIX_LIST,
+        import_list   => IPMORT_ACCESS_LIST,
         network       => [ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 ],
         shortcut      => default,
       }
