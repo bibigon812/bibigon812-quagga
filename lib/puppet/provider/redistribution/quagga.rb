@@ -90,6 +90,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
     if @property_hash[:ensure] == :absent
       line = "no redistribute #{protocol}"
+      @property_hash.clear
     else
       line = "redistribute #{protocol}"
       line << " metric #{@property_hash[:metric]}" unless @property_hash[:metric].nil?
