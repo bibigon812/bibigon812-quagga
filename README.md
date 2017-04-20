@@ -33,12 +33,13 @@ ospf { 'ospf':
 }
 
 ospf_area { '0.0.0.0':
-  default_cost  => 10,
-  export_list   => EXPORT_ACCESS_LIST,
-  filter_prefix => FILTER_PREFIX_LIST,
-  import_list   => IPMORT_ACCESS_LIST,
-  network       => [ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 ],
-  shortcut      => default,
+  default_cost       => 10,
+  access_list_export => ACCESS_LIST_EXPORT,
+  access_list_import => ACCESS_LIST_IPMORT,
+  prefix_list_export => PREFIX_LIST_EXPORT,
+  prefix_list_import => PREFIX_LIST_IMPORT,
+  network            => [ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 ],
+  shortcut           => default,
 }
 
 ospf_area { '0.0.0.1':
