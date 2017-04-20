@@ -4,13 +4,13 @@ Puppet::Type.newtype(:ospf_area) do
     Example:
 
       ospf_area { '0.0.0.0':
-        default_cost  => 10,
-        list_export   => EXPORT_ACCESS_LIST,
-        list_import   => IPMORT_ACCESS_LIST,
-        prefix_export => EXPORT_PREFIX_LIST,
-        prefix_import => IMPORT_PREFIX_LIST,
-        network       => [ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 ],
-        shortcut      => default,
+        default_cost       => 10,
+        access_list_export => ACCESS_LIST_EXPORT,
+        access_list_import => ACCESS_LIST_IPMORT,
+        prefix_list_export => PREFIX_LIST_EXPORT,
+        prefix_list_import => PREFIX_LIST_IMPORT,
+        network            => [ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 ],
+        shortcut           => default,
       }
 
       ospf_area { '0.0.0.1':
@@ -37,30 +37,50 @@ Puppet::Type.newtype(:ospf_area) do
     desc %q{ Set the summary-default cost of a NSSA or stub area }
 
     newvalues(/\A\d+\Z/)
+
+    munge do |value|
+      value.to_i
+    end
   end
 
-  newproperty(:list_export) do
+  newproperty(:access_list_export) do
     desc %q{ Set the filter for networks announced to other areas }
 
-    newvalues(/\A[\w-]+\Z/)
+    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+
+    munge do |value|
+      value.to_s
+    end
   end
 
-  newproperty(:list_import) do
+  newproperty(:access_list_import) do
     desc %q{ Set the filter for networks from other areas announced to the specified one }
 
-    newvalues(/\A[\w-]+\Z/)
+    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+
+    munge do |value|
+      value.to_s
+    end
   end
 
-  newproperty(:prefix_export) do
+  newproperty(:prefix_list_export) do
     desc %q{ Filter networks sent from this area }
 
-    newvalues(/\A[\w-]+\Z/)
+    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+
+    munge do |value|
+      value.to_s
+    end
   end
 
-  newproperty(:prefix_import) do
+  newproperty(:prefix_list_import) do
     desc %q{ Filter networks sent to this area }
 
-    newvalues(/\A[\w-]+\Z/)
+    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+
+    munge do |value|
+      value.to_s
+    end
   end
 
   newproperty(:network, :array_matching => :all) do
@@ -82,11 +102,16 @@ Puppet::Type.newtype(:ospf_area) do
   newproperty(:stub) do
     desc %q{ Configure OSPF area as stub }
 
-    newvalues(:false, :true, :no_summary, 'no-summary')
+    newvalues(:false, :true, :no_summary)
+    newvalues('no-summary')
     defaultto(:false)
 
     munge do |value|
-      value.to_s.gsub(/-/, '_').to_sym if value == 'no-summary'
+      if value == :no_summary || value == 'no-summary'
+        'no-summary'
+      else
+        value.to_s.to_sym
+      end
     end
   end
 end
