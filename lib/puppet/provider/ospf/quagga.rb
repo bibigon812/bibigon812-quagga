@@ -131,6 +131,7 @@ Puppet::Type.type(:ospf).provide :quagga do
     cmds << "router ospf"
     @property_hash.each do |property, value|
       if @resource[property].nil?
+        debug "Property #{property}"
         cmds << "no #{resource_map[property]}"
         needs_purge = true
       end
