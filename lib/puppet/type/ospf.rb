@@ -14,7 +14,17 @@ Puppet::Type.newtype(:ospf) do
     }
   }
 
-  ensurable
+  ensurable do
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+
+    defaultto(:present)
+  end
 
   newparam(:name) do
     desc %q{Name must be 'ospf'.}
