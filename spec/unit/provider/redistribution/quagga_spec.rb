@@ -21,7 +21,7 @@ describe Puppet::Type.type(:redistribution).provider(:quagga) do
 router bgp 197888
  bgp router-id 172.16.32.103
  bgp network import-check
- network 91.228.177.0/24
+ network 195.131.0.0/24
  redistribute connected metric 100 route-map ABCD
  neighbor INTERNAL peer-group
  neighbor INTERNAL remote-as 197888
@@ -58,8 +58,8 @@ router ospf
 !
 ip route 0.0.0.0/0 10.255.1.2 254
 !
-ip prefix-list ADVERTISED-PREFIXES seq 10 permit 193.160.158.0/26
-ip prefix-list CONNECTED-NETWORKS seq 20 permit 193.160.158.96/28 le 32'
+ip prefix-list ADVERTISED-PREFIXES seq 10 permit 195.131.0.0/16
+ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
     end
 
     it 'should return 5 resources' do
