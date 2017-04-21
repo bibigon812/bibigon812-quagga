@@ -237,10 +237,6 @@ describe Puppet::Type.type(:ospf_area) do
       expect { described_class.new(:name => '0.0.0.0', :stub => 'no_summary') }.to_not raise_error
     end
 
-    it 'should support no_summary as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => 'no-summary') }.to_not raise_error
-    end
-
     it 'should not support vasya as a value' do
       expect { described_class.new(:name => '0.0.0.0', :stub => :vasya) }.to raise_error(Puppet::Error, /Invalid value/)
     end
@@ -258,11 +254,7 @@ describe Puppet::Type.type(:ospf_area) do
     end
 
     it 'should contain no-summary' do
-      expect(described_class.new(:name => '0.0.0.0', :stub => 'no-summary')[:stub]).to eq('no-summary')
-    end
-
-    it 'should contain no-summary' do
-      expect(described_class.new(:name => '0.0.0.0', :stub => :no_summary)[:stub]).to eq('no-summary')
+      expect(described_class.new(:name => '0.0.0.0', :stub => :no_summary)[:stub]).to eq(:no_summary)
     end
   end
 end
