@@ -79,11 +79,11 @@ Puppet::Type.type(:ospf).provide :quagga do
   end
 
   def create
-    @property_flush[:ensure] = :present
+    @property_hash[:ensure] = :present
   end
 
   def destroy
-    @property_flush[:ensure] = :absent
+    @property_hash[:ensure] = :absent
     flush
   end
 
@@ -98,20 +98,19 @@ Puppet::Type.type(:ospf).provide :quagga do
 
     cmds = []
     cmds << "configure terminal"
-    cmds << "router ospf"
 
-    if @property_flush[:ensure] == :absent
-      remove
-      @property_flush.clear
+
+    if @property_hash[:ensure] == :absent
       @property_hash.clear
-      return
-    end
-
-    @property_flush.each do |property, value|
-      if resource_map.include? property
-        cmds << "#{resource_map[property]} #{value}"
+      cmds << "no router ospf"
+    else
+      cmds << "router ospf"
+      @property_flush.each do |property, value|
+        if resource_map.include? property
+          cmds << "#{resource_map[property]} #{value}"
+        end
+        @property_hash[property] = value
       end
-      @property_hash[property] = value
     end
     @property_flush.clear
 
@@ -140,16 +139,6 @@ Puppet::Type.type(:ospf).provide :quagga do
     cmds << "write memory"
 
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
-  end
-
-  def remove
-    cmds = []
-    cmds << 'configure terminal'
-    cmds << 'no router ospf'
-    cmds << 'end'
-    cmds << 'write memory'
-
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   @resource_map.keys.each do |property|
