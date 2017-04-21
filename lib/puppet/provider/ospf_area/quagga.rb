@@ -163,6 +163,9 @@ Puppet::Type.type(:ospf_area).provide :quagga do
 
   def purge
     debug '[purge]'
+
+    resource_map = self.class.instance_variable_get('@resource_map')
+
     need_purge = false
     cmds = []
     cmds << "configure terminal"
