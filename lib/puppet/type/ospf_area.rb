@@ -22,17 +22,7 @@ Puppet::Type.newtype(:ospf_area) do
       }
   }
 
-  ensurable do
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-
-    defaultto(:present)
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ OSPF area }
