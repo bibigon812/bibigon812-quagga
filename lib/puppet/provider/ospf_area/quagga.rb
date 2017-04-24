@@ -129,19 +129,20 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     cmds << "router ospf"
 
     if @property_hash[:ensure] == :absent
-      @property_hash.each do |property, current_value|
-        debug "protperty: #{property}, value: #{current_value}"
-        case resource_map[property][:type]
-        when :Array
-          current_value.each do |value|
-            cmds << "no " + ERB.new(resource_map[property][:template]).result()
+      resource_map.each do |property, options|
+        unless @property_hash[property].nil?
+          case options[:type]
+          when :Array
+            @property_hash[property].each do |value|
+              cmds << "no " + ERB.new(options[:template]).result()
+            end
+          when :Symbol
+            value = @property_hash[property].to_s.gsub(/_/, '-')
+            cmds << "no " + ERB.new(options[:template]).result()
+          else
+            value = @property_hash[property]
+            cmds << "no " + ERB.new(options[:template]).result()
           end
-        when :Symbol
-          value = current_value.to_s.gsub(/_/, '-')
-          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
-        else
-          value = current_value
-          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
         end
       end
       @property_hash.clear
@@ -183,20 +184,21 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     cmds = []
     cmds << "configure terminal"
     cmds << "router ospf"
-    @property_hash.each do |property, current_value|
+    resource_map.each do |property, options|
       if @resource[property].nil?
-        case resource_map[property][:type]
+        case options[:type]
         when :Array
-          current_value.each do |value|
-            cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
+          @property_hash[property].each do |value|
+            cmds << "no " + ERB.new(options[:template]).result()
           end
         when :Symbol
-          value = current_value.to_s.gsub(/_/, '-')
+          value = @property_hash[property].to_s.gsub(/_/, '-')
           cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
         else
-          value = current_value
+          value = @property_hash[proeprty]
           cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
         end
+        @property_hash[property] = :absent
       end
     end
     cmds << "end"
