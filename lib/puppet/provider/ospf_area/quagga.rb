@@ -201,7 +201,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     resource_map = self.class.instance_variable_get('@resource_map')
 
     resource_map.keys.each do |property|
-      if @resource[property].nil?
+      if (!@property_hash[property].nil?) && @resource[property].nil?
         @property_remove[property] = @property_hash[property]
       end
     end
