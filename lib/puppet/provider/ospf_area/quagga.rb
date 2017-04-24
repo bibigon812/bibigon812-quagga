@@ -129,8 +129,8 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     cmds << "router ospf"
 
     if @property_hash[:ensure] == :absent
-      @preopert_hash.each do |property, current_value|
-        case @resource_map[property][:type]
+      @property_hash.each do |property, current_value|
+        case resource_map[property][:type]
         when :Array
           current_value.each do |value|
             cmds << "no " + ERB.new(resource_map[property][:template]).result()
