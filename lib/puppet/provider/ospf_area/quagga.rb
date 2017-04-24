@@ -131,13 +131,14 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     if @property_hash[:ensure] == :absent
       resource_map.each do |property, options|
         unless @property_hash[property].nil?
+          debug "property: #{property}, value: @proeprty_hash[property]"
           case options[:type]
           when :Array
             @property_hash[property].each do |value|
               cmds << "no " + ERB.new(options[:template]).result(binding)
             end
           when :Symbol
-            next if options[:default] == @proeprty_hash[property]
+            next if options[:default] == @property_hash[property]
             if [:true, :false].include?(@property_hash[property])
               value = ""
             else
