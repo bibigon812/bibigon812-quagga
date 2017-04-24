@@ -137,7 +137,12 @@ Puppet::Type.type(:ospf_area).provide :quagga do
               cmds << "no " + ERB.new(options[:template]).result(binding)
             end
           when :Symbol
-            value = @property_hash[property].to_s.gsub(/_/, '-')
+            next if options[:default] == @proeprty_hash[property]
+            if [:true, :false].include?(@property_hash[property])
+              value = ""
+            else
+              value = @property_hash[property].to_s.gsub(/_/, '-')
+            end
             cmds << "no " + ERB.new(options[:template]).result(binding)
           else
             value = @property_hash[property]
