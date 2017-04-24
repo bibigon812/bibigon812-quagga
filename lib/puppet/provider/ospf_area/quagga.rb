@@ -129,9 +129,19 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     cmds << "router ospf"
 
     if @property_hash[:ensure] == :absent
-      cmds << "no area #{area}"
-      @property_hash[:network].each do |network|
-        cmds << "no network #{network} area #{area}"
+      @preopert_hash.each do |property, current_value|
+        case resource_map[property][:type]
+        when :Array
+          current_value.each do |value|
+            cmds << "no " + ERB.new(resource_map[property][:template]).result()
+          end
+        when :Symbol
+          value = current_value.to_s.gsub(/_/, '-')
+          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
+        else
+          value = current_value
+          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
+        end
       end
       @property_hash.clear
     else
@@ -166,19 +176,31 @@ Puppet::Type.type(:ospf_area).provide :quagga do
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
+    area = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
+
     need_purge = false
     cmds = []
     cmds << "configure terminal"
     cmds << "router ospf"
-    @property_hash.each do |property, value|
+    @property_hash.each do |property, current_value|
       if @resource[property].nil?
-        cmds << "no " + ERB.new(resource_map[proeprty])
+        case resource_map[property][:type]
+        when :Array
+          current_value.each do |value|
+            cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
+          end
+        when :Symbol
+          value = current_value.to_s.gsub(/_/, '-')
+          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
+        else
+          value = current_value
+          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
+        end
       end
     end
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
-    @property_hash.clear
   end
 
   @resource_map.keys.each do |property|
