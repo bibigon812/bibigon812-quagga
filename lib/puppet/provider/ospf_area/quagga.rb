@@ -85,6 +85,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       end
     end
     hash.each_value do |area_hash|
+      debug "#{area_hash}"
       ospf_areas << new(area_hash)
     end
     ospf_areas
