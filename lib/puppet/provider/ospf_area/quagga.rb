@@ -134,14 +134,14 @@ Puppet::Type.type(:ospf_area).provide :quagga do
           case options[:type]
           when :Array
             @property_hash[property].each do |value|
-              cmds << "no " + ERB.new(options[:template]).result()
+              cmds << "no " + ERB.new(options[:template]).result(binding)
             end
           when :Symbol
             value = @property_hash[property].to_s.gsub(/_/, '-')
-            cmds << "no " + ERB.new(options[:template]).result()
+            cmds << "no " + ERB.new(options[:template]).result(binding)
           else
             value = @property_hash[property]
-            cmds << "no " + ERB.new(options[:template]).result()
+            cmds << "no " + ERB.new(options[:template]).result(binding)
           end
         end
       end
@@ -152,17 +152,17 @@ Puppet::Type.type(:ospf_area).provide :quagga do
         when :Array
           old_value = @property_hash[property]
           (old_value - new_value).each do |value|
-            cmds << "no " + ERB.new(resource_map[property][:template]).result()
+            cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
           end
           (new_value - old_value).each do |value|
-            cmds << ERB.new(resource_map[property][:template]).result()
+            cmds << ERB.new(resource_map[property][:template]).result(binding)
           end
         when :Symbol
           value = new_value.to_s.gsub(/_/, '-')
-          cmds << ERB.new(resource_map[property][:template]).result()
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
         else
           value = new_value
-          cmds << ERB.new(resource_map[property][:template]).result()
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
         end
         @proeprty_hash[property] = value
       end
@@ -189,14 +189,14 @@ Puppet::Type.type(:ospf_area).provide :quagga do
         case options[:type]
         when :Array
           @property_hash[property].each do |value|
-            cmds << "no " + ERB.new(options[:template]).result()
+            cmds << "no " + ERB.new(options[:template]).result(binding)
           end
         when :Symbol
           value = @property_hash[property].to_s.gsub(/_/, '-')
-          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
+          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result(binding)
         else
           value = @property_hash[proeprty]
-          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result()
+          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result(binding)
         end
         @property_hash[property] = :absent
       end
