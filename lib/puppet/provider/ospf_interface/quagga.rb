@@ -18,10 +18,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  def initialize value={}
-    super(value)
-    @property_flush = {}
-  end
+  mk_resource_methods
 
   def self.instances
     ospf_interfaces = []
@@ -78,18 +75,22 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
         found_providers << provider
+        provider.flush
       end
+    end
+    (providers - found_providers).each do |provider|
+      provider.destroy
     end
   end
 
   def create
-    debug 'Enabling OSPF for interface: %s' % @resource[:name]
-    @property_flush[:ensure] = :enabled
+    debug '[create]'
+    @property_hash[:ensure] = :present
   end
 
   def destroy
-    debug 'Disabling OSPF for interface: %s' % @property_hash[:name]
-    @property_flush[:ensure] = :absent
+    debug '[destroy]'
+    @property_hash.clear
   end
 
   def exists?
@@ -99,48 +100,29 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   def flush
     debug 'Flushing changes'
 
-    if @property_flush[:ensure] == :absent
-      @property_flush.clear
-      @property_hash.clear
-      return
-    end
-
     resource_map = self.class.instance_variable_get('@resource_map')
+    name = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
 
     cmds = []
     cmds << "configure terminal"
-    cmds << "interface #{@property_hash[:name]}"
+    cmds << "interface #{name}"
 
-    @property_flush.each do |property, value|
-      if value.to_sym == :true
-        cmds << "ip ospf #{resource_map[property]}"
-      elsif value.to_sym == :false
-        cmds << "no ip ospf #{resource_map[property]}"
+    resource_map.each do |property, command|
+      if @property_hash[property].nil?
+        cmds << "no ip ospf #{command}"
       else
-        cmds << "ip ospf #{resource_map[property]} #{value}"
+        if value == :true
+          cmds << "ip ospf #{command}"
+        elsif value == :false
+          cmds << "no ip ospf #{command}"
+        else
+          cmds << "ip ospf #{command} #{@property_hash[property]}"
+        end
       end
-      @property_hash[property] = value
     end
-    @property_flush.clear
 
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-  end
-
-  @resource_map.keys.each do |property|
-    if @known_booleans.include?(property)
-      define_method "#{property}" do
-        @property_hash[property] || :false
-      end
-    else
-      define_method "#{property}" do
-        @property_hash[property] || :absent
-      end
-    end
-
-    define_method "#{property}=" do |value|
-      @property_flush[property] = value
-    end
   end
 end
