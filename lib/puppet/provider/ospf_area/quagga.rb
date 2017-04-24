@@ -156,7 +156,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
           else
             value = desired_value.to_s.gsub(/_/, '-')
           end
-          cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
+          cmds << "no " + ERB.new(resource_map[property][:template]).result(binding).strip
         else
           value = @property_hash[property]
           cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
@@ -165,6 +165,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
 
 
     @property_flush.each do |property, desired_value|
+      debug "[change]: #{property} => #{desired_value}"
       case resource_map[property][:type]
       when :Array
         old_value = @property_hash[property].nil? ? [] : @property_hash[property]
@@ -179,10 +180,11 @@ Puppet::Type.type(:ospf_area).provide :quagga do
         if desired_value == :true
           value = ""
         elsif desired_value == :false
+          cmd = "no"
         else
           value = desired_value.to_s.gsub(/_/, '-')
         end
-        cmds << ERB.new(resource_map[property][:template]).result(binding)
+        cmds << "#{cmd} #{ERB.new(resource_map[property][:template]).result(binding)}".strip
       else
         value = desired_value
         cmds << ERB.new(resource_map[property][:template]).result(binding)
