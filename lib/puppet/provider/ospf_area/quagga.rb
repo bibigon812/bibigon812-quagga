@@ -19,6 +19,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
   def initialize(value={})
     super(value)
     @property_flush = {}
+    @property_remove = {}
   end
 
   def self.instances
@@ -98,6 +99,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
         found_providers << provider
+        provider.purge
       end
     end
     (providers - found_providers).each do |provider|
@@ -106,12 +108,23 @@ Puppet::Type.type(:ospf_area).provide :quagga do
   end
 
   def create
+    resource_map = self.class.instance_variable_get('@resource_map')
+
     @property_hash[:ensure] = :present
+
+    resource_map.keys.each do |property|
+      @property_flush[property] = @resource[property] unless @resource[property].nil?
+    end
   end
 
   def destroy
+    resource_map = self.class.instance_variable_get('@resource_map')
+
     @property_hash[:ensure] = :absent
-    flush
+
+    resource_map.keys.each do |property|
+      @property_remove[property] = @property_hash[property] unless @property_hash[property].nil?
+    end
   end
 
   def exists?
@@ -129,88 +142,69 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     cmds << "configure terminal"
     cmds << "router ospf"
 
-    if @property_hash[:ensure] == :absent
-      resource_map.each do |property, options|
-        unless @property_hash[property].nil?
-          debug "property: #{property}, value: @proeprty_hash[property]"
-          case options[:type]
-          when :Array
-            @property_hash[property].each do |value|
-              cmds << "no " + ERB.new(options[:template]).result(binding)
-            end
-          when :Symbol
-            next if options[:default] == @property_hash[property]
-            if [:true, :false].include?(@property_hash[property])
-              value = ""
-            else
-              value = @property_hash[property].to_s.gsub(/_/, '-')
-            end
-            cmds << "no " + ERB.new(options[:template]).result(binding)
-          else
-            value = @property_hash[property]
-            cmds << "no " + ERB.new(options[:template]).result(binding)
-          end
-        end
-      end
-      @property_hash.clear
-    else
-      @property_flush.each do |property, new_value|
-        case resource_map[property][:type]
+    @property_remove.each do |property, desired_value|
+      debug "[remove]: #{property} => #{desired_value}"
+      case resource_map[property][:type]
         when :Array
-          old_value = @property_hash[property]
-          (old_value - new_value).each do |value|
+          desired_value.each do |value|
             cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
           end
-          (new_value - old_value).each do |value|
-            cmds << ERB.new(resource_map[property][:template]).result(binding)
-          end
         when :Symbol
-          value = new_value.to_s.gsub(/_/, '-')
-          cmds << ERB.new(resource_map[property][:template]).result(binding)
+          next if options[:default] == desired_value
+          if [:true, :false].include?(desired_value)
+            value = ""
+          else
+            value = desired_value.to_s.gsub(/_/, '-')
+          end
+          cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
         else
-          value = new_value
-          cmds << ERB.new(resource_map[property][:template]).result(binding)
-        end
-        @proeprty_hash[property] = value
+          value = @property_hash[property]
+          cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
       end
     end
+
+
+    @property_flush.each do |property, desired_value|
+      case resource_map[property][:type]
+      when :Array
+        old_value = @property_hash[property].nil? ? [] : @property_hash[property]
+        (old_value - desired_value).each do |value|
+          cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
+        end
+        (desired_value - old_value).each do |value|
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
+        end
+      when :Symbol
+        cmd = ""
+        if desired_value == :true
+          value = ""
+        elsif desired_value == :false
+        else
+          value = desired_value.to_s.gsub(/_/, '-')
+        end
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      else
+        value = desired_value
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      end
+      @property_hash[property] = desired_value
+    end
+
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
     @property_flush.clear
+    @property_remove.clear
   end
 
   def purge
-    debug '[purge]'
-
     resource_map = self.class.instance_variable_get('@resource_map')
 
-    area = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
-
-    need_purge = false
-    cmds = []
-    cmds << "configure terminal"
-    cmds << "router ospf"
-    resource_map.each do |property, options|
+    resource_map.keys.each do |property|
       if @resource[property].nil?
-        case options[:type]
-        when :Array
-          @property_hash[property].each do |value|
-            cmds << "no " + ERB.new(options[:template]).result(binding)
-          end
-        when :Symbol
-          value = @property_hash[property].to_s.gsub(/_/, '-')
-          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result(binding)
-        else
-          value = @property_hash[proeprty]
-          cmds << "no " + ERB.new(resource_map[proeprty][:template]).result(binding)
-        end
-        @property_hash[property] = :absent
+        @property_remove[property] = @property_hash[property]
       end
     end
-    cmds << "end"
-    cmds << "write memory"
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
   end
 
   @resource_map.keys.each do |property|
