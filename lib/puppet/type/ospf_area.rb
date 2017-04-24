@@ -95,8 +95,21 @@ Puppet::Type.newtype(:ospf_area) do
   newproperty(:shortcut) do
     desc %q{ Configure the area's shortcutting mode }
 
-    newvalues(:false, :true, :default)
+    newvalues(:disable, :default, :enable, :false, :true)
     defaultto(:default)
+
+    munge do |value|
+      case value
+        when :false
+          :disable
+        when :true
+          :enable
+        when String
+          value.to_sym
+        else
+          value
+      end
+    end
   end
 
   newproperty(:stub) do

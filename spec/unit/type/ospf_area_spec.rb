@@ -203,6 +203,14 @@ describe Puppet::Type.type(:ospf_area) do
       expect { described_class.new(:name => '0.0.0.0', :shortcut => 'false') }.to_not raise_error
     end
 
+    it 'should support true as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :shortcut => :enable) }.to_not raise_error
+    end
+
+    it 'should support false as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :shortcut => 'disable') }.to_not raise_error
+    end
+
     it 'should support default as a value' do
       expect { described_class.new(:name => '0.0.0.0', :shortcut => :default) }.to_not raise_error
     end
@@ -211,8 +219,20 @@ describe Puppet::Type.type(:ospf_area) do
       expect { described_class.new(:name => '0.0.0.0', :shortcut => :vasya) }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should contain true' do
-      expect(described_class.new(:name => '0.0.0.0', :shortcut => :true)[:shortcut]).to eq(:true)
+    it 'should contain enable' do
+      expect(described_class.new(:name => '0.0.0.0', :shortcut => :true)[:shortcut]).to eq(:enable)
+    end
+
+    it 'should contain enable' do
+      expect(described_class.new(:name => '0.0.0.0', :shortcut => :enable)[:shortcut]).to eq(:enable)
+    end
+
+    it 'should contain disable' do
+      expect(described_class.new(:name => '0.0.0.0', :shortcut => 'disable')[:shortcut]).to eq(:disable)
+    end
+
+    it 'should contain disable' do
+      expect(described_class.new(:name => '0.0.0.0', :shortcut => :false)[:shortcut]).to eq(:disable)
     end
 
     it 'should contain default' do
