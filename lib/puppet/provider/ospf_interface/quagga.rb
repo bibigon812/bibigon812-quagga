@@ -20,9 +20,15 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
 
   mk_resource_methods
 
+  def initialize(value)
+    super(value)
+    @property_flush = {}
+    @property_remove = {}
+  end
+
   def self.instances
     ospf_interfaces = []
-    debug 'Creating instances of OSPF interfaces'
+    debug '[instances]'
     hash = {}
     config = vtysh('-c', 'show ip ospf interface')
     config.split(/\n/).collect do |line|
@@ -41,9 +47,9 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
       elsif line =~ /\A\s+MTU mismatch detection:(\w+)\Z/
         case $1
         when 'disabled'
-          hash[:mtu_ignore] = :true
+          hash[:mtu_ignore] = :enable
         else
-          hash[:mtu_ignore] = :false
+          hash[:mtu_ignore] = :disable
         end
       elsif line =~ /\A\s+Router\s+ID\s+(\d+\.\d+\.\d+\.\d+),\s+Network\s+Type\s+(\w+),\s+Cost:\s+(\d+)\Z/
         network = $2
@@ -84,13 +90,25 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   end
 
   def create
-    debug '[create]'
+    resource_map = self.class.instance_variable_get('@resource_map')
+
     @property_hash[:ensure] = :present
+
+    resource_map.keys.each do |property|
+      @property_flush[property] = @resource[property] unless @resource[property].nil?
+    end
   end
 
   def destroy
-    debug '[destroy]'
-    @property_hash.clear
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    @property_hash[:ensure] = :absent
+
+    resource_map.keys.each do |property|
+      @property_remove[property] = @property_hash[property] unless @property_hash[property].nil?
+    end
+
+    flush unless @property_remove.empty?
   end
 
   def exists?
@@ -98,31 +116,60 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   end
 
   def flush
-    debug 'Flushing changes'
-
     resource_map = self.class.instance_variable_get('@resource_map')
     name = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
+
+    debug "[flush][#{name}]"
 
     cmds = []
     cmds << "configure terminal"
     cmds << "interface #{name}"
 
-    resource_map.each do |property, command|
-      if @property_hash[property].nil?
-        cmds << "no ip ospf #{command}"
-      else
-        if value == :true
-          cmds << "ip ospf #{command}"
-        elsif value == :false
-          cmds << "no ip ospf #{command}"
+    @property_remove.keys.each do |property|
+      debug "The #{property} property has been removed"
+
+      cmds << "no ip ospf #{resource_map[property]}"
+    end
+
+    @property_flush.each do |property, value|
+      debug "The #{property} property has been changed from #{@property_hash[property]} to #{desired_value}"
+
+      cmd = "ip ospf"
+      case value
+        when :disable
+          cmds << "no ip ospf #{resource_map[property]}"
+        when :enable
+          cmds << "ip ospf #{resource_map[property]}"
         else
-          cmds << "ip ospf #{command} #{@property_hash[property]}"
-        end
+          cmds << "ip ospf #{resource_map[property]} #{value}"
       end
     end
 
     cmds << "end"
     cmds << "write memory"
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+  end
+
+  def purge
+    debug '[purge]'
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    resource_map.keys.each do |property|
+      if (!@property_hash[property].nil?) && @resource[property].nil?
+        @property_remove[property] = @property_hash[property]
+      end
+    end
+
+    flush unless @property_remove.empty?
+  end
+
+  @resource_map.keys.each do |property|
+    define_method "#{property}" do
+      @property_hash[property] || :absent
+    end
+
+    define_method "#{property}=" do |value|
+      @property_flush[property] = value
+    end
   end
 end
