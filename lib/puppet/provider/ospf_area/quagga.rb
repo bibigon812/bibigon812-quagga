@@ -204,7 +204,9 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     resource_map = self.class.instance_variable_get('@resource_map')
 
     resource_map.keys.each do |property|
-      debug "Is #{property} empty? #{@property_hash[property].nil?}"
+      debug "Is the property #{property} empty? #{@property_hash[property].nil?}"
+      debug "Is the resource #{property} empty? #{@resource[property].nil?}"
+
       if (!@property_hash[property].nil?) && @resource[property].nil?
         @property_remove[property] = @property_hash[property]
       end
