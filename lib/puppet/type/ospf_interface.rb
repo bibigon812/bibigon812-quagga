@@ -27,6 +27,7 @@ Puppet::Type.newtype(:ospf_interface) do
     desc %q{ Interface cost }
 
     newvalues(/\A\d+\Z/)
+    defaultto(10)
 
     validate do |value|
       value = value.to_i
@@ -44,6 +45,7 @@ Puppet::Type.newtype(:ospf_interface) do
     desc %q{ Interval after which a neighbor is declared dead }
 
     newvalues(/\A\d+\Z/)
+    defaultto(40)
 
     validate do |value|
       value = value.to_i
@@ -61,6 +63,7 @@ Puppet::Type.newtype(:ospf_interface) do
     desc %q{ Time between HELLO packets }
 
     newvalues(/\A\d+\Z/)
+    defaultto(10)
 
     validate do |value|
       value = value.to_i
@@ -112,6 +115,7 @@ Puppet::Type.newtype(:ospf_interface) do
     desc %q{ Router priority }
 
     newvalues(/\A\d+\Z/)
+    defaultto(1)
 
     validate do |value|
       value = value.to_i
@@ -129,6 +133,7 @@ Puppet::Type.newtype(:ospf_interface) do
     desc %q{ Time between retransmitting lost link state advertisements }
 
     newvalues(/\A\d+\Z/)
+    defaultto(5)
 
     validate do |value|
       value = value.to_i
@@ -146,6 +151,7 @@ Puppet::Type.newtype(:ospf_interface) do
     desc %q{ Link state transmit delay }
 
     newvalues(/\A\d+\Z/)
+    defaultto(1)
 
     validate do |value|
       value = value.to_i

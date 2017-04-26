@@ -2,14 +2,14 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   @doc = %q{Manages the interface ospf parameters using quagga}
 
   @resource_map = {
-    :cost                 => 'cost',
-    :dead_interval        => 'dead-interval',
-    :hello_interval       => 'hello-interval',
-    :mtu_ignore           => 'mtu-ignore',
-    :network              => 'network',
-    :priority             => 'priority',
-    :retransmit_interval  => 'retransmit-interval',
-    :transmit_delay       => 'transmit-delay',
+    :cost                 => { :config => 'cost', :default => 10, },
+    :dead_interval        => { :config => 'dead-interval', :default => 40 },
+    :hello_interval       => { :config => 'hello-interval', :default => 10 },
+    :mtu_ignore           => { :config => 'mtu-ignore', :default => :disable },
+    :network              => { :config => 'network' },
+    :priority             => { :config => 'priority', :default => 1 },
+    :retransmit_interval  => { :config => 'retransmit-interval', :default => 5 },
+    :transmit_delay       => { :config => 'transmit-delay', :default => 1 }
   }
 
   @known_booleans = [
@@ -105,7 +105,9 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     @property_hash[:ensure] = :absent
 
     resource_map.keys.each do |property|
-      @property_remove[property] = @property_hash[property] unless @property_hash[property].nil?
+      unless @property_hash[property].nil? || @property_hash[property] == resource_map[property][:default]
+        @property_remove[property] = @property_hash[property]
+      end
     end
 
     flush unless @property_remove.empty?
@@ -122,26 +124,26 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     debug "[flush][#{name}]"
 
     cmds = []
-    cmds << "configure terminal"
+    cmds << 'configure terminal'
     cmds << "interface #{name}"
 
     @property_remove.keys.each do |property|
       debug "The #{property} property has been removed"
 
-      cmds << "no ip ospf #{resource_map[property]}"
+      cmds << "no ip ospf #{resource_map[property][:config]}"
     end
 
     @property_flush.each do |property, value|
-      debug "The #{property} property has been changed from #{@property_hash[property]} to #{desired_value}"
+      debug "The #{property} property has been changed from #{@property_hash[property]} to #{value}"
 
       cmd = "ip ospf"
       case value
         when :disable
-          cmds << "no ip ospf #{resource_map[property]}"
+          cmds << "no ip ospf #{resource_map[property][:config]}"
         when :enable
-          cmds << "ip ospf #{resource_map[property]}"
+          cmds << "ip ospf #{resource_map[property][:config]}"
         else
-          cmds << "ip ospf #{resource_map[property]} #{value}"
+          cmds << "ip ospf #{resource_map[property][:config]} #{value}"
       end
     end
 
