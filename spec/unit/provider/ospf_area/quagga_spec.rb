@@ -84,7 +84,7 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
         :network => [ '10.255.1.0/24', '10.255.2.0/24', '10.255.3.0/24' ],
         :provider => :quagga,
         :shortcut => :default,
-        :stub => :false,
+        :stub => :disable,
       })
     end
 
@@ -99,7 +99,7 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
         :prefix_list_import => 'PREFIX_LIST_IMPORT',
         :provider => :quagga,
         :shortcut => :default,
-        :stub => :true,
+        :stub => :enable,
       })
     end
   end
