@@ -145,7 +145,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     cmds << "router ospf"
 
     @property_remove.each do |property, desired_value|
-      debug "[remove] #{property} #{desired_value}"
+      debug "The #{property} property has been removed"
       case resource_map[property][:type]
         when :Array
           desired_value.each do |value|
@@ -167,7 +167,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
 
 
     @property_flush.each do |property, desired_value|
-      debug "[change] #{property} from #{@property_hash[property]} to #{desired_value}"
+      debug "The #{property} property has been changed from #{@property_hash[property]} to #{desired_value}"
       case resource_map[property][:type]
       when :Array
         old_value = @property_hash[property].nil? ? [] : @property_hash[property]
@@ -213,7 +213,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       end
     end
 
-    flush
+    flush unless @property_remove.empty?
   end
 
   @resource_map.keys.each do |property|
