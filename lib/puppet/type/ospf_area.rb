@@ -100,9 +100,9 @@ Puppet::Type.newtype(:ospf_area) do
 
     munge do |value|
       case value
-        when :false, 'false'
+        when :false, 'false', false
           :disable
-        when :true, 'true'
+        when :true, 'true', true
           :enable
         when 'default'
           :default
@@ -123,12 +123,12 @@ Puppet::Type.newtype(:ospf_area) do
 
     munge do |value|
       case value
+        when :false, 'false', false
+          :disable
+        when :true, 'true', true
+          :enable
         when 'no-summary', 'no_summary'
           :no_summary
-        when :false, 'false'
-          :disable
-        when :true, 'true'
-          :enable
         when String
           value.to_sym
         else

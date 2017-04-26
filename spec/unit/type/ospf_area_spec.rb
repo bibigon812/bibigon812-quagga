@@ -281,6 +281,11 @@ describe Puppet::Type.type(:ospf_area) do
       expect(described_class.new(:name => '0.0.0.0', :stub => :true)[:stub]).to eq(:enable)
     end
 
+    it 'should contain true' do
+      expect(described_class.new(:name => '0.0.0.0', :stub => true)[:stub]).to eq(:enable)
+    end
+
+
     it 'should contain false' do
       expect(described_class.new(:name => '0.0.0.0', :stub => 'false')[:stub]).to eq(:disable)
     end
