@@ -123,9 +123,9 @@ Puppet::Type.newtype(:ospf_area) do
 
     munge do |value|
       case value
-        when :false, 'false', false
+        when :false, 'false', false, 'disable'
           :disable
-        when :true, 'true', true
+        when :true, 'true', true, 'enable'
           :enable
         when 'no-summary', 'no_summary'
           :no_summary
