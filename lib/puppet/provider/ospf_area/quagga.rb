@@ -125,6 +125,8 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     resource_map.keys.each do |property|
       @property_remove[property] = @property_hash[property] unless @property_hash[property].nil?
     end
+
+    flush
   end
 
   def exists?
@@ -210,6 +212,8 @@ Puppet::Type.type(:ospf_area).provide :quagga do
         @property_remove[property] = @property_hash[property]
       end
     end
+
+    flush
   end
 
   @resource_map.keys.each do |property|
