@@ -77,11 +77,18 @@ Puppet::Type.newtype(:ospf_interface) do
   newproperty(:mtu_ignore) do
     desc %q{ Disable mtu mismatch detection }
 
-    newvalues(:true, :false)
-    defaultto(:false)
+    newvalues(:disable, :enable, :true, :false)
+    defaultto(:disable)
 
     munge do |value|
-      value.to_s.to_sym
+      case value
+        when false, :false, 'false', 'disable'
+          :disable
+        when true, :true, 'true', 'enable'
+          :enable
+        else
+          value
+      end
     end
   end
 
@@ -92,7 +99,12 @@ Puppet::Type.newtype(:ospf_interface) do
     newvalues('non-broadcast', 'point-to-multipoint', 'point-to-point')
 
     munge do |value|
-      value.to_s.gsub(/-/, '_').to_sym
+      case value
+        when String
+          value.gsub(/-/, '_').to_sym
+        else
+          value
+      end
     end
   end
 
