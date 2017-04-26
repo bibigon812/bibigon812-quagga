@@ -254,6 +254,10 @@ describe Puppet::Type.type(:ospf_area) do
     end
 
     it 'should support no_summary as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => 'no-summary') }.to_not raise_error
+    end
+
+    it 'should support no_summary as a value' do
       expect { described_class.new(:name => '0.0.0.0', :stub => 'no_summary') }.to_not raise_error
     end
 
@@ -275,6 +279,10 @@ describe Puppet::Type.type(:ospf_area) do
 
     it 'should contain no-summary' do
       expect(described_class.new(:name => '0.0.0.0', :stub => :no_summary)[:stub]).to eq(:no_summary)
+    end
+
+    it 'should contain no-summary' do
+      expect(described_class.new(:name => '0.0.0.0', :stub => 'no-summary')[:stub]).to eq(:no_summary)
     end
   end
 end

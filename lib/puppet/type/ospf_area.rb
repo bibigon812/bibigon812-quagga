@@ -116,6 +116,18 @@ Puppet::Type.newtype(:ospf_area) do
     desc %q{ Configure OSPF area as stub }
 
     newvalues(:false, :true, :no_summary)
+    newvalues('no-summary')
     defaultto(:false)
+
+    munge do |value|
+      case value
+        when 'no-summary'
+          :no_summary
+        when String
+          value.to_sym
+        else
+          value
+      end
+    end
   end
 end
