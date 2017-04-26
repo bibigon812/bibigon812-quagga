@@ -134,11 +134,10 @@ Puppet::Type.type(:ospf_area).provide :quagga do
   end
 
   def flush
-    debug '[flush]'
-
     resource_map = self.class.instance_variable_get('@resource_map')
-
     area = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
+
+    debug "[flush][#{area}]"
 
     cmds = []
     cmds << "configure terminal"
@@ -164,7 +163,6 @@ Puppet::Type.type(:ospf_area).provide :quagga do
           cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
       end
     end
-
 
     @property_flush.each do |property, desired_value|
       debug "The #{property} property has been changed from #{@property_hash[property]} to #{desired_value}"
@@ -207,8 +205,6 @@ Puppet::Type.type(:ospf_area).provide :quagga do
 
     resource_map.keys.each do |property|
       if (!@property_hash[property].nil?) && @resource[property].nil?
-        debug "The property #{property} has been selected to remove"
-
         @property_remove[property] = @property_hash[property]
       end
     end
