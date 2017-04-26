@@ -152,7 +152,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
             cmds << "no " + ERB.new(resource_map[property][:template]).result(binding)
           end
         when :Symbol
-          next if options[:default] == desired_value
+          next if resource_map[property][:default] == desired_value
           if [:true, :false].include?(desired_value)
             value = ""
           else
