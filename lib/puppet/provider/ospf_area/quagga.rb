@@ -153,7 +153,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
           end
         when :Symbol
           next if resource_map[property][:default] == desired_value
-          if [:true, :false].include?(desired_value)
+          if desired_value == :enable
             value = ""
           else
             value = desired_value.to_s.gsub(/_/, '-')
