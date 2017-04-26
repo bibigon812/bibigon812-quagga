@@ -98,8 +98,9 @@ Puppet::Type.newtype(:ospf_interface) do
   newproperty(:network) do
     desc %q{ Network type }
 
-    newvalues(:broadcast, :non_broadcast, :point_to_multipoint, :point_to_point)
+    newvalues(:broadcast, :non_broadcast, :point_to_multipoint, :point_to_point, :loopback)
     newvalues('non-broadcast', 'point-to-multipoint', 'point-to-point')
+    defaultto(:broadcast)
 
     munge do |value|
       case value

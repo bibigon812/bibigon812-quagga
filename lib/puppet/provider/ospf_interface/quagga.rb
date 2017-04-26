@@ -2,14 +2,14 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   @doc = %q{Manages the interface ospf parameters using quagga}
 
   @resource_map = {
-    :cost                 => { :config => 'cost', :default => 10, },
-    :dead_interval        => { :config => 'dead-interval', :default => 40 },
-    :hello_interval       => { :config => 'hello-interval', :default => 10 },
-    :mtu_ignore           => { :config => 'mtu-ignore', :default => :disable },
-    :network              => { :config => 'network' },
-    :priority             => { :config => 'priority', :default => 1 },
-    :retransmit_interval  => { :config => 'retransmit-interval', :default => 5 },
-    :transmit_delay       => { :config => 'transmit-delay', :default => 1 }
+    :cost                 => 'cost',
+    :dead_interval        => 'dead-interval',
+    :hello_interval       => 'hello-interval',
+    :mtu_ignore           => 'mtu-ignore',
+    :network              => 'network',
+    :priority             => 'priority',
+    :retransmit_interval  => 'retransmit-interval',
+    :transmit_delay       => 'transmit-delay',
   }
 
   @known_booleans = [
@@ -23,7 +23,6 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   def initialize(value)
     super(value)
     @property_flush = {}
-    @property_remove = {}
   end
 
   def self.instances
@@ -80,37 +79,15 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        found_providers << provider
-        provider.flush
       end
-    end
-    (providers - found_providers).each do |provider|
-      provider.destroy
     end
   end
 
   def create
-    resource_map = self.class.instance_variable_get('@resource_map')
-
-    @property_hash[:ensure] = :present
-
-    resource_map.keys.each do |property|
-      @property_flush[property] = @resource[property] unless @resource[property].nil?
-    end
   end
 
   def destroy
-    resource_map = self.class.instance_variable_get('@resource_map')
 
-    @property_hash[:ensure] = :absent
-
-    resource_map.keys.each do |property|
-      unless @property_hash[property].nil? || @property_hash[property] == resource_map[property][:default]
-        @property_remove[property] = @property_hash[property]
-      end
-    end
-
-    flush unless @property_remove.empty?
   end
 
   def exists?
@@ -127,42 +104,24 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     cmds << 'configure terminal'
     cmds << "interface #{name}"
 
-    @property_remove.keys.each do |property|
-      debug "The #{property} property has been removed"
-
-      cmds << "no ip ospf #{resource_map[property][:config]}"
-    end
-
     @property_flush.each do |property, value|
-      debug "The #{property} property has been changed from #{@property_hash[property]} to #{value}"
-
-      cmd = "ip ospf"
-      case value
-        when :disable
-          cmds << "no ip ospf #{resource_map[property][:config]}"
-        when :enable
-          cmds << "ip ospf #{resource_map[property][:config]}"
-        else
-          cmds << "ip ospf #{resource_map[property][:config]} #{value}"
+      if value == :enalbe
+        cmds << "ip ospf #{reousrce_map[property]}"
+      elsif value == :disable
+        cmds << "no ip ospf #{reousrce_map[property]}"
+      else
+        cmds << "ip ospf #{reousrce_map[property]} #{value}"
       end
+
+      @property_hash[property] = value
     end
 
     cmds << "end"
     cmds << "write memory"
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-  end
-
-  def purge
-    debug '[purge]'
-    resource_map = self.class.instance_variable_get('@resource_map')
-
-    resource_map.keys.each do |property|
-      if (!@property_hash[property].nil?) && @resource[property].nil?
-        @property_remove[property] = @property_hash[property]
-      end
+    unless @property_flush.empty?
+      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+      @property_flush.clear
     end
-
-    flush unless @property_remove.empty?
   end
 
   @resource_map.keys.each do |property|
