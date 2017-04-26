@@ -177,9 +177,9 @@ Puppet::Type.type(:ospf_area).provide :quagga do
         end
       when :Symbol
         cmd = ""
-        if desired_value == :true
+        if desired_value == :enable
           value = ""
-        elsif desired_value == :false
+        elsif desired_value == :disable
           cmd = "no"
         else
           value = desired_value.to_s.gsub(/_/, '-')
