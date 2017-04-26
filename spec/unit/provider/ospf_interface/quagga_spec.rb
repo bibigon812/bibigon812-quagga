@@ -49,7 +49,7 @@ tun1 is up
         :cost => 100,
         :dead_interval => 8,
         :hello_interval => 2,
-        :mtu_ignore => :true,
+        :mtu_ignore => :enable,
         :network => :broadcast,
         :priority => 100,
         :retransmit_interval => 4,
