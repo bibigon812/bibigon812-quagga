@@ -81,6 +81,8 @@ Puppet::Type.type(:ospf_area).provide :quagga do
               end
               hash[area][property] = munged_value
             end
+
+            break
           end
         end
       end
