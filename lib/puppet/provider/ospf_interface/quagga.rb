@@ -2,14 +2,14 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   @doc = %q{Manages the interface ospf parameters using quagga}
 
   @resource_map = {
-    :cost                 => 'cost',
-    :dead_interval        => 'dead-interval',
-    :hello_interval       => 'hello-interval',
-    :mtu_ignore           => 'mtu-ignore',
-    :network              => 'network',
-    :priority             => 'priority',
-    :retransmit_interval  => 'retransmit-interval',
-    :transmit_delay       => 'transmit-delay',
+    :cost                 => { :regexp => /\A\sip\sospf\scost\s(\d+)\Z/, :template => 'ip ospf cost <%= value %>', :type => :Fixnum, :default => 10, },
+    :dead_interval        => { :regexp => /\A\sip\sospf\sdead-interval\s(\d+)\Z/, :template => 'ip ospf dead-interval <%= value %>', :type => :Fixnum, :default => 40, },
+    :hello_interval       => { :regexp => /\A\sip\sospf\shello-interval\s(\d+)\Z/, :template => 'ip ospf hello-interval <%= value %>', :type => :Fixnum, :default => 10, },
+    :mtu_ignore           => { :regexp => /\A\sip\sospf\smtu-ignore\Z/, :template => 'ip ospf mtu-ignore', :type => :Symbol, :default => :disable, },
+    :network              => { :regexp => /\A\sip\sospf\snetwork\s([\w-]+)\Z/, :template => 'ip ospf network <%= value %>', :type => :Symbol, :default => :broadcast, },
+    :priority             => { :regexp => /\A\sip\sospf\spriority\s(\d+)\Z/, :template => 'ip ospf priority <%= value %>', :type => :Fixnum, :default => 1, },
+    :retransmit_interval  => { :regexp => /\A\sip\sospf\sretransmit-interval\s(\d+)\Z/, :template => 'ip ospf retransmit-interval <%= value %>', :type => :Fixnum, :default => 5, },
+    :transmit_delay       => { :regexp => /\A\sip\sospf\stransmit-delay\s(\d+)\Z/, :template => 'ip ospf transmit-delay <%= value %>', :type => :Fixnum, :default => 1, },
   }
 
   @known_booleans = [
@@ -28,54 +28,70 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   def self.instances
     ospf_interfaces = []
     debug '[instances]'
+
+    found_interface = false
     hash = {}
-    config = vtysh('-c', 'show ip ospf interface')
+    config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
-      if line =~ /\A([\w\d\.]+) is (up|down)\Z/
+      next if line =~ /\A!\Z/
+      if line =~ /\Ainterface\s([\w\d\.]+)\Z/
         name = $1
+        found_interface = true
+
         unless hash.empty?
-          debug "OSPF #{hash[:ensure]} on #{hash[:name]}"
-          ospf_interfaces << new(hash) if hash[:ensure] == :present
+          debug "#{hash}"
+          ospf_interfaces << new(hash)
         end
+
         hash = {}
-        hash[:name] = name
-        hash[:provider] = self.name
+
         hash[:ensure] = :present
-      elsif line =~ /\A\s+OSPF not enabled on this interface\Z/
-        hash[:ensure] = :absent
-      elsif line =~ /\A\s+MTU mismatch detection:(\w+)\Z/
-        case $1
-        when 'disabled'
-          hash[:mtu_ignore] = :enable
-        else
-          hash[:mtu_ignore] = :disable
+        hash[:provider] = self.name
+        hash[:name] = name
+
+        @resource_map.each do |property, options|
+          hash[property] = options[:default]
         end
-      elsif line =~ /\A\s+Router\s+ID\s+(\d+\.\d+\.\d+\.\d+),\s+Network\s+Type\s+(\w+),\s+Cost:\s+(\d+)\Z/
-        network = $2
-        cost = $3
-        hash[:network] = network.downcase.gsub(/-/, '_').to_sym
-        hash[:cost] = cost.to_i
-      elsif line =~ /\A\s+Transmit\s+Delay\s+is\s+(\d+)\s+sec,\s+State\s+(\w+),\s+Priority\s+(\d+)\Z/
-        transmit_delay = $1
-        priority = $3
-        hash[:transmit_delay] = transmit_delay.to_i
-        hash[:priority] = priority.to_i
-      elsif line =~ /\A\s+Timer\s+intervals\s+configured,\s+Hello\s+(\d+)s,\s+Dead\s+(\d+)s,\sWait\s+(\d+)s,\s+Retransmit\s+(\d)\Z/
-        hello_interval = $1
-        dead_interval = $2
-        retransmit_interval = $4
-        hash[:hello_interval] = hello_interval.to_i
-        hash[:dead_interval] = dead_interval.to_i
-        hash[:retransmit_interval] = retransmit_interval.to_i
+
+      elsif line =~ /\A\w/ and found_interface
+        found_interface = false
+      elsif found_interface
+        @resource_map.each do |property, options|
+          if line =~ options[:regexp]
+            value = $1
+
+            # mtu-ignore
+            if value.nil?
+              value = :enable
+
+            # other properties
+            else
+              case options[:type]
+                when :Fixnum
+                  value = value.to_i
+                when :Symbol
+                  value = value.gsub(/-/, '_').to_sym
+              end
+            end
+
+            hash[property] = value
+
+            break
+          end
+        end
       end
     end
-    ospf_interfaces << new(hash) if hash[:ensure] == :present
+
+    unless hash.empty?
+      debug "#{hash}"
+      ospf_interfaces << new(hash)
+    end
+
     ospf_interfaces
   end
 
   def self.prefetch(resources)
     providers = instances
-    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
@@ -105,19 +121,17 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     cmds << "interface #{name}"
 
     @property_flush.each do |property, value|
-      if value == :enalbe
-        cmds << "ip ospf #{reousrce_map[property]}"
-      elsif value == :disable
-        cmds << "no ip ospf #{reousrce_map[property]}"
+      if value == :disable
+        cmds << 'no ' + ERB.new(resource_map[property][:template]).result(binding)
       else
-        cmds << "ip ospf #{reousrce_map[property]} #{value}"
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
 
       @property_hash[property] = value
     end
 
-    cmds << "end"
-    cmds << "write memory"
+    cmds << 'end'
+    cmds << 'write memory'
     unless @property_flush.empty?
       vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
       @property_flush.clear
