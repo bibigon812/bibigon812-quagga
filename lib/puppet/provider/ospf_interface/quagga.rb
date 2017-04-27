@@ -39,7 +39,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
         found_interface = true
 
         unless hash.empty?
-          debug "#{hash}"
+          debug "ospf interface: #{hash}"
           ospf_interfaces << new(hash)
         end
 
@@ -83,7 +83,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     end
 
     unless hash.empty?
-      debug "#{hash}"
+      debug "ospf interface: #{hash}"
       ospf_interfaces << new(hash)
     end
 
