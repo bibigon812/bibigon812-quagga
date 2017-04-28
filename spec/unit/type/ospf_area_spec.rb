@@ -29,7 +29,7 @@ describe Puppet::Type.type(:ospf_area) do
     end
 
     [ :default_cost, :access_list_export, :access_list_import, :prefix_list_export,
-      :prefix_list_import, :network, :shortcut ].each do |property|
+      :prefix_list_import, :networks, :shortcut ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -191,6 +191,28 @@ describe Puppet::Type.type(:ospf_area) do
 
     it 'should contain prefix_list-import' do
       expect(described_class.new(:name => '0.0.0.0', :prefix_list_import => 'prefix_list-import')[:prefix_list_import]).to eq('prefix_list-import')
+    end
+  end
+
+  describe 'networks' do
+    it 'should support 10.0.0.0/24 as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :networks => '10.0.0.0/24') }.to_not raise_error
+    end
+
+    it 'should support 10.255.255.0/24 as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :networks => %w{10.255.255.0/24 192.168.0.0/16}) }.to_not raise_error
+    end
+
+    it 'should not support 10.256.0.0/24 as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :networks => '10.256.0.0/24') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain [ \'10.255.255.0/24\' ]' do
+      expect(described_class.new(:name => '0.0.0.0', :networks => '10.255.255.0/24')[:networks]).to eq(%w{10.255.255.0/24})
+    end
+
+    it 'should contain [ \'10.255.255.0/24\', \'192.168.0.0/16\' ]' do
+      expect(described_class.new(:name => '0.0.0.0', :networks => %w{10.255.255.0/24 192.168.0.0/16})[:networks]).to eq(%w{10.255.255.0/24 192.168.0.0/16})
     end
   end
 

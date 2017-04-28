@@ -11,7 +11,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     :prefix_list_import => { :type => :String, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sin\Z/, :template => "area <%= area %> filter-list prefix <%= value %> in" },
     :shortcut           => { :type => :Symbol, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sshortcut\s(default|enable|disable)\Z/, :template => "area <%= area %> shortcut <%= value %>", :default => :default },
     :stub               => { :type => :Symbol, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sstub(\sno-summary)?\Z/, :template => "area <%= area %> stub <%= value %>", :default => :disable },
-    :network            => { :type => :Array,  :regexp => /\A\snetwork\s(\d+\.\d+\.\d+\.\d+\/\d+)\sarea\s(\d+\.\d+\.\d+\.\d+)\Z/, :template => "network <%= value %> area <%= area %>" },
+    :networks           => { :type => :Array,  :regexp => /\A\snetwork\s(\d+\.\d+\.\d+\.\d+\/\d+)\sarea\s(\d+\.\d+\.\d+\.\d+)\Z/, :template => "network <%= value %> area <%= area %>" },
   }
 
   commands :vtysh => 'vtysh'
@@ -40,7 +40,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
             first_param = $1
             second_param = $2
 
-            if property == :network
+            if property == :networks
               area = second_param
               value = first_param
             else

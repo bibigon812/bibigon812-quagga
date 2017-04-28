@@ -9,7 +9,7 @@ Puppet::Type.newtype(:ospf_area) do
         access_list_import => 'ACCESS_LIST_IPMORT',
         prefix_list_export => 'PREFIX_LIST_EXPORT',
         prefix_list_import => 'PREFIX_LIST_IMPORT',
-        network            => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
+        networks           => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
         shortcut           => 'default',
       }
 
@@ -83,7 +83,7 @@ Puppet::Type.newtype(:ospf_area) do
     end
   end
 
-  newproperty(:network, :array_matching => :all) do
+  newproperty(:networks, :array_matching => :all) do
     desc %q{ Enable routing on an IP network }
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
