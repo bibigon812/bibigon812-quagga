@@ -44,7 +44,7 @@ Puppet::Type.type(:as_path).provide :quagga do
     @property_hash[:ensure] = :present
     cmds = []
     cmds << 'configure terminal'
-    cmds << "ip as-apth access-list #{name} #{action} #{regex}"
+    cmds << "ip as-path access-list #{name} #{action} #{regex}"
     cmds << 'end'
     cmds << 'write memory'
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
@@ -56,7 +56,7 @@ Puppet::Type.type(:as_path).provide :quagga do
     @property_hash[:ensure] = :absent
     cmds = []
     cmds << 'configure terminal'
-    cmds << "no ip as-apth access-list #{name} #{action} #{regex}"
+    cmds << "no ip as-path access-list #{name} #{action} #{regex}"
     cmds << 'end'
     cmds << 'write memory'
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
