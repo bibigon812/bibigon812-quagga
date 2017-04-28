@@ -9,8 +9,6 @@ Puppet::Type.type(:as_path).provide :quagga do
     debug '[instances]'
 
     as_paths = []
-    previous_name = ''
-    sequence = 1
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
@@ -18,15 +16,11 @@ Puppet::Type.type(:as_path).provide :quagga do
         name = $1
         action = $2
         regex = $3
-        sequence = 1 if name != previous_name
         hash = {}
         hash[:ensure] = :present
         hash[:provider] = self.name
-        hash[:name] = "#{name}:#{sequence}:#{action}:#{regex}"
+        hash[:name] = "#{name}:#{action}:#{regex}"
         as_paths << new(hash)
-
-        sequence += 1
-        previous_name = name
       end
     end
     as_paths
@@ -47,7 +41,7 @@ Puppet::Type.type(:as_path).provide :quagga do
   end
 
   def create
-    name, sequence, action, regex = @resource[:name].split(/:/)
+    name, action, regex = @resource[:name].split(/:/)
 
     @property_hash[:ensure] = :present
     cmds = []
@@ -59,7 +53,7 @@ Puppet::Type.type(:as_path).provide :quagga do
   end
 
   def destroy
-    name, sequence, action, regex = @property_hash[:name].split(/:/)
+    name, action, regex = @property_hash[:name].split(/:/)
 
     @property_hash[:ensure] = :absent
     cmds = []

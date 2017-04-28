@@ -38,7 +38,7 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     it 'should return the resource ospf' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'FROM_AS100:1:permit:_100$ _100_',
+          :name => 'FROM_AS100:permit:_100$ _100_',
           :provider => :quagga,
       })
     end
@@ -46,7 +46,7 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     it 'should return the resource ospf' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'FROM_AS100:2:permit:_90_',
+          :name => 'FROM_AS100:permit:_90_',
           :provider => :quagga,
       })
     end
@@ -54,7 +54,7 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     it 'should return the resource ospf' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'FROM_AS100:3:permit:_90$',
+          :name => 'FROM_AS100:permit:_90$',
           :provider => :quagga,
       })
     end
@@ -62,7 +62,7 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     it 'should return the resource ospf' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'FROM_AS20764:1:permit:_20764$',
+          :name => 'FROM_AS20764:permit:_20764$',
           :provider => :quagga,
       })
     end

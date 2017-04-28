@@ -12,7 +12,7 @@ Puppet::Type.newtype(:as_path) do
   newparam(:name) do
     desc %q{ The name contains the as-path name, action and regex }
 
-    newvalues(/\A\w+:\d+:(deny|permit):\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
+    newvalues(/\A\w+:(deny|permit):\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
   end
 
   autorequire(:package) do
