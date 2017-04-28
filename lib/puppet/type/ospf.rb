@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:ospf) do
-  @doc = %q{This type provides the capabilites to manage ospf router within
+  @doc = %q{This type provides the capabilities to manage ospf router within
     puppet.
 
     Example:

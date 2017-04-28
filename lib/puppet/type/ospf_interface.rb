@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:ospf_interface) do
-  @doc = %q{ This type provides the capabilites to manage ospf parameters of
+  @doc = %q{ This type provides the capabilities to manage ospf parameters of
     network interfaces within puppet.
 
     Example:

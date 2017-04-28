@@ -27,7 +27,7 @@ Puppet::Type.newtype(:redistribution) do
   end
 
   newparam(:name) do
-    desc %q{ The name contains the main protocol, the id and the the protocol for redistribution }
+    desc %q{ The name contains the main protocol, the id and the protocol for redistribution }
 
     newvalues(/\Aospf::(kernel|connected|static|rip|isis|bgp)\Z/)
     newvalues(/\Abgp:\d+:(connected|kernel|ospf|rip|static)\Z/)
