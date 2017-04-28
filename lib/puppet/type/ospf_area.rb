@@ -92,7 +92,7 @@ Puppet::Type.newtype(:ospf_area) do
     newvalues(re)
 
     def should_to_s(value)
-      '[\'' + value.join('\', \'') + '\']'
+      value.inspect
     end
   end
 
