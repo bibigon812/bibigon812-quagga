@@ -10,12 +10,11 @@ describe 'quagga' do
           cost                => 100,
           dead_interval       => 8,
           hello_interval      => 2,
-          network_type        => broadcast,
           retransmit_interval => 4,
         }
         ospf { 'ospf':
           ensure => present,
-          router_id => 1.1.1.1,
+          router_id => '1.1.1.1',
         }
       EOS
 
