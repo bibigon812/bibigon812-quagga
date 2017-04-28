@@ -90,6 +90,10 @@ Puppet::Type.newtype(:ospf_area) do
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\/(\d|[1-2][\d]|3[0-2])\Z/
 
     newvalues(re)
+
+    def should_to_s(value)
+      value.inspect
+    end
   end
 
   newproperty(:shortcut) do
