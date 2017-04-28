@@ -32,29 +32,29 @@ describe Puppet::Type.type(:as_path) do
   describe 'when validating values' do
     describe 'ensure' do
       it 'should support present as a value' do
-        expect { described_class.new(:name => 'from_as100:permit:_100$', :ensure => :present) }.to_not raise_error
+        expect { described_class.new(:name => 'from_as100:1:permit:_100$', :ensure => :present) }.to_not raise_error
       end
 
       it 'should support absent as a value' do
-        expect { described_class.new(:name => 'from_as100:permit:_100$', :ensure => :absent) }.to_not raise_error
+        expect { described_class.new(:name => 'from_as100:2:permit:_100$', :ensure => :absent) }.to_not raise_error
       end
 
       it 'should not support other values' do
-        expect { described_class.new(:name => 'from_as100:permit:_100$', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+        expect { described_class.new(:name => 'from_as100:3:permit:_100$', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
     end
   end
 
   describe 'name' do
-    it 'should support from_as100:permit:^100$ as a value' do
-      expect { described_class.new(:name => 'from_as100:permit:^100$') }.to_not raise_error
+    it 'should support from_as100:1:permit:^100$ as a value' do
+      expect { described_class.new(:name => 'from_as100:1:permit:^100$') }.to_not raise_error
     end
 
-    it 'should support from_as100:permit:^100_100$ as a value' do
-      expect { described_class.new(:name => 'from_as100:deny:^100_100$') }.to_not raise_error
+    it 'should support from_as100:2:permit:^100_100$ as a value' do
+      expect { described_class.new(:name => 'from_as100:2:deny:^100_100$') }.to_not raise_error
     end
 
-    it 'should not support accept as a value' do
+    it 'should not support from_as100:1 as a value' do
       expect { described_class.new(:name => 'from_as100:1') }.to raise_error(Puppet::Error, /Invalid value/)
     end
   end
