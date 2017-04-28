@@ -4,15 +4,49 @@ Puppet::Type.newtype(:as_path) do
 
     Example:
 
-    as_path { 'from_as100:1:permit:_100$': }
+    as_path { 'as100':
+      ensure => present,
+      rules => [
+        { permit => '_100$', },
+        { permit => '_100_', },
+      ],
+    }
   }
 
   ensurable
 
   newparam(:name) do
-    desc %q{ The name contains the as-path name, action and regex }
+    desc %q{ The name of the as-path access-list }
 
-    newvalues(/\A\w+:(deny|permit):\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
+    newvalues(/\A\w+\Z/)
+  end
+
+  newproperty(:rules, :array_matching => :all) do
+    desc %q{ Rules of the as-path access-list }
+
+    validate do |value|
+      case value
+        when Hash
+          value.each do |action, regex|
+            unless [:deny, :permit].include?(action.to_s.to_sym)
+              raise(ArgumentError, "Use the action permit or deny instead of #{action}")
+            end
+            unless regex.match(/\A\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
+              raise(ArgumentError, "The regex #{regex} is invalid")
+            end
+          end
+        else
+          raise(ArgumentError, 'Use a hash { action => regex }')
+      end
+    end
+
+    munge do |value|
+      new_value = {}
+      value.each do |action, regex|
+        new_value[action.to_s.to_sym] = regex
+      end
+      new_value
+    end
   end
 
   autorequire(:package) do

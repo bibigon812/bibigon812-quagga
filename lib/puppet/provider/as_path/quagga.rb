@@ -3,12 +3,17 @@ Puppet::Type.type(:as_path).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
+  def initialize(value)
+    super(value)
+    @property_flush = {}
+  end
 
   def self.instances
     debug '[instances]'
 
     as_paths = []
+    hash = {}
+    previous_name = ''
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
@@ -16,12 +21,24 @@ Puppet::Type.type(:as_path).provide :quagga do
         name = $1
         action = $2
         regex = $3
-        hash = {}
-        hash[:ensure] = :present
-        hash[:provider] = self.name
-        hash[:name] = "#{name}:#{action}:#{regex}"
-        as_paths << new(hash)
+
+        if name != previous_name
+          debug "as_path: #{hash}"
+          as_paths << new(hash) unless hash.empty?
+          hash = {}
+          hash[:ensure] = :present
+          hash[:provider] = self.name
+          hash[:name] = name
+          hash[:rules] = []
+        end
+        hash[:rules] << { action.to_sym => regex}
+
+        previous_name = name
       end
+    end
+    unless hash.empty?
+      debug "as_path: #{hash}"
+      as_paths << new(hash)
     end
     as_paths
   end
@@ -41,30 +58,47 @@ Puppet::Type.type(:as_path).provide :quagga do
   end
 
   def create
-    name, action, regex = @resource[:name].split(/:/)
-
     @property_hash[:ensure] = :present
-    cmds = []
-    cmds << 'configure terminal'
-    cmds << "ip as-path access-list #{name} #{action} #{regex}"
-    cmds << 'end'
-    cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    self.rules = @resource[:rules]
   end
 
   def destroy
-    name, action, regex = @property_hash[:name].split(/:/)
 
     @property_hash[:ensure] = :absent
-    cmds = []
-    cmds << 'configure terminal'
-    cmds << "no ip as-path access-list #{name} #{action} #{regex}"
-    cmds << 'end'
-    cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    self.rules = []
   end
 
   def exists?
     @property_hash[:ensure] == :present
   end
+
+  def rules
+    @property_hash[:rules] || :absent
+  end
+
+  def rules=(value)
+    name = @property_hash[:name]
+
+    cmds = []
+    cmds << 'configure terminal'
+
+    @property_hash[:rules].each do |rule|
+      rule.each do |action, regex|
+        cmds << "no ip as-path access-list #{name} #{action} #{regex}"
+      end
+    end
+
+    value.each do |rule|
+      rule.each do |action, regex|
+        cmds << "ip as-path access-list #{name} #{action} #{regex}"
+      end
+    end
+
+    cmds << 'end'
+    cmds << 'write memory'
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_hash[:rules] = value
+  end
+
 end

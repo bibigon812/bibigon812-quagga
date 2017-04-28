@@ -32,38 +32,24 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     end
 
     it 'should return a resource' do
-      expect(described_class.instances.size).to eq(10)
+      expect(described_class.instances.size).to eq(8)
     end
 
     it 'should return the resource ospf' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'FROM_AS100:permit:_100$ _100_',
+          :name => 'FROM_AS100',
           :provider => :quagga,
+          :rules => [{:permit => '_100$ _100_'}, {:permit => '_90_'}, {:permit => '_90$'},],
       })
     end
 
     it 'should return the resource ospf' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'FROM_AS100:permit:_90_',
+          :name => 'FROM_AS20764',
           :provider => :quagga,
-      })
-    end
-
-    it 'should return the resource ospf' do
-      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-          :ensure => :present,
-          :name => 'FROM_AS100:permit:_90$',
-          :provider => :quagga,
-      })
-    end
-
-    it 'should return the resource ospf' do
-      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-          :ensure => :present,
-          :name => 'FROM_AS20764:permit:_20764$',
-          :provider => :quagga,
+          :rules => [{:permit => '_20764$'},],
       })
     end
   end
