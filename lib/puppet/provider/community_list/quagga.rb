@@ -18,6 +18,7 @@ Puppet::Type.type(:community_list).provide :quagga do
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
+      next if line =~ /\A!\Z/
       if line =~ /\Aip\scommunity-list\s(\d+)\s(deny|permit)((\s(\d+:\d+))+)\Z/
         name = $1
         action = $2
