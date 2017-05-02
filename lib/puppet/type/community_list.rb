@@ -5,7 +5,7 @@ Puppet::Type.newtype(:community_list) do
 
     Example:
 
-      community_list {'100':
+      community_list { '100':
         ensure => present,
         rules  => [
           permit => 65000:50952,
