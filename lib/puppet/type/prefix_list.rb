@@ -1,40 +1,90 @@
 Puppet::Type.newtype(:prefix_list) do
   @doc = %q{
+    This type provides the capability to manage prefix-lists within
+    puppet.
+
     Example:
 
-      prefix_list { 'ABCD':
-        description => 'Prefix-list description',
-        seq => {
-          5 => {
-            action => permit,
-            prefix => 10.0.0.0/24,
-            le => 32,
-            ge => 25,
-          }
-        },
+      prefix_list {'TEST_PREFIX_LIST:10':
+        ensure => present,
+        action => permit,
+        prefix => '224.0.0.0/4',
+        ge     => 8,
+        le     => 24,
       }
   }
 
   ensurable
 
   newparam(:name) do
-    desc %q{ Prefix-list name }
-    newvalues /\A[\w-]+\Z/
+    desc %q{ Name of the prefix-list and sequence number of rule }
+
+    newvalues(/\A[\w-]+:\d+\Z/)
   end
 
-  newproperty(:description) do
-    desc %q{ Up to 80 characters describing this prefix-list }
-
-    newvalues /\A[\w\s-]{,80}\Z/
+  newparam(:proto) do
+    defaultto :ip
+    newvalues(:ip, :ipv6)
   end
 
-  newproperty(:seq) do
-    desc %{ Sequence number of entry }
+  newproperty(:action) do
+    desc %q{ Action can be permit or deny. }
+    newvalues(:deny, :permit)
+  end
+
+  newproperty(:prefix) do
+    desc %q{ IP prefix <network>/<length> }
+
+    newvalues(/\A([\d\.:\/]+|any)\Z/)
+  end
+
+  newproperty(:ge) do
+    desc %q{ Minimum prefix length to be matched }
+    newvalues(/^\d+$/)
 
     validate do |value|
-      unless value.is_a?(Hash)
-        raise ArgumentError, 'Sequence should be a Hash'
+      value_i = value.to_i
+      if value_i < 1 or value_i > 32
+        raise ArgumentError, 'Minimum prefix length: 1-32'
       end
+    end
+
+    munge do |value|
+      value.to_i
+    end
+  end
+
+  newproperty(:le) do
+    desc %q{ Maximum prefix length to be matched }
+    newvalues(/^\d+$/)
+
+    validate do |value|
+      value_i = value.to_i
+      if value_i < 1 or value_i > 32
+        raise ArgumentError, 'Maximum prefix length: 1-32'
+      end
+    end
+
+    munge do |value|
+      value.to_i
+    end
+  end
+
+  autorequire(:package) do
+    case value(:provider)
+      when :quagga
+        %w{quagga}
+      else
+        []
+    end
+  end
+
+  autorequire(:service) do
+    case value(:provider)
+      when :quagga
+        %w{zebra bgpd ospfd}
+      else
+        []
     end
   end
 end

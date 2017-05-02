@@ -28,7 +28,7 @@ describe Puppet::Type.type(:prefix_list) do
       end
     end
 
-    [ :description, :seq ].each do |property|
+    [ :action, :prefix, :ge, :le ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -38,34 +38,142 @@ describe Puppet::Type.type(:prefix_list) do
   describe 'when validating values' do
     describe 'ensure' do
       it 'should support present as a value' do
-        expect { described_class.new(:name => 'CONNECTED-NETWORK', :ensure => :present) }.to_not raise_error
+        expect { described_class.new(:name => 'CONNECTED-NETWORK:10', :ensure => :present) }.to_not raise_error
       end
 
       it 'should support absent as a value' do
-        expect { described_class.new(:name => 'CONNECTED-NETWORK', :ensure => :absent) }.to_not raise_error
+        expect { described_class.new(:name => 'CONNECTED-NETWORK:10', :ensure => :absent) }.to_not raise_error
       end
 
       it 'should not support other values' do
-        expect { described_class.new(:name => 'CONNECTED-NETWORK', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+        expect { described_class.new(:name => 'CONNECTED-NETWORK:10', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
     end
   end
 
-  describe 'description' do
-    it 'should support a string as a value' do
-      expect { described_class.new(:name => 'foo-prefix', :description => 'foo prefix-list') }.to_not raise_error
+  describe 'name' do
+    it 'should support as100 as a value' do
+      expect { described_class.new(:name => 'prefix_list:10') }.to_not raise_error
     end
 
-    it 'should not support a string over 80 chars' do
-      expect { described_class.new(:name => 'foo-prefix', :description => 'foo prefix list foo prefix list foo prefix list foo prefix list foo prefix list foo prefix list foo prefix list foo prefix list foo prefix list foo prefix list') }.to raise_error(Puppet::Error, /Invalid value/)
+    it 'should support as100 as a value' do
+      expect { described_class.new(:name => 'prefix-list:100') }.to_not raise_error
+    end
+
+    it 'should not support as100 as a value' do
+      expect { described_class.new(:name => 'prefix_list') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+  end
+
+  describe 'action' do
+    it 'should support :permit as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :action => :permit) }.to_not raise_error
+    end
+
+    it 'should support \'permit\' as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :action => 'permit') }.to_not raise_error
+    end
+
+    it 'should support :permit as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :action => :deny) }.to_not raise_error
+    end
+
+    it 'should support \'permit\' as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :action => 'deny') }.to_not raise_error
     end
 
     it 'should not support a dot in the string' do
-      expect { described_class.new(:name => 'foo-prefix', :description => 'foo.prefix-list') }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => 'foo-prefix:10', :action => 'reject') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should contain \'foo prefix-list\'' do
-      expect(described_class.new(:name => 'foo-prefix', :description => 'foo prefix-list')[:description]).to eq('foo prefix-list')
+    it 'should contain :permit' do
+      expect(described_class.new(:name => 'foo-prefix:10', :action => 'permit')[:action]).to eq(:permit)
+    end
+
+    it 'should contain :deny' do
+      expect(described_class.new(:name => 'foo-prefix:10', :action => 'deny')[:action]).to eq(:deny)
+    end
+  end
+
+  describe 'prefix' do
+    it 'should support :permit as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :prefix => '192.168.0.0/16') }.to_not raise_error
+    end
+
+    it 'should support \'permit\' as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :prefix => '172.16.0.0/12') }.to_not raise_error
+    end
+
+    it 'should support :any as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :prefix => :any) }.to_not raise_error
+    end
+
+    it 'should support \'any\' as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :prefix => 'any') }.to_not raise_error
+    end
+
+    it 'should not support a dot in the string' do
+      expect { described_class.new(:name => 'foo-prefix:10', :prefix => 'reject') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain :permit' do
+      expect(described_class.new(:name => 'foo-prefix:10', :prefix => '192.168.0.0/16')[:prefix]).to eq('192.168.0.0/16')
+    end
+
+    it 'should contain :deny' do
+      expect(described_class.new(:name => 'foo-prefix:10', :prefix => 'any')[:prefix]).to eq('any')
+    end
+  end
+
+  describe 'ge' do
+    it 'should support :permit as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :ge => '24') }.to_not raise_error
+    end
+
+    it 'should support \'permit\' as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :ge => 16) }.to_not raise_error
+    end
+
+    it 'should support :any as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :ge => 8) }.to_not raise_error
+    end
+
+    it 'should not support a dot in the string' do
+      expect { described_class.new(:name => 'foo-prefix:10', :ge => 'reject') }.to raise_error(Puppet::Error, /Minimum prefix length: 1-32/)
+    end
+
+    it 'should contain :permit' do
+      expect(described_class.new(:name => 'foo-prefix:10', :ge => '24')[:ge]).to eq(24)
+    end
+
+    it 'should contain :deny' do
+      expect(described_class.new(:name => 'foo-prefix:10', :ge => 16)[:ge]).to eq(16)
+    end
+  end
+
+  describe 'le' do
+    it 'should support :permit as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :le => '24') }.to_not raise_error
+    end
+
+    it 'should support \'permit\' as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :le => 16) }.to_not raise_error
+    end
+
+    it 'should support :any as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :le => 8) }.to_not raise_error
+    end
+
+    it 'should not support a dot in the string' do
+      expect { described_class.new(:name => 'foo-prefix:10', :le => 'reject') }.to raise_error(Puppet::Error, /Maximum prefix length: 1-32/)
+    end
+
+    it 'should contain :permit' do
+      expect(described_class.new(:name => 'foo-prefix:10', :le => '24')[:le]).to eq(24)
+    end
+
+    it 'should contain :deny' do
+      expect(described_class.new(:name => 'foo-prefix:10', :le => 16)[:le]).to eq(16)
     end
   end
 end
