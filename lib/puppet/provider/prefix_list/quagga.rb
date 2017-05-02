@@ -42,7 +42,7 @@ Puppet::Type.type(:prefix_list).provide :quagga do
     prefix_lists
   end
 
-  def self.prefetch
+  def self.prefetch(resources)
     debug '[prefetch]'
     providers = instances
     found_providers = []
