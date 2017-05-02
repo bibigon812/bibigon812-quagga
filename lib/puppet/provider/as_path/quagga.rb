@@ -23,15 +23,17 @@ Puppet::Type.type(:as_path).provide :quagga do
         regex = $3
 
         if name != previous_name
-          debug "as_path: #{hash}"
-          as_paths << new(hash) unless hash.empty?
+          unless hash.empty?
+            debug "as_path: #{hash}"
+            as_paths << new(hash)
+          end
           hash = {}
           hash[:ensure] = :present
           hash[:provider] = self.name
           hash[:name] = name
           hash[:rules] = []
         end
-        hash[:rules] << { action.to_sym => regex}
+        hash[:rules] << {action.to_sym => regex}
 
         previous_name = name
       end
