@@ -125,6 +125,36 @@ describe Puppet::Type.type(:prefix_list) do
     end
   end
 
+  describe 'proto' do
+    it 'should support :permit as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :proto => 'ip') }.to_not raise_error
+    end
+
+    it 'should support \'permit\' as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :proto => 'ipv6') }.to_not raise_error
+    end
+
+    it 'should support :any as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :proto => :ip) }.to_not raise_error
+    end
+
+    it 'should support \'any\' as a value' do
+      expect { described_class.new(:name => 'foo-prefix:10', :proto => :ipv6) }.to_not raise_error
+    end
+
+    it 'should not support a dot in the string' do
+      expect { described_class.new(:name => 'foo-prefix:10', :proto => :ipv5) }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain :permit' do
+      expect(described_class.new(:name => 'foo-prefix:10', :proto => 'ip')[:proto]).to eq(:ip)
+    end
+
+    it 'should contain :deny' do
+      expect(described_class.new(:name => 'foo-prefix:10', :proto => :ipv6)[:proto]).to eq(:ipv6)
+    end
+  end
+
   describe 'ge' do
     it 'should support :permit as a value' do
       expect { described_class.new(:name => 'foo-prefix:10', :ge => '24') }.to_not raise_error
