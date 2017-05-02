@@ -78,19 +78,24 @@ Puppet::Type.type(:prefix_list).provide :quagga do
 
   def flush
     name, sequence = @property_hash[:name].split(/:/)
-    proto = @property_hash[:proto]
-    action = @property_hash[:action]
-    prefix = @property_hash[:prefix]
-    ge = @property_hash[:ge]
-    le = @property_hash[:le]
 
     debug "[flush][#{name}:#{sequence}]"
 
     cmds = []
     cmds << 'configure terminal'
     if @property_hash[:ensure] == :absent
+      proto = @property_hash[:proto]
+      action = @property_hash[:action]
+      prefix = @property_hash[:prefix]
+
       cmds << "no #{proto} prefix-list #{name} seq #{sequence} #{action} #{prefix}"
     else
+      proto = @resource[:proto]
+      action = @resource[:action]
+      prefix = @resource[:prefix]
+      ge = @resource[:ge]
+      le = @resource[:le]
+
       cmd = ''
       cmd << "#{proto} prefix-list #{name} seq #{sequence} #{action} #{prefix}"
       cmd << " ge #{ge}" unless ge.nil?
@@ -107,7 +112,7 @@ Puppet::Type.type(:prefix_list).provide :quagga do
 
     known_resources = self.class.instance_variable_get('@known_resources')
     known_resources.each do |property|
-      if @resource[property].nil? && @property_hash[property] != :absent
+      if @resource[property].nil? && !@property_hash[property].nil?
         flush
         break
       end
