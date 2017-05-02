@@ -81,16 +81,13 @@ Puppet::Type.type(:as_path).provide :quagga do
 
   def rules=(value)
     debug '[rules=]'
-    name = @property_hash[:name]
+    name = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
 
     cmds = []
     cmds << 'configure terminal'
 
-    @property_hash[:rules].each do |rule|
-      rule.each do |action, regex|
-        cmds << "no ip as-path access-list #{name} #{action} #{regex}"
-      end
-    end
+
+    cmds << "no ip as-path access-list #{name}"
 
     value.each do |rule|
       rule.each do |action, regex|
