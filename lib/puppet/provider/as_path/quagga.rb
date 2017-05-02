@@ -60,12 +60,13 @@ Puppet::Type.type(:as_path).provide :quagga do
   end
 
   def create
+    debug '[create]'
     @property_hash[:ensure] = :present
     self.rules = @resource[:rules]
   end
 
   def destroy
-
+    debug '[destroy]'
     @property_hash[:ensure] = :absent
     self.rules = []
   end
@@ -79,6 +80,7 @@ Puppet::Type.type(:as_path).provide :quagga do
   end
 
   def rules=(value)
+    debug '[rules=]'
     name = @property_hash[:name]
 
     cmds = []
