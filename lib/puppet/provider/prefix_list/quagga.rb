@@ -9,11 +9,6 @@ Puppet::Type.type(:prefix_list).provide :quagga do
 
   mk_resource_methods
 
-  def initialize(value)
-    super(value)
-    @property_flush = {}
-  end
-
   def self.instances
     debug '[instances]'
     prefix_lists = []
@@ -51,6 +46,7 @@ Puppet::Type.type(:prefix_list).provide :quagga do
       if provider = providers.find{ |prefix_list| prefix_list.name == name }
         resources[name].provider = provider
         found_providers << provider
+        provider.purge
       end
     end
     (providers - found_providers).each do |provider|
@@ -97,12 +93,24 @@ Puppet::Type.type(:prefix_list).provide :quagga do
     else
       cmd = ''
       cmd << "#{proto} prefix-list #{name} seq #{sequence} #{action} #{prefix}"
-      cmd << "ge #{ge}" unless ge.nil?
-      cmd << "le #{le}" unless le.nil?
+      cmd << " ge #{ge}" unless ge.nil?
+      cmd << " le #{le}" unless le.nil?
       cmds << cmd
     end
     cmds << 'end'
     cmds << 'write memory'
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+  end
+
+  def purge
+    debug '[purge]'
+
+    known_resources = self.class.instance_variable_get('@known_resources')
+    known_resources.each do |property|
+      if @resource[property].nil? && @property_hash[property] != :absent
+        flush
+        break
+      end
+    end
   end
 end
