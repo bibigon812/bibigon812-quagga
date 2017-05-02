@@ -32,6 +32,7 @@ Puppet::Type.type(:prefix_list).provide :quagga do
         hash[:prefix] = $5
         hash[$7.to_sym] = $8.to_i unless $7.nil?
         hash[$10.to_sym] = $11.to_i unless $10.nil?
+        debug "prefix_list: #{hash}"
         prefix_lists << new(hash)
 
         found_prefix_list = true unless found_prefix_list
