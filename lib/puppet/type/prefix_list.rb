@@ -22,7 +22,9 @@ Puppet::Type.newtype(:prefix_list) do
     newvalues(/\A[\w-]+:\d+\Z/)
   end
 
-  newparam(:proto) do
+  newproperty(:proto) do
+    desc %q{ Proto ip or ipv6 }
+
     defaultto :ip
     newvalues(:ip, :ipv6)
   end
