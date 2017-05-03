@@ -87,8 +87,15 @@ Puppet::Type.type(:prefix_list).provide :quagga do
       proto = @property_hash[:proto]
       action = @property_hash[:action]
       prefix = @property_hash[:prefix]
+      ge = @property_hash[:ge]
+      le = @property_hash[:le]
 
-      cmds << "no #{proto} prefix-list #{name} seq #{sequence} #{action} #{prefix}"
+      cmd = ''
+      cmd << "no #{proto} prefix-list #{name} seq #{sequence} #{action} #{prefix}"
+      cmd << " ge #{ge}" unless ge.nil?
+      cmd << " le #{le}" unless le.nil?
+
+      cmds << cmd
     else
       proto = @resource[:proto]
       action = @resource[:action]
@@ -100,6 +107,7 @@ Puppet::Type.type(:prefix_list).provide :quagga do
       cmd << "#{proto} prefix-list #{name} seq #{sequence} #{action} #{prefix}"
       cmd << " ge #{ge}" unless ge.nil?
       cmd << " le #{le}" unless le.nil?
+
       cmds << cmd
     end
     cmds << 'end'
