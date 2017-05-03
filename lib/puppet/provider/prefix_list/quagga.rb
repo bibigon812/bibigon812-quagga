@@ -69,7 +69,6 @@ Puppet::Type.type(:prefix_list).provide :quagga do
   def destroy
     debug '[destroy]'
     @property_hash[:ensure] = :absent
-    flush
   end
 
   def exists?
