@@ -79,14 +79,21 @@ Puppet::Type.type(:route_map).provide :quagga do
   def create
     debug '[create]'
 
+    resource_map = self.class.instance_variable_get('@resource_map')
+
     @property_hash[:name] = @resource[:name]
     @property_hash[:ensure] = :present
+
+    resource_map.keys.each do |property|
+      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
+    end
   end
 
   def destroy
     debug '[destroy]'
 
     @property_hash[:ensure] = :absent
+    flush
   end
 
   def exists?
@@ -119,12 +126,15 @@ Puppet::Type.type(:route_map).provide :quagga do
         else
           cmds << "#{resource_map[property]} #{value}"
         end
+        @property_hash[property] = value
       end
     end
 
     cmds << 'end'
     cmds << 'write memory'
     vtysh(cmds.reduce([]){|cmds, cmd| cmds << '-c' << cmd})
+
+    @property_flush.clear
   end
 
   @resource_map.keys.each do |property|
