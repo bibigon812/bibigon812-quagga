@@ -15,7 +15,7 @@ Puppet::Type.newtype(:route_map) do
         set      => [
           'local-preference 200',
           'community none',
-        ]
+        ],
       }
   }
 

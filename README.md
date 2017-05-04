@@ -56,7 +56,7 @@ redistribution { 'bgp:65000:ospf':
     route_map => WORD,
 }
 
-as_path { 'as100':
+as_path { 'TEST_AS_PATH':
     ensure => present,
     rules => [
         permit => '_100$',
@@ -68,6 +68,27 @@ community_list { '100':
     rules  => [
         permit => 65000:50952,
         permit => 65000:31500,
+    ],
+}
+
+prefix_list {'TEST_PREFIX_LIST:10':
+    ensure => present,
+    action => permit,
+    prefix => '224.0.0.0/4',
+    ge     => 8,
+    le     => 24,
+}
+
+route_map {'TEST_ROUTE_MAP:permit:10':
+    ensure   => present,
+    match    => [
+        'as-path PATH_LIST',
+        'community COMMUNITY_LIST',
+    ],
+    on_match => 'next',
+    set      => [
+        'local-preference 200',
+        'community none',
     ],
 }
 ```
