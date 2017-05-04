@@ -13,7 +13,7 @@ Puppet::Type.type(:route_map).provide :quagga do
 
   def initialize(value)
     super(value)
-    @property_flash = {}
+    @property_flush = {}
   end
 
   def self.instances
