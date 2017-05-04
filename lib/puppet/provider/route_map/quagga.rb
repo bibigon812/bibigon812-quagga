@@ -156,12 +156,15 @@ Puppet::Type.type(:route_map).provide :quagga do
 
   def purge
     debug '[purge]'
+    need_flush = false
     resource_map = self.class.instance_variable_get('@resource_map')
     resource_map.keys.each do |property|
       if @resource[property].nil? && !@property_hash[property].nil?
         @property_remove[property] = @property_hash[property]
+        need_flush = true
       end
     end
+    flush if need_flush
   end
 
   @resource_map.keys.each do |property|
