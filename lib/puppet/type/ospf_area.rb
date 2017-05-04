@@ -140,4 +140,22 @@ Puppet::Type.newtype(:ospf_area) do
       end
     end
   end
+
+  autorequire(:package) do
+    case value(:provider)
+      when :quagga
+        %w{quagga}
+      else
+        []
+    end
+  end
+
+  autorequire(:service) do
+    case value(:provider)
+      when :quagga
+        %w{zebra ospfd}
+      else
+        []
+    end
+  end
 end
