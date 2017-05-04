@@ -76,7 +76,7 @@ Puppet::Type.newtype(:redistribution) do
     protocol = value(:name).split(/:/).first
     case value(:provider)
       when :quagga
-        [ "zebra", protocol ]
+        [ 'zebra', protocol ]
       else
         []
     end
