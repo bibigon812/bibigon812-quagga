@@ -55,6 +55,10 @@ Puppet::Type.newtype(:community_list) do
       end
       new_value
     end
+
+    def should_to_s(value)
+      value.inspect
+    end
   end
 
   autorequire(:package) do

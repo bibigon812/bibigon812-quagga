@@ -47,6 +47,10 @@ Puppet::Type.newtype(:route_map) do
     newvalues(/\Apeer\slocal\Z/)
     newvalues(/\Aprobability\s(\d+)\Z/)
     newvalues(/\Atag\s(\d+)\Z/)
+
+    def should_to_s(value)
+      value.inspect
+    end
   end
 
   newproperty(:on_match) do
@@ -80,6 +84,10 @@ Puppet::Type.newtype(:route_map) do
     newvalues(/\Atag\s(\d+)\Z/)
     newvalues(/\Avpn4\snext-hop\s(\d+\.\d+\.\d+\.\d+)\Z/)
     newvalues(/\Aweight\s(\d+)\Z/)
+
+    def should_to_s(value)
+      value.inspect
+    end
   end
 
   autorequire(:package) do

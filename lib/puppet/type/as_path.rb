@@ -47,6 +47,10 @@ Puppet::Type.newtype(:as_path) do
       end
       new_value
     end
+
+    def should_to_s(value)
+      value.inspect
+    end
   end
 
   autorequire(:package) do
