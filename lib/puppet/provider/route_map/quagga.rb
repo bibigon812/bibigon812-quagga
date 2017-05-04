@@ -14,6 +14,7 @@ Puppet::Type.type(:route_map).provide :quagga do
   def initialize(value)
     super(value)
     @property_flush = {}
+    @property_remove = {}
   end
 
   def self.instances
@@ -69,6 +70,7 @@ Puppet::Type.type(:route_map).provide :quagga do
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
         found_providers << provider
+        provider.purge
       end
     end
     (providers - found_providers).each do |provider|
@@ -114,6 +116,19 @@ Puppet::Type.type(:route_map).provide :quagga do
     if @property_hash[:ensure] == :absent
       cmds << "no #{cmds.last}"
     else
+
+      @property_remove.each do |property, value|
+        if [:match, :set].include?(property)
+          value.each do |line|
+            cmds << "no #{resource_map[property]} #{line}"
+          end
+        else
+          cmds << "no #{resource_map[property]} #{value}"
+        end
+      end
+
+      @property_remove.clear
+
       @property_flush.each do |property, value|
         if [:match, :set].include?(property)
           old_value = @property_hash[property] || []
@@ -128,13 +143,25 @@ Puppet::Type.type(:route_map).provide :quagga do
         end
         @property_hash[property] = value
       end
+
+      @property_flush.clear
+
     end
 
     cmds << 'end'
     cmds << 'write memory'
-    vtysh(cmds.reduce([]){|cmds, cmd| cmds << '-c' << cmd})
 
-    @property_flush.clear
+    vtysh(cmds.reduce([]){|cmds, cmd| cmds << '-c' << cmd})
+  end
+
+  def purge
+    debug '[purge]'
+    resource_map = self.class.instance_variable_get('@resource_map')
+    resource_map.keys.each do |property|
+      if @resource[property].nil? && !@property_hash[property].nil?
+        @property_remove[property] = @property_hash[property]
+      end
+    end
   end
 
   @resource_map.keys.each do |property|
