@@ -27,6 +27,12 @@ describe Puppet::Type.type(:as_path) do
         expect(described_class.attrtype(param)).to eq(:param)
       end
     end
+
+    [ :rules ].each do |property|
+      it "should have a #{property} property" do
+        expect(described_class.attrtype(property)).to eq(:property)
+      end
+    end
   end
 
   describe 'when validating values' do
