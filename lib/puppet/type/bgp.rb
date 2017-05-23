@@ -12,7 +12,21 @@ Puppet::Type.newtype(:bgp) do
   end
 
   newproperty(:import_check) do
+    desc %q{ Check BGP network route exists in IGP }
 
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
   end
 
   newproperty(:ipv4_unicast) do

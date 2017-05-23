@@ -4,11 +4,19 @@ Puppet::Type.type(:bgp).provide :quagga do
   commands :vtysh => 'vtysh'
 
   @resource_map = {
-      :ipv4_unicast       => {
+      :import_check => {
+          :default => :disabled,
+          :regex => /\A\sbgp\snetwork\simport-check\Z/,
+          :template => 'bgp network import-check',
+          :type => :boolean,
+          :value => ':enabled',
+      },
+      :ipv4_unicast => {
           :default => :enabled,
           :regex => /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
           :template => 'bgp default ipv4-unicast',
-          :type => :boolean, :value => ':disabled',
+          :type => :boolean,
+          :value => ':disabled',
       },
       :maximum_paths_ebgp => {
           :default => 1,
@@ -24,7 +32,7 @@ Puppet::Type.type(:bgp).provide :quagga do
           :type => :fixnum,
           :value => '$1',
       },
-      :router_id          => {
+      :router_id => {
           :regex => /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/,
           :template => 'bgp router-id <%= value %>',
           :type => :string,
