@@ -5,10 +5,10 @@ Puppet::Type.type(:bgp).provide :quagga do
 
   @resource_map = {
       :ipv4_unicast       => {
-          :default => :enable,
+          :default => :enabled,
           :regex => /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
           :template => 'bgp default ipv4-unicast',
-          :type => :boolean, :value => ':disable',
+          :type => :boolean, :value => ':disabled',
       },
       :maximum_paths_ebgp => {
           :default => 1,
@@ -140,7 +140,7 @@ Puppet::Type.type(:bgp).provide :quagga do
 
       @property_flush.each do |property, value|
         cmd = ''
-        if resource_map[property][:type] == :boolean && value == :disable
+        if resource_map[property][:type] == :boolean && value == :disabled
           cmd << 'no '
         end
         cmd << ERB.new(resource_map[property][:template]).result(binding)

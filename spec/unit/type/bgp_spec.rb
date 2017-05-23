@@ -90,52 +90,52 @@ describe Puppet::Type.type(:bgp) do
       expect { described_class.new(:name => '197888', :ipv4_unicast => false) }.to_not raise_error
     end
 
-    it 'should support \'enable\' as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => 'enable') }.to_not raise_error
+    it 'should support \'enabled\' as a value' do
+      expect { described_class.new(:name => '197888', :ipv4_unicast => 'enabled') }.to_not raise_error
     end
 
-    it 'should support :enable as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => :enable) }.to_not raise_error
+    it 'should support :enabled as a value' do
+      expect { described_class.new(:name => '197888', :ipv4_unicast => :enabled) }.to_not raise_error
     end
 
-    it 'should support \'disable\' as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => 'disable') }.to_not raise_error
+    it 'should support \'disabled\' as a value' do
+      expect { described_class.new(:name => '197888', :ipv4_unicast => 'disabled') }.to_not raise_error
     end
 
-    it 'should support :disable as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => :disable) }.to_not raise_error
+    it 'should support :disabled as a value' do
+      expect { described_class.new(:name => '197888', :ipv4_unicast => :disabled) }.to_not raise_error
     end
 
     it 'should not support allow as a value' do
       expect { described_class.new(:name => '197888', :ipv4_unicast => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should contain enable' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => 'true')[:ipv4_unicast]).to eq(:enable)
+    it 'should contain enabled' do
+      expect(described_class.new(:name => '197888', :ipv4_unicast => 'true')[:ipv4_unicast]).to eq(:enabled)
     end
 
-    it 'should contain enable' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => 'enable')[:ipv4_unicast]).to eq(:enable)
+    it 'should contain enabled' do
+      expect(described_class.new(:name => '197888', :ipv4_unicast => 'enabled')[:ipv4_unicast]).to eq(:enabled)
     end
 
-    it 'should contain enable' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => true)[:ipv4_unicast]).to eq(:enable)
+    it 'should contain enabled' do
+      expect(described_class.new(:name => '197888', :ipv4_unicast => true)[:ipv4_unicast]).to eq(:enabled)
     end
 
-    it 'should contain disable' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => 'false')[:ipv4_unicast]).to eq(:disable)
+    it 'should contain disabled' do
+      expect(described_class.new(:name => '197888', :ipv4_unicast => 'false')[:ipv4_unicast]).to eq(:disabled)
     end
 
-    it 'should contain disable' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => 'disable')[:ipv4_unicast]).to eq(:disable)
+    it 'should contain disabled' do
+      expect(described_class.new(:name => '197888', :ipv4_unicast => 'disabled')[:ipv4_unicast]).to eq(:disabled)
     end
 
-    it 'should contain disable' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => :disable)[:ipv4_unicast]).to eq(:disable)
+    it 'should contain disabled' do
+      expect(described_class.new(:name => '197888', :ipv4_unicast => :disabled)[:ipv4_unicast]).to eq(:disabled)
     end
 
-    it 'should contain disable' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => false)[:ipv4_unicast]).to eq(:disable)
+    it 'should contain disabled' do
+      expect(described_class.new(:name => '197888', :ipv4_unicast => false)[:ipv4_unicast]).to eq(:disabled)
     end
   end
 

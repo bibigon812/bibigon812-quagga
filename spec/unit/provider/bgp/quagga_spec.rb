@@ -62,7 +62,7 @@ router bgp 197888
           :ensure => :present,
           :name => '197888',
           :provider => :quagga,
-          :ipv4_unicast => :disable,
+          :ipv4_unicast => :disabled,
           :maximum_paths_ebgp => 4,
           :maximum_paths_ibgp => 4,
           :router_id => '172.16.32.103',

@@ -11,18 +11,22 @@ Puppet::Type.newtype(:bgp) do
     newvalues(/\A\d+\Z/)
   end
 
+  newproperty(:import_check) do
+
+  end
+
   newproperty(:ipv4_unicast) do
     desc %q{ Activate ipv4-unicast for a peer by default }
 
-    defaultto(:enable)
-    newvalues(:disable, :enable, :false, :true)
+    defaultto(:enabled)
+    newvalues(:disabled, :enabled, :false, :true)
 
     munge do |value|
       case value
-        when :false, 'false', false, 'disable'
-          :disable
-        when :true, 'true', true, 'enable'
-          :enable
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
         else
           value
       end
