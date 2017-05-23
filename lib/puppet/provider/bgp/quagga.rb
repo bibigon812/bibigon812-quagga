@@ -6,34 +6,34 @@ Puppet::Type.type(:bgp).provide :quagga do
   @resource_map = {
       :import_check => {
           :default => :disabled,
-          :regex => /\A\sbgp\snetwork\simport-check\Z/,
+          :regexp => /\A\sbgp\snetwork\simport-check\Z/,
           :template => 'bgp network import-check',
           :type => :boolean,
           :value => ':enabled',
       },
       :ipv4_unicast => {
           :default => :enabled,
-          :regex => /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
+          :regexp => /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
           :template => 'bgp default ipv4-unicast',
           :type => :boolean,
           :value => ':disabled',
       },
       :maximum_paths_ebgp => {
           :default => 1,
-          :regex => /\A\smaximum-paths\s(\d+)\Z/,
+          :regexp => /\A\smaximum-paths\s(\d+)\Z/,
           :template => 'maximum-paths <%= value %>',
           :type => :fixnum,
           :value => '$1',
       },
       :maximum_paths_ibgp => {
           :default => 1,
-          :regex => /\A\smaximum-paths\sibgp\s(\d+)\Z/,
+          :regexp => /\A\smaximum-paths\sibgp\s(\d+)\Z/,
           :template => 'maximum-paths ibgp <%= value %>',
           :type => :fixnum,
           :value => '$1',
       },
       :router_id => {
-          :regex => /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/,
+          :regexp => /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/,
           :template => 'bgp router-id <%= value %>',
           :type => :string,
           :value => '$1',
@@ -74,7 +74,7 @@ Puppet::Type.type(:bgp).provide :quagga do
         break
       elsif found_bgp
         @resource_map.each do |property, options|
-          if line =~ options[:regex]
+          if line =~ options[:regexp]
             value = eval(options[:value])
             case options[:type]
               when :fixnum
