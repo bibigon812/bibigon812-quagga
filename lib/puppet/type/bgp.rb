@@ -8,7 +8,7 @@ Puppet::Type.newtype(:bgp) do
 
   newparam(:name) do
     desc %q{ The AS number. }
-    newvalues(/^\d+$/)
+    newvalues(/\A\d+\Z/)
   end
 
   newproperty(:ipv4_unicast) do
