@@ -28,7 +28,7 @@ describe Puppet::Type.type(:bgp_neighbor) do
       end
     end
 
-    [:allowas_in, :default_originate, :local_as, :peer_group, :prefix_list_in, :prefix_list_out, :remote_as,
+    [:allow_as_in, :default_originate, :local_as, :peer_group, :prefix_list_in, :prefix_list_out, :remote_as,
      :route_map_export, :route_map_import, :route_map_in, :route_map_out].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
@@ -79,41 +79,41 @@ describe Puppet::Type.type(:bgp_neighbor) do
     end
   end
 
-  describe 'allowas_in' do
+  describe 'allow_as_in' do
     it 'should support \'1\' as a value' do
-      expect { described_class.new(:name => '192.168.1.1', :allowas_in => '1') }.to_not raise_error
+      expect { described_class.new(:name => '192.168.1.1', :allow_as_in => '1') }.to_not raise_error
     end
 
     it 'should support 1 as a value' do
-      expect { described_class.new(:name => '192.168.1.1', :allowas_in => 1) }.to_not raise_error
+      expect { described_class.new(:name => '192.168.1.1', :allow_as_in => 1) }.to_not raise_error
     end
 
     it 'should not support 0 as a value' do
-      expect { described_class.new(:name => '192.168.1.1', :allowas_in => 0) }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => '192.168.1.1', :allow_as_in => 0) }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
     it 'should not support -1 as a value' do
-      expect { described_class.new(:name => '192.168.1.1', :allowas_in => -1) }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => '192.168.1.1', :allow_as_in => -1) }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
     it 'should not support \'a lot\' as a value' do
-      expect { described_class.new(:name => '192.168.1.1', :allowas_in => 'a lot') }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => '192.168.1.1', :allow_as_in => 'a lot') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
     it 'should contain 1' do
-      expect(described_class.new(:name => '192.168.1.1', :allowas_in => '1')[:allowas_in]).to eq(1)
+      expect(described_class.new(:name => '192.168.1.1', :allow_as_in => '1')[:allow_as_in]).to eq(1)
     end
 
     it 'should contain 2' do
-      expect(described_class.new(:name => '192.168.1.1', :allowas_in => 2)[:allowas_in]).to eq(2)
+      expect(described_class.new(:name => '192.168.1.1', :allow_as_in => 2)[:allow_as_in]).to eq(2)
     end
 
     it 'should contain 5' do
-      expect(described_class.new(:name => '192.168.1.1', :allowas_in => 5)[:allowas_in]).to eq(5)
+      expect(described_class.new(:name => '192.168.1.1', :allow_as_in => 5)[:allow_as_in]).to eq(5)
     end
 
     it 'should contain 10' do
-      expect(described_class.new(:name => '192.168.1.1', :allowas_in => '10')[:allowas_in]).to eq(10)
+      expect(described_class.new(:name => '192.168.1.1', :allow_as_in => '10')[:allow_as_in]).to eq(10)
     end
   end
 
