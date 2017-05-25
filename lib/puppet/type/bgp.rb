@@ -2,6 +2,17 @@ Puppet::Type.newtype(:bgp) do
   @doc = %q{
     This type provides the capability to manage bgp parameters within
     puppet.
+
+    Examples:
+
+      bgp { '65000':
+        ensure             => present,
+        import_check       => enabled,
+        ipv4_unicast       => disabled,
+        maximum_paths_ebgp => 10,
+        maximum_paths_ibgp => 10,
+        router_id          => '192.168.1.1',
+      }
   }
 
   ensurable
