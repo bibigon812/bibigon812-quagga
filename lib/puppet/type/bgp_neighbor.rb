@@ -47,14 +47,14 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newparam(:name) do
-    desc %q{ A neighbor IP address or a peer-group name }
+    desc %q{ It's consists of a AS number and a neighbor IP address or a peer-group name }
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
-    re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
+    re = /\A\d+:#{block}\.#{block}\.#{block}\.#{block}\Z/
 
     newvalues(re)
-    newvalues(/\A[\h:]\Z/)
-    newvalues(/\A\w+\Z/)
+    newvalues(/\A\d+:[\h:]\Z/)
+    newvalues(/\A\d+:\w+\Z/)
   end
 
   newproperty(:allow_as_in) do
@@ -164,7 +164,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
 
   autorequire(:bgp) do
     reqs = []
-    as = value(:as)
+    as = value(:name).split(/:/).first
 
     unless as.nil?
       reqs << as
@@ -173,10 +173,10 @@ Puppet::Type.newtype(:bgp_neighbor) do
     reqs
   end
 
-  autorequire(:bgpneighbor) do
+  autorequire(:bgp_neighbor) do
     reqs = []
     peer_group = value(:peer_group)
-    unless peer_group.nil? || peer_group == :true
+    unless peer_group.nil? || peer_group == :enabled
       reqs << peer_group
     end
 
