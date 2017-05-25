@@ -11,7 +11,7 @@
 - the prefix_list type and a provider for it
 - the route_map type and a provider for it
 - the bgp type and a provider for it
-- the bgp_neighbor type and a provider for it
+- the bgp_neighbor type
 
 ### Updated
 - changelog
