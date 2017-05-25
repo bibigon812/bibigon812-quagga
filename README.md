@@ -41,11 +41,11 @@ bgp_neighbor { '65000:internal_peers':
 }
 
 ospf { 'ospf':
-    ensure              => present,
-    abr_type            => 'cisco',
-    opaque              => true,
-    rfc1583             => true,
-    router_id           => '192.168.0.1',
+    ensure    => present,
+    abr_type  => 'cisco',
+    opaque    => true,
+    rfc1583   => true,
+    router_id => '192.168.0.1',
 }
 
 ospf_area { '0.0.0.0':
