@@ -178,12 +178,12 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   def create
     debug '[create]'
 
-    # resource_map = self.class.instance_variable_get('@resource_map')
+    resource_map = self.class.instance_variable_get('@resource_map')
 
     @property_hash[:ensure] = @resource[:ensure]
     @property_hash[:name] = @resource[:name]
 
-    @resource_map.each_key do |property|
+    resource_map.each_key do |property|
       self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
     end
   end
@@ -204,7 +204,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
     debug "[flush][#{name}]"
 
-    # resource_map = self.class.instance_variable_get('@resource_map')
+    resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
     cmds << 'configure terminal'
@@ -214,15 +214,15 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
       cmds << "no neighbor #{name}"
     else
       @property_remove.each do |property, value|
-        cmds << "no #{ERB.new(@resource_map[property][:template]).result(binding)}"
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
       end
 
       @property_flush.each do |property, value|
         cmd = ''
-        if @resource_map[property][:type] == :switch && value == :disabled
+        if resource_map[property][:type] == :switch && value == :disabled
           cmd << 'no '
         end
-        cmd << ERB.new(@resource_map[property][:template]).result(binding)
+        cmd << ERB.new(resource_map[property][:template]).result(binding)
         cmds << cmd
       end
     end
@@ -240,7 +240,9 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   def purge
     debug '[purge]'
 
-    @resource_map.keys.each do |property|
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    resource_map.each_key do |property|
       if @resource[property].nil? && !@property_hash[property].nil?
         @property_remove[property] = @property_hash[property]
       end
