@@ -175,6 +175,12 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     (providers - found_providers).each { |provider| provider.destroy }
   end
 
+  def activate
+    debug '[activate]'
+
+    @state = @property_hash[:ensure] = :activate
+  end
+
   def create
     debug '[create]'
 
@@ -214,6 +220,10 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
       @property_flush[:empty] = :absent
       cmds << "no neighbor #{name}"
     else
+      if @state
+        cmds << "neighbor #{name} #{@state}"
+      end
+
       @property_remove.each do |property, value|
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
       end
@@ -243,11 +253,19 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
+    @state = @resource[:ensure] unless @resource[:ensure] == @property_hash[:ensure]
+
     resource_map.each_key do |property|
       if @resource[property].nil? && !@property_hash[property].nil?
         @property_remove[property] = @property_hash[property]
       end
     end
+  end
+
+  def shutdown
+    debug '[shutdown]'
+
+    @state = @property_hash[:ensure] = :shutdown
   end
 
   @resource_map.each_key do |property|
