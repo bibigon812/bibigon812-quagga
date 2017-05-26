@@ -78,6 +78,12 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
       },
   }
 
+  def initialize(value)
+    super(value)
+    @property_flush = {}
+    @property_remove = {}
+  end
+
   def self.instances
     debug '[instances]'
 
@@ -154,5 +160,100 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     end
 
     bgp_neighbors
+  end
+
+  def self.prefetch(resources)
+    providers = instances
+    found_providers = []
+    resources.each_key do |name|
+      if provider = providers.find { |provider| provider.name == name }
+        resources[name].provider = provider
+        found_providers << provider
+        provider.purge
+      end
+    end
+    (providers - found_providers).each { |provider| provider.destroy }
+  end
+
+  def create
+    debug '[create]'
+
+    # resource_map = self.class.instance_variable_get('@resource_map')
+
+    @property_hash[:ensure] = @resource[:ensure]
+    @property_hash[:name] = @resource[:name]
+
+    @resource_map.each_key do |property|
+      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
+    end
+  end
+
+  def destroy
+    debug '[destroy]'
+
+    @property_hash[:ensure] = :absent
+    flush
+  end
+
+  def exists?
+    @property_hash[:ensure] != :absent
+  end
+
+  def flush
+    as, name = @property_hash[:name].split(/:/)
+
+    debug "[flush][#{name}]"
+
+    # resource_map = self.class.instance_variable_get('@resource_map')
+
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << "router bgp #{as}"
+
+    if @property_hash == :absent
+      cmds << "no neighbor #{name}"
+    else
+      @property_remove.each do |property, value|
+        cmds << "no #{ERB.new(@resource_map[property][:template]).result(binding)}"
+      end
+
+      @property_flush.each do |property, value|
+        cmd = ''
+        if @resource_map[property][:type] == :switch && value == :disabled
+          cmd << 'no '
+        end
+        cmd << ERB.new(@resource_map[property][:template]).result(binding)
+        cmds << cmd
+      end
+    end
+
+    cmds << 'end'
+    cmds << 'write memory'
+
+    unless @property_flush.empty? && @property_remove.empty?
+      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+      @property_flush.clear
+      @property_remove.clear
+    end
+  end
+
+  def purge
+    debug '[purge]'
+
+    @resource_map.keys.each do |property|
+      if @resource[property].nil? && !@property_hash[property].nil?
+        @property_remove[property] = @property_hash[property]
+      end
+    end
+  end
+
+  @resource_map.each_key do |property|
+    define_method "#{property}" do
+      @property_hash[property] || :absent
+    end
+
+    define_method "#{property}=" do |value|
+      @property_flush[property] = value
+    end
   end
 end
