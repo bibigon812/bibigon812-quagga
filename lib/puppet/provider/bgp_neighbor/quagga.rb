@@ -220,11 +220,15 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
       @property_flush[:empty] = :absent
       cmds << "no neighbor #{name}"
     else
-      case @state
-        when :activate
-          cmds << "neighbor #{name} activate"
-        when :shutdown
-          cmds << "neighbor #{name} shutdown"
+      unless @state.nil?
+        case @state
+          when :activate
+            cmds << "neighbor #{name} activate"
+          when :shutdown
+            cmds << "neighbor #{name} shutdown"
+          when :present
+            cmds << "no neighbor #{name} #{@previous_state}" unless @previous_state.nil?
+        end
       end
 
       @property_remove.each do |property, value|
@@ -258,6 +262,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
     unless @resource[:ensure] == @property_hash[:ensure]
       @state = @resource[:ensure]
+      @previous_state = @property_hash[:ensure]
       debug "New state: #{@state}"
     end
 
