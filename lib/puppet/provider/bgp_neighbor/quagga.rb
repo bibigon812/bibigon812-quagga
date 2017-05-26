@@ -202,7 +202,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   def flush
     as, name = @property_hash[:name].split(/:/)
 
-    debug "[flush][#{name}]"
+    debug "[flush][#{as}:#{name}]"
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
@@ -211,6 +211,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     cmds << "router bgp #{as}"
 
     if @property_hash[:ensure] == :absent
+      @property_flush[:empty] = :absent
       cmds << "no neighbor #{name}"
     else
       @property_remove.each do |property, value|
