@@ -220,8 +220,11 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
       @property_flush[:empty] = :absent
       cmds << "no neighbor #{name}"
     else
-      if @state
-        cmds << "neighbor #{name} #{@state}"
+      case @state
+        when :activate
+          cmds << "neighbor #{name} activate"
+        when :shutdown
+          cmds << "neighbor #{name} shutdown"
       end
 
       @property_remove.each do |property, value|
@@ -263,6 +266,8 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
         @property_remove[property] = @property_hash[property]
       end
     end
+
+    flush
   end
 
   def shutdown
