@@ -253,7 +253,10 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
-    @state = @resource[:ensure] unless @resource[:ensure] == @property_hash[:ensure]
+    unless @resource[:ensure] == @property_hash[:ensure]
+      @state = @resource[:ensure]
+      debug "New state: #{@state}"
+    end
 
     resource_map.each_key do |property|
       if @resource[property].nil? && !@property_hash[property].nil?
