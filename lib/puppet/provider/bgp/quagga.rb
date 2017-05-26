@@ -139,7 +139,7 @@ Puppet::Type.type(:bgp).provide :quagga do
     cmds << 'configure terminal'
     cmds << "router bgp #{name}"
 
-    if @property_hash == :absent
+    if @property_hash[:ensure] == :absent
       cmds << "no router bgp #{name}"
     else
       @property_remove.each do |property, value|
