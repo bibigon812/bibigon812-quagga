@@ -98,6 +98,23 @@ Puppet::Type.newtype(:bgp_neighbor) do
     end
   end
 
+  newproperty(:next_hop_self) do
+    desc %q{ Disable the next hop calculation for this neighbor }
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
+  end
+
   newproperty(:peer_group) do
     desc %q{ Member of the peer-group. }
     defaultto(:disabled)

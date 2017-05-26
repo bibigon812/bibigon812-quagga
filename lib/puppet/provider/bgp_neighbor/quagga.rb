@@ -23,6 +23,13 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :template => 'neighbor <%= name %> local-as <%= value %>',
           :type => :fixnum,
       },
+      :next_hop_self => {
+          :default => :disabled,
+          :eval => ':enabled',
+          :regexp => /\A\sneighbor\s\S+\snext-hop-self\Z/,
+          :template => 'neighbor <%= name %> next-hop-self',
+          :type => :switch,
+      },
       :peer_group => {
           :template => 'neighbor <%= name %> peer-group <%= value %>',
           :type => :string,
@@ -104,6 +111,10 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           hash[:provider] = self.name
           hash[:name] = "#{as}:#{name}"
           hash[:ensure] = :present
+
+          @resource_map.each do |property, options|
+            hash[property] = options[:default] if options.has_key?(:default)
+          end
         end
 
         hash[key] = value || :enabled

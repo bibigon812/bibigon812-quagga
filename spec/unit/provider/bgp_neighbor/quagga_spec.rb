@@ -44,6 +44,7 @@ router bgp 197888
  neighbor RR_WEAK next-hop-self
  neighbor RR_WEAK route-map RR_WEAK_out out
  neighbor 172.16.32.108 peer-group INTERNAL
+ neighbor 172.16.32.108 default-originate
  neighbor 172.16.32.108 shutdown
  maximum-paths 4
  maximum-paths ibgp 4
@@ -61,8 +62,10 @@ router bgp 197888
     it 'should return the 197888:INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
           :allow_as_in => 1,
+          :default_originate => :disabled,
           :ensure => :activate,
           :name => '197888:INTERNAL',
+          :next_hop_self => :enabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
@@ -71,8 +74,10 @@ router bgp 197888
 
     it 'should return the 197888:RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
+          :default_originate => :disabled,
           :ensure => :activate,
           :name => '197888:RR',
+          :next_hop_self => :enabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
@@ -81,8 +86,10 @@ router bgp 197888
 
     it 'should return the 197888:RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
+          :default_originate => :disabled,
           :ensure => :activate,
           :name => '197888:RR_WEAK',
+          :next_hop_self => :enabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
@@ -92,8 +99,10 @@ router bgp 197888
 
     it 'should return the 197888:172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
+          :default_originate => :enabled,
           :ensure => :shutdown,
           :name => '197888:172.16.32.108',
+          :next_hop_self => :disabled,
           :peer_group => 'INTERNAL',
           :provider => :quagga,
       })

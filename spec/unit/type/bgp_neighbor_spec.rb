@@ -28,8 +28,8 @@ describe Puppet::Type.type(:bgp_neighbor) do
       end
     end
 
-    [:allow_as_in, :default_originate, :local_as, :peer_group, :prefix_list_in, :prefix_list_out, :remote_as,
-     :route_map_export, :route_map_import, :route_map_in, :route_map_out].each do |property|
+    [:allow_as_in, :default_originate, :local_as, :next_hop_self, :peer_group, :prefix_list_in, :prefix_list_out,
+     :remote_as, :route_map_export, :route_map_import, :route_map_in, :route_map_out].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -188,6 +188,80 @@ describe Puppet::Type.type(:bgp_neighbor) do
 
     it 'should contain disabled' do
       expect(described_class.new(:name => '65000:192.168.1.1', :default_originate => false)[:default_originate]).to eq(:disabled)
+    end
+  end
+
+  describe 'next_hop_self' do
+    it 'should support \'true\' as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'true') }.to_not raise_error
+    end
+
+    it 'should support :true as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => :true) }.to_not raise_error
+    end
+
+    it 'should support true as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => true) }.to_not raise_error
+    end
+
+    it 'should support \'false\' as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'false') }.to_not raise_error
+    end
+
+    it 'should support :false as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => :false) }.to_not raise_error
+    end
+
+    it 'should support false as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => false) }.to_not raise_error
+    end
+
+    it 'should support \'enabled\' as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'enabled') }.to_not raise_error
+    end
+
+    it 'should support :enabled as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => :enabled) }.to_not raise_error
+    end
+
+    it 'should support \'disabled\' as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'disabled') }.to_not raise_error
+    end
+
+    it 'should support :disabled as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => :disabled) }.to_not raise_error
+    end
+
+    it 'should not support allow as a value' do
+      expect { described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain enabled' do
+      expect(described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'true')[:next_hop_self]).to eq(:enabled)
+    end
+
+    it 'should contain enabled' do
+      expect(described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'enabled')[:next_hop_self]).to eq(:enabled)
+    end
+
+    it 'should contain enabled' do
+      expect(described_class.new(:name => '65000:192.168.1.1', :next_hop_self => true)[:next_hop_self]).to eq(:enabled)
+    end
+
+    it 'should contain disabled' do
+      expect(described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'false')[:next_hop_self]).to eq(:disabled)
+    end
+
+    it 'should contain disabled' do
+      expect(described_class.new(:name => '65000:192.168.1.1', :next_hop_self => 'disabled')[:next_hop_self]).to eq(:disabled)
+    end
+
+    it 'should contain disabled' do
+      expect(described_class.new(:name => '65000:192.168.1.1', :next_hop_self => :disabled)[:next_hop_self]).to eq(:disabled)
+    end
+
+    it 'should contain disabled' do
+      expect(described_class.new(:name => '65000:192.168.1.1', :next_hop_self => false)[:next_hop_self]).to eq(:disabled)
     end
   end
 
