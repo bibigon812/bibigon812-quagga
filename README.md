@@ -268,7 +268,9 @@ as_path { 'TEST_AS_PATH':
 
 ## Hiera
 
-### bgp yaml
+### bgp
+
+#### yaml
 
 ```yaml
 ---
@@ -292,7 +294,7 @@ site::profiles::bgp:
 
 ```
 
-### bgp profile
+#### profile
 
 ```puppet
 class site::profiles::bgp {
@@ -321,5 +323,76 @@ class site::profiles::bgp {
     merge($bgp, { $as => $bgp_configs })
   }
   create_resources('bgp', $bgp)
+}
+```
+
+### ospf
+
+#### yaml
+
+```yaml
+---
+site::profiles::ospf:
+  area:
+    0.0.0.0:
+      networks:
+        - 10.0.10.0/24
+        - 10.0.100.0/24
+    0.0.0.10:
+      stub: true
+      networks:
+        - 192.168.1.0/24
+        - 10.0.0.0/24
+        - 172.16.100.0/24
+  redistribute:
+    - bgp:
+        metric: 100
+        route_map: ROUTE_MAP
+    - connected
+```
+
+#### profile
+
+```puppet
+class site::profiles::ospf {
+  $config = hiera_hash('site::profiles::ospf', {})
+  $ospf = { 'ospf' => delete(delete($config, 'redistribute'), 'area') }
+  $ospf_areas = $config['area'].reduce({}) |$memo, $value| {
+    $area = $value[0]
+    $options = $value[1].reduce({}) |$memo, $value| {
+      if $value[0] == 'networks' {
+        $options = sort($value[1])
+      } else {
+        $options = $value[1]
+      }
+      merge($memo, { $value[0] => $options })
+    }
+    merge($memo, { $area => $options })
+  }
+  $redistribution = $config['redistribute'].reduce({}) |$memo, $value| {
+    $name = $value ? {
+      Hash    => $value.keys[0],
+      default => $value,
+    }
+    $config = $value ? {
+      Hash    => $value[$name],
+      default => {},
+    }
+    merge($memo, { "ospf::${name}" => $config })
+  }
+  $defaults = {
+    ensure => present,
+  }
+  $ospf_interface = hiera_hash('site::profiles::interface', {}).reduce({}) |$memo, $iface| {
+    $iface_name = $iface[0]
+    $ospf_interface = try_get_value($iface[1], 'ip/ospf')
+    if $ospf_interface {
+      merge($memo, { $iface_name => $ospf_interface })
+    }
+  }
+  create_resources('ospf', $ospf)
+  create_resources('ospf_interface', $ospf_interface)
+  create_resources('redistribution', $redistribution)
+  create_resources('ospf_area', $ospf_areas)
 }
 ```

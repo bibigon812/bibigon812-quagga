@@ -1,6 +1,11 @@
 ## [Unreleased]
 ### Added
-- hiera docs
+- a hiera bgp configuration
+- a hiera ospf configuration
+
+### Updated
+- changelog
+- docs
 
 ## [1.0.1] - 29-05-2017
 ### Changed
