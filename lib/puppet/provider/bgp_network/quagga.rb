@@ -20,6 +20,7 @@ Puppet::Type.type(:bgp_network).provide :quagga do
         hash[:name] = "#{as},#{network}"
         hash[:provider] = self.name
         hash[:ensure] = :present
+        debug "bgp_network: #{hash}"
         networks << new(hash)
       elsif line =~ /^\w/ and found_config
         break
@@ -29,7 +30,6 @@ Puppet::Type.type(:bgp_network).provide :quagga do
   end
 
   def self.prefetch(resources)
-    debug '[prefetch]'
     providers = instances
     found_providers = []
     resources.keys.each do |name|
@@ -72,6 +72,9 @@ Puppet::Type.type(:bgp_network).provide :quagga do
 
     cmds = []
     as, network = @property_hash[:name].split(/,/)
+
+    cmds << 'configure terminal'
+    cmds << "router bgp #{as}"
 
     if network.include?(':')
       cmds << "no ipv6 bgp network #{network}"
