@@ -5,7 +5,7 @@ describe 'quagga' do
     it 'should work with no errors' do
       pp = <<-EOS
         class { 'quagga': }
-        ospf_interface { 'lo':
+        ospf_interface { 'eth0':
           ensure              => present,
           cost                => 100,
           dead_interval       => 8,
