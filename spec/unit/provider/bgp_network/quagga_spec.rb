@@ -64,7 +64,7 @@ router bgp 197888
     it 'should return the 197888:INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => '197888,172.16.32.0/24',
+          :name => '197888 172.16.32.0/24',
           :provider => :quagga,
       })
     end
@@ -72,7 +72,15 @@ router bgp 197888
     it 'should return the 197888:INTERNAL resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
         :ensure => :present,
-        :name => '197888,1::/64',
+        :name => '197888 1::/64',
+        :provider => :quagga,
+      })
+    end
+
+    it 'should return the 197888:INTERNAL resource' do
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
+        :ensure => :present,
+        :name => '197888 2::/64',
         :provider => :quagga,
       })
     end

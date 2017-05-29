@@ -17,7 +17,7 @@ Puppet::Type.type(:bgp_network).provide :quagga do
       elsif line =~ /\A\snetwork\s([\h\.\/:]+)\Z/
         hash = {}
         network = $1
-        hash[:name] = "#{as},#{network}"
+        hash[:name] = "#{as} #{network}"
         hash[:provider] = self.name
         hash[:ensure] = :present
         debug "bgp_network: #{hash}"
@@ -47,7 +47,7 @@ Puppet::Type.type(:bgp_network).provide :quagga do
     debug '[create]'
 
     cmds = []
-    as, network = @resource[:name].split(/,/)
+    as, network = @resource[:name].split(/\s+/)
 
     cmds << 'configure terminal'
     cmds << "router bgp #{as}"
@@ -71,7 +71,7 @@ Puppet::Type.type(:bgp_network).provide :quagga do
     debug '[destroy]'
 
     cmds = []
-    as, network = @property_hash[:name].split(/,/)
+    as, network = @property_hash[:name].split(/\s+/)
 
     cmds << 'configure terminal'
     cmds << "router bgp #{as}"
