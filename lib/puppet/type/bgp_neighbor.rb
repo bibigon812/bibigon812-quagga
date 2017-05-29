@@ -57,10 +57,16 @@ Puppet::Type.newtype(:bgp_neighbor) do
 
   newproperty(:allow_as_in) do
     desc %q{ Accept as-path with my AS present in it }
+    defaultto(1)
     newvalues(/\A(10|[1-9])\Z/)
 
     munge do |value|
-      value.to_i
+      case value
+        when String
+          value.to_i
+        else
+          value
+      end
     end
   end
 
