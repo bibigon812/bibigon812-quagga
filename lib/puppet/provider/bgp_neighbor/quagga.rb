@@ -213,7 +213,14 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   def create
     debug '[create]'
 
+    resource_map = self.class.instance_variable_get('@resource_map')
 
+    @property_hash[:ensure] = :present
+    @property_hash[:name] = @resource[:name]
+
+    resource_map.keys.each do |property|
+      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
+    end
   end
 
 
