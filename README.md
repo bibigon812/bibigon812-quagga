@@ -5,10 +5,80 @@ ISIS without restarting daemons.
 
 ## Features
 ### Route maps
+
+The route_map resource is a single sequence. You can use a chain of resources
+to describe complex route maps, for example:
+
+```
+route_map { 'bgp_out:permit:10':
+    ensure   => present,
+    match    => 'ip address prefix-list ADVERTISED-PREFIXES'
+    on_match => 'goto 65000',
+}
+
+route_map { 'bgp_out:deny:99':
+    ensure => present,
+}
+
+route_map { 'bgp_out:permit:65000':
+    ensure => present,
+    set    => 'community 0:666',
+}
+```
+
 ### Prefix lists
 ### Community lists
 ### BGP
+
+There are three resources to manage the BGP:
+
+  - bgp
+  - bgp_neighbor
+  - bgp_network
+
+#### bgp
+
+  - name - AS number
+  - ensure - absent|present
+  - import_check - disabled|enabled
+  - ipv4_unicast - disabled|enabled
+  - maximum_paths_ebgp - number of the ebgp ECMP
+  - maximum_paths_ibgp - number of the ibgp ECMP
+  - router_id - IP address
+
+#### bgp_neighbor
+
+  - name - AS number and IP address
+  - ensure - absent|present
+  - activate - disabled|enabled
+  - allow_as_in - number
+  - default_originate - disabled|enabled
+  - local_as - AS number
+  - next_hop_self - disabled|enabled
+  - passive - disabled|enabled
+  - peer_group - disabled|enabled or peer group name
+  - prefix_list_in - prefix-list name
+  - prefix_list_out - prefix-list name
+  - remote_as - AS number
+  - route_map_export - route-map name
+  - route_map_import - route-map name
+  - route_map_in - route-map name
+  - route_map_out - route-map name
+  - route_reflector_client - disabled|enabled
+  - route_server_client - disabled|enabled
+  - shutdown - disabled|enabled
+
+#### bgp_network
+
+  - name - AS number and network
+
 ### OSPF
+
+There are three resources to manage the OSPF:
+
+  - ospf
+  - ospf_area
+  - ospf_interface
 
 #### Examples
 
