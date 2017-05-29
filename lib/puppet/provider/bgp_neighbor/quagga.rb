@@ -156,7 +156,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           end
           hash = {}
           hash[:provider] = self.name
-          hash[:name] = "#{as}:#{name}"
+          hash[:name] = "#{as} #{name}"
           hash[:ensure] = :present
 
           @resource_map.each do |property, options|
@@ -236,9 +236,9 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   end
 
   def flush
-    as, name = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
+    as, name = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/\s+/)
 
-    debug "[flush][#{as}:#{name}]"
+    debug "[flush][#{as} #{name}]"
 
     resource_map = self.class.instance_variable_get('@resource_map')
 

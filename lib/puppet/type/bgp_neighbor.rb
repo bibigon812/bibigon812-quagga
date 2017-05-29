@@ -32,11 +32,14 @@ Puppet::Type.newtype(:bgp_neighbor) do
     desc %q{ It's consists of a AS number and a neighbor IP address or a peer-group name }
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
-    re = /\A\d+:#{block}\.#{block}\.#{block}\.#{block}\Z/
 
-    newvalues(re)
-    newvalues(/\A\d+:[\h:]\Z/)
-    newvalues(/\A\d+:\w+\Z/)
+    newvalues(/\A\d+\s+#{block}\.#{block}\.#{block}\.#{block}\Z/)
+    newvalues(/\A\d+\s+[\h:]\Z/)
+    newvalues(/\A\d+\s+\w+\Z/)
+
+    munge do |value|
+      value.gsub(/\s+/, ' ')
+    end
   end
 
   newproperty(:activate) do
