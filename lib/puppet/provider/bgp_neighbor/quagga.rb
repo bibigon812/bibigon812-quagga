@@ -237,7 +237,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   end
 
   def flush
-    as, name = @property_hash[:name].split(/:/)
+    as, name = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
 
     debug "[flush][#{as}:#{name}]"
 
