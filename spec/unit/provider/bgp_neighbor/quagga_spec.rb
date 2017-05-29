@@ -7,7 +7,7 @@ describe Puppet::Type.type(:bgp_neighbor).provider(:quagga) do
     end
   end
 
-  describe 'prefetch' do
+  describe 'methods' do
     it 'should have a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
@@ -61,50 +61,58 @@ router bgp 197888
 
     it 'should return the 197888:INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
+          :activate => :enabled,
           :allow_as_in => 1,
           :default_originate => :disabled,
-          :ensure => :activate,
+          :ensure => :present,
           :name => '197888:INTERNAL',
           :next_hop_self => :enabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
+          :shutdown => :disabled,
       })
     end
 
     it 'should return the 197888:RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
+          :activate => :enabled,
           :default_originate => :disabled,
-          :ensure => :activate,
+          :ensure => :present,
           :name => '197888:RR',
           :next_hop_self => :enabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
+          :shutdown => :disabled,
       })
     end
 
     it 'should return the 197888:RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
+          :activate => :enabled,
           :default_originate => :disabled,
-          :ensure => :activate,
+          :ensure => :present,
           :name => '197888:RR_WEAK',
           :next_hop_self => :enabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
           :route_map_out => 'RR_WEAK_out',
+          :shutdown => :disabled,
       })
     end
 
     it 'should return the 197888:172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
+          :activate => :disabled,
           :default_originate => :enabled,
-          :ensure => :shutdown,
+          :ensure => :present,
           :name => '197888:172.16.32.108',
           :next_hop_self => :disabled,
           :peer_group => 'INTERNAL',
           :provider => :quagga,
+          :shutdown => :enabled,
       })
     end
   end

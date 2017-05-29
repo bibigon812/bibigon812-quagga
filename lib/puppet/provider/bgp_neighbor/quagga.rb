@@ -4,28 +4,35 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   commands :vtysh => 'vtysh'
 
   @resource_map = {
+      :activate => {
+          :default => 'default_ipv4_unicast',
+          :value => 'ipv4_unicast',
+          :regexp => /\A\s(no\s)?neighbor\s\S+\sactivate\Z/,
+          :template => 'neighbor <%= name %> activate',
+          :type => :switch,
+      },
       :allow_as_in => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sallowas-in\s(\d+)\Z/,
           :template => 'neighbor <%= name %> allowas-in <%= value %>',
           :type => :fixnum,
       },
       :default_originate => {
-          :default => :disabled,
-          :eval => ':enabled',
+          :default => ':disabled',
+          :value => ':enabled',
           :regexp => /\A\sneighbor\s\S+\sdefault-originate\Z/,
           :template => 'neighbor <%= name %> default-originate',
           :type => :switch,
       },
       :local_as => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\slocal-as\s(\d+)\Z/,
           :template => 'neighbor <%= name %> local-as <%= value %>',
           :type => :fixnum,
       },
       :next_hop_self => {
-          :default => :disabled,
-          :eval => ':enabled',
+          :default => ':disabled',
+          :value => ':enabled',
           :regexp => /\A\sneighbor\s\S+\snext-hop-self\Z/,
           :template => 'neighbor <%= name %> next-hop-self',
           :type => :switch,
@@ -35,46 +42,53 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :type => :string,
       },
       :prefix_list_in => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sprefix-list\s(\S+)\sin\Z/,
           :template => 'neighbor <%= name %> prefix-list <%= value %> in',
           :type => :string,
       },
       :prefix_list_out => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sprefix-list\s(\S+)\sout\Z/,
           :template => 'neighbor <%= name %> prefix-list <%= value %> out',
           :type => :string,
       },
       :remote_as => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sremote-as\s(\d+)\Z/,
           :template => 'neighbor <%= name %> remote-as <%= value %>',
           :type => :fixnum,
       },
       :route_map_export => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sroute-map\s(\S+)\sexport\Z/,
           :template => 'neighbor <%= name %> route-map <%= value %> export',
           :type => :string,
       },
       :route_map_import => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sroute-map\s(\S+)\simport\Z/,
           :template => 'neighbor <%= name %> route-map <%= value %> import',
           :type => :string,
       },
       :route_map_in => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sroute-map\s(\S+)\sin\Z/,
           :template => 'neighbor <%= name %> route-map <%= value %> in',
           :type => :string,
       },
       :route_map_out => {
-          :eval => '$1',
+          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sroute-map\s(\S+)\sout\Z/,
           :template => 'neighbor <%= name %> route-map <%= value %> out',
           :type => :string,
+      },
+      :shutdown => {
+          :default => ':disabled',
+          :value => ':enabled',
+          :regexp => /\A\sneighbor\s\S+\sshutdown\Z/,
+          :template => 'neighbor <%= name %> shutdown',
+          :type => :switch,
       },
   }
 
@@ -92,6 +106,8 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     as = ''
     previous_name = name = ''
     found_router = false
+    ipv4_unicast = :disabled
+    default_ipv4_unicast = :enabled
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
@@ -100,7 +116,11 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
         as = $1
         found_router = true
 
-      elsif line =~ /\A\sneighbor\s(\S+)\s(peer-group|remote-as)(\s(\S+))?\Z/
+      elsif found_router && line =~/\A\sno\sbgp\sdefault\sipv4-unicast\Z/
+        ipv4_unicast = :enabled
+        default_ipv4_unicast = :disabled
+
+      elsif found_router && line =~ /\A\sneighbor\s(\S+)\s(peer-group|remote-as)(\s(\S+))?\Z/
         name = $1
         key = $2
         value = $4
@@ -119,24 +139,18 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           hash[:ensure] = :present
 
           @resource_map.each do |property, options|
-            hash[property] = options[:default] if options.has_key?(:default)
+            hash[property] = eval(options[:default]) if options.has_key?(:default)
           end
         end
 
         hash[key] = value || :enabled
 
-      elsif line =~ /\A\sneighbor\s#{Regexp.escape(name)}\sactivate\Z/
-        hash[:ensure] = :activate
-
-      elsif line =~ /\A\sneighbor\s#{Regexp.escape(name)}\sshutdown\Z/
-        hash[:ensure] = :shutdown
-
-      elsif line =~ /\A\sneighbor\s#{Regexp.escape(name)}\s/
+      elsif found_router && line =~ /\A\sneighbor\s#{Regexp.escape(name)}\s/
         @resource_map.each do |property, options|
           if options.has_key?(:regexp)
             if line =~ options[:regexp]
 
-              value = eval(options[:eval])
+              value = eval(options[:value])
               hash[property] = case options[:type]
                                  when :fixnum
                                    value.to_i
@@ -147,7 +161,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           end
         end
 
-      elsif line =~ /\A\w/ and found_router
+      elsif found_router && line =~ /\A\w/
         break
       end
 
@@ -175,24 +189,12 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     (providers - found_providers).each { |provider| provider.destroy }
   end
 
-  def activate
-    debug '[activate]'
-
-    @state = @property_hash[:ensure] = :activate
-  end
-
   def create
     debug '[create]'
 
-    resource_map = self.class.instance_variable_get('@resource_map')
 
-    @property_hash[:ensure] = @resource[:ensure]
-    @property_hash[:name] = @resource[:name]
-
-    resource_map.each_key do |property|
-      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
-    end
   end
+
 
   def destroy
     debug '[destroy]'
@@ -273,12 +275,6 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     end
 
     flush
-  end
-
-  def shutdown
-    debug '[shutdown]'
-
-    @state = @property_hash[:ensure] = :shutdown
   end
 
   @resource_map.each_key do |property|

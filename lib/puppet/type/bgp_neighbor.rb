@@ -24,27 +24,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
       }
   }
 
-  ensurable do
-    desc %q{ Manage the state of a neighbor }
-
-    defaultto(:present)
-
-    newvalue(:present) do
-      provider.create
-    end
-
-    newvalue(:absent) do
-      provider.destroy
-    end
-
-    newvalue(:activate) do
-      provider.activate
-    end
-
-    newvalue(:shutdown) do
-      provider.shutdown
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ It's consists of a AS number and a neighbor IP address or a peer-group name }
@@ -55,6 +35,23 @@ Puppet::Type.newtype(:bgp_neighbor) do
     newvalues(re)
     newvalues(/\A\d+:[\h:]\Z/)
     newvalues(/\A\d+:\w+\Z/)
+  end
+
+  newproperty(:activate) do
+    desc %q{ Enable the Address Family for this Neighbor }
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
   end
 
   newproperty(:allow_as_in) do
@@ -177,6 +174,23 @@ Puppet::Type.newtype(:bgp_neighbor) do
   newproperty(:route_map_out) do
     desc %q{ Apply map to outbound routes }
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
+  end
+
+  newproperty(:shutdown) do
+    desc %q{ Administratively shut down this neighbor }
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
   end
 
   autorequire(:bgp) do

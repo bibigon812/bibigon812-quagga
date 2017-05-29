@@ -28,8 +28,9 @@ describe Puppet::Type.type(:bgp_neighbor) do
       end
     end
 
-    [:allow_as_in, :default_originate, :local_as, :next_hop_self, :peer_group, :prefix_list_in, :prefix_list_out,
-     :remote_as, :route_map_export, :route_map_import, :route_map_in, :route_map_out].each do |property|
+    [:activate, :allow_as_in, :default_originate, :local_as, :next_hop_self, :peer_group, :prefix_list_in,
+     :prefix_list_out, :remote_as, :route_map_export, :route_map_import, :route_map_in, :route_map_out,
+     :shutdown].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -46,15 +47,7 @@ describe Puppet::Type.type(:bgp_neighbor) do
         expect { described_class.new(:name => '65000:192.168.1.1', :ensure => :absent) }.to_not raise_error
       end
 
-      it 'should support absent as a value' do
-        expect { described_class.new(:name => '65000:192.168.1.1', :ensure => :activate) }.to_not raise_error
-      end
-
-      it 'should support absent as a value' do
-        expect { described_class.new(:name => '65000:192.168.1.1', :ensure => :shutdown) }.to_not raise_error
-      end
-
-      it 'should not support other values' do
+      it 'should not support foo values' do
         expect { described_class.new(:name => '65000:192.168.1.1', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
     end
