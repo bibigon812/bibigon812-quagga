@@ -10,7 +10,7 @@ without restarting daemons.
 The route_map resource is a single sequence. You can use a chain of resources
 to describe complex route maps, for example:
 
-```
+```puppet
 route_map { 'bgp_out:permit:10':
     ensure   => present,
     match    => 'ip address prefix-list ADVERTISED-PREFIXES'
@@ -40,7 +40,7 @@ route_map { 'bgp_out:permit:65000':
 The prefix_list resource is a single sequence. You can use a chain of resources
 to describe compex prefix lists, for example:
 
-```
+```puppet
 prefix_list {'ADVERTISED_PREFIXES:10':
     ensure => present,
     action => 'permit',
@@ -66,7 +66,7 @@ prefix_list {'ADVERTISED_PREFIXES:20':
 
 ### community_list
 
-```
+```puppet
 community_list { '100':
     rules  => [
         permit => 65000:50952,
@@ -82,7 +82,7 @@ community_list { '100':
     
 ### bgp
 
-```
+```puppet
 bgp { '65000':
     ensure             => present,
     import_check       => 'enabled',
@@ -104,7 +104,7 @@ bgp { '65000':
 
 ### bgp_neighbor
 
-```
+```puppet
 bgp_neighbor { '65000 internal':
     ensure        => 'present',
     activate      => 'enabled',
@@ -147,7 +147,7 @@ bgp_neighbor { '65000 10.0.0.3':
 
 ### bgp_network
 
-```
+```puppet
 bgp_network { '65000 192.168.1.0/24':
     ensure => present,
 }
@@ -159,7 +159,7 @@ bgp_network { '65000 192.168.1.0/24':
 
 ### ospf
 
-```
+```puppet
 ospf { 'ospf':
     ensure    => present,
     abr_type  => 'cisco',
@@ -179,7 +179,7 @@ ospf { 'ospf':
   
 ### ospf_area
 
-```
+```puppet
 ospf_area { '0.0.0.0':
     network => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
 }
@@ -207,7 +207,7 @@ ospf_area { '0.0.0.2':
   
 ### ospf_interface
 
-```
+```puppet
 ospf_interface { 'eth0':
     mtu_ignore     => 'enabled',
     hello_interval => 2,
@@ -229,7 +229,7 @@ ospf_interface { 'eth0':
 
 ### redistribution
 
-```
+```puppet
 redistribution { 'ospf::connected':
     metric      => 100,
     metric_type => 2,
@@ -251,7 +251,7 @@ redistribution { 'bgp:65000:ospf':
 
 ### as_path
 
-```
+```puppet
 as_path { 'TEST_AS_PATH':
     ensure => present,
     rules => [
