@@ -5,7 +5,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
     :cost                 => { :regexp => /\A\sip\sospf\scost\s(\d+)\Z/, :template => 'ip ospf cost <%= value %>', :type => :Fixnum, :default => 10, },
     :dead_interval        => { :regexp => /\A\sip\sospf\sdead-interval\s(\d+)\Z/, :template => 'ip ospf dead-interval <%= value %>', :type => :Fixnum, :default => 40, },
     :hello_interval       => { :regexp => /\A\sip\sospf\shello-interval\s(\d+)\Z/, :template => 'ip ospf hello-interval <%= value %>', :type => :Fixnum, :default => 10, },
-    :mtu_ignore           => { :regexp => /\A\sip\sospf\smtu-ignore\Z/, :template => 'ip ospf mtu-ignore', :type => :Symbol, :default => :disable, },
+    :mtu_ignore           => { :regexp => /\A\sip\sospf\smtu-ignore\Z/, :template => 'ip ospf mtu-ignore', :type => :Symbol, :default => :disabled, },
     :network              => { :regexp => /\A\sip\sospf\snetwork\s([\w-]+)\Z/, :template => 'ip ospf network <%= value %>', :type => :Symbol, :default => :broadcast, },
     :priority             => { :regexp => /\A\sip\sospf\spriority\s(\d+)\Z/, :template => 'ip ospf priority <%= value %>', :type => :Fixnum, :default => 1, },
     :retransmit_interval  => { :regexp => /\A\sip\sospf\sretransmit-interval\s(\d+)\Z/, :template => 'ip ospf retransmit-interval <%= value %>', :type => :Fixnum, :default => 5, },
@@ -62,7 +62,7 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
 
             # mtu-ignore
             if value.nil?
-              value = :enable
+              value = :enabled
 
             # other properties
             else

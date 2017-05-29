@@ -143,19 +143,19 @@ describe Puppet::Type.type(:ospf_interface) do
       end
 
       it 'should support false as a value' do
-        expect { described_class.new(:name => 'foo', :mtu_ignore => 'enable') }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :mtu_ignore => 'enabled') }.to_not raise_error
       end
 
       it 'should support :false as a value' do
-        expect { described_class.new(:name => 'foo', :mtu_ignore => :enable) }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :mtu_ignore => :enabled) }.to_not raise_error
       end
 
       it 'should support false as a value' do
-        expect { described_class.new(:name => 'foo', :mtu_ignore => 'disable') }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :mtu_ignore => 'disabled') }.to_not raise_error
       end
 
       it 'should support :false as a value' do
-        expect { described_class.new(:name => 'foo', :mtu_ignore => :disable) }.to_not raise_error
+        expect { described_class.new(:name => 'foo', :mtu_ignore => :disabled) }.to_not raise_error
       end
 
       it 'should not support foo as a value' do
@@ -163,43 +163,43 @@ describe Puppet::Type.type(:ospf_interface) do
       end
 
       it 'should contain enable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => 'true')[:mtu_ignore]).to eq(:enable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => 'true')[:mtu_ignore]).to eq(:enabled)
       end
 
       it 'should contain enable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => :true)[:mtu_ignore]).to eq(:enable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => :true)[:mtu_ignore]).to eq(:enabled)
       end
 
       it 'should contain enable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => true)[:mtu_ignore]).to eq(:enable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => true)[:mtu_ignore]).to eq(:enabled)
       end
 
       it 'should contain enable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => :enable)[:mtu_ignore]).to eq(:enable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => :enabled)[:mtu_ignore]).to eq(:enabled)
       end
 
       it 'should contain enable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => 'enable')[:mtu_ignore]).to eq(:enable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => 'enabled')[:mtu_ignore]).to eq(:enabled)
       end
 
       it 'should contain disable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => 'false')[:mtu_ignore]).to eq(:disable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => 'false')[:mtu_ignore]).to eq(:disabled)
       end
 
       it 'should contain disable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => :false)[:mtu_ignore]).to eq(:disable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => :false)[:mtu_ignore]).to eq(:disabled)
       end
 
       it 'should contain disable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => false)[:mtu_ignore]).to eq(:disable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => false)[:mtu_ignore]).to eq(:disabled)
       end
 
       it 'should contain disable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => :disable)[:mtu_ignore]).to eq(:disable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => :disabled)[:mtu_ignore]).to eq(:disabled)
       end
 
       it 'should contain disable' do
-        expect(described_class.new(:name => 'foo', :mtu_ignore => 'disable')[:mtu_ignore]).to eq(:disable)
+        expect(described_class.new(:name => 'foo', :mtu_ignore => 'disabled')[:mtu_ignore]).to eq(:disabled)
       end
     end
 

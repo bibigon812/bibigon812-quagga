@@ -80,15 +80,15 @@ Puppet::Type.newtype(:ospf_interface) do
   newproperty(:mtu_ignore) do
     desc %q{ Disable mtu mismatch detection }
 
-    newvalues(:disable, :enable, :true, :false)
-    defaultto(:disable)
+    newvalues(:disabled, :enabled, :true, :false)
+    defaultto(:disabled)
 
     munge do |value|
       case value
-        when false, :false, 'false', 'disable'
-          :disable
-        when true, :true, 'true', 'enable'
-          :enable
+        when false, :false, 'false', 'disabled'
+          :disabled
+        when true, :true, 'true', 'enabled'
+          :enabled
         else
           value
       end
