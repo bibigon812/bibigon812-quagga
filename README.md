@@ -339,7 +339,7 @@ site::profiles::ospf:
         - 10.0.10.0/24
         - 10.0.100.0/24
     0.0.0.10:
-      stub: true
+      stub: enabled
       networks:
         - 192.168.1.0/24
         - 10.0.0.0/24
