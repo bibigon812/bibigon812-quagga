@@ -185,7 +185,7 @@ ospf_area { '0.0.0.0':
 }
 
 ospf_area { '0.0.0.1':
-    stub => true,
+    stub => 'enabled',
 }
 
 ospf_area { '0.0.0.2':

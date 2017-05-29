@@ -14,7 +14,7 @@ Puppet::Type.newtype(:ospf_area) do
       }
 
       ospf_area { '0.0.0.1':
-        stub => true,
+        stub => 'enabled',
       }
 
       ospf_area { '0.0.0.2':
@@ -121,16 +121,16 @@ Puppet::Type.newtype(:ospf_area) do
   newproperty(:stub) do
     desc %q{ Configure OSPF area as stub }
 
-    newvalues(:disable, :enable, :false, :true, :no_summary)
+    newvalues(:disabled, :enabled, :false, :true, :no_summary)
     newvalues('no-summary')
     defaultto(:false)
 
     munge do |value|
       case value
-        when :false, 'false', false, 'disable'
-          :disable
-        when :true, 'true', true, 'enable'
-          :enable
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
         when 'no-summary', 'no_summary'
           :no_summary
         when String

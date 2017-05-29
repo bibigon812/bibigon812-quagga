@@ -275,12 +275,12 @@ describe Puppet::Type.type(:ospf_area) do
       expect { described_class.new(:name => '0.0.0.0', :stub => :no_summary) }.to_not raise_error
     end
 
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => 'disable') }.to_not raise_error
+    it 'should support disabled as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => 'disabled') }.to_not raise_error
     end
 
     it 'should support no_summary as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => :enable) }.to_not raise_error
+      expect { described_class.new(:name => '0.0.0.0', :stub => :enabled) }.to_not raise_error
     end
 
     it 'should support no_summary as a value' do
@@ -300,16 +300,16 @@ describe Puppet::Type.type(:ospf_area) do
     end
 
     it 'should contain true' do
-      expect(described_class.new(:name => '0.0.0.0', :stub => :true)[:stub]).to eq(:enable)
+      expect(described_class.new(:name => '0.0.0.0', :stub => :true)[:stub]).to eq(:enabled)
     end
 
     it 'should contain true' do
-      expect(described_class.new(:name => '0.0.0.0', :stub => true)[:stub]).to eq(:enable)
+      expect(described_class.new(:name => '0.0.0.0', :stub => true)[:stub]).to eq(:enabled)
     end
 
 
     it 'should contain false' do
-      expect(described_class.new(:name => '0.0.0.0', :stub => 'false')[:stub]).to eq(:disable)
+      expect(described_class.new(:name => '0.0.0.0', :stub => 'false')[:stub]).to eq(:disabled)
     end
 
     it 'should contain no-summary' do

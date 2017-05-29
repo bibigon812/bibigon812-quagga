@@ -1,3 +1,10 @@
+## [Unreleased]
+### Changed
+- values of the stub property
+
+### Updated
+- changelog
+
 ## [1.0.0] - 29-05-2017
 ### Added
 - the ospf_interface type
