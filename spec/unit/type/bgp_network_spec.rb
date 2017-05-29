@@ -32,37 +32,37 @@ describe Puppet::Type.type(:bgp_network) do
   describe 'when validating values' do
     describe 'ensure' do
       it 'should support present as a value' do
-        expect { described_class.new(:name => '65000,192.168.1.0/24', :ensure => :present) }.to_not raise_error
+        expect { described_class.new(:name => '65000 192.168.1.0/24', :ensure => :present) }.to_not raise_error
       end
 
       it 'should support absent as a value' do
-        expect { described_class.new(:name => '65000,192.168.1.0/24', :ensure => :absent) }.to_not raise_error
+        expect { described_class.new(:name => '65000 192.168.1.0/24', :ensure => :absent) }.to_not raise_error
       end
 
       it 'should not support foo values' do
-        expect { described_class.new(:name => '65000,192.168.1.0/24', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+        expect { described_class.new(:name => '65000 192.168.1.0/24', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
     end
   end
 
   describe 'name' do
-    it 'should support 65000:192.168.1.0/24 as a value' do
-      expect { described_class.new(:name => '65000,192.168.1.0/24') }.to_not raise_error
+    it 'should support \'65000  192.168.1.0/24\' as a value' do
+      expect { described_class.new(:name => '65000  192.168.1.0/24') }.to_not raise_error
     end
 
-    it 'should support 65000:192.168.1.0/24 as a value' do
-      expect { described_class.new(:name => '65000,192.168.1.1/32') }.to_not raise_error
+    it 'should support \'65000 192.168.1.0/24\' as a value' do
+      expect { described_class.new(:name => '65000 192.168.1.1/32') }.to_not raise_error
     end
 
-    it 'should support 65000:192.168.1.0/24 as a value' do
-      expect { described_class.new(:name => '65000,0.0.0.0/0') }.to_not raise_error
+    it 'should support \'65000   192.168.1.0/24\' as a value' do
+      expect { described_class.new(:name => '65000   0.0.0.0/0') }.to_not raise_error
     end
 
-    it 'should not support 65000:192.168.1.0 as a value' do
+    it 'should not support \'65000 192.168.1.0\' as a value' do
       expect { described_class.new(:name => '65000,192.168.1.0') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should not support 192.168.1.0 as a value' do
+    it 'should not support \'192.168.1.0\' as a value' do
       expect { described_class.new(:name => '192.168.1.0/24') }.to raise_error(Puppet::Error, /Invalid value/)
     end
   end

@@ -5,11 +5,11 @@ Puppet::Type.newtype(:bgp_network) do
 
     Examples:
 
-      bgp_network { '65000,192.168.0.0/24':
+      bgp_network { '65000 192.168.0.0/24':
         ensure => present,
       }
 
-      bgp_network { '65000,2a00::/64':
+      bgp_network { '65000 2a00::/64':
         ensure => present,
       }
   }
@@ -21,8 +21,12 @@ Puppet::Type.newtype(:bgp_network) do
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
 
-    newvalues(/\A\d+,#{block}\.#{block}\.#{block}\.#{block}\/(1?\d|2\d|3[0-2])\Z/)
-    newvalues(/\A\d+,[\h:]\/(1[0-1]\d|12[0-8]|\d{1,2})\Z/)
+    newvalues(/\A\d+\s+#{block}\.#{block}\.#{block}\.#{block}\/(1?\d|2\d|3[0-2])\Z/)
+    newvalues(/\A\d+\s+[\h:]\/(1[0-1]\d|12[0-8]|\d{1,2})\Z/)
+
+    munge do |value|
+      value.gsub(/\s+/, ' ')
+    end
   end
 
   autorequire(:bgp) do
