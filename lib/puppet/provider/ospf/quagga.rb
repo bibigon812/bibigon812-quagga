@@ -36,6 +36,8 @@ Puppet::Type.type(:ospf).provide :quagga do
         hash[:ensure] = :present
         hash[:name] = as.to_sym
         hash[:provider] = self.name
+        hash[:opaque] = :disabled
+        hash[:rfc1583] = :disabled
       elsif line =~ /\A\w/ and found_section
         break
       elsif found_section
@@ -43,7 +45,7 @@ Puppet::Type.type(:ospf).provide :quagga do
         @resource_map.each do |property, command|
           if config_line.start_with? command
             if @known_booleans.include? property
-              hash[property] = :true
+              hash[property] = :enabled
             else
               config_line.slice! command
               hash[property] = config_line.strip
@@ -144,7 +146,7 @@ Puppet::Type.type(:ospf).provide :quagga do
   @resource_map.keys.each do |property|
     if @known_booleans.include?(property)
       define_method "#{property}" do
-        @property_hash[property] || :false
+        @property_hash[property] || :disabled
       end
     else
       define_method "#{property}" do

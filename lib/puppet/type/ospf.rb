@@ -26,7 +26,7 @@ Puppet::Type.newtype(:ospf) do
   end
 
   newparam(:name) do
-    desc %q{Name must be 'ospf'.}
+    desc %q{ Name must be 'ospf' }
 
     newvalues :ospf
   end
@@ -41,15 +41,37 @@ Puppet::Type.newtype(:ospf) do
   newproperty(:opaque) do
     desc %q{ Enable the Opaque-LSA capability (rfc2370) }
 
-    newvalues(:false, :true)
-    defaultto(:false)
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
   end
 
   newproperty(:rfc1583) do
     desc %q{ Enable the RFC1583Compatibility flag }
 
-    newvalues(:false, :true)
-    defaultto(:false)
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
   end
 
   newproperty(:router_id) do

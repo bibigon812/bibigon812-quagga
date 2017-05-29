@@ -95,11 +95,11 @@ describe Puppet::Type.type(:ospf) do
     end
 
     it 'should contain true' do
-      expect(described_class.new(:name => 'ospf', :opaque => 'true')[:opaque]).to eq(:true)
+      expect(described_class.new(:name => 'ospf', :opaque => 'true')[:opaque]).to eq(:enabled)
     end
 
     it 'should contain false' do
-      expect(described_class.new(:name => 'ospf', :opaque => 'false')[:opaque]).to eq(:false)
+      expect(described_class.new(:name => 'ospf', :opaque => 'false')[:opaque]).to eq(:disabled)
     end
   end
 
