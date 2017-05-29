@@ -43,13 +43,13 @@ to describe compex prefix lists, for example:
 ```
 prefix_list {'ADVERTISED_PREFIXES:10':
     ensure => present,
-    action => permit,
+    action => 'permit',
     prefix => '192.168.0.0/16',
     le     => 24,
 }
 prefix_list {'ADVERTISED_PREFIXES:20':
     ensure => present,
-    action => permit,
+    action => 'permit',
     prefix => '172.16.0.0/12',
     le     => 24,
 }
@@ -209,7 +209,7 @@ ospf_area { '0.0.0.2':
 
 ```
 ospf_interface { 'eth0':
-    mtu_ignore     => true,
+    mtu_ignore     => 'enabled',
     hello_interval => 2,
     dead_interval  => 8,
 }
@@ -238,7 +238,7 @@ redistribution { 'ospf::connected':
 
 redistribution { 'bgp:65000:ospf':
     metric    => 100,
-    route_map => WORD,
+    route_map => 'WORD',
 }
 ```
 
