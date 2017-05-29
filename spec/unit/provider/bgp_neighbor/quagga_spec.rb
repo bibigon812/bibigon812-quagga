@@ -27,6 +27,7 @@ router bgp 197888
  network 172.16.32.0/24
  neighbor INTERNAL peer-group
  neighbor INTERNAL remote-as 197888
+ neighbor INTERNAL allowas-in 1
  neighbor INTERNAL update-source 172.16.32.103
  neighbor INTERNAL activate
  neighbor INTERNAL next-hop-self
@@ -79,7 +80,6 @@ router bgp 197888
     it 'should return the 197888:RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
           :activate => :enabled,
-          :allow_as_in => 1,
           :default_originate => :disabled,
           :ensure => :present,
           :name => '197888:RR',
@@ -97,7 +97,6 @@ router bgp 197888
     it 'should return the 197888:RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
           :activate => :enabled,
-          :allow_as_in => 1,
           :default_originate => :disabled,
           :ensure => :present,
           :name => '197888:RR_WEAK',
@@ -116,7 +115,6 @@ router bgp 197888
     it 'should return the 197888:172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
           :activate => :disabled,
-          :allow_as_in => 1,
           :default_originate => :enabled,
           :ensure => :present,
           :name => '197888:172.16.32.108',

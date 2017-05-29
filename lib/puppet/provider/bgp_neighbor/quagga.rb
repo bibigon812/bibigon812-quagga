@@ -12,7 +12,6 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :type => :switch,
       },
       :allow_as_in => {
-          :default => '1',
           :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sallowas-in\s(\d+)\Z/,
           :template => 'neighbor <%= name %> allowas-in <%= value %>',
