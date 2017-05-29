@@ -112,6 +112,23 @@ Puppet::Type.newtype(:bgp_neighbor) do
     end
   end
 
+  newproperty(:passive) do
+    desc %q{ Don't send open messages to this neighbor }
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
+  end
+
   newproperty(:peer_group) do
     desc %q{ Member of the peer-group. }
     defaultto(:disabled)
@@ -174,6 +191,40 @@ Puppet::Type.newtype(:bgp_neighbor) do
   newproperty(:route_map_out) do
     desc %q{ Apply map to outbound routes }
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
+  end
+
+  newproperty(:route_reflector_client) do
+    desc %q{ Configure a neighbor as Route Reflector client }
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
+  end
+
+  newproperty(:route_server_client) do
+    desc %q{ Configure a neighbor as Route Server client }
+    defaultto(:disabled)
+    newvalues(:disabled, :enabled, :false, :true)
+
+    munge do |value|
+      case value
+        when :false, 'false', false, 'disabled'
+          :disabled
+        when :true, 'true', true, 'enabled'
+          :enabled
+        else
+          value
+      end
+    end
   end
 
   newproperty(:shutdown) do

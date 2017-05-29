@@ -67,9 +67,12 @@ router bgp 197888
           :ensure => :present,
           :name => '197888:INTERNAL',
           :next_hop_self => :enabled,
+          :passive => :disabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
+          :route_reflector_client => :disabled,
+          :route_server_client => :disabled,
           :shutdown => :disabled,
       })
     end
@@ -81,9 +84,12 @@ router bgp 197888
           :ensure => :present,
           :name => '197888:RR',
           :next_hop_self => :enabled,
+          :passive => :disabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
+          :route_reflector_client => :disabled,
+          :route_server_client => :disabled,
           :shutdown => :disabled,
       })
     end
@@ -95,10 +101,13 @@ router bgp 197888
           :ensure => :present,
           :name => '197888:RR_WEAK',
           :next_hop_self => :enabled,
+          :passive => :disabled,
           :peer_group => :enabled,
           :provider => :quagga,
           :remote_as => 197888,
           :route_map_out => 'RR_WEAK_out',
+          :route_reflector_client => :disabled,
+          :route_server_client => :disabled,
           :shutdown => :disabled,
       })
     end
@@ -110,8 +119,11 @@ router bgp 197888
           :ensure => :present,
           :name => '197888:172.16.32.108',
           :next_hop_self => :disabled,
+          :passive => :disabled,
           :peer_group => 'INTERNAL',
           :provider => :quagga,
+          :route_reflector_client => :disabled,
+          :route_server_client => :disabled,
           :shutdown => :enabled,
       })
     end

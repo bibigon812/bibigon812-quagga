@@ -37,6 +37,13 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :template => 'neighbor <%= name %> next-hop-self',
           :type => :switch,
       },
+      :passive => {
+          :default => ':disabled',
+          :value => ':enabled',
+          :regexp => /\A\sneighbor\s\S+\spassive\Z/,
+          :template => 'neighbor <%= name %> passive',
+          :type => :switch,
+      },
       :peer_group => {
           :template => 'neighbor <%= name %> peer-group <%= value %>',
           :type => :string,
@@ -82,6 +89,20 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :regexp => /\A\sneighbor\s\S+\sroute-map\s(\S+)\sout\Z/,
           :template => 'neighbor <%= name %> route-map <%= value %> out',
           :type => :string,
+      },
+      :route_reflector_client => {
+          :default => ':disabled',
+          :value => ':enabled',
+          :regexp => /\A\sneighbor\s\S+\sroute-reflector-client\Z/,
+          :template => 'neighbor <%= name %> route-reflector-client',
+          :type => :switch,
+      },
+      :route_server_client => {
+          :default => ':disabled',
+          :value => ':enabled',
+          :regexp => /\A\sneighbor\s\S+\sroute-server-client\Z/,
+          :template => 'neighbor <%= name %> route-server-client',
+          :type => :switch,
       },
       :shutdown => {
           :default => ':disabled',
