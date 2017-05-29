@@ -1,10 +1,9 @@
 ## Overview
 
-This module provides management of network protocols, such as BGP, OSPF, RIP,
-ISIS without restarting daemons.
+This module provides management of network protocols, such as BGP, OSPF
+without restarting daemons.
 
-## Features
-### Route maps
+### Route_map
 
 The route_map resource is a single sequence. You can use a chain of resources
 to describe complex route maps, for example:
@@ -26,112 +25,161 @@ route_map { 'bgp_out:permit:65000':
 }
 ```
 
+#### Reference
+
+  - `name`: Name of the route-map, action and sequence number of rule
+  - `match`: Match values from routing table
+  - `on_match`: Exit policy on matches
+  - `set`: Set values in destination routing protocol
+
+
 ### Prefix lists
+
+The prefix_list resource is a single sequence. You can use a chain of resources
+to describe compex prefix lists, for example:
+
+```
+prefix_list {'ADVERTISED_PREFIXES:10':
+    ensure => present,
+    action => permit,
+    prefix => '192.168.0.0/16',
+    le     => 24,
+}
+prefix_list {'ADVERTISED_PREFIXES:20':
+    ensure => present,
+    action => permit,
+    prefix => '172.16.0.0/12',
+    le     => 24,
+}
+```
+
+#### Reference
+
+  - `name`: Name of the prefix-list and sequence number of rule
+  - `action`: Action can be permit or deny
+  - `ge`: Minimum prefix length to be matched
+  - `le`: Maximum prefix length to be matched
+  - `prefix`: IP prefix <network>/<length>
+  - `proto`: IP protocol version
+
 ### Community lists
-### BGP
 
-There are three resources to manage the BGP:
+```
+community_list { '100':
+    rules  => [
+        permit => 65000:50952,
+        permit => 65000:31500,
+    ],
+}
+```
 
-  - bgp
-  - bgp_neighbor
-  - bgp_network
+#### Reference
 
-#### bgp
-
-  - name - AS number
-  - ensure - absent|present
-  - import_check - disabled|enabled
-  - ipv4_unicast - disabled|enabled
-  - maximum_paths_ebgp - number of the ebgp ECMP
-  - maximum_paths_ibgp - number of the ibgp ECMP
-  - router_id - IP address
-
-#### bgp_neighbor
-
-  - name - AS number and IP address
-  - ensure - absent|present
-  - activate - disabled|enabled
-  - allow_as_in - number
-  - default_originate - disabled|enabled
-  - local_as - AS number
-  - next_hop_self - disabled|enabled
-  - passive - disabled|enabled
-  - peer_group - disabled|enabled or peer group name
-  - prefix_list_in - prefix-list name
-  - prefix_list_out - prefix-list name
-  - remote_as - AS number
-  - route_map_export - route-map name
-  - route_map_import - route-map name
-  - route_map_in - route-map name
-  - route_map_out - route-map name
-  - route_reflector_client - disabled|enabled
-  - route_server_client - disabled|enabled
-  - shutdown - disabled|enabled
-
-#### bgp_network
-
-  - name - AS number and network
-
-### OSPF
-
-There are three resources to manage the OSPF:
-
-  - ospf
-  - ospf_area
-  - ospf_interface
-
-#### Examples
+  - `name`: Community list number
+  - `rules`: Action and community { action => community }
+    
+### bgp
 
 ```
 bgp { '65000':
     ensure             => present,
     import_check       => 'enabled',
-    ipv4_unicast       => 'disabled',
+    ipv4_unicast       => 'enabled',
     maximum_paths_ebgp => 10,
     maximum_paths_ibgp => 10,
-    router_id          => '192.168.1.1',
+    router_id          => '10.0.0.1',
+}
+```
+
+#### Reference
+
+  - `name`: AS number
+  - `import_check`: Check BGP network route exists in IGP
+  - `ipv4_unicast`: Activate ipv4-unicast for a peer by default
+  - `maximum_paths_ebgp`: Forward packets over multiple paths ebgp
+  - `maximum_paths_ibgp`: Forward packets over multiple paths ibgp
+  - `router_id`: Override configured router identifier
+
+### bgp_neighbor
+
+```
+bgp_neighbor { '65000 internal':
+    ensure        => 'present',
+    activate      => 'enabled',
+    next_hop_self => 'enabled',
+    peer_group    => 'enabled',
+    remote_as     => 65000,
 }
 
-bgp_neighbor { '65000 192.168.1.1':
-    ensure                 => 'present',
-    activate               => 'enabled',
-    peer_group             => 'internal_peers',
-    route_reflector_client => 'enabled',
-}
-
-bgp_neighbor { '65000 internal_peers':
+bgp_neighbor { '65000 10.0.0.2':
     ensure            => present,
-    allow_as_in       => 1,
-    default_originate => 'disabled',
-    local_as          => 65000,
-    peer_group        => 'enabled',
-    prefix_list_in    => 'PREFIX_LIST_IN',
-    prefix_list_out   => 'PREFIX_LIST_OUT',
-    remote_as         => 65000,
-    route_map_in      => 'ROUTE_MAP_IN',
-    route_map_out     => 'ROUTE_MAP_OUT',
+    peer_group        => 'internal',
 }
 
+bgp_neighbor { '65000 10.0.0.3':
+    ensure            => present,
+    peer_group        => 'internal',
+}
+```
+
+#### Reference
+
+  - `name`: It's consists of a AS number and a neighbor IP address or a peer-group name
+  - `activate`: Enable the Address Family for this Neighbor
+  - `allow_as_in`: Accept as-path with my AS present in it
+  - `default_originate`: Originate default route to this neighbor
+  - `local_as`: Specify a local-as number
+  - `next_hop_self`: Disable the next hop calculation for this neighbor
+  - `passive`: Don't send open messages to this neighbor
+  - `peer_group`: Member of the peer-group
+  - `prefix_list_in`: Filter updates from this neighbor
+  - `prefix_list_out`: Filter updates to this neighbor
+  - `remote_as`: Specify a BGP neighbor as
+  - `route_map_export`: Apply map to routes coming from a Route-Server client
+  - `route_map_import`: Apply map to routes going into a Route-Server client's table
+  - `route_map_in`: Apply map to incoming routes
+  - `route_map_out`: Apply map to outbound routes
+  - `route_reflector_client`: Configure a neighbor as Route Reflector client
+  - `route_server_client`: Configure a neighbor as Route Server client
+  - `shutdown`: Administratively shut down this neighbor
+
+### bgp_network
+
+```
 bgp_network { '65000 192.168.1.0/24':
     ensure => present,
 }
+```
 
+#### Reference
+
+  - `name`: It's consists of a AS number and a network IP address
+
+### ospf
+
+```
 ospf { 'ospf':
     ensure    => present,
     abr_type  => 'cisco',
-    opaque    => true,
-    rfc1583   => true,
-    router_id => '192.168.0.1',
+    opaque    => 'disabled',
+    rfc1583   => 'disabled',
+    router_id => '10.0.0.1',
 }
+```
 
+#### Reference
+
+  - `name`: Name must be 'ospf'
+  - `abr_type`: Set OSPF ABR type
+  - `opaque`: Enable the Opaque-LSA capability (rfc2370)
+  - `rfc1583`: Enable the RFC1583Compatibility flag
+  - `router_id`: Router-id for the OSPF process
+  
+### ospf_area
+
+```
 ospf_area { '0.0.0.0':
-    default_cost       => 10,
-    access_list_export => 'ACCESS_LIST_EXPORT',
-    access_list_import => 'ACCESS_LIST_IPMORT',
-    prefix_list_export => 'PREFIX_LIST_EXPORT',
-    prefix_list_import => 'PREFIX_LIST_IMPORT',
-    network            => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
-    shortcut           => 'default',
+    network => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
 }
 
 ospf_area { '0.0.0.1':
@@ -141,13 +189,45 @@ ospf_area { '0.0.0.1':
 ospf_area { '0.0.0.2':
     stub => 'no-summary',
 }
+```
 
+#### Reference
+
+  - `name`: OSPF area
+  - `default_cost`: Set the summary-default cost of a NSSA or stub area
+  - `access_list_expor`: Set the filter for networks announced to other areas
+  - `access_list_import`: Set the filter for networks from other areas announced to the specified one
+  - `prefix_list_export`: Filter networks sent from this area
+  - `prefix_list_import`: Filter networks sent to this area
+  - `networks`: Enable routing on an IP network
+  - `shortcut`: Configure the area's shortcutting mode
+  - `stub`: Configure OSPF area as stub
+  
+### ospf_interface
+
+```
 ospf_interface { 'eth0':
     mtu_ignore     => true,
     hello_interval => 2,
     dead_interval  => 8,
 }
+```
 
+#### Reference
+
+  - `name`: The friendly name of the network interface
+  - `cost`: Interface cos
+  - `dead_interval`: Interval after which a neighbor is declared dead
+  - `hello_interval`: Time between HELLO packets
+  - `mtu_ignore`: Disable mtu mismatch detection
+  - `network`: Network type
+  - `priority`: Router priority
+  - `retransmit_interval`: Time between retransmitting lost link state advertisements
+  - `transmit_delay`: Link state transmit delay
+
+### redistribution
+
+```
 redistribution { 'ospf::connected':
     metric      => 100,
     metric_type => 2,
@@ -158,7 +238,18 @@ redistribution { 'bgp:65000:ospf':
     metric    => 100,
     route_map => WORD,
 }
+```
 
+#### Reference
+
+  - `name`: The name contains the main protocol, the id and the protocol for redistribution
+  - `metric`: Metric for redistributed routes
+  - `metric_type`: OSPF exterior metric type for redistributed routes
+  - `route_map`: Route map reference
+
+### as_path
+
+```
 as_path { 'TEST_AS_PATH':
     ensure => present,
     rules => [
@@ -166,32 +257,9 @@ as_path { 'TEST_AS_PATH':
         permit => '_100_',
     ],
 }
-
-community_list { '100':
-    rules  => [
-        permit => 65000:50952,
-        permit => 65000:31500,
-    ],
-}
-
-prefix_list {'TEST_PREFIX_LIST:10':
-    ensure => present,
-    action => permit,
-    prefix => '224.0.0.0/4',
-    ge     => 8,
-    le     => 24,
-}
-
-route_map {'TEST_ROUTE_MAP:permit:10':
-    ensure   => present,
-    match    => [
-        'as-path PATH_LIST',
-        'community COMMUNITY_LIST',
-    ],
-    on_match => 'next',
-    set      => [
-        'local-preference 200',
-        'community none',
-    ],
-}
 ```
+
+#### Reference
+
+  - `name`: The name of the as-path access-list
+  - `rules`: Rules of the as-path access-list { action => regex }

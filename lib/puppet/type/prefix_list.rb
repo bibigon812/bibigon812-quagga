@@ -23,14 +23,14 @@ Puppet::Type.newtype(:prefix_list) do
   end
 
   newproperty(:proto) do
-    desc %q{ Proto ip or ipv6 }
+    desc %q{ IP protocol version }
 
     defaultto :ip
     newvalues(:ip, :ipv6)
   end
 
   newproperty(:action) do
-    desc %q{ Action can be permit or deny. }
+    desc %q{ Action can be permit or deny }
     newvalues(:deny, :permit)
   end
 

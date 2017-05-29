@@ -133,7 +133,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:peer_group) do
-    desc %q{ Member of the peer-group. }
+    desc %q{ Member of the peer-group }
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
     newvalues(/\A[[:alpha:]]\w+\Z/)

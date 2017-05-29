@@ -18,7 +18,7 @@ Puppet::Type.newtype(:bgp) do
   ensurable
 
   newparam(:name) do
-    desc %q{ The AS number. }
+    desc %q{ The AS number }
     newvalues(/\A\d+\Z/)
   end
 
