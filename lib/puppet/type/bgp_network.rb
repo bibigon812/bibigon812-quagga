@@ -19,9 +19,7 @@ Puppet::Type.newtype(:bgp_network) do
   newparam(:name) do
     desc %q{ It's consists of a AS number and a network IP address }
 
-    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
-
-    newvalues(/\A\d+\s+#{block}\.#{block}\.#{block}\.#{block}\/(1?\d|2\d|3[0-2])\Z/)
+    newvalues(/\A\d+\s+(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\/(1?\d|2\d|3[0-2])\Z/)
     newvalues(/\A\d+\s+[\h:]\/(1[0-1]\d|12[0-8]|\d{1,2})\Z/)
 
     munge do |value|
