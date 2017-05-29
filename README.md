@@ -290,8 +290,7 @@ site::profiles::bgp:
         peer_group: INTERNAL
     network:
       - 172.16.32.0/24
-      - 91.228.177.0/24
-
+      - 192.168.0.0/24
 ```
 
 #### profile
@@ -394,5 +393,102 @@ class site::profiles::ospf {
   create_resources('ospf_interface', $ospf_interface)
   create_resources('redistribution', $redistribution)
   create_resources('ospf_area', $ospf_areas)
+}
+```
+
+### prefix_list
+
+#### yaml
+
+```yaml
+---
+site::profiles::prefix_list:
+  ADVERTISED_ROUTES:
+    rules:
+      10:
+        action: 'permit'
+        prefix: '192.168.0.0/24'
+      1000:
+        action: 'deny'
+        le: 32
+        prefix: '0.0.0.0/0'
+```
+
+#### profile
+
+```puppet
+class site::profiles::prefix_list {
+  $prefix_lists = hiera_hash('site::profiles::prefix_list', {}).reduce({}) |$memo, $value| {
+    $name = $value[0]
+    $ensure = $value[1]['ensure'] ? {
+      'absent' => 'absent',
+      default  => 'present',
+    }
+    $prefix_list = $value[1]['rules'].reduce({}) |$memo, $value| {
+      merge($memo, {"${name}:${value[0]}" => merge({ensure => $ensure}, $value[1])})
+    }
+    merge($memo, $prefix_list)
+  }
+  create_resources('prefix_list', $prefix_lists)
+}
+```
+
+### route_map
+
+#### yaml
+
+```yaml
+---
+site::profiles::route_map:
+  AS1234_in:
+    1:
+      action: deny
+      match: ip address prefix-list AS_LOCAL
+    31:
+      action: permit
+      match: as-path FROM_AS2345
+      set: local-preference 800
+    60:
+      action: permit
+      match: ip address prefix-list ABCD_1
+      on_match: goto 100
+      set: local-preference 800
+    63:
+      action: permit
+      match: ip address prefix-list ABCD_2
+      on_match: goto 100
+      set: local-preference 800
+    100:
+      action: permit
+      on_match: goto 200
+      set: local-preference 200
+    200:
+      action: permit
+      set: community 65000:1234 additive
+```
+
+#### profile
+
+```puppet
+class site::profiles::route_map {
+  $route_maps = hiera_hash('site::profiles::route_map', {}).reduce({}) |$route_maps, $route_map| {
+    $name = $route_map[0]
+    $new_route_map = $route_map[1].reduce({}) |$route_map, $sequence| {
+      $index = $sequence[0]
+      $action = $sequence[1]['action']
+      $params = $sequence[1].reduce({}) |$params, $param| {
+        $new_param = $param[1] ? {
+          Array   => sort($param[1]),
+          default => $param[1],
+        }
+        unless $param[0] == 'action' {
+          merge($params, {$param[0] => $new_param})
+        }
+      }
+      merge($route_map, {"${name}:${action}:${index}" => $params})
+    }
+    merge($route_maps, $new_route_map)
+  }
+  create_resources('route_map', $route_maps)
 }
 ```
