@@ -5,7 +5,7 @@
 This module provides management of network protocols, such as BGP, OSPF
 without restarting daemons.
 
-### Route_map
+### route_map
 
 The route_map resource is a single sequence. You can use a chain of resources
 to describe complex route maps, for example:
@@ -35,7 +35,7 @@ route_map { 'bgp_out:permit:65000':
   - `set`: Set values in destination routing protocol
 
 
-### Prefix lists
+### prefix_list
 
 The prefix_list resource is a single sequence. You can use a chain of resources
 to describe compex prefix lists, for example:
@@ -64,7 +64,7 @@ prefix_list {'ADVERTISED_PREFIXES:20':
   - `prefix`: IP prefix <network>/<length>
   - `proto`: IP protocol version
 
-### Community lists
+### community_list
 
 ```
 community_list { '100':
@@ -265,3 +265,61 @@ as_path { 'TEST_AS_PATH':
 
   - `name`: The name of the as-path access-list
   - `rules`: Rules of the as-path access-list { action => regex }
+
+## Hiera
+
+### bgp yaml
+
+```yaml
+---
+site::profiles::bgp:
+  65000:
+    import_check: enabled
+    ipv4_unicast: disabled
+    router_id: 172.16.32.103
+    neighbor:
+      INTERNAL:
+        activate: enabled
+        allow_as_in: 1
+        next_hop_self: enabled
+        peer_group: enabled
+        remote_as: 197888
+      172.16.32.105:
+        peer_group: INTERNAL
+    network:
+      - 172.16.32.0/24
+      - 91.228.177.0/24
+
+```
+
+### bgp profile
+
+```puppet
+class site::profiles::bgp {
+  $bgp = hiera_hash('site::profiles::bgp', {}).reduce({}) |$bgp, $bgp_config| {
+    $as = $bgp_config[0]
+    $bgp_configs = $bgp_config[1].reduce({}) |$params, $param| {
+      if $param[0] == 'network' {
+        if $param[1] {
+          any2array($param[1]).each |$network| {
+            create_resources('bgp_network', { "${as} ${network}" => { ensure => present, } })
+          }
+        }
+        $hash = {}
+      } elsif $param[0] == 'neighbor' {
+        if $param[1] {
+          $param[1].each |$neighbor, $neighbor_config| {
+            create_resources('bgp_neighbor', { "${as} ${neighbor}" => $neighbor_config })
+          }
+        }
+        $hash = {}
+      } else {
+        $hash = { $param[0] => $param[1] }
+      }
+      merge($params, $hash)
+    }
+    merge($bgp, { $as => $bgp_configs })
+  }
+  create_resources('bgp', $bgp)
+}
+```

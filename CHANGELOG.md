@@ -1,3 +1,7 @@
+## [Unreleased]
+### Added
+- hiera docs
+
 ## [1.0.1] - 29-05-2017
 ### Changed
 - values of the stub property
