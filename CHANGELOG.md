@@ -1,9 +1,10 @@
-## [Unreleased]
+## [1.0.1] - 29-05-2017
 ### Changed
 - values of the stub property
 
 ### Updated
 - changelog
+- docs
 
 ## [1.0.0] - 29-05-2017
 ### Added

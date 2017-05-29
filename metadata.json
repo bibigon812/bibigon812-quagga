@@ -1,6 +1,6 @@
 {
     "name": "bibigon812-quagga",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Dmitriy Yakovlev",
     "summary": "Manages networking on linux machines.",
     "license": "Apache-2.0",
