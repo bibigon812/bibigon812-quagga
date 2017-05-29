@@ -22,14 +22,14 @@ bgp { '65000':
     router_id          => '192.168.1.1',
 }
 
-bgp_neighbor { '65000:192.168.1.1':
+bgp_neighbor { '65000 192.168.1.1':
     ensure                 => 'present',
     activate               => 'enabled',
     peer_group             => 'internal_peers',
     route_reflector_client => 'enabled',
 }
 
-bgp_neighbor { '65000:internal_peers':
+bgp_neighbor { '65000 internal_peers':
     ensure            => present,
     allow_as_in       => 1,
     default_originate => 'disabled',
@@ -40,6 +40,10 @@ bgp_neighbor { '65000:internal_peers':
     remote_as         => 65000,
     route_map_in      => 'ROUTE_MAP_IN',
     route_map_out     => 'ROUTE_MAP_OUT',
+}
+
+bgp_network { '65000 192.168.1.0/24':
+    ensure => present,
 }
 
 ospf { 'ospf':
