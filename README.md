@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bibigon812/bibigon812-quagga.svg?branch=master)](https://travis-ci.org/bibigon812/bibigon812-quagga)
+
 ## Overview
 
 This module provides management of network protocols, such as BGP, OSPF

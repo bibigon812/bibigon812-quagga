@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.0.0] - 29-05-2017
 ### Added
 - the ospf_interface type
 - the quagga provider of the ospf_interface type
@@ -11,7 +11,9 @@
 - the prefix_list type and a provider for it
 - the route_map type and a provider for it
 - the bgp type and a provider for it
-- the bgp_neighbor type
+- the bgp_neighbor type and a provider for it
+- the bgp_network type and a provider for it
 
 ### Updated
 - changelog
+- docs
