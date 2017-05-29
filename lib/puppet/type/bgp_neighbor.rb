@@ -6,8 +6,9 @@ Puppet::Type.newtype(:bgp_neighbor) do
     Examples:
 
       bgp_neighbor { '65000:192.168.1.1':
-        ensure            => 'activate',
-        peer_group        => 'internal_peers',
+        ensure     => 'present',
+        activate   => 'enabled',
+        peer_group => 'internal_peers',
       }
 
       bgp_neighbor { '65000:internal_peers':

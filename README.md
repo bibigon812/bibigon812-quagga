@@ -15,20 +15,21 @@ ISIS without restarting daemons.
 ```
 bgp { '65000':
     ensure             => present,
-    import_check       => enabled,
-    ipv4_unicast       => disabled,
+    import_check       => 'enabled',
+    ipv4_unicast       => 'disabled',
     maximum_paths_ebgp => 10,
     maximum_paths_ibgp => 10,
     router_id          => '192.168.1.1',
 }
 
 bgp_neighbor { '65000:192.168.1.1':
-    ensure            => 'activate',
-    peer_group        => 'internal_peers',
+    ensure     => present,
+    activate   => 'enabled',
+    peer_group => 'internal_peers',
 }
 
 bgp_neighbor { '65000:internal_peers':
-    ensure            => 'present',
+    ensure            => present,
     allow_as_in       => 1,
     default_originate => 'disabled',
     local_as          => 65000,
