@@ -1,6 +1,7 @@
 ## [Unreleased]
 ### Fixed
 - typos
+- autorequires in bgp_netighbor and bgp_network resources
 
 ### Updated
 - docs
