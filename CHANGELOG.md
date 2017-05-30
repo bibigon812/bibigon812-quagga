@@ -1,3 +1,10 @@
+## [Unreleased]
+### Fixed
+- an instantiation of the ospf resource
+
+### Removed
+- a default value of the activate property of the bgp_neighbor resource
+
 ## [1.0.3] - 30-05-2017
 ### Fixed
 - typos
