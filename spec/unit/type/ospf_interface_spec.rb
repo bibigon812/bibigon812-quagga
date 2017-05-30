@@ -162,43 +162,43 @@ describe Puppet::Type.type(:ospf_interface) do
         expect { described_class.new(:name => 'foo', :mtu_ignore => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
 
-      it 'should contain enable' do
+      it 'should contain enabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => 'true')[:mtu_ignore]).to eq(:enabled)
       end
 
-      it 'should contain enable' do
+      it 'should contain enabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => :true)[:mtu_ignore]).to eq(:enabled)
       end
 
-      it 'should contain enable' do
+      it 'should contain enabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => true)[:mtu_ignore]).to eq(:enabled)
       end
 
-      it 'should contain enable' do
+      it 'should contain enabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => :enabled)[:mtu_ignore]).to eq(:enabled)
       end
 
-      it 'should contain enable' do
+      it 'should contain enabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => 'enabled')[:mtu_ignore]).to eq(:enabled)
       end
 
-      it 'should contain disable' do
+      it 'should contain disabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => 'false')[:mtu_ignore]).to eq(:disabled)
       end
 
-      it 'should contain disable' do
+      it 'should contain disabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => :false)[:mtu_ignore]).to eq(:disabled)
       end
 
-      it 'should contain disable' do
+      it 'should contain disabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => false)[:mtu_ignore]).to eq(:disabled)
       end
 
-      it 'should contain disable' do
+      it 'should contain disabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => :disabled)[:mtu_ignore]).to eq(:disabled)
       end
 
-      it 'should contain disable' do
+      it 'should contain disabled' do
         expect(described_class.new(:name => 'foo', :mtu_ignore => 'disabled')[:mtu_ignore]).to eq(:disabled)
       end
     end
