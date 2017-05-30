@@ -21,7 +21,7 @@ class { 'quagga': }
   - `owner`: User of quagga configuration files
   - `group`: Group of quagga configuration files
   - `mode`: Mode of quagga configuration files
-  - `package_name`: Name of thee quagga package
+  - `package_name`: Name of the quagga package
   - `package_ensure`: Ensure for the quagga package
   - `content`:  Initial content of configuration files
 
