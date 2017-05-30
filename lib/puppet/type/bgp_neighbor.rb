@@ -249,7 +249,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
 
   autorequire(:bgp) do
     reqs = []
-    as = value(:name).split(/:/).first
+    as = value(:name).split(/\s+/).first
 
     unless as.nil?
       reqs << as
