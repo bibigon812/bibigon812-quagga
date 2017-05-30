@@ -1,3 +1,10 @@
+## [Unreleased]
+### Fixed
+- typos
+
+### Updated
+- docs
+
 ## [1.0.2] 30-05-2017
 ### Added
 - proxy classes to use hiera
