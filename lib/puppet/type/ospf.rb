@@ -36,6 +36,15 @@ Puppet::Type.newtype(:ospf) do
 
     newvalues :cisco, :ibm, :shortcut, :standard
     defaultto :cisco
+
+    munge do |value|
+      case value
+        when String
+          value.to_sym
+        else
+          value
+      end
+    end
   end
 
   newproperty(:opaque) do

@@ -9,10 +9,6 @@ Puppet::Type.type(:ospf).provide :quagga do
     :reference_bandwidth => 'auto-cost  reference-bandwidth',
   }
 
-  @default_values = {
-    :abr_type => 'cisco',
-  }
-
   @known_booleans = [ :opaque, :rfc1583, ]
 
   commands :vtysh => 'vtysh'
@@ -38,6 +34,7 @@ Puppet::Type.type(:ospf).provide :quagga do
         hash[:provider] = self.name
         hash[:opaque] = :disabled
         hash[:rfc1583] = :disabled
+        hash[:abr_type] = :cisco
       elsif line =~ /\A\w/ and found_section
         break
       elsif found_section
@@ -48,16 +45,15 @@ Puppet::Type.type(:ospf).provide :quagga do
               hash[property] = :enabled
             else
               config_line.slice! command
-              hash[property] = config_line.strip
+              hash[property] = case property
+                                 when :abr_type
+                                   config_line.strip.to_sym
+                                 else
+                                   config_line.strip
+                               end
             end
           end
         end
-      end
-    end
-
-    @default_values.each do |property, value|
-      unless hash.include? property
-        hash[property] = value
       end
     end
 
