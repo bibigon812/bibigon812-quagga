@@ -1,11 +1,13 @@
 ## [Unreleased]
 ### Added
-- a hiera bgp configuration
-- a hiera ospf configuration
+- proxy classes to use hiera
 
 ### Updated
 - changelog
 - docs
+
+### Fixed
+- a control of services
 
 ## [1.0.1] - 29-05-2017
 ### Changed
