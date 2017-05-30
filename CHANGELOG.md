@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.0.5] - 30-05-2017
 ### Added
 - a default value of the activate property of the bgp_neighbor resource
 
