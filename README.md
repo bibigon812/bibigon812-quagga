@@ -5,81 +5,28 @@
 This module provides management of network protocols, such as BGP, OSPF
 without restarting daemons.
 
-### route_map
+## At the beginning
 
-The route_map resource is a single sequence. You can use a chain of resources
-to describe complex route maps, for example:
+### quagga
 
-```puppet
-route_map { 'bgp_out:permit:10':
-    ensure   => present,
-    match    => 'ip address prefix-list ADVERTISED-PREFIXES'
-    on_match => 'goto 65000',
-}
-
-route_map { 'bgp_out:deny:99':
-    ensure => present,
-}
-
-route_map { 'bgp_out:permit:65000':
-    ensure => present,
-    set    => 'community 0:666',
-}
-```
-
-#### Reference
-
-  - `name`: Name of the route-map, action and sequence number of rule
-  - `match`: Match values from routing table
-  - `on_match`: Exit policy on matches
-  - `set`: Set values in destination routing protocol
-
-
-### prefix_list
-
-The prefix_list resource is a single sequence. You can use a chain of resources
-to describe compex prefix lists, for example:
+Describe quagga class.
 
 ```puppet
-prefix_list {'ADVERTISED_PREFIXES:10':
-    ensure => present,
-    action => 'permit',
-    prefix => '192.168.0.0/16',
-    le     => 24,
-}
-prefix_list {'ADVERTISED_PREFIXES:20':
-    ensure => present,
-    action => 'permit',
-    prefix => '172.16.0.0/12',
-    le     => 24,
-}
+class { 'quagga': }
 ```
 
-#### Reference
+##### Reference
 
-  - `name`: Name of the prefix-list and sequence number of rule
-  - `action`: Action can be permit or deny
-  - `ge`: Minimum prefix length to be matched
-  - `le`: Maximum prefix length to be matched
-  - `prefix`: IP prefix <network>/<length>
-  - `proto`: IP protocol version
+  - `enable`: Manages quagga services
+  - `owner`: User of quagga configuration files
+  - `group`: Group of quagga configuration files
+  - `mode`: Mode of quagga configuration files
+  - `package_name`: Name of thee quagga package
+  - `package_ensure`: Ensure for the quagga package
+  - `content`:  Initial content of configuration files
 
-### community_list
+## The most fat
 
-```puppet
-community_list { '100':
-    rules  => [
-        permit => 65000:50952,
-        permit => 65000:31500,
-    ],
-}
-```
-
-#### Reference
-
-  - `name`: Community list number
-  - `rules`: Action and community { action => community }
-    
 ### bgp
 
 ```puppet
@@ -249,6 +196,81 @@ redistribution { 'bgp:65000:ospf':
   - `metric_type`: OSPF exterior metric type for redistributed routes
   - `route_map`: Route map reference
 
+### route_map
+
+The route_map resource is a single sequence. You can use a chain of resources
+to describe complex route maps, for example:
+
+```puppet
+route_map { 'bgp_out:permit:10':
+    ensure   => present,
+    match    => 'ip address prefix-list ADVERTISED-PREFIXES'
+    on_match => 'goto 65000',
+}
+
+route_map { 'bgp_out:deny:99':
+    ensure => present,
+}
+
+route_map { 'bgp_out:permit:65000':
+    ensure => present,
+    set    => 'community 0:666',
+}
+```
+
+#### Reference
+
+  - `name`: Name of the route-map, action and sequence number of rule
+  - `match`: Match values from routing table
+  - `on_match`: Exit policy on matches
+  - `set`: Set values in destination routing protocol
+
+
+### prefix_list
+
+The prefix_list resource is a single sequence. You can use a chain of resources
+to describe compex prefix lists, for example:
+
+```puppet
+prefix_list {'ADVERTISED_PREFIXES:10':
+    ensure => present,
+    action => 'permit',
+    prefix => '192.168.0.0/16',
+    le     => 24,
+}
+prefix_list {'ADVERTISED_PREFIXES:20':
+    ensure => present,
+    action => 'permit',
+    prefix => '172.16.0.0/12',
+    le     => 24,
+}
+```
+
+#### Reference
+
+  - `name`: Name of the prefix-list and sequence number of rule
+  - `action`: Action can be permit or deny
+  - `ge`: Minimum prefix length to be matched
+  - `le`: Maximum prefix length to be matched
+  - `prefix`: IP prefix <network>/<length>
+  - `proto`: IP protocol version
+
+### community_list
+
+```puppet
+community_list { '100':
+    rules  => [
+        permit => 65000:50952,
+        permit => 65000:31500,
+    ],
+}
+```
+
+#### Reference
+
+  - `name`: Community list number
+  - `rules`: Action and community { action => community }    
+
 ### as_path
 
 ```puppet
@@ -268,9 +290,9 @@ as_path { 'TEST_AS_PATH':
 
 ## Hiera
 
-### bgp
+If is Hierea in your mind you can use something like this.
 
-#### yaml
+### bgp proxy
 
 ```yaml
 ---
@@ -292,8 +314,6 @@ site::profiles::bgp:
       - 172.16.32.0/24
       - 192.168.0.0/24
 ```
-
-#### profile
 
 ```puppet
 class site::profiles::bgp {
@@ -325,9 +345,7 @@ class site::profiles::bgp {
 }
 ```
 
-### ospf
-
-#### yaml
+### ospf proxy
 
 ```yaml
 ---
@@ -348,9 +366,19 @@ site::profiles::ospf:
         metric: 100
         route_map: ROUTE_MAP
     - connected
-```
 
-#### profile
+site::profiles::interface:
+  eth1:
+    ip:
+      ospf:
+        dead_interval: 8
+        hello_interval: 2
+        mtu_ignore: enabled
+        network: broadcast
+        priority: 100
+        retransmit_interval: 4
+        transmit_delay: 1
+```
 
 ```puppet
 class site::profiles::ospf {
@@ -396,9 +424,7 @@ class site::profiles::ospf {
 }
 ```
 
-### prefix_list
-
-#### yaml
+### prefix_list proxy
 
 ```yaml
 ---
@@ -413,8 +439,6 @@ site::profiles::prefix_list:
         le: 32
         prefix: '0.0.0.0/0'
 ```
-
-#### profile
 
 ```puppet
 class site::profiles::prefix_list {
@@ -433,9 +457,7 @@ class site::profiles::prefix_list {
 }
 ```
 
-### route_map
-
-#### yaml
+### route_map proxy
 
 ```yaml
 ---
@@ -466,8 +488,6 @@ site::profiles::route_map:
       action: permit
       set: community 65000:1234 additive
 ```
-
-#### profile
 
 ```puppet
 class site::profiles::route_map {
