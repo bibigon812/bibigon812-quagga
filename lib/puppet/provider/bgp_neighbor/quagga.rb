@@ -5,7 +5,8 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
   @resource_map = {
       :activate => {
-          :value => '$1.nil? ? :enabled : :disabled',
+          :default => 'default_ipv4_unicast',
+          :value => 'ipv4_unicast',
           :regexp => /\A\s(no\s)?neighbor\s\S+\sactivate\Z/,
           :template => 'neighbor <%= name %> activate',
           :type => :switch,
@@ -165,7 +166,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
         hash[key] = value || :enabled
 
-      elsif found_router && line =~ /\A\sneighbor\s#{Regexp.escape(name)}\s/
+      elsif found_router && line =~ /\A\s(no\s)?neighbor\s#{Regexp.escape(name)}\s/
         @resource_map.each do |property, options|
           if options.has_key?(:regexp)
             if line =~ options[:regexp]
@@ -177,6 +178,8 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
                                  else
                                    value
                                end
+
+              break
             end
           end
         end
