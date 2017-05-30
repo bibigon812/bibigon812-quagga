@@ -53,7 +53,7 @@ bgp { '65000':
 
 ```puppet
 bgp_neighbor { '65000 internal':
-    ensure        => 'present',
+    ensure        => present,
     activate      => 'enabled',
     next_hop_self => 'enabled',
     peer_group    => 'enabled',
