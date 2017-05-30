@@ -8,6 +8,8 @@ class quagga (
   String  $content        = $::quagga::params::content,
 ) inherits ::quagga::params {
 
+  $running = $enable
+
   package { 'quagga':
     ensure => present,
     name   => $package_name,
@@ -53,8 +55,8 @@ class quagga (
   }
 
   service { 'zebra':
-    ensure  => running,
-    enable  => true,
+    ensure  => $running,
+    enable  => $enable,
     require => [
       File['/etc/quagga/zebra.conf'],
       Package['quagga'],
@@ -62,8 +64,8 @@ class quagga (
   }
 
   service { 'bgpd':
-    ensure  => running,
-    enable  => true,
+    ensure  => $running,
+    enable  => $enable,
     require => [
       File['/etc/quagga/bgpd.conf'],
       Package['quagga'],
@@ -71,8 +73,8 @@ class quagga (
   }
 
   service { 'ospfd':
-    ensure  => running,
-    enable  => true,
+    ensure  => $running,
+    enable  => $enable,
     require => [
       File['/etc/quagga/ospfd.conf'],
       Package['quagga'],
