@@ -1,12 +1,13 @@
-## [Unreleased]
+## [1.0.3] - 30-05-2017
 ### Fixed
 - typos
 - autorequires in bgp_netighbor and bgp_network resources
 
 ### Updated
 - docs
+- changelog
 
-## [1.0.2] 30-05-2017
+## [1.0.2] - 30-05-2017
 ### Added
 - proxy classes to use hiera
 
