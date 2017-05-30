@@ -290,7 +290,7 @@ as_path { 'TEST_AS_PATH':
 
 ## Hiera
 
-If is Hierea in your mind you can use something like this.
+If Hierea is in your mind you can use something like this.
 
 ### bgp proxy
 
