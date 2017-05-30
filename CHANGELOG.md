@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.0.4] - 30-05-2017
 ### Fixed
 - an instantiation of the ospf resource
 
