@@ -1,6 +1,10 @@
 ## [Unreleased]
+### Added
+- a default value of the activate property of the bgp_neighbor resource
+
 ### Fixed
 - an instantiation of the bgp_neighbor resource
+- removing the allow_as_in property of the bgp_neighbor resource
 
 ### Updated
 - changelog

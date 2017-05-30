@@ -15,6 +15,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sallowas-in\s(\d+)\Z/,
           :template => 'neighbor <%= name %> allowas-in <%= value %>',
+          :remove_template => 'no neighbor <%= name %> allowas-in',
           :type => :fixnum,
       },
       :default_originate => {
@@ -253,7 +254,11 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
       cmds << "no neighbor #{name}"
     else
       @property_remove.each do |property, value|
-        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        if resource_map[property].has_key?(:remove_template)
+          cmds << ERB.new(resource_map[property][:remove_template]).result(binding)
+        else
+          cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        end
       end
 
       @property_flush.each do |property, value|
