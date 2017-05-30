@@ -5,8 +5,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
   @resource_map = {
       :activate => {
-          :default => 'default_ipv4_unicast',
-          :value => 'ipv4_unicast',
+          :value => '$1.nil? ? :enabled : :disabled',
           :regexp => /\A\s(no\s)?neighbor\s\S+\sactivate\Z/,
           :template => 'neighbor <%= name %> activate',
           :type => :switch,

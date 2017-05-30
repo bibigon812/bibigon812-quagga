@@ -42,7 +42,6 @@ Puppet::Type.newtype(:bgp_neighbor) do
 
   newproperty(:activate) do
     desc %q{ Enable the Address Family for this Neighbor }
-    defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
 
     munge do |value|

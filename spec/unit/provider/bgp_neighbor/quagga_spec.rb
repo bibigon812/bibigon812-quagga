@@ -114,7 +114,6 @@ router bgp 197888
 
     it 'should return the 197888:172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-          :activate => :disabled,
           :default_originate => :enabled,
           :ensure => :present,
           :name => '197888 172.16.32.108',
@@ -126,6 +125,22 @@ router bgp 197888
           :route_server_client => :disabled,
           :shutdown => :enabled,
       })
+    end
+  end
+
+  context 'running-config without bgp' do
+    before :each do
+      described_class.expects(:vtysh).with(
+          '-c', 'show running-config'
+      ).returns '!
+ address-family ipv6
+ exit-address-family
+ exit
+!'
+    end
+
+    it 'should not return a resource' do
+      expect(described_class.instances.size).to eq(0)
     end
   end
 end
