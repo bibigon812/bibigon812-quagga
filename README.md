@@ -15,7 +15,7 @@ Describe quagga class.
 class { 'quagga': }
 ```
 
-##### Reference
+#### Reference
 
   - `enable`: Manages quagga services. Default to `true`.
   - `owner`: User of quagga configuration files. Default to `quagga`.
