@@ -3,6 +3,8 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
+  mk_resource_methods
+
   def self.instances
     debug '[instances]'
 

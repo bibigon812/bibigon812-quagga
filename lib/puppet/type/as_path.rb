@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:as_path) do
-  @doc = %q{
+  @doc = <<-EOT
 
 This type provides the capabilities to manage as-path access-list within puppet.
 
@@ -15,7 +15,7 @@ as_path { 'as100':
 }
 ```
 
-  }
+EOT
 
   ensurable
 
