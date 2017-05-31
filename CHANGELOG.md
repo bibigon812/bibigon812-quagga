@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.1.1] - 31-05-2017
 ### Fixed
 - NilClass in flush methods
 - errors on creating all resources 
