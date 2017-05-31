@@ -286,6 +286,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
         if resource_map[property][:type] == :switch && value == :disabled
           cmd << 'no '
         end
+        value = nil if property == :peer_group && value == :enabled
         cmd << ERB.new(resource_map[property][:template]).result(binding)
         cmds << cmd
       end
