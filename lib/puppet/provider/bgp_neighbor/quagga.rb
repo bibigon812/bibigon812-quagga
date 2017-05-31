@@ -4,15 +4,15 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   commands :vtysh => 'vtysh'
 
   @resource_map = {
+      :peer_group => {
+          :template => 'neighbor <%= name %> peer-group <%= value %>',
+          :type => :string,
+      },
       :remote_as => {
           :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sremote-as\s(\d+)\Z/,
           :template => 'neighbor <%= name %> remote-as <%= value %>',
           :type => :fixnum,
-      },
-      :peer_group => {
-          :template => 'neighbor <%= name %> peer-group <%= value %>',
-          :type => :string,
       },
       :activate => {
           :default => 'default_ipv4_unicast',
