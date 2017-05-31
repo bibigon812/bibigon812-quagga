@@ -1,19 +1,26 @@
 Puppet::Type.newtype(:ospf) do
-  @doc = %q{This type provides the capabilities to manage ospf router within
-    puppet.
+  @doc = %q{
+This type provides the capabilities to manage ospf router within puppet.
 
-    Example:
+Examples:
 
-    ospf { 'ospf':
-      ensure              => present,
-      abr_type            => cisco,
-      opaque              => true,
-      rfc1583             => true,
-      router_id           => '192.168.0.1',
-    }
+```puppet
+ospf { 'ospf':
+  ensure              => present,
+  abr_type            => cisco,
+  opaque              => true,
+  rfc1583             => true,
+  router_id           => '192.168.0.1',
+}
+```
+
   }
 
   ensurable do
+    desc %q{ Manage the state of this router ospf. The default action is `present`. }
+
+    defaultto(:present)
+
     newvalues(:present) do
       provider.create
     end
@@ -21,18 +28,16 @@ Puppet::Type.newtype(:ospf) do
     newvalues(:absent) do
       provider.destroy
     end
-
-    defaultto(:present)
   end
 
   newparam(:name) do
-    desc %q{ Name must be 'ospf' }
+    desc %q{ Name must be 'ospf'. }
 
     newvalues :ospf
   end
 
   newproperty(:abr_type) do
-    desc %q{ Set OSPF ABR type }
+    desc %q{ Set OSPF ABR type. Default to `cisco`. }
 
     newvalues :cisco, :ibm, :shortcut, :standard
     defaultto :cisco
@@ -48,7 +53,7 @@ Puppet::Type.newtype(:ospf) do
   end
 
   newproperty(:opaque) do
-    desc %q{ Enable the Opaque-LSA capability (rfc2370) }
+    desc %q{ Enable the Opaque-LSA capability (rfc2370). Default to `disabled`. }
 
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
@@ -66,7 +71,7 @@ Puppet::Type.newtype(:ospf) do
   end
 
   newproperty(:rfc1583) do
-    desc %q{ Enable the RFC1583Compatibility flag }
+    desc %q{ Enable the RFC1583Compatibility flag. Default to `disabled`. }
 
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
@@ -84,7 +89,7 @@ Puppet::Type.newtype(:ospf) do
   end
 
   newproperty(:router_id) do
-    desc %q{ Router-id for the OSPF process }
+    desc %q{ Router-id for the OSPF process. }
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/

@@ -1,28 +1,44 @@
 Puppet::Type.newtype(:as_path) do
-  @doc = %q{ This type provides the capabilities to manage as-path access-list
-    within puppet.
+  @doc = %q{
 
-    Example:
+This type provides the capabilities to manage as-path access-list within puppet.
 
-    as_path { 'as100':
-      ensure => present,
-      rules => [
-        { permit => '_100$', },
-        { permit => '_100_', },
-      ],
-    }
+Examples:
+
+```puppet
+as_path { 'as100':
+  ensure => present,
+  rules => [
+    { permit => '_100$', },
+    { permit => '_100_', },
+  ],
+}
+```
+
   }
 
-  ensurable
+  ensurable do
+    desc %q{ Manage the state of this as-path. The default action is `present`. }
+
+    defaultto(:present)
+
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+  end
 
   newparam(:name) do
-    desc %q{ The name of the as-path access-list }
+    desc %q{ The name of the as-path access-list. }
 
     newvalues(/\A\w+\Z/)
   end
 
   newproperty(:rules, :array_matching => :all) do
-    desc %q{ Rules of the as-path access-list }
+    desc %q{ Rules of the as-path access-list. `{ action => regex }`. }
 
     validate do |value|
       case value

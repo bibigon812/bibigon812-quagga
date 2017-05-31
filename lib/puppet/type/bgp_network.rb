@@ -1,23 +1,39 @@
 Puppet::Type.newtype(:bgp_network) do
   @doc = %q{
-    This type provides the capability to manage bgp neighbor within
-    puppet.
 
-    Examples:
+This type provides the capability to manage bgp neighbor within
+puppet.
 
-      bgp_network { '65000 192.168.0.0/24':
-        ensure => present,
-      }
+Examples:
 
-      bgp_network { '65000 2a00::/64':
-        ensure => present,
-      }
+```puppet
+bgp_network { '65000 192.168.0.0/24':
+  ensure => present,
+}
+
+bgp_network { '65000 2a00::/64':
+  ensure => present,
+}
+```
+
   }
 
-  ensurable
+  ensurable do
+    desc %q{ Manage the state of this bgp network. The default action is `present`. }
+
+    defaultto(:present)
+
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+  end
 
   newparam(:name) do
-    desc %q{ It's consists of a AS number and a network IP address }
+    desc %q{ It's consists of a AS number and a network IP address. }
 
     newvalues(/\A\d+\s+(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\/(1?\d|2\d|3[0-2])\Z/)
     newvalues(/\A\d+\s+[\h:]\/(1[0-1]\d|12[0-8]|\d{1,2})\Z/)

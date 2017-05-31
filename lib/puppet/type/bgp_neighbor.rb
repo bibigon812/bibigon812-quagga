@@ -1,35 +1,50 @@
 Puppet::Type.newtype(:bgp_neighbor) do
   @doc = %q{
-    This type provides the capability to manage bgp neighbor within
-    puppet.
 
-    Examples:
+This type provides the capability to manage bgp neighbor within puppet.
 
-      bgp_neighbor { '65000 192.168.1.1':
-        ensure                 => 'present',
-        activate               => 'enabled',
-        peer_group             => 'internal_peers',
-        route_reflector_client => 'enabled',
-      }
+Examples:
 
-      bgp_neighbor { '65000 internal_peers':
-        ensure            => 'present',
-        allow_as_in       => 1,
-        default_originate => 'disabled',
-        local_as          => 65000,
-        peer_group        => 'enabled',
-        prefix_list_in    => 'PREFIX_LIST_IN',
-        prefix_list_out   => 'PREFIX_LIST_OUT',
-        remote_as         => 65000,
-        route_map_in      => 'ROUTE_MAP_IN',
-        route_map_out     => 'ROUTE_MAP_OUT',
-      }
+```puppet
+bgp_neighbor { '65000 192.168.1.1':
+  ensure                 => 'present',
+  activate               => 'enabled',
+  peer_group             => 'internal_peers',
+  route_reflector_client => 'enabled',
+}
+
+bgp_neighbor { '65000 internal_peers':
+  ensure            => 'present',
+  allow_as_in       => 1,
+  default_originate => 'disabled',
+  local_as          => 65000,
+  peer_group        => 'enabled',
+  prefix_list_in    => 'PREFIX_LIST_IN',
+  prefix_list_out   => 'PREFIX_LIST_OUT',
+  remote_as         => 65000,
+  route_map_in      => 'ROUTE_MAP_IN',
+  route_map_out     => 'ROUTE_MAP_OUT',
+}
+```
+
   }
 
-  ensurable
+  ensurable do
+    desc %q{ Manage the state of this bgp neighbor. The default action is `present`. }
+
+    defaultto(:present)
+
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+  end
 
   newparam(:name) do
-    desc %q{ It's consists of a AS number and a neighbor IP address or a peer-group name }
+    desc %q{ It's consists of a AS number and a neighbor IP address or a peer-group name. }
 
     newvalues(/\A\d+\s+(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\Z/)
     newvalues(/\A\d+\s+[\h:]\Z/)
@@ -41,7 +56,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:activate) do
-    desc %q{ Enable the Address Family for this Neighbor }
+    desc %q{ Enable the Address Family for this Neighbor. Default to `enabled`. }
     defaultto(:enabled)
     newvalues(:disabled, :enabled, :false, :true)
 
@@ -58,7 +73,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:allow_as_in) do
-    desc %q{ Accept as-path with my AS present in it }
+    desc %q{ Accept as-path with my AS present in it. }
     newvalues(/\A(10|[1-9])\Z/)
 
     munge do |value|
@@ -67,7 +82,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:default_originate) do
-    desc %q{ Originate default route to this neighbor }
+    desc %q{ Originate default route to this neighbor. Default to `disabled`. }
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
 
@@ -84,7 +99,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:local_as) do
-    desc %q{ Specify a local-as number }
+    desc %q{ Specify a local-as number. }
     newvalues(/\A\d+\Z/)
 
     validate do |value|
@@ -99,7 +114,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:next_hop_self) do
-    desc %q{ Disable the next hop calculation for this neighbor }
+    desc %q{ Disable the next hop calculation for this neighbor. Default to `disabled`. }
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
 
@@ -116,7 +131,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:passive) do
-    desc %q{ Don't send open messages to this neighbor }
+    desc %q{ Don't send open messages to this neighbor. Default to `disabled`. }
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
 
@@ -133,7 +148,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:peer_group) do
-    desc %q{ Member of the peer-group }
+    desc %q{ Member of the peer-group. Default to `disabled`. }
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
     newvalues(/\A[[:alpha:]]\w+\Z/)
@@ -152,17 +167,17 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:prefix_list_in) do
-    desc %q{ Filter updates from this neighbor }
+    desc %q{ Filter updates from this neighbor. }
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:prefix_list_out) do
-    desc %q{ Filter updates to this neighbor }
+    desc %q{ Filter updates to this neighbor. }
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:remote_as) do
-    desc %q{ Specify a BGP neighbor as }
+    desc %q{ Specify a BGP neighbor as. }
     newvalues(/\A\d+\Z/)
 
     validate do |value|
@@ -177,27 +192,27 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:route_map_export) do
-    desc %q{ Apply map to routes coming from a Route-Server client }
+    desc %q{ Apply map to routes coming from a Route-Server client. }
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:route_map_import) do
-    desc %q{ Apply map to routes going into a Route-Server client's table }
+    desc %q{ Apply map to routes going into a Route-Server client's table. }
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:route_map_in) do
-    desc %q{ Apply map to incoming routes }
+    desc %q{ Apply map to incoming routes. }
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:route_map_out) do
-    desc %q{ Apply map to outbound routes }
+    desc %q{ Apply map to outbound routes. }
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:route_reflector_client) do
-    desc %q{ Configure a neighbor as Route Reflector client }
+    desc %q{ Configure a neighbor as Route Reflector client. Default to `disabled`. }
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
 
@@ -214,7 +229,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:route_server_client) do
-    desc %q{ Configure a neighbor as Route Server client }
+    desc %q{ Configure a neighbor as Route Server client. Default to `disabled`. }
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
 
@@ -231,7 +246,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   newproperty(:shutdown) do
-    desc %q{ Administratively shut down this neighbor }
+    desc %q{ Administratively shut down this neighbor. Default to `disabled`. }
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
 

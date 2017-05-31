@@ -1,34 +1,49 @@
 Puppet::Type.newtype(:route_map) do
   @doc = %q{
-    This type provides the capability to manage route-map within
-    puppet.
 
-    Example:
+This type provides the capability to manage route-map within puppet.
 
-      route_map {'TEST_ROUTE_MAP:permit:10':
-        ensure   => present,
-        match    => [
-          'as-path PATH_LIST',
-          'community COMMUNITY_LIST',
-        ],
-        on_match => 'next',
-        set      => [
-          'local-preference 200',
-          'community none',
-        ],
-      }
+Example:
+
+```puppet
+route_map {'TEST_ROUTE_MAP:permit:10':
+  ensure   => present,
+  match    => [
+    'as-path PATH_LIST',
+    'community COMMUNITY_LIST',
+  ],
+  on_match => 'next',
+  set      => [
+    'local-preference 200',
+    'community none',
+  ],
+}
+```
+
   }
 
-  ensurable
+  ensurable do
+    desc %q{ Manage the state of this route-map. The default action is `present`. }
+
+    defaultto(:present)
+
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+  end
 
   newparam(:name) do
-    desc %q{ Name of the route-map, action and sequence number of rule }
+    desc %q{ Name of the route-map, action and sequence number of rule. }
 
     newvalues(/\A\w[\w-]+:(deny|permit):\d+\Z/)
   end
 
   newproperty(:match, :array_matching => :all) do
-    desc %q{ Match values from routing table }
+    desc %q{ Match values from routing table. }
 
     newvalues(/\Aas-path\s(\w+)\Z/)
     newvalues(/\Acommunity\s(\w+)(\s(exact-match))?\Z/)
@@ -54,14 +69,14 @@ Puppet::Type.newtype(:route_map) do
   end
 
   newproperty(:on_match) do
-    desc %q{ Exit policy on matches }
+    desc %q{ Exit policy on matches. }
 
     newvalues(/\Agoto\s(\d+)\Z/)
     newvalues(/\Anext\Z/)
   end
 
   newproperty(:set, :array_matching => :all) do
-    desc %q{ Set values in destination routing protocol }
+    desc %q{ Set values in destination routing protocol. }
 
     newvalues(/\Aaggregator\sas\s(\d+)\Z/)
     newvalues(/\Aas-path\sexclude(\s(\d+))+\Z/)

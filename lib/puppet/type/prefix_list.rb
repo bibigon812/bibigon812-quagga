@@ -1,47 +1,62 @@
 Puppet::Type.newtype(:prefix_list) do
   @doc = %q{
-    This type provides the capability to manage prefix-lists within
-    puppet.
 
-    Example:
+This type provides the capability to manage prefix-lists within puppet.
 
-      prefix_list {'TEST_PREFIX_LIST:10':
-        ensure => present,
-        action => permit,
-        prefix => '224.0.0.0/4',
-        ge     => 8,
-        le     => 24,
-      }
+Example:
+
+```puppet
+  prefix_list {'TEST_PREFIX_LIST:10':
+    ensure => present,
+    action => permit,
+    prefix => '224.0.0.0/4',
+    ge     => 8,
+    le     => 24,
+  }
+```
+
   }
 
-  ensurable
+  ensurable do
+    desc %q{ Manage the state of this prefix-list. The default action is `present`. }
+
+    defaultto(:present)
+
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+  end
 
   newparam(:name) do
-    desc %q{ Name of the prefix-list and sequence number of rule }
+    desc %q{ Name of the prefix-list and sequence number of rule. }
 
     newvalues(/\A[\w-]+:\d+\Z/)
   end
 
   newproperty(:proto) do
-    desc %q{ IP protocol version }
+    desc %q{ IP protocol version: `ip`, `ipv6`. Default to `ip`. }
 
     defaultto :ip
     newvalues(:ip, :ipv6)
   end
 
   newproperty(:action) do
-    desc %q{ Action can be permit or deny }
+    desc %q{ Action can be `permit` or `deny`. }
     newvalues(:deny, :permit)
   end
 
   newproperty(:prefix) do
-    desc %q{ IP prefix <network>/<length> }
+    desc %q{ IP prefix `<network>/<length>`. }
 
     newvalues(/\A([\d\.:\/]+|any)\Z/)
   end
 
   newproperty(:ge) do
-    desc %q{ Minimum prefix length to be matched }
+    desc %q{ Minimum prefix length to be matched. }
     newvalues(/^\d+$/)
 
     validate do |value|
@@ -57,7 +72,7 @@ Puppet::Type.newtype(:prefix_list) do
   end
 
   newproperty(:le) do
-    desc %q{ Maximum prefix length to be matched }
+    desc %q{ Maximum prefix length to be matched. }
     newvalues(/^\d+$/)
 
     validate do |value|

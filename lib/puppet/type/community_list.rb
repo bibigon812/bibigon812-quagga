@@ -1,20 +1,36 @@
 Puppet::Type.newtype(:community_list) do
   @doc = %q{
-    This type provides the capability to manage community-list
-    within puppet.
 
-    Example:
+This type provides the capability to manage community-list
+within puppet.
 
-      community_list { '100':
-        ensure => present,
-        rules  => [
-          permit => 65000:50952,
-          permit => 65000:31500,
-        ],
-      }
+Examples:
+
+```puppet
+community_list { '100':
+  ensure => present,
+  rules  => [
+    permit => 65000:50952,
+    permit => 65000:31500,
+  ],
+}
+```
+
   }
 
-  ensurable
+  ensurable do
+    desc %q{ Manage the state of this community list. The default action is `present`. }
+
+    defaultto(:present)
+
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+  end
 
   newparam(:name) do
     desc %q{ Community list number. }

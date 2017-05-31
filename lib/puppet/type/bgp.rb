@@ -1,21 +1,36 @@
 Puppet::Type.newtype(:bgp) do
   @doc = %q{
-    This type provides the capability to manage bgp parameters within
-    puppet.
 
-    Examples:
+This type provides the capability to manage bgp parameters within puppet.
 
-      bgp { '65000':
-        ensure             => present,
-        import_check       => enabled,
-        ipv4_unicast       => disabled,
-        maximum_paths_ebgp => 10,
-        maximum_paths_ibgp => 10,
-        router_id          => '192.168.1.1',
-      }
+Examples:
+
+```puppet
+bgp { '65000':
+  ensure             => present,
+  import_check       => 'enabled',
+  ipv4_unicast       => 'disabled',
+  maximum_paths_ebgp => 10,
+  maximum_paths_ibgp => 10,
+  router_id          => '192.168.1.1',
+}
+```
+
   }
 
-  ensurable
+  ensurable do
+    desc %q{ Manage the state of this router bgp. The default action is `present`. }
+
+    defaultto(:present)
+
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+  end
 
   newparam(:name) do
     desc %q{ The AS number }
@@ -23,7 +38,7 @@ Puppet::Type.newtype(:bgp) do
   end
 
   newproperty(:import_check) do
-    desc %q{ Check BGP network route exists in IGP }
+    desc %q{ Check BGP network route exists in IGP. Default to `disabled`. }
 
     defaultto(:disabled)
     newvalues(:disabled, :enabled, :false, :true)
@@ -41,7 +56,7 @@ Puppet::Type.newtype(:bgp) do
   end
 
   newproperty(:ipv4_unicast) do
-    desc %q{ Activate ipv4-unicast for a peer by default }
+    desc %q{ Activate ipv4-unicast for a peer by default. Default to `enabled`. }
 
     defaultto(:enabled)
     newvalues(:disabled, :enabled, :false, :true)
@@ -59,7 +74,7 @@ Puppet::Type.newtype(:bgp) do
   end
 
   newproperty(:maximum_paths_ebgp) do
-    desc %q{ Forward packets over multiple paths ebgp }
+    desc %q{ Forward packets over multiple paths ebgp. Default to `1`. }
 
     defaultto(1)
     newvalues(/\A([1-9]|[1-5][0-9]|6[0-4])\Z/)
@@ -70,7 +85,7 @@ Puppet::Type.newtype(:bgp) do
   end
 
   newproperty(:maximum_paths_ibgp) do
-    desc %q{ Forward packets over multiple paths ibgp }
+    desc %q{ Forward packets over multiple paths ibgp. Default to `1`. }
 
     defaultto(1)
     newvalues(/\A([1-9]|[1-5][0-9]|6[0-4])\Z/)

@@ -1,30 +1,45 @@
 Puppet::Type.newtype(:ospf_interface) do
-  @doc = %q{ This type provides the capabilities to manage ospf parameters of
-    network interfaces within puppet.
+  @doc = %q{
+This type provides the capabilities to manage ospf parameters of network interfaces within puppet.
 
-    Example:
+Example:
 
-    ospf_interface { 'eth0':
-      ensure              => present,
-      cost                => 100,
-      dead_interval       => 8,
-      hello_interval      => 2,
-      mtu_ignore          => true,
-      network             => broadcast,
-      priority            => 100,
-      retransmit_interval => 4,
-      transmit_delay      => 1,
-    }
+```puppet
+ospf_interface { 'eth0':
+  ensure              => present,
+  cost                => 100,
+  dead_interval       => 8,
+  hello_interval      => 2,
+  mtu_ignore          => true,
+  network             => broadcast,
+  priority            => 100,
+  retransmit_interval => 4,
+  transmit_delay      => 1,
+}
+```
+
   }
 
-  ensurable
+  ensurable do
+    desc %q{ Manage ospf parameters of this network interface. The default action is `present`. }
+
+    defaultto(:present)
+
+    newvalues(:present) do
+      provider.create
+    end
+
+    newvalues(:absent) do
+      provider.destroy
+    end
+  end
 
   newparam(:name) do
-    desc %q{ The friendly name of the network interface }
+    desc %q{ The friendly name of the network interface. }
   end
 
   newproperty(:cost) do
-    desc %q{ Interface cost }
+    desc %q{ Interface cost. }
 
     newvalues(/\A\d+\Z/)
     defaultto(10)
@@ -42,7 +57,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:dead_interval) do
-    desc %q{ Interval after which a neighbor is declared dead }
+    desc %q{ Interval after which a neighbor is declared dead. Default to `40`. }
 
     newvalues(/\A\d+\Z/)
     defaultto(40)
@@ -60,7 +75,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:hello_interval) do
-    desc %q{ Time between HELLO packets }
+    desc %q{ Time between HELLO packets. Default to `10`. }
 
     newvalues(/\A\d+\Z/)
     defaultto(10)
@@ -78,7 +93,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:mtu_ignore) do
-    desc %q{ Disable mtu mismatch detection }
+    desc %q{ Disable mtu mismatch detection. Default to `disabled`. }
 
     newvalues(:disabled, :enabled, :true, :false)
     defaultto(:disabled)
@@ -96,7 +111,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:network) do
-    desc %q{ Network type }
+    desc %q{ Network type: `broadcast`, `non_broadcast`, `point_to_point`, `loopback`. Default to `broadcast`. }
 
     newvalues(:broadcast, :non_broadcast, :point_to_multipoint, :point_to_point, :loopback)
     newvalues('non-broadcast', 'point-to-multipoint', 'point-to-point')
@@ -113,7 +128,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:priority) do
-    desc %q{ Router priority }
+    desc %q{ Router priority. Default to `1`. }
 
     newvalues(/\A\d+\Z/)
     defaultto(1)
@@ -131,7 +146,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:retransmit_interval) do
-    desc %q{ Time between retransmitting lost link state advertisements }
+    desc %q{ Time between retransmitting lost link state advertisements. Default to `5`. }
 
     newvalues(/\A\d+\Z/)
     defaultto(5)
@@ -149,7 +164,7 @@ Puppet::Type.newtype(:ospf_interface) do
   end
 
   newproperty(:transmit_delay) do
-    desc %q{ Link state transmit delay }
+    desc %q{ Link state transmit delay. Default to `1`. }
 
     newvalues(/\A\d+\Z/)
     defaultto(1)

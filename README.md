@@ -17,13 +17,13 @@ class { 'quagga': }
 
 ##### Reference
 
-  - `enable`: Manages quagga services
-  - `owner`: User of quagga configuration files
-  - `group`: Group of quagga configuration files
-  - `mode`: Mode of quagga configuration files
-  - `package_name`: Name of the quagga package
-  - `package_ensure`: Ensure for the quagga package
-  - `content`:  Initial content of configuration files
+  - `enable`: Manages quagga services. Default to `true`.
+  - `owner`: User of quagga configuration files. Default to `quagga`.
+  - `group`: Group of quagga configuration files. Default to `quagga`.
+  - `mode`: Mode of quagga configuration files. Default to `600`.
+  - `package_name`: Name of the quagga package. Default to `quagga`.
+  - `package_ensure`: Ensure for the quagga package. Default to `present`.
+  - `content`:  Initial content of configuration files. Default to `hostname ${::fqdn}\n`
 
 ## The most fat
 
@@ -43,11 +43,11 @@ bgp { '65000':
 #### Reference
 
   - `name`: AS number
-  - `import_check`: Check BGP network route exists in IGP
-  - `ipv4_unicast`: Activate ipv4-unicast for a peer by default
-  - `maximum_paths_ebgp`: Forward packets over multiple paths ebgp
-  - `maximum_paths_ibgp`: Forward packets over multiple paths ibgp
-  - `router_id`: Override configured router identifier
+  - `import_check`: Check BGP network route exists in IGP.
+  - `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default to `enabled`.
+  - `maximum_paths_ebgp`: Forward packets over multiple paths ebgp. Default to `1`.
+  - `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default to `1`.
+  - `router_id`: Override configured router identifier.
 
 ### bgp_neighbor
 
@@ -73,24 +73,24 @@ bgp_neighbor { '65000 10.0.0.3':
 
 #### Reference
 
-  - `name`: It's consists of a AS number and a neighbor IP address or a peer-group name
-  - `activate`: Enable the Address Family for this Neighbor
-  - `allow_as_in`: Accept as-path with my AS present in it
-  - `default_originate`: Originate default route to this neighbor
-  - `local_as`: Specify a local-as number
-  - `next_hop_self`: Disable the next hop calculation for this neighbor
-  - `passive`: Don't send open messages to this neighbor
-  - `peer_group`: Member of the peer-group
-  - `prefix_list_in`: Filter updates from this neighbor
-  - `prefix_list_out`: Filter updates to this neighbor
-  - `remote_as`: Specify a BGP neighbor as
-  - `route_map_export`: Apply map to routes coming from a Route-Server client
-  - `route_map_import`: Apply map to routes going into a Route-Server client's table
-  - `route_map_in`: Apply map to incoming routes
-  - `route_map_out`: Apply map to outbound routes
-  - `route_reflector_client`: Configure a neighbor as Route Reflector client
-  - `route_server_client`: Configure a neighbor as Route Server client
-  - `shutdown`: Administratively shut down this neighbor
+  - `name`: It's consists of a AS number and a neighbor IP address or a peer-group name.
+  - `activate`: Enable the Address Family for this Neighbor. Default to `enabled`.
+  - `allow_as_in`: Accept as-path with my AS present in it.
+  - `default_originate`: Originate default route to this neighbor. Default to `disabled`.
+  - `local_as`: Specify a local-as number.
+  - `next_hop_self`: Disable the next hop calculation for this neighbor. Default to `disabled`.
+  - `passive`: Don't send open messages to this neighbor. Default to `disabled`.
+  - `peer_group`: Member of the peer-group. Default to `disabled`.
+  - `prefix_list_in`: Filter updates from this neighbor.
+  - `prefix_list_out`: Filter updates to this neighbor.
+  - `remote_as`: Specify a BGP neighbor as.
+  - `route_map_export`: Apply map to routes coming from a Route-Server client.
+  - `route_map_import`: Apply map to routes going into a Route-Server client's table.
+  - `route_map_in`: Apply map to incoming routes.
+  - `route_map_out`: Apply map to outbound routes.
+  - `route_reflector_client`: Configure a neighbor as Route Reflector client. Default to `disabled`.
+  - `route_server_client`: Configure a neighbor as Route Server client. Default to `disabled`.
+  - `shutdown`: Administratively shut down this neighbor. Default to `disabled`.
 
 ### bgp_network
 
@@ -102,7 +102,7 @@ bgp_network { '65000 192.168.1.0/24':
 
 #### Reference
 
-  - `name`: It's consists of a AS number and a network IP address
+  - `name`: It's consists of a AS number and a network IP address.
 
 ### ospf
 
@@ -118,11 +118,11 @@ ospf { 'ospf':
 
 #### Reference
 
-  - `name`: Name must be 'ospf'
-  - `abr_type`: Set OSPF ABR type
-  - `opaque`: Enable the Opaque-LSA capability (rfc2370)
-  - `rfc1583`: Enable the RFC1583Compatibility flag
-  - `router_id`: Router-id for the OSPF process
+  - `name`: Name must be `ospf`.
+  - `abr_type`: Set OSPF ABR type. Default to `cisco`.
+  - `opaque`: Enable the Opaque-LSA capability (rfc2370). Default to `disabled`.
+  - `rfc1583`: Enable the RFC1583Compatibility flag. Default to `disabled`. 
+  - `router_id`: Router-id for the OSPF process.
   
 ### ospf_area
 
@@ -142,15 +142,14 @@ ospf_area { '0.0.0.2':
 
 #### Reference
 
-  - `name`: OSPF area
-  - `default_cost`: Set the summary-default cost of a NSSA or stub area
-  - `access_list_expor`: Set the filter for networks announced to other areas
-  - `access_list_import`: Set the filter for networks from other areas announced to the specified one
-  - `prefix_list_export`: Filter networks sent from this area
-  - `prefix_list_import`: Filter networks sent to this area
-  - `networks`: Enable routing on an IP network
-  - `shortcut`: Configure the area's shortcutting mode
-  - `stub`: Configure OSPF area as stub
+  - `name`: OSPF area.
+  - `default_cost`: Set the summary-default cost of a NSSA or stub area.
+  - `access_list_expor`: Set the filter for networks announced to other areas.
+  - `access_list_import`: Set the filter for networks from other areas announced to the specified one.
+  - `prefix_list_export`: Filter networks sent from this area.
+  - `prefix_list_import`: Filter networks sent to this area.
+  - `networks`: Enable routing on an IP network.
+  - `stub`: Configure OSPF area as stub: `enabled`, `disabled` or `no_summary`. Default to `disabled`.
   
 ### ospf_interface
 
@@ -164,15 +163,15 @@ ospf_interface { 'eth0':
 
 #### Reference
 
-  - `name`: The friendly name of the network interface
-  - `cost`: Interface cos
-  - `dead_interval`: Interval after which a neighbor is declared dead
-  - `hello_interval`: Time between HELLO packets
-  - `mtu_ignore`: Disable mtu mismatch detection
-  - `network`: Network type
-  - `priority`: Router priority
-  - `retransmit_interval`: Time between retransmitting lost link state advertisements
-  - `transmit_delay`: Link state transmit delay
+  - `name`: The friendly name of the network interface.
+  - `cost`: Interface cos. Default to `10`.
+  - `dead_interval`: Interval after which a neighbor is declared dead. Default to `40`. 
+  - `hello_interval`: Time between HELLO packets. Default to `10`.
+  - `mtu_ignore`: Disable mtu mismatch detection. Default to `disabled`.
+  - `network`: Network type: `broadcast`, `non_broadcast`, `point_to_point` or `loopback`. Default to `broadcast`.
+  - `priority`: Router priority. Default to `1`.
+  - `retransmit_interval`: Time between retransmitting lost link state advertisements. Default to `5`.
+  - `transmit_delay`: Link state transmit delay. Default to `1`.
 
 ### redistribution
 
@@ -191,10 +190,10 @@ redistribution { 'bgp:65000:ospf':
 
 #### Reference
 
-  - `name`: The name contains the main protocol, the id and the protocol for redistribution
-  - `metric`: Metric for redistributed routes
-  - `metric_type`: OSPF exterior metric type for redistributed routes
-  - `route_map`: Route map reference
+  - `name`: The name contains the main protocol, the id and the protocol for redistribution.
+  - `metric`: Metric for redistributed routes.
+  - `metric_type`: OSPF exterior metric type for redistributed routes.
+  - `route_map`: Route map reference.
 
 ### route_map
 
@@ -220,10 +219,10 @@ route_map { 'bgp_out:permit:65000':
 
 #### Reference
 
-  - `name`: Name of the route-map, action and sequence number of rule
-  - `match`: Match values from routing table
-  - `on_match`: Exit policy on matches
-  - `set`: Set values in destination routing protocol
+  - `name`: Name of the route-map, action and sequence number of rule.
+  - `match`: Match values from routing table.
+  - `on_match`: Exit policy on matches.
+  - `set`: Set values in destination routing protocol.
 
 
 ### prefix_list
@@ -248,12 +247,12 @@ prefix_list {'ADVERTISED_PREFIXES:20':
 
 #### Reference
 
-  - `name`: Name of the prefix-list and sequence number of rule
-  - `action`: Action can be permit or deny
-  - `ge`: Minimum prefix length to be matched
-  - `le`: Maximum prefix length to be matched
-  - `prefix`: IP prefix <network>/<length>
-  - `proto`: IP protocol version
+  - `name`: Name of the prefix-list and sequence number of rule: `name:sequence`.
+  - `action`: Action can be `permit` or `deny`.
+  - `ge`: Minimum prefix length to be matched.
+  - `le`: Maximum prefix length to be matched.
+  - `prefix`: IP prefix `<network>/<length>`.
+  - `proto`: IP protocol version: `ip`, `ipv6`. Default to `ip`.
 
 ### community_list
 
@@ -268,8 +267,8 @@ community_list { '100':
 
 #### Reference
 
-  - `name`: Community list number
-  - `rules`: Action and community { action => community }    
+  - `name`: Community list number.
+  - `rules`: A rule of the community list `{ action => community }`.    
 
 ### as_path
 
@@ -285,8 +284,8 @@ as_path { 'TEST_AS_PATH':
 
 #### Reference
 
-  - `name`: The name of the as-path access-list
-  - `rules`: Rules of the as-path access-list { action => regex }
+  - `name`: The name of the as-path access-list.
+  - `rules`: A rule of the as-path access-list `{ action => regex }`.
 
 ## Hiera
 
@@ -383,33 +382,47 @@ site::profiles::interface:
 ```puppet
 class site::profiles::ospf {
   $config = hiera_hash('site::profiles::ospf', {})
-  $ospf = { 'ospf' => delete(delete($config, 'redistribute'), 'area') }
-  $ospf_areas = $config['area'].reduce({}) |$memo, $value| {
-    $area = $value[0]
-    $options = $value[1].reduce({}) |$memo, $value| {
-      if $value[0] == 'networks' {
-        $options = sort($value[1])
-      } else {
-        $options = $value[1]
+
+  unless empty($config) {
+
+    $ospf = { 'ospf' => delete(delete($config, 'redistribute'), 'area') }
+
+    $ospf_areas = dig($config, ['area'], {}).reduce({}) |$memo, $value| {
+      $area = $value[0]
+      $options = $value[1].reduce({}) |$memo, $value| {
+        if $value[0] == 'networks' {
+          $options = sort($value[1])
+        } else {
+          $options = $value[1]
+        }
+        merge($memo, { $value[0] => $options })
       }
-      merge($memo, { $value[0] => $options })
+      merge($memo, { $area => $options })
     }
-    merge($memo, { $area => $options })
-  }
-  $redistribution = $config['redistribute'].reduce({}) |$memo, $value| {
-    $name = $value ? {
-      Hash    => $value.keys[0],
-      default => $value,
+
+    $redistribution = dig($config, ['redistribute'], {}).reduce({}) |$memo, $value| {
+      $name = $value ? {
+        Hash    => $value.keys[0],
+        default => $value,
+      }
+
+      $config = $value ? {
+        Hash    => $value[$name],
+        default => {},
+      }
+
+      merge($memo, { "ospf::${name}" => $config })
     }
-    $config = $value ? {
-      Hash    => $value[$name],
-      default => {},
+
+    $defaults = {
+      ensure => present,
     }
-    merge($memo, { "ospf::${name}" => $config })
+
+    create_resources('ospf', $ospf, $defaults)
+    create_resources('redistribution', $redistribution)
+    create_resources('ospf_area', $ospf_areas)
   }
-  $defaults = {
-    ensure => present,
-  }
+
   $ospf_interface = hiera_hash('site::profiles::interface', {}).reduce({}) |$memo, $iface| {
     $iface_name = $iface[0]
     $ospf_interface = try_get_value($iface[1], 'ip/ospf')
@@ -417,10 +430,10 @@ class site::profiles::ospf {
       merge($memo, { $iface_name => $ospf_interface })
     }
   }
-  create_resources('ospf', $ospf)
-  create_resources('ospf_interface', $ospf_interface)
-  create_resources('redistribution', $redistribution)
-  create_resources('ospf_area', $ospf_areas)
+
+  unless empty($ospf_interface) {
+    create_resources('ospf_interface', $ospf_interface)
+  }
 }
 ```
 

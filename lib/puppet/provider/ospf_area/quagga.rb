@@ -9,7 +9,6 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     :access_list_import => { :type => :String, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\simport-list\s([\w-]+)\Z/, :template => "area <%= area %> import-list <%= value %>" },
     :prefix_list_export => { :type => :String, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sout\Z/, :template => "area <%= area %> filter-list prefix <%= value %> out" },
     :prefix_list_import => { :type => :String, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sin\Z/, :template => "area <%= area %> filter-list prefix <%= value %> in" },
-    :shortcut           => { :type => :Symbol, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sshortcut\s(default|enable|disable)\Z/, :template => "area <%= area %> shortcut <%= value %>", :default => :default },
     :stub               => { :type => :Symbol, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sstub(\sno-summary)?\Z/, :template => "area <%= area %> stub <%= value %>", :default => :disabled },
     :networks           => { :type => :Array,  :regexp => /\A\snetwork\s(\d+\.\d+\.\d+\.\d+\/\d+)\sarea\s(\d+\.\d+\.\d+\.\d+)\Z/, :template => "network <%= value %> area <%= area %>" },
   }
@@ -154,11 +153,13 @@ Puppet::Type.type(:ospf_area).provide :quagga do
           end
         when :Symbol
           next if resource_map[property][:default] == desired_value
+
           if desired_value == :enabled
             value = ""
           else
             value = desired_value.to_s.gsub(/_/, '-')
           end
+
           cmds << "no " + ERB.new(resource_map[property][:template]).result(binding).strip
         else
           value = @property_hash[property]
