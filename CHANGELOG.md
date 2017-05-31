@@ -1,10 +1,12 @@
 ## [Unreleased]
 ### Fixed
 - NilClass in flush methods
+- errors on creating all resources 
 
 ### Updated
 - docs
 - the ensurable method in types
+- changelog
 
 ## [1.1.0] - 31-05-2017
 ### Fixed
