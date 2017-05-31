@@ -476,52 +476,68 @@ class site::profiles::prefix_list {
 ---
 site::profiles::route_map:
   AS1234_in:
-    1:
-      action: deny
-      match: ip address prefix-list AS_LOCAL
-    31:
-      action: permit
-      match: as-path FROM_AS2345
-      set: local-preference 800
-    60:
-      action: permit
-      match: ip address prefix-list ABCD_1
-      on_match: goto 100
-      set: local-preference 800
-    63:
-      action: permit
-      match: ip address prefix-list ABCD_2
-      on_match: goto 100
-      set: local-preference 800
-    100:
-      action: permit
-      on_match: goto 200
-      set: local-preference 200
-    200:
-      action: permit
-      set: community 65000:1234 additive
+    rules:
+      1:
+        action: deny
+        match: ip address prefix-list AS_LOCAL
+      31:
+        action: permit
+        match: as-path FROM_AS2345
+        set: local-preference 800
+      60:
+        action: permit
+        match: ip address prefix-list ABCD_1
+        on_match: goto 100
+        set: local-preference 800
+      63:
+        action: permit
+        match: ip address prefix-list ABCD_2
+        on_match: goto 100
+        set: local-preference 800
+      100:
+        action: permit
+        on_match: goto 200
+        set: local-preference 200
+      200:
+        action: permit
+        set: community 65000:1234 additive
 ```
 
 ```puppet
 class site::profiles::route_map {
+
   $route_maps = hiera_hash('site::profiles::route_map', {}).reduce({}) |$route_maps, $route_map| {
+  
     $name = $route_map[0]
-    $new_route_map = $route_map[1].reduce({}) |$route_map, $sequence| {
+    
+    $ensure = dig($route_map[1], ['ensure'], 'present') ? {
+      'absent' => 'absent',
+      default  => 'present',
+    }
+    
+    $new_route_map = dig($route_map[1], ['rules'], {}).reduce({}) |$route_map, $sequence| {
+    
       $index = $sequence[0]
-      $action = $sequence[1]['action']
+      $action = dig($sequence[1], ['action'], 'permit')
+      
       $params = $sequence[1].reduce({}) |$params, $param| {
+      
         $new_param = $param[1] ? {
           Array   => sort($param[1]),
           default => $param[1],
         }
+        
         unless $param[0] == 'action' {
           merge($params, {$param[0] => $new_param})
         }
       }
-      merge($route_map, {"${name}:${action}:${index}" => $params})
+      
+      merge($route_map, {"${name}:${action}:${index}" => merge({ ensure => $ensure }, $params)})
     }
+    
     merge($route_maps, $new_route_map)
   }
+
   create_resources('route_map', $route_maps)
 }
 ```
