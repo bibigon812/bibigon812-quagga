@@ -103,7 +103,7 @@ Puppet::Type.type(:route_map).provide :quagga do
   end
 
   def flush
-    name, action, sequence = @property_hash[:name].split(/:/)
+    name, action, sequence = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
 
     debug "[flush][#{name}:#{action}:#{sequence}]"
     resource_map = self.class.instance_variable_get('@resource_map')

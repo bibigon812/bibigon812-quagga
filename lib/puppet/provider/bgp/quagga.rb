@@ -129,7 +129,7 @@ Puppet::Type.type(:bgp).provide :quagga do
   end
 
   def flush
-    name = @property_hash[:name]
+    name = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
 
     debug "[flush][#{name}]"
 

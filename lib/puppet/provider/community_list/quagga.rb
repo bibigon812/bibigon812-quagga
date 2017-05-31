@@ -69,6 +69,7 @@ Puppet::Type.type(:community_list).provide :quagga do
 
   def create
     debug '[create]'
+    @property_hash[:name] = @resource[:name]
     @property_hash[:ensure] = :present
     self.rules = @resource[:rules]
   end

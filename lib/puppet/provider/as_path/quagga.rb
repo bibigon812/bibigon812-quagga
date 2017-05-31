@@ -101,5 +101,4 @@ Puppet::Type.type(:as_path).provide :quagga do
 
     @property_hash[:rules] = value
   end
-
 end

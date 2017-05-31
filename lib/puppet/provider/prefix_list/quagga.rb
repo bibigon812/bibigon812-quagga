@@ -76,7 +76,7 @@ Puppet::Type.type(:prefix_list).provide :quagga do
   end
 
   def flush
-    name, sequence = @property_hash[:name].split(/:/)
+    name, sequence = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
 
     debug "[flush][#{name}:#{sequence}]"
 
