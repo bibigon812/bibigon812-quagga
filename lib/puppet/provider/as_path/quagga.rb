@@ -3,10 +3,7 @@ Puppet::Type.type(:as_path).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  def initialize(value)
-    super(value)
-    @property_flush = {}
-  end
+  mk_resource_methods
 
   def self.instances
     debug '[instances]'
@@ -69,6 +66,7 @@ Puppet::Type.type(:as_path).provide :quagga do
     debug '[destroy]'
     @property_hash[:ensure] = :absent
     self.rules = []
+    @property_hash.clear
   end
 
   def exists?

@@ -13,6 +13,8 @@ Puppet::Type.type(:ospf).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
+  mk_resource_methods
+
   def initialize value={}
     super(value)
     @property_flush = {}

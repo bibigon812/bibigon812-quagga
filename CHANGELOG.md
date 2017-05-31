@@ -1,3 +1,7 @@
+## [Unreleased]
+### Added
+- mk_resource_methods into providers
+
 ## [1.1.1] - 31-05-2017
 ### Fixed
 - NilClass in flush methods

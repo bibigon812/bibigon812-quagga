@@ -3,6 +3,8 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
+  mk_resource_methods
+
   @resource_map = {
       :activate => {
           :default => 'default_ipv4_unicast',
