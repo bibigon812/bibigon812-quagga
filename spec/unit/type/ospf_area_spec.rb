@@ -29,7 +29,7 @@ describe Puppet::Type.type(:ospf_area) do
     end
 
     [ :default_cost, :access_list_export, :access_list_import, :prefix_list_export,
-      :prefix_list_import, :networks, :shortcut ].each do |property|
+      :prefix_list_import, :networks ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -213,52 +213,6 @@ describe Puppet::Type.type(:ospf_area) do
 
     it 'should contain [ \'10.255.255.0/24\', \'192.168.0.0/16\' ]' do
       expect(described_class.new(:name => '0.0.0.0', :networks => %w{10.255.255.0/24 192.168.0.0/16})[:networks]).to eq(%w{10.255.255.0/24 192.168.0.0/16})
-    end
-  end
-
-  describe 'shortcut' do
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :shortcut => true) }.to_not raise_error
-    end
-
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :shortcut => 'false') }.to_not raise_error
-    end
-
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :shortcut => :enable) }.to_not raise_error
-    end
-
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :shortcut => 'disable') }.to_not raise_error
-    end
-
-    it 'should support default as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :shortcut => :default) }.to_not raise_error
-    end
-
-    it 'should not support vasya as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :shortcut => :vasya) }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain enable' do
-      expect(described_class.new(:name => '0.0.0.0', :shortcut => :true)[:shortcut]).to eq(:enable)
-    end
-
-    it 'should contain enable' do
-      expect(described_class.new(:name => '0.0.0.0', :shortcut => :enable)[:shortcut]).to eq(:enable)
-    end
-
-    it 'should contain disable' do
-      expect(described_class.new(:name => '0.0.0.0', :shortcut => 'disable')[:shortcut]).to eq(:disable)
-    end
-
-    it 'should contain disable' do
-      expect(described_class.new(:name => '0.0.0.0', :shortcut => :false)[:shortcut]).to eq(:disable)
-    end
-
-    it 'should contain default' do
-      expect(described_class.new(:name => '0.0.0.0', :shortcut => 'default')[:shortcut]).to eq(:default)
     end
   end
 
