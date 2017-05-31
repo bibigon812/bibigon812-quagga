@@ -141,6 +141,7 @@ Puppet::Type.type(:bgp).provide :quagga do
 
     if @property_hash[:ensure] == :absent
       cmds << "no router bgp #{name}"
+      @property_remove[:ensure] = :absent
     else
       @property_remove.each do |property, value|
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
