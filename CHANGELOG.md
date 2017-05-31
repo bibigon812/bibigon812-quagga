@@ -1,9 +1,13 @@
 ## [Unreleased]
-### Updated
-- docs
+### Fixed
+- reading the activate property of the bgp_neighbor resource
 
 ### Removed
-- the shortcut property of the ospf_area type.
+- the shortcut property of the ospf_area type
+
+### Updated
+- docs
+- changelog
 
 ## [1.0.5] - 30-05-2017
 ### Added

@@ -23,7 +23,7 @@ class { 'quagga': }
   - `mode`: Mode of quagga configuration files. Default to `600`.
   - `package_name`: Name of the quagga package. Default to `quagga`.
   - `package_ensure`: Ensure for the quagga package. Default to `present`.
-  - `content`:  Initial content of configuration files. Default to `hostname ${::fqdn}\n`
+  - `content`:  Initial content of configuration files. Default to `hostname ${::fqdn}\n`.
 
 ## The most fat
 

@@ -130,6 +130,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     found_router = false
     ipv4_unicast = :disabled
     default_ipv4_unicast = :enabled
+    activate = {}
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
@@ -153,6 +154,14 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
         unless name == previous_name
           unless hash.empty?
             debug "bgp_neighbor: #{hash}"
+
+            hash[:activate] ||= activate[hash[:peer_group]] || default_ipv4_unicast
+
+            if hash[:peer_group] == :enabled
+              # If it's peer_group I store activate value.
+              activate[previous_name] = hash[:activate]
+            end
+
             bgp_neighbors << new(hash)
           end
           hash = {}
@@ -161,6 +170,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           hash[:ensure] = :present
 
           @resource_map.each do |property, options|
+            next if property == :activate
             hash[property] = eval(options[:default]) if options.has_key?(:default)
           end
         end
@@ -171,6 +181,15 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
         @resource_map.each do |property, options|
           if options.has_key?(:regexp)
             if line =~ options[:regexp]
+
+              if property == :activate && ! [:enabled, :disabled].include?(hash[:peer_group])
+                ipv4_unicast = case activate[hash[:peer_group]] || default_ipv4_unicast
+                                 when :enabled
+                                   :disabled
+                                 else
+                                   :enabled
+                               end
+              end
 
               value = eval(options[:value])
               hash[property] = case options[:type]
@@ -194,6 +213,7 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
     unless hash.empty?
       debug "bgp_neighbor: #{hash}"
+      hash[:activate] ||= activate[hash[:peer_group]] || default_ipv4_unicast
       bgp_neighbors << new(hash)
     end
 
