@@ -20,19 +20,7 @@ ospf_interface { 'eth0':
 
   }
 
-  ensurable do
-    desc %q{ Manage ospf parameters of this network interface. The default action is `present`. }
-
-    defaultto(:present)
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ The friendly name of the network interface. }

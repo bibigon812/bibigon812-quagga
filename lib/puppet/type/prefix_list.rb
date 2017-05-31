@@ -17,19 +17,7 @@ Example:
 
   }
 
-  ensurable do
-    desc %q{ Manage the state of this prefix-list. The default action is `present`. }
-
-    defaultto(:present)
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ Name of the prefix-list and sequence number of rule. }

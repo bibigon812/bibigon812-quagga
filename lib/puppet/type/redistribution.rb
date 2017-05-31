@@ -20,19 +20,7 @@ redistribution { 'bgp:65000:ospf':
 
   }
 
-  ensurable do
-    desc %q{ Manage the state of this redistribution. The default action is `present`. }
-
-    defaultto(:present)
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ The name contains the main protocol, the id and the protocol for redistribution. }

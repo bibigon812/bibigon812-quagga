@@ -18,19 +18,7 @@ bgp_network { '65000 2a00::/64':
 
   }
 
-  ensurable do
-    desc %q{ Manage the state of this bgp network. The default action is `present`. }
-
-    defaultto(:present)
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ It's consists of a AS number and a network IP address. }

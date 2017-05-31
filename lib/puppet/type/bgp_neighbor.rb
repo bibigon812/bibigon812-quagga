@@ -29,19 +29,7 @@ bgp_neighbor { '65000 internal_peers':
 
   }
 
-  ensurable do
-    desc %q{ Manage the state of this bgp neighbor. The default action is `present`. }
-
-    defaultto(:present)
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ It's consists of a AS number and a neighbor IP address or a peer-group name. }

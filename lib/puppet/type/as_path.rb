@@ -17,19 +17,7 @@ as_path { 'as100':
 
   }
 
-  ensurable do
-    desc %q{ Manage the state of this as-path. The default action is `present`. }
-
-    defaultto(:present)
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ The name of the as-path access-list. }

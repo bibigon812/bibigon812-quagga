@@ -4,6 +4,7 @@
 
 ### Updated
 - docs
+- the ensurable method in types
 
 ## [1.1.0] - 31-05-2017
 ### Fixed

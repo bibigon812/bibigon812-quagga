@@ -26,19 +26,7 @@ ospf_area { '0.0.0.2':
 
   }
 
-  ensurable do
-    desc %q{ Manage the state of this ospf area. The default action is `present`. }
-
-    defaultto(:present)
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ OSPF area, ex. `0.0.0.0`. }
