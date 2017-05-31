@@ -22,19 +22,7 @@ route_map {'TEST_ROUTE_MAP:permit:10':
 
   }
 
-  ensurable do
-    desc %q{ Manage the state of this route-map. The default action is `present`. }
-
-    defaultto(:present)
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-  end
+  ensurable
 
   newparam(:name) do
     desc %q{ Name of the route-map, action and sequence number of rule. }
