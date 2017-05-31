@@ -4,6 +4,16 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   commands :vtysh => 'vtysh'
 
   @resource_map = {
+      :remote_as => {
+          :value => '$1',
+          :regexp => /\A\sneighbor\s\S+\sremote-as\s(\d+)\Z/,
+          :template => 'neighbor <%= name %> remote-as <%= value %>',
+          :type => :fixnum,
+      },
+      :peer_group => {
+          :template => 'neighbor <%= name %> peer-group <%= value %>',
+          :type => :string,
+      },
       :activate => {
           :default => 'default_ipv4_unicast',
           :value => 'ipv4_unicast',
@@ -45,10 +55,6 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :template => 'neighbor <%= name %> passive',
           :type => :switch,
       },
-      :peer_group => {
-          :template => 'neighbor <%= name %> peer-group <%= value %>',
-          :type => :string,
-      },
       :prefix_list_in => {
           :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sprefix-list\s(\S+)\sin\Z/,
@@ -60,12 +66,6 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :regexp => /\A\sneighbor\s\S+\sprefix-list\s(\S+)\sout\Z/,
           :template => 'neighbor <%= name %> prefix-list <%= value %> out',
           :type => :string,
-      },
-      :remote_as => {
-          :value => '$1',
-          :regexp => /\A\sneighbor\s\S+\sremote-as\s(\d+)\Z/,
-          :template => 'neighbor <%= name %> remote-as <%= value %>',
-          :type => :fixnum,
       },
       :route_map_export => {
           :value => '$1',

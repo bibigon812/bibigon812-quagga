@@ -1,9 +1,14 @@
 ## [Unreleased]
+### Fixed
+- the bgp resource removing
+- the bgp_neighbor resource removing
+
 ### Removed
 - an unused code
 
 ### Updated
 - changelog
+- proxy classes
 
 ## [1.1.1] - 31-05-2017
 ### Fixed

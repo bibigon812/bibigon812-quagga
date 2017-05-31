@@ -316,31 +316,47 @@ site::profiles::bgp:
 
 ```puppet
 class site::profiles::bgp {
+
   $bgp = hiera_hash('site::profiles::bgp', {}).reduce({}) |$bgp, $bgp_config| {
+
     $as = $bgp_config[0]
+    $ensure = dig($bgp_config[1], ['ensure'], 'present')
+
     $bgp_configs = $bgp_config[1].reduce({}) |$params, $param| {
+
       if $param[0] == 'network' {
+
         if $param[1] {
           any2array($param[1]).each |$network| {
-            create_resources('bgp_network', { "${as} ${network}" => { ensure => present, } })
+            create_resources('bgp_network', { "${as} ${network}" => { ensure => $ensure } })
           }
         }
+
         $hash = {}
+
       } elsif $param[0] == 'neighbor' {
+
         if $param[1] {
           $param[1].each |$neighbor, $neighbor_config| {
-            create_resources('bgp_neighbor', { "${as} ${neighbor}" => $neighbor_config })
+            create_resources('bgp_neighbor', {"${as} ${neighbor}" => merge({ ensure => $ensure }, $neighbor_config)})
           }
         }
+
         $hash = {}
+
       } else {
         $hash = { $param[0] => $param[1] }
       }
+
       merge($params, $hash)
     }
+
     merge($bgp, { $as => $bgp_configs })
   }
-  create_resources('bgp', $bgp)
+
+  unless empty($bgp) {
+    create_resources('bgp', $bgp)
+  }
 }
 ```
 
