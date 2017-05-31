@@ -3,8 +3,6 @@ Puppet::Type.type(:community_list).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
-
   def initialize(value)
     super(value)
     @property_flush = {}

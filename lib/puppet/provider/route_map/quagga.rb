@@ -9,8 +9,6 @@ Puppet::Type.type(:route_map).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
-
   def initialize(value)
     super(value)
     @property_flush = {}

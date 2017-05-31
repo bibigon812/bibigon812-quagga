@@ -3,8 +3,6 @@ Puppet::Type.type(:bgp).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
-
   @resource_map = {
       :import_check => {
           :default => :disabled,

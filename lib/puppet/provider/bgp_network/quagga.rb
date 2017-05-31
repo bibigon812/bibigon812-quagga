@@ -3,8 +3,6 @@ Puppet::Type.type(:bgp_network).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
-
   def self.instances
     debug '[instances]'
     found_config = false

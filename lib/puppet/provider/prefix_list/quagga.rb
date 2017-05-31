@@ -7,8 +7,6 @@ Puppet::Type.type(:prefix_list).provide :quagga do
 
   commands :vtysh => 'vtysh'
 
-  mk_resource_methods
-
   def self.instances
     debug '[instances]'
     prefix_lists = []
