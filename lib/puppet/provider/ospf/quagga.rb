@@ -77,10 +77,19 @@ Puppet::Type.type(:ospf).provide :quagga do
   end
 
   def create
+    resource_map = self.class.instance_variable_get('@resource_map')
+
     @property_hash[:ensure] = :present
+    @property_hash[:name] = @resource[:name]
+
+    resource_map.keys.each do |property|
+      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
+    end
   end
 
   def destroy
+    debug '[destroy]'
+
     @property_hash[:ensure] = :absent
     flush
   end
