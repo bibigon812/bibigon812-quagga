@@ -6,7 +6,6 @@ Puppet::Type.type(:ospf).provide :quagga do
     :opaque              => 'capability opaque',
     :rfc1583             => 'compatible rfc1583',
     :abr_type            => 'ospf abr-type',
-    :reference_bandwidth => 'auto-cost  reference-bandwidth',
   }
 
   @known_booleans = [ :opaque, :rfc1583, ]
