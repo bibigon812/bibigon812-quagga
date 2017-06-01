@@ -114,8 +114,13 @@ Puppet::Type.type(:ospf).provide :quagga do
     else
       cmds << 'router ospf'
       @property_flush.each do |property, value|
-        if resource_map.include? property
-          cmds << "#{resource_map[property]} #{value}"
+        case value
+          when :disabled
+            cmds << "no #{resource_map[property]}"
+          when :enabled
+            cmds << "#{resource_map[property]}"
+          else
+            cmds << "#{resource_map[property]} #{value}"
         end
         @property_hash[property] = value
         need_flush = true
