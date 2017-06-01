@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.1.2] - 01-06-2017
 ### Fixed
 - removing of `bgp` and `bgp_neighbor` resources
 - the `flush` method in the `ospf` resource
