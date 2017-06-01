@@ -1,6 +1,6 @@
 {
     "name": "bibigon812-quagga",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "author": "Dmitriy Yakovlev",
     "summary": "puppet module to manage Quagga",
     "license": "Apache-2.0",

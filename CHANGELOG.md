@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.1.3] - 01-06-2017
 ### Fixed
 - creation of the resource `ospf`
 
