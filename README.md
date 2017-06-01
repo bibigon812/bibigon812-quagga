@@ -431,18 +431,18 @@ class site::profiles::ospf {
     }
 
     $defaults = {
-      ensure => present,
+      ensure => dig($ospf, ['ospf', 'ensure'], 'present'),
     }
 
     create_resources('ospf', $ospf, $defaults)
-    create_resources('redistribution', $redistribution)
-    create_resources('ospf_area', $ospf_areas)
+    create_resources('redistribution', $redistribution, $defaults)
+    create_resources('ospf_area', $ospf_areas, $defaults)
   }
 
   $ospf_interface = hiera_hash('site::profiles::interface', {}).reduce({}) |$memo, $iface| {
     $iface_name = $iface[0]
-    $ospf_interface = try_get_value($iface[1], 'ip/ospf')
-    if $ospf_interface {
+    $ospf_interface = dig($iface[1], ['ip','ospf'], {})
+    unless empty($ospf_interface) {
       merge($memo, { $iface_name => $ospf_interface })
     }
   }
