@@ -1,7 +1,7 @@
 ## [Unreleased]
 ### Fixed
-- the bgp resource removing
-- the bgp_neighbor resource removing
+- removing of `bgp` and `bgp_neighbor` resources
+- the `flush` method in the `ospf` resource
 
 ### Removed
 - an unused code
