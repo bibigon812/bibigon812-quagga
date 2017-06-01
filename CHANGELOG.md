@@ -1,3 +1,13 @@
+## [Unreleased]
+### Fixed
+- creation of the resource `ospf`
+
+### Removed
+- the property `reference_bandwidth` from the provider
+
+### Updated
+- the method `flush` of the resource `ospf`
+
 ## [1.1.2] - 01-06-2017
 ### Fixed
 - removing of `bgp` and `bgp_neighbor` resources
