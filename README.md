@@ -58,6 +58,7 @@ bgp_neighbor { '65000 internal':
     next_hop_self => 'enabled',
     peer_group    => 'enabled',
     remote_as     => 65000,
+    update_source => '10.0.0.1',
 }
 
 bgp_neighbor { '65000 10.0.0.2':
@@ -91,6 +92,7 @@ bgp_neighbor { '65000 10.0.0.3':
   - `route_reflector_client`: Configure a neighbor as Route Reflector client. Default to `disabled`.
   - `route_server_client`: Configure a neighbor as Route Server client. Default to `disabled`.
   - `shutdown`: Administratively shut down this neighbor. Default to `disabled`.
+  - `update_source`: Source of routing updates. It can be the interface name or IP address.
 
 ### bgp_network
 

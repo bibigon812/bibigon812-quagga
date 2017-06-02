@@ -1,3 +1,7 @@
+## [Unreleased]
+### Added
+- the property `update_source` to the resource `bgp_neighbor`
+
 ## [1.1.3] - 01-06-2017
 ### Fixed
 - creation of the resource `ospf`
