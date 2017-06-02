@@ -112,6 +112,12 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :template => 'neighbor <%= name %> shutdown',
           :type => :switch,
       },
+      :update_source => {
+          :value => '$1',
+          :regexp => /\A\sneighbor\s\S+\supdate-source\s(\S+)\Z/,
+          :template => 'neighbor <%= name %> update-source <%= value %>',
+          :type => :string,
+      },
   }
 
   def initialize(value)
@@ -310,7 +316,6 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     unless @resource[:ensure] == @property_hash[:ensure]
       @state = @resource[:ensure]
       @previous_state = @property_hash[:ensure]
-      debug "New state: #{@state}"
     end
 
     resource_map.each_key do |property|

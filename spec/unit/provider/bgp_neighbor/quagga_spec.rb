@@ -74,6 +74,7 @@ router bgp 197888
         :route_reflector_client => :disabled,
         :route_server_client => :disabled,
         :shutdown => :disabled,
+        :update_source => '172.16.32.103',
       })
     end
 
@@ -91,6 +92,7 @@ router bgp 197888
         :route_reflector_client => :disabled,
         :route_server_client => :disabled,
         :shutdown => :disabled,
+        :update_source => '172.16.32.103',
       })
     end
 
@@ -109,6 +111,7 @@ router bgp 197888
         :route_reflector_client => :disabled,
         :route_server_client => :disabled,
         :shutdown => :disabled,
+        :update_source => '172.16.32.103',
       })
     end
 
@@ -203,6 +206,7 @@ router bgp 197888
         :route_reflector_client => :disabled,
         :route_server_client => :disabled,
         :shutdown => :disabled,
+        :update_source => '172.16.32.103',
       })
     end
 
@@ -220,6 +224,7 @@ router bgp 197888
         :route_reflector_client => :disabled,
         :route_server_client => :disabled,
         :shutdown => :disabled,
+        :update_source => '172.16.32.103',
       })
     end
 
@@ -238,6 +243,7 @@ router bgp 197888
         :route_reflector_client => :disabled,
         :route_server_client => :disabled,
         :shutdown => :disabled,
+        :update_source => '172.16.32.103',
       })
     end
 

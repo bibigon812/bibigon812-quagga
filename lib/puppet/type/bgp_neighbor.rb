@@ -250,6 +250,16 @@ bgp_neighbor { '65000 internal_peers':
     end
   end
 
+  newproperty(:update_source) do
+    desc %q{ Source of routing updates. }
+
+    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
+    interface = /[[:alpha:]]\w+(\.\d+(:\d+)?)?/
+    newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\Z/)
+    newvalues(/\A\h+:[\h:]+\Z/)
+    newvalues(/\A#{interface}\Z/)
+  end
+
   autorequire(:bgp) do
     reqs = []
     as = value(:name).split(/\s+/).first

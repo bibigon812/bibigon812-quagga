@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:bgp_neighbor) do
-  let(:networking_service) do
+  let(:bgp_neighbor) do
     @provider_class = describe_class.provide(:bgp_neighbor) {
       mk_resource_methods
     }
@@ -775,6 +775,32 @@ describe Puppet::Type.type(:bgp_neighbor) do
 
     it 'should contain disabled' do
       expect(described_class.new(:name => '65000 192.168.1.1', :route_server_client => false)[:route_server_client]).to eq(:disabled)
+    end
+  end
+
+  describe 'update_source' do
+    it 'should support eth1 as a value' do
+      expect { described_class.new(:name => '65000 192.168.1.1', :update_source => 'eth1') }.to_not raise_error
+    end
+
+    it 'should support 10.0.0.1 as a value' do
+      expect { described_class.new(:name => '65000 192.168.1.1', :update_source => '10.0.0.1') }.to_not raise_error
+    end
+
+    it 'should not support 0bond0 as a value' do
+      expect { described_class.new(:name => '65000 192.168.1.1', :update_source => '0bond0') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should not support 10.256.0.1 as a value' do
+      expect { described_class.new(:name => '65000 192.168.1.1', :update_source => '10.256.0.1') }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+
+    it 'should contain eth0' do
+      expect(described_class.new(:name => '65000 192.168.1.1', :update_source => 'eth0')[:update_source]).to eq('eth0')
+    end
+
+    it 'should contain 10.0.0.2' do
+      expect(described_class.new(:name => '65000 192.168.1.1', :update_source => '10.0.0.2')[:update_source]).to eq('10.0.0.2')
     end
   end
 end
