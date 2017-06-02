@@ -559,3 +559,57 @@ class site::profiles::route_map {
   create_resources('route_map', $route_maps)
 }
 ```
+
+## community_list proxy
+
+```yaml
+---
+site::profiles::community_list:
+  100:
+    ensure: present
+    rules:
+      - permit: 65000:12345
+  300:
+    ensure: present
+    rules:
+      - permit: 65000:23456
+      - permit: 65000:34567
+      - permit: 65000:1234
+  500:
+    rules:
+      - permit: 65000:2345
+      - permit: 65000:56789
+```
+
+```puppet
+class site::profiles::community_list {
+  $community_list = hiera_hash('site::profiles::community_list', {})
+
+  unless empty($community_list) {
+    create_resources('community_list', $community_list)
+  }
+}
+```
+
+## as_path proxy
+
+```yaml
+---
+site::profiles::as_path:
+  FROM_AS12345:
+    rules:
+      - permit: '_12345$'
+  FROM_AS23456:
+    rules:
+      - permit: '_23456$'
+```
+
+```puppet
+class site::profiles::as_path {
+  $as_paths = hiera_hash('site::profiles::as_path', {})
+
+  unless empty($as_paths) {
+    create_resources('as_path', $as_paths)
+  }
+}
+```
