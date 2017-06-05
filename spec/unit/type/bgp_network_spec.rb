@@ -54,8 +54,8 @@ describe Puppet::Type.type(:bgp_network) do
       expect { described_class.new(:name => '65000 192.168.1.1/32') }.to_not raise_error
     end
 
-    it 'should support \'65000   192.168.1.0/24\' as a value' do
-      expect { described_class.new(:name => '65000   0.0.0.0/0') }.to_not raise_error
+    it 'should support \'65000   2a04:6d40::/48\' as a value' do
+      expect { described_class.new(:name => '65000   2a04:6d40::/48') }.to_not raise_error
     end
 
     it 'should not support \'65000 192.168.1.0\' as a value' do
