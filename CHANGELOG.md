@@ -1,3 +1,7 @@
+## [Unreleased]
+### Fixed
+- the ipv6 support of the resource `bgp_network`
+
 ## [1.1.4] - 05-06-2017
 ### Added
 - the property `update_source` to the resource `bgp_neighbor`
