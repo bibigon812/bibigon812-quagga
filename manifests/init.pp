@@ -13,7 +13,7 @@ class quagga (
   package { 'quagga':
     ensure => present,
     name   => $package_name,
-    before => Service['zebra', 'bgpd', 'ospfd']
+    before => Service['zebra', 'bgpd', 'ospfd', 'pimd']
   }
 
   file { '/etc/sysconfig/quagga':
@@ -23,33 +23,20 @@ class quagga (
     mode    => '0644',
     content => file('quagga/quagga'),
     require => Package['quagga'],
-    notify  => Service['zebra', 'bgpd', 'ospfd'],
+    notify  => Service['zebra', 'bgpd', 'ospfd', 'pimd'],
   }
 
-  file { '/etc/quagga/zebra.conf':
+  file {[
+    '/etc/quagga/zebra.conf',
+    '/etc/quagga/bgpd.conf',
+    '/etc/quagga/ospfd.conf',
+    '/etc/quagga/pimd.conf'
+  ]:
     ensure  => present,
     owner   => $owner,
     group   => $group,
     mode    => $mode,
     content => $content,
-    replace => 'no',
-    require => Package['quagga'],
-  }
-
-  file { '/etc/quagga/bgpd.conf':
-    ensure  => present,
-    owner   => $owner,
-    group   => $group,
-    mode    => $mode,
-    replace => 'no',
-    require => Package['quagga'],
-  }
-
-  file { '/etc/quagga/ospfd.conf':
-    ensure  => present,
-    owner   => $owner,
-    group   => $group,
-    mode    => $mode,
     replace => 'no',
     require => Package['quagga'],
   }
@@ -77,6 +64,15 @@ class quagga (
     enable  => $enable,
     require => [
       File['/etc/quagga/ospfd.conf'],
+      Package['quagga'],
+    ],
+  }
+
+  service { 'pimd':
+    ensure  => $running,
+    enable  => $enable,
+    require => [
+      File['/etc/quagga/pimd.conf'],
       Package['quagga'],
     ],
   }
