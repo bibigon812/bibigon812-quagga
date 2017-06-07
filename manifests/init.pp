@@ -1,17 +1,18 @@
 class quagga (
-  Boolean $enable         = true,
+  Boolean $bgp            = true,
+  Boolean $ospf           = true,
+  Boolean $pim            = true,
+  Boolean $zebra          = true,
   String  $owner          = $::quagga::params::owner,
   String  $group          = $::quagga::params::group,
   String  $mode           = $::quagga::params::mode,
   String  $package_name   = $::quagga::params::package_name,
   String  $package_ensure = $::quagga::params::package_ensure,
   String  $content        = $::quagga::params::content,
+
 ) inherits ::quagga::params {
-
-  $running = $enable
-
   package { 'quagga':
-    ensure => present,
+    ensure => $package_ensure,
     name   => $package_name,
     before => Service['zebra', 'bgpd', 'ospfd', 'pimd']
   }
@@ -42,8 +43,8 @@ class quagga (
   }
 
   service { 'zebra':
-    ensure  => $running,
-    enable  => $enable,
+    ensure  => $zebra,
+    enable  => $zebra,
     require => [
       File['/etc/quagga/zebra.conf'],
       Package['quagga'],
@@ -51,8 +52,8 @@ class quagga (
   }
 
   service { 'bgpd':
-    ensure  => $running,
-    enable  => $enable,
+    ensure  => $bgp,
+    enable  => $bgp,
     require => [
       File['/etc/quagga/bgpd.conf'],
       Package['quagga'],
@@ -60,8 +61,8 @@ class quagga (
   }
 
   service { 'ospfd':
-    ensure  => $running,
-    enable  => $enable,
+    ensure  => $ospf,
+    enable  => $ospf,
     require => [
       File['/etc/quagga/ospfd.conf'],
       Package['quagga'],
@@ -69,8 +70,8 @@ class quagga (
   }
 
   service { 'pimd':
-    ensure  => $running,
-    enable  => $enable,
+    ensure  => $ospf,
+    enable  => $ospf,
     require => [
       File['/etc/quagga/pimd.conf'],
       Package['quagga'],
