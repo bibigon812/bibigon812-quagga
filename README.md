@@ -2,8 +2,18 @@
 
 ## Overview
 
-This module provides management of network protocols, such as BGP, OSPF
-without restarting daemons.
+This module provides management of network protocols without restarting
+services.
+
+Currently it supports:
+
+  - BGP
+  - OSPF
+  - PIM
+  - route map
+  - prefix list
+  - community list
+  - as-path list
 
 ## At the beginning
 
