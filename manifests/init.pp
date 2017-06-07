@@ -70,8 +70,8 @@ class quagga (
   }
 
   service { 'pimd':
-    ensure  => $ospf,
-    enable  => $ospf,
+    ensure  => $pim,
+    enable  => $pim,
     require => [
       File['/etc/quagga/pimd.conf'],
       Package['quagga'],
