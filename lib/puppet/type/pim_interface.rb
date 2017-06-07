@@ -1,5 +1,16 @@
 Puppet::Type.newtype(:pim_interface) do
-  @doc = 'This type provides the capabilities to manage PIM parameters of network interfaces within puppet'
+  @doc = %q{
+    This type provides the capabilities to manage PIM parameters of
+    network interfaces within puppet.
+
+      Examples:
+
+        pim_interface { 'eth0':
+          ensure  => present,
+          igmp    => true,
+          pim_ssm => false,
+        }
+  }
 
   ensurable
 
