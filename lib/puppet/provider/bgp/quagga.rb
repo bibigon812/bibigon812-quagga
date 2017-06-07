@@ -5,18 +5,18 @@ Puppet::Type.type(:bgp).provide :quagga do
 
   @resource_map = {
       :import_check => {
-          :default => :disabled,
+          :default => :false,
           :regexp => /\A\sbgp\snetwork\simport-check\Z/,
           :template => 'bgp network import-check',
           :type => :boolean,
-          :value => ':enabled',
+          :value => ':true',
       },
       :ipv4_unicast => {
-          :default => :enabled,
+          :default => :true,
           :regexp => /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
           :template => 'bgp default ipv4-unicast',
           :type => :boolean,
-          :value => ':disabled',
+          :value => ':false',
       },
       :maximum_paths_ebgp => {
           :default => 1,
@@ -43,13 +43,12 @@ Puppet::Type.type(:bgp).provide :quagga do
   def initialize(value)
     super(value)
     @property_flush = {}
-    @property_remove = {}
   end
 
   def self.instances
     debug '[instances]'
 
-    bgp = []
+    providers = []
     found_bgp = false
     hash = {}
 
@@ -89,18 +88,16 @@ Puppet::Type.type(:bgp).provide :quagga do
     end
     unless hash.empty?
       debug "bgp: #{hash}"
-      bgp << new(hash)
+      providers << new(hash)
     end
-    bgp
+    providers
   end
 
   def self.prefetch(resources)
     providers = instances
-    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        found_providers << provider
       end
     end
   end
@@ -119,9 +116,19 @@ Puppet::Type.type(:bgp).provide :quagga do
   end
 
   def destroy
-    debug '[destroy]'
-    @property_hash[:ensure] = :absent
-    flush
+    name = @property_hash[:name]
+
+    debug "[destroy][#{name}]"
+
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << "no router bgp #{name}"
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_hash.clear
   end
 
   def exists?
@@ -129,7 +136,7 @@ Puppet::Type.type(:bgp).provide :quagga do
   end
 
   def flush
-    name = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
+    name = @property_hash[:name]
 
     debug "[flush][#{name}]"
 
@@ -139,43 +146,21 @@ Puppet::Type.type(:bgp).provide :quagga do
     cmds << 'configure terminal'
     cmds << "router bgp #{name}"
 
-    if @property_hash[:ensure] == :absent
-      cmds << "no router bgp #{name}"
-      @property_remove[:ensure] = :absent
-    else
-      @property_remove.each do |property, value|
-        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+    @property_flush.each do |property, value|
+      cmd = ''
+      if resource_map[property][:type] == :boolean && value == :dalse
+        cmd << 'no '
       end
-
-      @property_flush.each do |property, value|
-        cmd = ''
-        if resource_map[property][:type] == :boolean && value == :disabled
-          cmd << 'no '
-        end
-        cmd << ERB.new(resource_map[property][:template]).result(binding)
-        cmds << cmd
-      end
+      cmd << ERB.new(resource_map[property][:template]).result(binding)
+      cmds << cmd
     end
 
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty? && @property_remove.empty?
+    unless @property_flush.empty?
       vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
       @property_flush.clear
-      @property_remove.clear
-    end
-  end
-
-  def purge
-    debug '[purge]'
-
-    # resource_map = self.class.instance_variable_get('@resource_map')
-
-    @resource_map.keys.each do |property|
-      if @resource[property].nil? && !@property_hash[property].nil?
-        @property_remove[property] = @property_hash[property]
-      end
     end
   end
 

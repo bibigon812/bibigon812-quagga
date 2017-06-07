@@ -65,151 +65,55 @@ describe Puppet::Type.type(:bgp) do
     end
   end
 
-  describe 'import_check' do
-    it 'should support \'true\' as a value' do
-      expect { described_class.new(:name => '197888', :import_check => 'true') }.to_not raise_error
-    end
+  [:import_check, :ipv4_unicast].each do |property|
+    describe "boolean values of the property `#{property}`" do
+      it 'should support \'true\' as a value' do
+        expect { described_class.new(:name => '65000', property => 'true') }.to_not raise_error
+      end
 
-    it 'should support :true as a value' do
-      expect { described_class.new(:name => '197888', :import_check => :true) }.to_not raise_error
-    end
+      it 'should support :true as a value' do
+        expect { described_class.new(:name => '65000', property => :true) }.to_not raise_error
+      end
 
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '197888', :import_check => true) }.to_not raise_error
-    end
+      it 'should support true as a value' do
+        expect { described_class.new(:name => '65000', property => true) }.to_not raise_error
+      end
 
-    it 'should support \'false\' as a value' do
-      expect { described_class.new(:name => '197888', :import_check => 'false') }.to_not raise_error
-    end
+      it 'should support \'false\' as a value' do
+        expect { described_class.new(:name => '65000', property => 'false') }.to_not raise_error
+      end
 
-    it 'should support :false as a value' do
-      expect { described_class.new(:name => '197888', :import_check => :false) }.to_not raise_error
-    end
+      it 'should support :false as a value' do
+        expect { described_class.new(:name => '65000', property => :false) }.to_not raise_error
+      end
 
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '197888', :import_check => false) }.to_not raise_error
-    end
+      it 'should support false as a value' do
+        expect { described_class.new(:name => '65000', property => false) }.to_not raise_error
+      end
 
-    it 'should support \'enabled\' as a value' do
-      expect { described_class.new(:name => '197888', :import_check => 'enabled') }.to_not raise_error
-    end
+      it 'should not support :enabled as a value' do
+        expect { described_class.new(:name => '65000', property => :enabled) }.to raise_error(Puppet::Error, /Invalid value/)
+      end
 
-    it 'should support :enabled as a value' do
-      expect { described_class.new(:name => '197888', :import_check => :enabled) }.to_not raise_error
-    end
+      it 'should not support \'disabled\' as a value' do
+        expect { described_class.new(:name => '65000', property => 'disabled') }.to raise_error(Puppet::Error, /Invalid value/)
+      end
 
-    it 'should support \'disabled\' as a value' do
-      expect { described_class.new(:name => '197888', :import_check => 'disabled') }.to_not raise_error
-    end
+      it 'should contain :true' do
+        expect(described_class.new(:name => '65000', property => 'true')[property]).to eq(:true)
+      end
 
-    it 'should support :disabled as a value' do
-      expect { described_class.new(:name => '197888', :import_check => :disabled) }.to_not raise_error
-    end
+      it 'should contain :true' do
+        expect(described_class.new(:name => '65000', property => true)[property]).to eq(:true)
+      end
 
-    it 'should not support allow as a value' do
-      expect { described_class.new(:name => '197888', :import_check => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
+      it 'should contain :false' do
+        expect(described_class.new(:name => '65000', property => 'false')[property]).to eq(:false)
+      end
 
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '197888', :import_check => 'true')[:import_check]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '197888', :import_check => 'enabled')[:import_check]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '197888', :import_check => true)[:import_check]).to eq(:enabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '197888', :import_check => 'false')[:import_check]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '197888', :import_check => 'disabled')[:import_check]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '197888', :import_check => :disabled)[:import_check]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '197888', :import_check => false)[:import_check]).to eq(:disabled)
-    end
-  end
-
-  describe 'ipv4_unicast' do
-    it 'should support \'true\' as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => 'true') }.to_not raise_error
-    end
-
-    it 'should support :true as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => :true) }.to_not raise_error
-    end
-
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => true) }.to_not raise_error
-    end
-
-    it 'should support \'false\' as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => 'false') }.to_not raise_error
-    end
-
-    it 'should support :false as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => :false) }.to_not raise_error
-    end
-
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => false) }.to_not raise_error
-    end
-
-    it 'should support \'enabled\' as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => 'enabled') }.to_not raise_error
-    end
-
-    it 'should support :enabled as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => :enabled) }.to_not raise_error
-    end
-
-    it 'should support \'disabled\' as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => 'disabled') }.to_not raise_error
-    end
-
-    it 'should support :disabled as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => :disabled) }.to_not raise_error
-    end
-
-    it 'should not support allow as a value' do
-      expect { described_class.new(:name => '197888', :ipv4_unicast => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => 'true')[:ipv4_unicast]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => 'enabled')[:ipv4_unicast]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => true)[:ipv4_unicast]).to eq(:enabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => 'false')[:ipv4_unicast]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => 'disabled')[:ipv4_unicast]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => :disabled)[:ipv4_unicast]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '197888', :ipv4_unicast => false)[:ipv4_unicast]).to eq(:disabled)
+      it 'should contain :false' do
+        expect(described_class.new(:name => '65000', property => false)[property]).to eq(:false)
+      end
     end
   end
 

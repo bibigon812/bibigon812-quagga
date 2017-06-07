@@ -28,37 +28,15 @@ bgp { '65000':
   newproperty(:import_check) do
     desc %q{ Check BGP network route exists in IGP. Default to `disabled`. }
 
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
-
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:false)
   end
 
   newproperty(:ipv4_unicast) do
     desc %q{ Activate ipv4-unicast for a peer by default. Default to `enabled`. }
 
-    defaultto(:enabled)
-    newvalues(:disabled, :enabled, :false, :true)
-
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:true)
   end
 
   newproperty(:maximum_paths_ebgp) do
