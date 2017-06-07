@@ -122,7 +122,6 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
   def initialize(value)
     super(value)
     @property_flush = {}
-    @property_remove = {}
   end
 
   def self.instances
@@ -243,10 +242,8 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
         found_providers << provider
-        provider.purge
       end
     end
-    (providers - found_providers).each { |provider| provider.destroy }
   end
 
   def create
@@ -264,10 +261,20 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
 
 
   def destroy
-    debug '[destroy]'
+    as, name = @property_hash[:name].split(/\s+/)
 
-    @property_hash[:ensure] = :absent
-    flush
+    debug "[destroy][#{as} #{name}]"
+
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << "router bgp #{as}"
+    cmds << "no neighbor #{name}"
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_hash.clear
   end
 
   def exists?
@@ -275,7 +282,8 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
   end
 
   def flush
-    as, name = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/\s+/)
+    # as, name = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/\s+/)
+    as, name = @property_hash[:name].split(/\s+/)
 
     debug "[flush][#{as} #{name}]"
 
@@ -285,61 +293,36 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
     cmds << 'configure terminal'
     cmds << "router bgp #{as}"
 
-    if @property_hash[:ensure] == :absent
-      @property_flush[:empty] = :absent
-      cmds << "no neighbor #{name}"
-    else
-      @property_remove.each do |property, value|
-        if resource_map[property].has_key?(:remove_template)
-          cmds << ERB.new(resource_map[property][:remove_template]).result(binding)
-        else
-          cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-        end
+    @property_remove.each do |property, value|
+      if resource_map[property].has_key?(:remove_template)
+        cmds << ERB.new(resource_map[property][:remove_template]).result(binding)
+      else
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
       end
+    end
 
-      @property_flush.each do |property, value|
-        cmd = ''
-        if resource_map[property][:type] == :boolean && value == :false
-          cmd << 'no '
-        end
-        value = nil if property == :peer_group && (value == :true || value == :false)
-        cmd << ERB.new(resource_map[property][:template]).result(binding)
-        cmds << cmd
+    @property_flush.each do |property, value|
+      cmd = ''
+      if resource_map[property][:type] == :boolean && value == :false
+        cmd << 'no '
       end
+      value = nil if property == :peer_group && (value == :true || value == :false)
+      cmd << ERB.new(resource_map[property][:template]).result(binding)
+      cmds << cmd
     end
 
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty? && @property_remove.empty?
+    unless @property_flush.empty?
       vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
       @property_flush.clear
-      @property_remove.clear
     end
   end
 
-  def purge
-    debug '[purge]'
-
-    resource_map = self.class.instance_variable_get('@resource_map')
-
-    unless @resource[:ensure] == @property_hash[:ensure]
-      @state = @resource[:ensure]
-      @previous_state = @property_hash[:ensure]
-    end
-
-    resource_map.each_key do |property|
-      if @resource[property].nil? && !@property_hash[property].nil?
-        @property_remove[property] = @property_hash[property]
-      end
-    end
-
-    flush
-  end
-
-  def clear
-    as, name = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/\s+/)
-    debug "[resfresh][#{as} #{name}]"
+  def reset
+    as, name = @property_hash[:name].split(/\s+/)
+    debug "[reset][#{as} #{name}]"
 
     cmds = []
     proto = name.include?('.') ? 'ip' : 'ipv6'
