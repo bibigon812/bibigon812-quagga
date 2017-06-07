@@ -90,7 +90,6 @@ Puppet::Type.type(:pim_interface).provide :quagga do
   end
 
   def destroy
-
   end
 
   def exists?
