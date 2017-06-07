@@ -22,12 +22,16 @@ Currently it supports:
 Describe quagga class.
 
 ```puppet
-class { 'quagga': }
+class { 'quagga':
+    pim => false,
+}
 ```
 
 #### Reference
 
-  - `enable`: Manages quagga services. Default to `true`.
+  - `bgp`: Manages the BGP service. Default to `true`.
+  - `ospf`: Manages the OSPF service. Default to `true`.
+  - `pim`: Manages the PIM service. Default to `true`.
   - `owner`: User of quagga configuration files. Default to `quagga`.
   - `group`: Group of quagga configuration files. Default to `quagga`.
   - `mode`: Mode of quagga configuration files. Default to `600`.
