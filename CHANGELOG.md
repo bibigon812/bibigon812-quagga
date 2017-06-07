@@ -1,4 +1,4 @@
-## [1.2.1]
+## [1.2.1] - 07-06-2017
 ### Added
 - pim support by [@m4ce](https://github.com/m4ce) 
 
