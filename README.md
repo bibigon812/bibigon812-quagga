@@ -288,6 +288,22 @@ as_path { 'TEST_AS_PATH':
 
   - `name`: The name of the as-path access-list.
   - `rules`: A rule of the as-path access-list `{ action => regex }`.
+  
+### pim_interface
+
+```puppet
+pim_interface { 'eth0':
+    ensure  => present,
+}
+```
+
+#### Reference
+
+  - `name`: The friendly name of the network interface
+  - `igmp`: Enable IGMP. Default to `true`.
+  - `pim_ssm`: Enable PIM SSM operation. Default to `true`.
+  - `igmp_query_interval`: IGMP query interval. Default to `125`.
+  - `igmp_query_max_response_time_dsec`: IGMP maximum query response time in deciseconds. Default to `100`.
 
 ## Hiera
 
