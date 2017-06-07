@@ -6,7 +6,7 @@ Puppet::Type.type(:bgp_network).provide :quagga do
   def self.instances
     debug '[instances]'
     found_config = false
-    networks = []
+    providers = []
     as = ''
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
@@ -21,25 +21,20 @@ Puppet::Type.type(:bgp_network).provide :quagga do
         hash[:provider] = self.name
         hash[:ensure] = :present
         debug "bgp_network: #{hash}"
-        networks << new(hash)
+        providers << new(hash)
       elsif line =~ /^\w/ and found_config
         break
       end
     end
-    networks
+    providers
   end
 
   def self.prefetch(resources)
     providers = instances
-    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find{ |provider| provider.name == name }
         resources[name].provider = provider
-        found_providers << provider
       end
-    end
-    (providers - found_providers).each do |provider|
-      provider.destroy
     end
   end
 
