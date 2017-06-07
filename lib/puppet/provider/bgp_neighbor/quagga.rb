@@ -1,10 +1,11 @@
-Puppet::Type.type(:bgp_neighbor).provide :quagga do
+Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
   @doc = %q{ Manages bgp neighbors using quagga }
 
   commands :vtysh => 'vtysh'
 
   @resource_map = {
       :peer_group => {
+          :value => '$1',
           :template => 'neighbor <%= name %> peer-group <%= value %>',
           :type => :string,
       },
@@ -15,11 +16,9 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :type => :fixnum,
       },
       :activate => {
-          :default => 'default_ipv4_unicast',
-          :value => 'ipv4_unicast',
           :regexp => /\A\s(no\s)?neighbor\s\S+\sactivate\Z/,
           :template => 'neighbor <%= name %> activate',
-          :type => :switch,
+          :type => :boolean,
       },
       :allow_as_in => {
           :value => '$1',
@@ -29,11 +28,11 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :type => :fixnum,
       },
       :default_originate => {
-          :default => ':disabled',
-          :value => ':enabled',
+          :default => ':false',
+          :value => ':true',
           :regexp => /\A\sneighbor\s\S+\sdefault-originate\Z/,
           :template => 'neighbor <%= name %> default-originate',
-          :type => :switch,
+          :type => :boolean,
       },
       :local_as => {
           :value => '$1',
@@ -42,18 +41,18 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :type => :fixnum,
       },
       :next_hop_self => {
-          :default => ':disabled',
-          :value => ':enabled',
+          :default => ':false',
+          :value => ':true',
           :regexp => /\A\sneighbor\s\S+\snext-hop-self\Z/,
           :template => 'neighbor <%= name %> next-hop-self',
-          :type => :switch,
+          :type => :boolean,
       },
       :passive => {
-          :default => ':disabled',
-          :value => ':enabled',
+          :default => ':false',
+          :value => ':true',
           :regexp => /\A\sneighbor\s\S+\spassive\Z/,
           :template => 'neighbor <%= name %> passive',
-          :type => :switch,
+          :type => :boolean,
       },
       :prefix_list_in => {
           :value => '$1',
@@ -92,25 +91,25 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
           :type => :string,
       },
       :route_reflector_client => {
-          :default => ':disabled',
-          :value => ':enabled',
+          :default => ':false',
+          :value => ':true',
           :regexp => /\A\sneighbor\s\S+\sroute-reflector-client\Z/,
           :template => 'neighbor <%= name %> route-reflector-client',
-          :type => :switch,
+          :type => :boolean,
       },
       :route_server_client => {
-          :default => ':disabled',
-          :value => ':enabled',
+          :default => ':false',
+          :value => ':true',
           :regexp => /\A\sneighbor\s\S+\sroute-server-client\Z/,
           :template => 'neighbor <%= name %> route-server-client',
-          :type => :switch,
+          :type => :boolean,
       },
       :shutdown => {
-          :default => ':disabled',
-          :value => ':enabled',
+          :default => ':false',
+          :value => ':true',
           :regexp => /\A\sneighbor\s\S+\sshutdown\Z/,
           :template => 'neighbor <%= name %> shutdown',
-          :type => :switch,
+          :type => :boolean,
       },
       :update_source => {
           :value => '$1',
@@ -129,14 +128,16 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
   def self.instances
     debug '[instances]'
 
-    bgp_neighbors = []
+    providers = []
+
     hash = {}
+    activate = {}
+
     as = ''
     previous_name = name = ''
     found_router = false
-    ipv4_unicast = :disabled
-    default_ipv4_unicast = :enabled
-    activate = {}
+
+    default_ipv4_unicast = :true
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
@@ -145,9 +146,9 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
         as = $1
         found_router = true
 
+      # I store a default value of the property `ipv4_unicast`
       elsif found_router && line =~/\A\sno\sbgp\sdefault\sipv4-unicast\Z/
-        ipv4_unicast = :enabled
-        default_ipv4_unicast = :disabled
+        default_ipv4_unicast = :false
 
       elsif found_router && line =~ /\A\sneighbor\s(\S+)\s(peer-group|remote-as)(\s(\S+))?\Z/
         name = $1
@@ -159,51 +160,56 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
         unless name == previous_name
           unless hash.empty?
+            unless hash.include?(:activate)
+              hash[:activate] = (activate[hash[:peer_group]].nil? ? default_ipv4_unicast : activate[hash[:peer_group]])
+            end
+
             debug "bgp_neighbor: #{hash}"
 
-            hash[:activate] ||= activate[hash[:peer_group]] || default_ipv4_unicast
-
-            if hash[:peer_group] == :enabled
-              # If it's peer_group I store activate value.
+            if hash[:peer_group]
+              # If it's peer_group I store a activate value.
               activate[previous_name] = hash[:activate]
             end
 
-            bgp_neighbors << new(hash)
+            providers << new(hash)
           end
+
           hash = {}
           hash[:provider] = self.name
           hash[:name] = "#{as} #{name}"
           hash[:ensure] = :present
 
+          # I add defult values
           @resource_map.each do |property, options|
             next if property == :activate
             hash[property] = eval(options[:default]) if options.has_key?(:default)
           end
         end
 
-        hash[key] = value || :enabled
+        hash[key] = value.nil? ? :true : value
 
       elsif found_router && line =~ /\A\s(no\s)?neighbor\s#{Regexp.escape(name)}\s/
         @resource_map.each do |property, options|
           if options.has_key?(:regexp)
             if line =~ options[:regexp]
 
-              if property == :activate && ! [:enabled, :disabled].include?(hash[:peer_group])
-                ipv4_unicast = case activate[hash[:peer_group]] || default_ipv4_unicast
-                                 when :enabled
-                                   :disabled
-                                 else
-                                   :enabled
-                               end
-              end
+              if property == :activate
+                hash[:activate] = case (activate[hash[:peer_group]].nil? ? default_ipv4_unicast : activate[hash[:peer_group]])
+                                    when :true
+                                      :false
+                                    else
+                                      :true
+                                  end
 
-              value = eval(options[:value])
-              hash[property] = case options[:type]
-                                 when :fixnum
-                                   value.to_i
-                                 else
-                                   value
-                               end
+              else
+                value = eval(options[:value])
+                hash[property] = case options[:type]
+                                   when :fixnum
+                                     value.to_i
+                                   else
+                                     value
+                                 end
+              end
 
               break
             end
@@ -218,12 +224,16 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     end
 
     unless hash.empty?
+      unless hash.include?(:activate)
+        hash[:activate] = activate[hash[:peer_group]].nil? ? default_ipv4_unicast : activate[hash[:peer_group]]
+      end
+
       debug "bgp_neighbor: #{hash}"
-      hash[:activate] ||= activate[hash[:peer_group]] || default_ipv4_unicast
-      bgp_neighbors << new(hash)
+
+      providers << new(hash)
     end
 
-    bgp_neighbors
+    providers
   end
 
   def self.prefetch(resources)
@@ -289,10 +299,10 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
 
       @property_flush.each do |property, value|
         cmd = ''
-        if resource_map[property][:type] == :switch && value == :disabled
+        if resource_map[property][:type] == :boolean && value == :false
           cmd << 'no '
         end
-        value = nil if property == :peer_group && (value == :enabled || value == :disabled)
+        value = nil if property == :peer_group && (value == :true || value == :false)
         cmd << ERB.new(resource_map[property][:template]).result(binding)
         cmds << cmd
       end
@@ -325,6 +335,17 @@ Puppet::Type.type(:bgp_neighbor).provide :quagga do
     end
 
     flush
+  end
+
+  def clear
+    as, name = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/\s+/)
+    debug "[resfresh][#{as} #{name}]"
+
+    cmds = []
+    proto = name.include?('.') ? 'ip' : 'ipv6'
+    cmds << "clear #{proto} bgp #{name} soft"
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   @resource_map.each_key do |property|

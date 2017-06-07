@@ -61,73 +61,73 @@ router bgp 197888
 
     it 'should return the 197888:INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :activate => :enabled,
+        :activate => :true,
         :allow_as_in => 1,
-        :default_originate => :disabled,
+        :default_originate => :false,
         :ensure => :present,
         :name => '197888 INTERNAL',
-        :next_hop_self => :enabled,
-        :passive => :disabled,
-        :peer_group => :enabled,
+        :next_hop_self => :true,
+        :passive => :false,
+        :peer_group => :true,
         :provider => :quagga,
         :remote_as => 197888,
-        :route_reflector_client => :disabled,
-        :route_server_client => :disabled,
-        :shutdown => :disabled,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :false,
         :update_source => '172.16.32.103',
       })
     end
 
     it 'should return the 197888:RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :activate => :enabled,
-        :default_originate => :disabled,
+        :activate => :true,
+        :default_originate => :false,
         :ensure => :present,
         :name => '197888 RR',
-        :next_hop_self => :enabled,
-        :passive => :disabled,
-        :peer_group => :enabled,
+        :next_hop_self => :true,
+        :passive => :false,
+        :peer_group => :true,
         :provider => :quagga,
         :remote_as => 197888,
-        :route_reflector_client => :disabled,
-        :route_server_client => :disabled,
-        :shutdown => :disabled,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :false,
         :update_source => '172.16.32.103',
       })
     end
 
     it 'should return the 197888:RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :activate => :enabled,
-        :default_originate => :disabled,
+        :activate => :true,
+        :default_originate => :false,
         :ensure => :present,
         :name => '197888 RR_WEAK',
-        :next_hop_self => :enabled,
-        :passive => :disabled,
-        :peer_group => :enabled,
+        :next_hop_self => :true,
+        :passive => :false,
+        :peer_group => :true,
         :provider => :quagga,
         :remote_as => 197888,
         :route_map_out => 'RR_WEAK_out',
-        :route_reflector_client => :disabled,
-        :route_server_client => :disabled,
-        :shutdown => :disabled,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :false,
         :update_source => '172.16.32.103',
       })
     end
 
     it 'should return the 197888:172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-        :activate => :enabled,
-        :default_originate => :enabled,
+        :activate => :true,
+        :default_originate => :true,
         :ensure => :present,
         :name => '197888 172.16.32.108',
-        :next_hop_self => :disabled,
-        :passive => :disabled,
+        :next_hop_self => :false,
+        :passive => :false,
         :peer_group => 'INTERNAL',
         :provider => :quagga,
-        :route_reflector_client => :disabled,
-        :route_server_client => :disabled,
-        :shutdown => :enabled,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :true,
       })
     end
   end
@@ -193,73 +193,73 @@ router bgp 197888
 
     it 'should return the 197888:INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :activate => :disabled,
+        :activate => :false,
         :allow_as_in => 1,
-        :default_originate => :disabled,
+        :default_originate => :false,
         :ensure => :present,
         :name => '197888 INTERNAL',
-        :next_hop_self => :enabled,
-        :passive => :disabled,
-        :peer_group => :enabled,
+        :next_hop_self => :true,
+        :passive => :false,
+        :peer_group => :true,
         :provider => :quagga,
         :remote_as => 197888,
-        :route_reflector_client => :disabled,
-        :route_server_client => :disabled,
-        :shutdown => :disabled,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :false,
         :update_source => '172.16.32.103',
       })
     end
 
     it 'should return the 197888:RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :activate => :enabled,
-        :default_originate => :disabled,
+        :activate => :true,
+        :default_originate => :false,
         :ensure => :present,
         :name => '197888 RR',
-        :next_hop_self => :enabled,
-        :passive => :disabled,
-        :peer_group => :enabled,
+        :next_hop_self => :true,
+        :passive => :false,
+        :peer_group => :true,
         :provider => :quagga,
         :remote_as => 197888,
-        :route_reflector_client => :disabled,
-        :route_server_client => :disabled,
-        :shutdown => :disabled,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :false,
         :update_source => '172.16.32.103',
       })
     end
 
     it 'should return the 197888:RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :activate => :enabled,
-        :default_originate => :disabled,
+        :activate => :true,
+        :default_originate => :false,
         :ensure => :present,
         :name => '197888 RR_WEAK',
-        :next_hop_self => :enabled,
-        :passive => :disabled,
-        :peer_group => :enabled,
+        :next_hop_self => :true,
+        :passive => :false,
+        :peer_group => :true,
         :provider => :quagga,
         :remote_as => 197888,
         :route_map_out => 'RR_WEAK_out',
-        :route_reflector_client => :disabled,
-        :route_server_client => :disabled,
-        :shutdown => :disabled,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :false,
         :update_source => '172.16.32.103',
       })
     end
 
     it 'should return the 197888:172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-        :activate => :disabled,
-        :default_originate => :enabled,
+        :activate => :false,
+        :default_originate => :true,
         :ensure => :present,
         :name => '197888 172.16.32.108',
-        :next_hop_self => :disabled,
-        :passive => :disabled,
+        :next_hop_self => :false,
+        :passive => :false,
         :peer_group => 'INTERNAL',
         :provider => :quagga,
-        :route_reflector_client => :disabled,
-        :route_server_client => :disabled,
-        :shutdown => :enabled,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :true,
       })
     end
   end
