@@ -72,6 +72,59 @@ describe Puppet::Type.type(:bgp_neighbor) do
     end
   end
 
+  [:activate, :default_originate, :next_hop_self, :passive, :route_reflector_client,
+   :route_server_client].each do |property|
+    describe "boolean values of the property `#{property}`" do
+      it 'should support \'true\' as a value' do
+        expect { described_class.new(:name => '65000 192.168.1.1', property => 'true') }.to_not raise_error
+      end
+
+      it 'should support :true as a value' do
+        expect { described_class.new(:name => '65000 192.168.1.1', property => :true) }.to_not raise_error
+      end
+
+      it 'should support true as a value' do
+        expect { described_class.new(:name => '65000 192.168.1.1', property => true) }.to_not raise_error
+      end
+
+      it 'should support \'false\' as a value' do
+        expect { described_class.new(:name => '65000 192.168.1.1', property => 'false') }.to_not raise_error
+      end
+
+      it 'should support :false as a value' do
+        expect { described_class.new(:name => '65000 192.168.1.1', property => :false) }.to_not raise_error
+      end
+
+      it 'should support false as a value' do
+        expect { described_class.new(:name => '65000 192.168.1.1', property => false) }.to_not raise_error
+      end
+
+      it 'should not support :enabled as a value' do
+        expect { described_class.new(:name => '65000 192.168.1.1', property => :enabled) }.to raise_error(Puppet::Error, /Invalid value/)
+      end
+
+      it 'should not support \'disabled\' as a value' do
+        expect { described_class.new(:name => '65000 192.168.1.1', property => 'disabled') }.to raise_error(Puppet::Error, /Invalid value/)
+      end
+
+      it 'should contain :true' do
+        expect(described_class.new(:name => '65000 192.168.1.1', property => 'true')[property]).to eq(:true)
+      end
+
+      it 'should contain :true' do
+        expect(described_class.new(:name => '65000 192.168.1.1', property => true)[property]).to eq(:true)
+      end
+
+      it 'should contain :false' do
+        expect(described_class.new(:name => '65000 192.168.1.1', property => 'false')[property]).to eq(:false)
+      end
+
+      it 'should contain :false' do
+        expect(described_class.new(:name => '65000 192.168.1.1', property => false)[property]).to eq(:false)
+      end
+    end
+  end
+
   describe 'allow_as_in' do
     it 'should support \'1\' as a value' do
       expect { described_class.new(:name => '65000 192.168.1.1', :allow_as_in => '1') }.to_not raise_error
@@ -110,228 +163,6 @@ describe Puppet::Type.type(:bgp_neighbor) do
     end
   end
 
-  describe 'default_originate' do
-    it 'should support \'true\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => 'true') }.to_not raise_error
-    end
-
-    it 'should support :true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => :true) }.to_not raise_error
-    end
-
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => true) }.to_not raise_error
-    end
-
-    it 'should support \'false\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => 'false') }.to_not raise_error
-    end
-
-    it 'should support :false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => :false) }.to_not raise_error
-    end
-
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => false) }.to_not raise_error
-    end
-
-    it 'should support \'enabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => 'enabled') }.to_not raise_error
-    end
-
-    it 'should support :enabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => :enabled) }.to_not raise_error
-    end
-
-    it 'should support \'disabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => 'disabled') }.to_not raise_error
-    end
-
-    it 'should support :disabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => :disabled) }.to_not raise_error
-    end
-
-    it 'should not support allow as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :default_originate => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :default_originate => 'true')[:default_originate]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :default_originate => 'enabled')[:default_originate]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :default_originate => true)[:default_originate]).to eq(:enabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :default_originate => 'false')[:default_originate]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :default_originate => 'disabled')[:default_originate]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :default_originate => :disabled)[:default_originate]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :default_originate => false)[:default_originate]).to eq(:disabled)
-    end
-  end
-
-   describe 'next_hop_self' do
-    it 'should support \'true\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'true') }.to_not raise_error
-    end
-
-    it 'should support :true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => :true) }.to_not raise_error
-    end
-
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => true) }.to_not raise_error
-    end
-
-    it 'should support \'false\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'false') }.to_not raise_error
-    end
-
-    it 'should support :false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => :false) }.to_not raise_error
-    end
-
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => false) }.to_not raise_error
-    end
-
-    it 'should support \'enabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'enabled') }.to_not raise_error
-    end
-
-    it 'should support :enabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => :enabled) }.to_not raise_error
-    end
-
-    it 'should support \'disabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'disabled') }.to_not raise_error
-    end
-
-    it 'should support :disabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => :disabled) }.to_not raise_error
-    end
-
-    it 'should not support allow as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'true')[:next_hop_self]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'enabled')[:next_hop_self]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :next_hop_self => true)[:next_hop_self]).to eq(:enabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'false')[:next_hop_self]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :next_hop_self => 'disabled')[:next_hop_self]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :next_hop_self => :disabled)[:next_hop_self]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :next_hop_self => false)[:next_hop_self]).to eq(:disabled)
-    end
-  end
-
-  describe 'passive' do
-    it 'should support \'true\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => 'true') }.to_not raise_error
-    end
-
-    it 'should support :true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => :true) }.to_not raise_error
-    end
-
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => true) }.to_not raise_error
-    end
-
-    it 'should support \'false\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => 'false') }.to_not raise_error
-    end
-
-    it 'should support :false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => :false) }.to_not raise_error
-    end
-
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => false) }.to_not raise_error
-    end
-
-    it 'should support \'enabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => 'enabled') }.to_not raise_error
-    end
-
-    it 'should support :enabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => :enabled) }.to_not raise_error
-    end
-
-    it 'should support \'disabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => 'disabled') }.to_not raise_error
-    end
-
-    it 'should support :disabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => :disabled) }.to_not raise_error
-    end
-
-    it 'should not support allow as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :passive => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :passive => 'true')[:passive]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :passive => 'enabled')[:passive]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :passive => true)[:passive]).to eq(:enabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :passive => 'false')[:passive]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :passive => 'disabled')[:passive]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :passive => :disabled)[:passive]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :passive => false)[:passive]).to eq(:disabled)
-    end
-  end
-
   describe 'peer_group' do
     it 'should support \'true\' as a value' do
       expect { described_class.new(:name => '65000 192.168.1.1', :peer_group => 'true') }.to_not raise_error
@@ -357,22 +188,6 @@ describe Puppet::Type.type(:bgp_neighbor) do
       expect { described_class.new(:name => '65000 192.168.1.1', :peer_group => false) }.to_not raise_error
     end
 
-    it 'should support \'enabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :peer_group => 'enabled') }.to_not raise_error
-    end
-
-    it 'should support :enabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :peer_group => :enabled) }.to_not raise_error
-    end
-
-    it 'should support \'disabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :peer_group => 'disabled') }.to_not raise_error
-    end
-
-    it 'should support :disabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :peer_group => :disabled) }.to_not raise_error
-    end
-
     it 'should support peer_group as a value' do
       expect { described_class.new(:name => '65000 192.168.1.1', :peer_group => 'peer_group') }.to_not raise_error
     end
@@ -385,40 +200,28 @@ describe Puppet::Type.type(:bgp_neighbor) do
       expect { described_class.new(:name => '65000 192.168.1.1', :peer_group => '9-allow') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'true')[:peer_group]).to eq(:enabled)
+    it 'should contain true' do
+      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'true')[:peer_group]).to eq(:true)
     end
 
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'enabled')[:peer_group]).to eq(:enabled)
+    it 'should contain true' do
+      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => true)[:peer_group]).to eq(:true)
     end
 
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => true)[:peer_group]).to eq(:enabled)
+    it 'should contain fasle' do
+      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'false')[:peer_group]).to eq(:false)
     end
 
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'false')[:peer_group]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'disabled')[:peer_group]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => :disabled)[:peer_group]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => false)[:peer_group]).to eq(:disabled)
+    it 'should contain :false' do
+      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => false)[:peer_group]).to eq(:false)
     end
 
     it 'should contain peer_group' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'peer_group')[:peer_group]).to eq(:peer_group)
+      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'peer_group')[:peer_group]).to eq('peer_group')
     end
 
     it 'should contain peer_group_1' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'peer_group_1')[:peer_group]).to eq(:peer_group_1)
+      expect(described_class.new(:name => '65000 192.168.1.1', :peer_group => 'peer_group_1')[:peer_group]).to eq('peer_group_1')
     end
   end
 
@@ -627,154 +430,6 @@ describe Puppet::Type.type(:bgp_neighbor) do
 
     it 'should contain AS100_out' do
       expect(described_class.new(:name => '65000 192.168.1.1', :route_map_out => 'AS100_out')[:route_map_out]).to eq('AS100_out')
-    end
-  end
-
-  describe 'route_reflector_client' do
-    it 'should support \'true\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'true') }.to_not raise_error
-    end
-
-    it 'should support :true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => :true) }.to_not raise_error
-    end
-
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => true) }.to_not raise_error
-    end
-
-    it 'should support \'false\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'false') }.to_not raise_error
-    end
-
-    it 'should support :false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => :false) }.to_not raise_error
-    end
-
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => false) }.to_not raise_error
-    end
-
-    it 'should support \'enabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'enabled') }.to_not raise_error
-    end
-
-    it 'should support :enabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => :enabled) }.to_not raise_error
-    end
-
-    it 'should support \'disabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'disabled') }.to_not raise_error
-    end
-
-    it 'should support :disabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => :disabled) }.to_not raise_error
-    end
-
-    it 'should not support allow as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'true')[:route_reflector_client]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'enabled')[:route_reflector_client]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => true)[:route_reflector_client]).to eq(:enabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'false')[:route_reflector_client]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => 'disabled')[:route_reflector_client]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => :disabled)[:route_reflector_client]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_reflector_client => false)[:route_reflector_client]).to eq(:disabled)
-    end
-  end
-
-  describe 'route_server_client' do
-    it 'should support \'true\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'true') }.to_not raise_error
-    end
-
-    it 'should support :true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => :true) }.to_not raise_error
-    end
-
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => true) }.to_not raise_error
-    end
-
-    it 'should support \'false\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'false') }.to_not raise_error
-    end
-
-    it 'should support :false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => :false) }.to_not raise_error
-    end
-
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => false) }.to_not raise_error
-    end
-
-    it 'should support \'enabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'enabled') }.to_not raise_error
-    end
-
-    it 'should support :enabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => :enabled) }.to_not raise_error
-    end
-
-    it 'should support \'disabled\' as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'disabled') }.to_not raise_error
-    end
-
-    it 'should support :disabled as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => :disabled) }.to_not raise_error
-    end
-
-    it 'should not support allow as a value' do
-      expect { described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'allow') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'true')[:route_server_client]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'enabled')[:route_server_client]).to eq(:enabled)
-    end
-
-    it 'should contain enabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_server_client => true)[:route_server_client]).to eq(:enabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'false')[:route_server_client]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_server_client => 'disabled')[:route_server_client]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_server_client => :disabled)[:route_server_client]).to eq(:disabled)
-    end
-
-    it 'should contain disabled' do
-      expect(described_class.new(:name => '65000 192.168.1.1', :route_server_client => false)[:route_server_client]).to eq(:disabled)
     end
   end
 

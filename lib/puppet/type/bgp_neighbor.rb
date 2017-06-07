@@ -1,32 +1,28 @@
 Puppet::Type.newtype(:bgp_neighbor) do
   @doc = %q{
+    This type provides the capability to manage bgp neighbor within puppet.
 
-This type provides the capability to manage bgp neighbor within puppet.
+    Examples:
 
-Examples:
+      bgp_neighbor { '65000 192.168.1.1':
+          ensure                 => 'present',
+          activate               => 'enabled',
+          peer_group             => 'internal_peers',
+          route_reflector_client => 'enabled',
+      }
 
-```puppet
-bgp_neighbor { '65000 192.168.1.1':
-  ensure                 => 'present',
-  activate               => 'enabled',
-  peer_group             => 'internal_peers',
-  route_reflector_client => 'enabled',
-}
-
-bgp_neighbor { '65000 internal_peers':
-  ensure            => 'present',
-  allow_as_in       => 1,
-  default_originate => 'disabled',
-  local_as          => 65000,
-  peer_group        => 'enabled',
-  prefix_list_in    => 'PREFIX_LIST_IN',
-  prefix_list_out   => 'PREFIX_LIST_OUT',
-  remote_as         => 65000,
-  route_map_in      => 'ROUTE_MAP_IN',
-  route_map_out     => 'ROUTE_MAP_OUT',
-}
-```
-
+      bgp_neighbor { '65000 internal_peers':
+          ensure            => 'present',
+          allow_as_in       => 1,
+          default_originate => 'disabled',
+          local_as          => 65000,
+          peer_group        => 'enabled',
+          prefix_list_in    => 'PREFIX_LIST_IN',
+          prefix_list_out   => 'PREFIX_LIST_OUT',
+          remote_as         => 65000,
+          route_map_in      => 'ROUTE_MAP_IN',
+          route_map_out     => 'ROUTE_MAP_OUT',
+      }
   }
 
   ensurable
@@ -43,21 +39,11 @@ bgp_neighbor { '65000 internal_peers':
     end
   end
 
-  newproperty(:activate) do
+  newproperty(:activate, :boolean => true) do
     desc %q{ Enable the Address Family for this Neighbor. Default to `enabled`. }
-    defaultto(:enabled)
-    newvalues(:disabled, :enabled, :false, :true)
 
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:true)
   end
 
   newproperty(:allow_as_in) do
@@ -69,21 +55,11 @@ bgp_neighbor { '65000 internal_peers':
     end
   end
 
-  newproperty(:default_originate) do
+  newproperty(:default_originate, :boolean => true) do
     desc %q{ Originate default route to this neighbor. Default to `disabled`. }
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
 
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:false)
   end
 
   newproperty(:local_as) do
@@ -101,57 +77,26 @@ bgp_neighbor { '65000 internal_peers':
     end
   end
 
-  newproperty(:next_hop_self) do
+  newproperty(:next_hop_self, :boolean => true) do
     desc %q{ Disable the next hop calculation for this neighbor. Default to `disabled`. }
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
 
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:false)
   end
 
-  newproperty(:passive) do
+  newproperty(:passive, :boolean => true) do
     desc %q{ Don't send open messages to this neighbor. Default to `disabled`. }
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
 
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:false)
   end
 
   newproperty(:peer_group) do
     desc %q{ Member of the peer-group. Default to `disabled`. }
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
+
+    newvalues(:false, :true)
+    defaultto(:false)
     newvalues(/\A[[:alpha:]]\w+\Z/)
-    munge do |value|
-      case value
-        when :true, 'true', true, 'enabled'
-          :enabled
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when String
-          value.to_sym
-        else
-          value
-      end
-    end
   end
 
   newproperty(:prefix_list_in) do
@@ -199,55 +144,25 @@ bgp_neighbor { '65000 internal_peers':
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
-  newproperty(:route_reflector_client) do
+  newproperty(:route_reflector_client, :boolean => true) do
     desc %q{ Configure a neighbor as Route Reflector client. Default to `disabled`. }
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
 
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:false)
   end
 
-  newproperty(:route_server_client) do
+  newproperty(:route_server_client, :boolean => true) do
     desc %q{ Configure a neighbor as Route Server client. Default to `disabled`. }
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
 
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:false)
   end
 
   newproperty(:shutdown) do
     desc %q{ Administratively shut down this neighbor. Default to `disabled`. }
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
 
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    newvalues(:false, :true)
+    defaultto(:false)
   end
 
   newproperty(:update_source) do
@@ -297,5 +212,9 @@ bgp_neighbor { '65000 internal_peers':
       else
         []
     end
+  end
+
+  def refresh
+    provider.class.clear if provider.class.respond_to?(:clear)
   end
 end
