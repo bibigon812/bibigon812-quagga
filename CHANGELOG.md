@@ -1,6 +1,6 @@
 ## [Unreleased]
 ### Added
-- pim support by @m4ce 
+- pim support by [@m4ce](https://github.com/m4ce) 
 
 ### Fixed
 - the ipv6 support of the resource `bgp_network`
