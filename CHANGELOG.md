@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.2.1]
 ### Added
 - pim support by [@m4ce](https://github.com/m4ce) 
 
