@@ -147,7 +147,7 @@ Puppet::Type.type(:ospf).provide :quagga do
       @proeprty_remove[property] = value if @resource[property].nil?
     end
 
-    flush
+    flush unless @property_remove.empty?
   end
 
   @resource_map.keys.each do |property|

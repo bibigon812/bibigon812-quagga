@@ -11,14 +11,16 @@ Puppet::Type.type(:community_list).provide :quagga do
   def self.instances
     debug '[instances]'
 
-    community_lists = []
+    providers = []
     hash = {}
     previous_name = ''
     found_community_list = false
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
+
       next if line =~ /\A!\Z/
+
       if line =~ /\Aip\scommunity-list\s(\d+)\s(deny|permit)((\s(\d+:\d+))+)\Z/
         name = $1
         action = $2
@@ -28,7 +30,7 @@ Puppet::Type.type(:community_list).provide :quagga do
         if name != previous_name
           unless hash.empty?
             debug "community_list: #{hash}"
-            community_lists << new(hash)
+            providers << new(hash)
           end
           hash = {}
           hash[:ensure] = :present
@@ -46,24 +48,21 @@ Puppet::Type.type(:community_list).provide :quagga do
         break
       end
     end
+
     unless hash.empty?
       debug "community_list: #{hash}"
-      community_lists << new(hash)
+      providers << new(hash)
     end
-    community_lists
+
+    providers
   end
 
   def self.prefetch(resources)
     providers = instances
-    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        found_providers << provider
       end
-    end
-    (providers - found_providers).each do |provider|
-      provider.destroy
     end
   end
 

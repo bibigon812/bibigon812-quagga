@@ -11,7 +11,7 @@ Puppet::Type.type(:prefix_list).provide :quagga do
 
   def self.instances
     debug '[instances]'
-    prefix_lists = []
+    providers = []
     found_prefix_list = false
 
     config = vtysh('-c', 'show running-config')
@@ -28,29 +28,24 @@ Puppet::Type.type(:prefix_list).provide :quagga do
         hash[$7.to_sym] = $8.to_i unless $7.nil?
         hash[$10.to_sym] = $11.to_i unless $10.nil?
         debug "prefix_list: #{hash}"
-        prefix_lists << new(hash)
+        providers << new(hash)
 
         found_prefix_list = true unless found_prefix_list
-      elsif line =~ /!\A\w/ and found_prefix_list
+      elsif line =~ /\A\w/ and found_prefix_list
         break
       end
     end
-    prefix_lists
+    providers
   end
 
   def self.prefetch(resources)
     debug '[prefetch]'
     providers = instances
-    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find{ |prefix_list| prefix_list.name == name }
         resources[name].provider = provider
-        found_providers << provider
         provider.purge
       end
-    end
-    (providers - found_providers).each do |provider|
-      provider.destroy
     end
   end
 

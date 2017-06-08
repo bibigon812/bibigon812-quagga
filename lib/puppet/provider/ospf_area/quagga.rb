@@ -108,6 +108,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
+        provider.purge
       end
     end
   end
@@ -131,7 +132,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       @property_remove[property] = @property_hash[property] unless @property_hash[property].nil?
     end
 
-    flush
+    flush unless @property_remove.empty?
   end
 
   def exists?
@@ -221,6 +222,19 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       @property_flush.clear
       @property_remove.clear
     end
+  end
+
+  def purge
+    debug '[purge]'
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    resource_map.keys.each do |property|
+      if (!@property_hash[property].nil?) && @resource[property].nil?
+        @property_remove[property] = @property_hash[property]
+      end
+    end
+
+    flush unless @property_remove.empty?
   end
 
   @resource_map.keys.each do |property|
