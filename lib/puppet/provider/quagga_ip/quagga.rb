@@ -1,7 +1,13 @@
-Puppet::Type.type(:pim).provide :quagga do
-  @doc = 'Manages PIM parameters using Quagga'
+Puppet::Type.type(:quagga_ip).provide :quagga do
+  @doc = 'Manages Quagga IP parameters'
 
   @resource_map = {
+    :forwarding => {
+      :regexp => /\Aip\sforwarding\Z/,
+      :template => 'ip forwarding',
+      :type => :boolean,
+      :default => :false
+    },
     :multicast_routing => {
       :regexp => /\Aip\smulticast-routing\Z/,
       :template => 'ip multicast-routing',
