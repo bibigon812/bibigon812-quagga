@@ -100,7 +100,7 @@ Puppet::Type.newtype(:ospf_area) do
     desc %q{ Configure OSPF area as stub. Default to `disabled`. }
 
     newvalues(:false, :true, :no_summary)
-    newvalues(/\Ano-summary\Z/)
+    newvalues('no-summary')
     defaultto(:false)
 
     munge do |value|

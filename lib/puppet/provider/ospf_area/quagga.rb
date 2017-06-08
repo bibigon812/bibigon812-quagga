@@ -4,13 +4,13 @@ Puppet::Type.type(:ospf_area).provide :quagga do
   @doc = %q{ Manages OSPF areas using quagga }
 
   @resource_map = {
-    :default_cost       => { :type => :Fixnum,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sdefault-cost\s(\d+)\Z/,                :template => 'area <%= area %> default-cost <%= value %>' },
-    :access_list_export => { :type => :String,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sexport-list\s([\w-]+)\Z/,              :template => 'area <%= area %> export-list <%= value %>' },
-    :access_list_import => { :type => :String,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\simport-list\s([\w-]+)\Z/,              :template => 'area <%= area %> import-list <%= value %>' },
-    :prefix_list_export => { :type => :String,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sout\Z/, :template => 'area <%= area %> filter-list prefix <%= value %> out' },
-    :prefix_list_import => { :type => :String,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sin\Z/,  :template => 'area <%= area %> filter-list prefix <%= value %> in' },
-    :stub               => { :type => :boolean, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sstub(\sno-summary)?\Z/,                :template => 'area <%= area %> stub <%= value %>', :default => :false },
-    :networks           => { :type => :Array,   :regexp => /\A\snetwork\s(\d+\.\d+\.\d+\.\d+\/\d+)\sarea\s(\d+\.\d+\.\d+\.\d+)\Z/, :template => 'network <%= value %> area <%= area %>' },
+    :default_cost       => { :type => :fixnum,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sdefault-cost\s(\d+)\Z/,                :template => 'area <%= area %> default-cost <%= value %>' },
+    :access_list_export => { :type => :string,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sexport-list\s([\w-]+)\Z/,              :template => 'area <%= area %> export-list <%= value %>' },
+    :access_list_import => { :type => :string,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\simport-list\s([\w-]+)\Z/,              :template => 'area <%= area %> import-list <%= value %>' },
+    :prefix_list_export => { :type => :string,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sout\Z/, :template => 'area <%= area %> filter-list prefix <%= value %> out' },
+    :prefix_list_import => { :type => :string,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sin\Z/,  :template => 'area <%= area %> filter-list prefix <%= value %> in' },
+    :stub               => { :type => :symbol, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sstub(\sno-summary)?\Z/,                :template => 'area <%= area %> stub <%= value %>', :default => :false },
+    :networks           => { :type => :array,   :regexp => /\A\snetwork\s(\d+\.\d+\.\d+\.\d+\/\d+)\sarea\s(\d+\.\d+\.\d+\.\d+)\Z/, :template => 'network <%= value %> area <%= area %>' },
   }
 
   commands :vtysh => 'vtysh'
@@ -54,9 +54,9 @@ Puppet::Type.type(:ospf_area).provide :quagga do
             value = :true if value.nil?
 
             case options[:type]
-            when :Array
+            when :array
               munged_value = [ value ]
-            when :Fixnum
+            when :fixnum
               munged_value = value.to_i
             when :Symbol
               munged_value = value.to_s.gsub(/-/, '_').to_sym
@@ -66,7 +66,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
 
             if hash.has_key?(area)
 
-              if options[:type] == :Array
+              if options[:type] == :array
                 hash[area][property] ||= []
                 hash[area][property] << value
               else
@@ -152,7 +152,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       debug "The #{property} property has been removed"
 
       case resource_map[property][:type]
-        when :Array
+        when :array
           desired_value.each do |value|
             cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
           end
@@ -178,7 +178,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       debug "The #{property} property has been changed from #{@property_hash[property]} to #{desired_value}"
 
       case resource_map[property][:type]
-        when :Array
+        when :array
           old_value = @property_hash[property].nil? ? [] : @property_hash[property]
 
           (old_value - desired_value).each do |value|
@@ -189,7 +189,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
             cmds << ERB.new(resource_map[property][:template]).result(binding)
           end
 
-        when :Symbol
+        when :symbol
           cmd = ''
 
           if desired_value == :true
