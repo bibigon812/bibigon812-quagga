@@ -1,29 +1,25 @@
 Puppet::Type.newtype(:ospf_area) do
   @doc = %q{
+    This type provides the capabilities to manage ospf area within puppet.
 
-This type provides the capabilities to manage ospf area within puppet.
+      Examples:
 
-Examples:
+        ospf_area { '0.0.0.0':
+            default_cost       => 10,
+            access_list_export => 'ACCESS_LIST_EXPORT',
+            access_list_import => 'ACCESS_LIST_IPMORT',
+            prefix_list_export => 'PREFIX_LIST_EXPORT',
+            prefix_list_import => 'PREFIX_LIST_IMPORT',
+            networks           => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
+        }
 
-```puppet
-ospf_area { '0.0.0.0':
-  default_cost       => 10,
-  access_list_export => 'ACCESS_LIST_EXPORT',
-  access_list_import => 'ACCESS_LIST_IPMORT',
-  prefix_list_export => 'PREFIX_LIST_EXPORT',
-  prefix_list_import => 'PREFIX_LIST_IMPORT',
-  networks           => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
-}
+        ospf_area { '0.0.0.1':
+           stub => 'enabled',
+        }
 
-ospf_area { '0.0.0.1':
-  stub => 'enabled',
-}
-
-ospf_area { '0.0.0.2':
-  stub => 'no-summary',
-}
-```
-
+        ospf_area { '0.0.0.2':
+           stub => 'no-summary',
+        }
   }
 
   ensurable
@@ -103,20 +99,18 @@ ospf_area { '0.0.0.2':
   newproperty(:stub) do
     desc %q{ Configure OSPF area as stub. Default to `disabled`. }
 
-    newvalues(:disabled, :enabled, :false, :true, :no_summary)
-    newvalues('no-summary')
-    defaultto(:disabled)
+    newvalues(:false, :true, :no_summary)
+    newvalues(/\Ano-summary\Z/)
+    defaultto(:false)
 
     munge do |value|
       case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
         when 'no-summary', 'no_summary'
           :no_summary
         when String
           value.to_sym
+        when true, false
+          value.to_s.to_sym
         else
           value
       end

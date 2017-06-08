@@ -21,7 +21,7 @@ describe Puppet::Type.type(:ospf_area) do
     expect(described_class.key_attributes).to eq([:name])
   end
 
-  describe "when validating attributes" do
+  describe 'when validating attributes' do
     [:name, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
@@ -229,14 +229,6 @@ describe Puppet::Type.type(:ospf_area) do
       expect { described_class.new(:name => '0.0.0.0', :stub => :no_summary) }.to_not raise_error
     end
 
-    it 'should support disabled as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => 'disabled') }.to_not raise_error
-    end
-
-    it 'should support no_summary as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => :enabled) }.to_not raise_error
-    end
-
     it 'should support no_summary as a value' do
       expect { described_class.new(:name => '0.0.0.0', :stub => 'no-summary') }.to_not raise_error
     end
@@ -246,24 +238,24 @@ describe Puppet::Type.type(:ospf_area) do
     end
 
     it 'should not support vasya as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => :vasya) }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => '0.0.0.0', :stub => :disabled) }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
     it 'should not support petya as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => 'petya') }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => '0.0.0.0', :stub => 'enabled') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
     it 'should contain true' do
-      expect(described_class.new(:name => '0.0.0.0', :stub => :true)[:stub]).to eq(:enabled)
+      expect(described_class.new(:name => '0.0.0.0', :stub => :true)[:stub]).to eq(:true)
     end
 
     it 'should contain true' do
-      expect(described_class.new(:name => '0.0.0.0', :stub => true)[:stub]).to eq(:enabled)
+      expect(described_class.new(:name => '0.0.0.0', :stub => true)[:stub]).to eq(:true)
     end
 
 
     it 'should contain false' do
-      expect(described_class.new(:name => '0.0.0.0', :stub => 'false')[:stub]).to eq(:disabled)
+      expect(described_class.new(:name => '0.0.0.0', :stub => 'false')[:stub]).to eq(:false)
     end
 
     it 'should contain no-summary' do
