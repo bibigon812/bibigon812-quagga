@@ -3,15 +3,15 @@ Puppet::Type.newtype(:bgp_network) do
     This type provides the capability to manage bgp neighbor within
     puppet.
 
-    Examples:
+      Examples:
 
-      bgp_network { '65000 192.168.0.0/24':
-          ensure => present,
-      }
+        bgp_network { '65000 192.168.0.0/24':
+            ensure => present,
+        }
 
-      bgp_network { '65000 2a00::/64':
-          ensure => present,
-      }
+        bgp_network { '65000 2a00::/64':
+            ensure => present,
+        }
   }
 
   ensurable

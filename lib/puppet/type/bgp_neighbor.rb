@@ -2,27 +2,27 @@ Puppet::Type.newtype(:bgp_neighbor) do
   @doc = %q{
     This type provides the capability to manage bgp neighbor within puppet.
 
-    Examples:
+      Examples:
 
-      bgp_neighbor { '65000 192.168.1.1':
-          ensure                 => 'present',
-          activate               => 'enabled',
-          peer_group             => 'internal_peers',
-          route_reflector_client => 'enabled',
-      }
+        bgp_neighbor { '65000 192.168.1.1':
+            ensure                 => present,
+            activate               => true,
+            peer_group             => 'internal_peers',
+            route_reflector_client => true,
+        }
 
-      bgp_neighbor { '65000 internal_peers':
-          ensure            => 'present',
-          allow_as_in       => 1,
-          default_originate => 'disabled',
-          local_as          => 65000,
-          peer_group        => 'enabled',
-          prefix_list_in    => 'PREFIX_LIST_IN',
-          prefix_list_out   => 'PREFIX_LIST_OUT',
-          remote_as         => 65000,
-          route_map_in      => 'ROUTE_MAP_IN',
-          route_map_out     => 'ROUTE_MAP_OUT',
-      }
+        bgp_neighbor { '65000 internal_peers':
+            ensure            => present,
+            allow_as_in       => 1,
+            default_originate => false,
+            local_as          => 65000,
+            peer_group        => true,
+            prefix_list_in    => 'PREFIX_LIST_IN',
+            prefix_list_out   => 'PREFIX_LIST_OUT',
+            remote_as         => 65000,
+            route_map_in      => 'ROUTE_MAP_IN',
+            route_map_out     => 'ROUTE_MAP_OUT',
+        }
   }
 
   ensurable
