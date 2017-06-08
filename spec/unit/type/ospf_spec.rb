@@ -28,10 +28,20 @@ describe Puppet::Type.type(:ospf) do
       end
     end
 
-    [:abr_type, :opaque, :rfc1583, :router_id, ].each do |property|
+    [:abr_type, :opaque, :rfc1583, :router_id, :log_adjacency_changes].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
+    end
+  end
+
+  describe 'name' do
+    it 'should support ospf as a value' do
+      expect { described_class.new(:name => 'ospf') }.to_not raise_error
+    end
+
+    it 'should not support foo as a value' do
+      expect { described_class.new(:name => 'foo') }.to raise_error(Puppet::Error, /Invalid value/)
     end
   end
 
@@ -69,46 +79,18 @@ describe Puppet::Type.type(:ospf) do
     end
 
     it 'should contain standard' do
-      expect(described_class.new(:name => 'ospf', :abr_type => 'standard')[:abr_type]).to eq(:standard)
+      expect(described_class.new(:name => 'ospf', :abr_type => :standard)[:abr_type]).to eq(:standard)
     end
   end
 
   [:opaque, :rfc1583].each do |property|
     describe "boolean values of the property `#{property}`" do
-      it 'should support \'true\' as a value' do
-        expect { described_class.new(:name => 'ospf', property => 'true') }.to_not raise_error
-      end
-
-      it 'should support :true as a value' do
-        expect { described_class.new(:name => 'ospf', property => :true) }.to_not raise_error
-      end
-
       it 'should support true as a value' do
         expect { described_class.new(:name => 'ospf', property => true) }.to_not raise_error
       end
 
-      it 'should support \'false\' as a value' do
-        expect { described_class.new(:name => 'ospf', property => 'false') }.to_not raise_error
-      end
-
-      it 'should support :false as a value' do
-        expect { described_class.new(:name => 'ospf', property => :false) }.to_not raise_error
-      end
-
       it 'should support false as a value' do
         expect { described_class.new(:name => 'ospf', property => false) }.to_not raise_error
-      end
-
-      it 'should not support :enabled as a value' do
-        expect { described_class.new(:name => 'ospf', property => :enabled) }.to raise_error(Puppet::Error, /Invalid value/)
-      end
-
-      it 'should not support \'disabled\' as a value' do
-        expect { described_class.new(:name => 'ospf', property => 'disabled') }.to raise_error(Puppet::Error, /Invalid value/)
-      end
-
-      it 'should contain :true' do
-        expect(described_class.new(:name => 'ospf', property => 'true')[property]).to eq(:true)
       end
 
       it 'should contain :true' do
@@ -116,11 +98,11 @@ describe Puppet::Type.type(:ospf) do
       end
 
       it 'should contain :false' do
-        expect(described_class.new(:name => 'ospf', property => 'false')[property]).to eq(:false)
+        expect(described_class.new(:name => 'ospf', property => false)[property]).to eq(:false)
       end
 
-      it 'should contain :false' do
-        expect(described_class.new(:name => 'ospf', property => false)[property]).to eq(:false)
+      it 'should not support foo as a value' do
+        expect { described_class.new(:name => 'ospf', property => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
     end
   end
@@ -148,6 +130,36 @@ describe Puppet::Type.type(:ospf) do
 
     it 'should contain \'1.1.1.1\'' do
       expect(described_class.new(:name => 'ospf', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
+    end
+  end
+
+  describe 'log_adjacency_changes' do
+    it 'should support true as a value' do
+      expect { described_class.new(:name => 'ospf', :log_adjacency_changes => true) }.to_not raise_error
+    end
+
+    it 'should support false as a value' do
+      expect { described_class.new(:name => 'ospf', :log_adjacency_changes => false) }.to_not raise_error
+    end
+
+    it 'should support detail as a value' do
+      expect { described_class.new(:name => 'ospf', :log_adjacency_changes => :detail) }.to_not raise_error
+    end
+
+    it 'should contain :true' do
+      expect(described_class.new(:name => 'ospf', :log_adjacency_changes => true)[:log_adjacency_changes]).to eq(:true)
+    end
+
+    it 'should contain :false' do
+      expect(described_class.new(:name => 'ospf', :log_adjacency_changes => false)[:log_adjacency_changes]).to eq(:false)
+    end
+
+    it 'should contain :detail' do
+      expect(described_class.new(:name => 'ospf', :log_adjacency_changes => :detail)[:log_adjacency_changes]).to eq(:detail)
+    end
+
+    it 'should not support foo as a value' do
+      expect { described_class.new(:name => 'ospf', :log_adjacency_changes => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
     end
   end
 end
