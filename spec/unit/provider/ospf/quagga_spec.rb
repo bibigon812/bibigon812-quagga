@@ -46,9 +46,9 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
         :abr_type => :cisco,
         :ensure => :present,
         :name => :ospf,
-        :opaque => :disabled,
+        :opaque => :false,
         :provider => :quagga,
-        :rfc1583 => :disabled,
+        :rfc1583 => :false,
         :router_id => '10.255.78.4',
       })
     end

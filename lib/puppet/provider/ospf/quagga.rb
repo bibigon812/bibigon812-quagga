@@ -20,7 +20,7 @@ Puppet::Type.type(:ospf).provide :quagga do
   def self.instances
     debug '[instances]'
     found_section = false
-    ospf = []
+    providers = []
     hash = {}
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
@@ -31,8 +31,8 @@ Puppet::Type.type(:ospf).provide :quagga do
         hash[:ensure] = :present
         hash[:name] = as.to_sym
         hash[:provider] = self.name
-        hash[:opaque] = :disabled
-        hash[:rfc1583] = :disabled
+        hash[:opaque] = :false
+        hash[:rfc1583] = :false
         hash[:abr_type] = :cisco
       elsif line =~ /\A\w/ and found_section
         break
@@ -41,7 +41,7 @@ Puppet::Type.type(:ospf).provide :quagga do
         @resource_map.each do |property, command|
           if config_line.start_with? command
             if @known_booleans.include? property
-              hash[property] = :enabled
+              hash[property] = :true
             else
               config_line.slice! command
               hash[property] = case property
@@ -56,22 +56,16 @@ Puppet::Type.type(:ospf).provide :quagga do
       end
     end
 
-    ospf << new(hash) unless hash.empty?
-    ospf
+    providers << new(hash) unless hash.empty?
+    providers
   end
 
   def self.prefetch(resources)
     providers = instances
-    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        found_providers << provider
-        provider.purge
       end
-    end
-    (providers - found_providers).each do |provider|
-      provider.destroy
     end
   end
 
@@ -87,10 +81,17 @@ Puppet::Type.type(:ospf).provide :quagga do
   end
 
   def destroy
-    debug '[destroy]'
+    debug '[destroy][ospf]'
 
-    @property_hash[:ensure] = :absent
-    flush
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << 'no router ospf'
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_hash.clear
   end
 
   def exists?
@@ -102,57 +103,26 @@ Puppet::Type.type(:ospf).provide :quagga do
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
-    cmds = []
-    cmds << 'configure terminal'
-
-    need_flush =false
-
-    if @property_hash[:ensure] == :absent
-      @property_hash.clear
-      cmds << 'no router ospf'
-      need_flush = true
-    else
-      cmds << 'router ospf'
-      @property_flush.each do |property, value|
-        case value
-          when :disabled
-            cmds << "no #{resource_map[property]}"
-          when :enabled
-            cmds << "#{resource_map[property]}"
-          else
-            cmds << "#{resource_map[property]} #{value}"
-        end
-        @property_hash[property] = value
-        need_flush = true
-      end
-    end
-    @property_flush.clear
-
-    cmds << 'end'
-    cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if need_flush
-  end
-
-  def purge
-    debug '[purge]'
-
-    resource_map = self.class.instance_variable_get('@resource_map')
-    needs_purge = false
-
-    cmds = []
-    cmds << 'configure terminal'
     cmds << 'router ospf'
-    @property_hash.each do |property, value|
-      if @resource[property].nil?
-        debug "Property #{property}"
-        cmds << "no #{resource_map[property]}"
-        needs_purge = true
+    @property_flush.each do |property, value|
+      case value
+        when :false
+          cmds << "no #{resource_map[property]}"
+        when :true
+          cmds << "#{resource_map[property]}"
+        else
+          cmds << "#{resource_map[property]} #{value}"
       end
+      @property_hash[property] = value
     end
+
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd }) if needs_purge
+    unless @property_flush.empty?
+      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+      @property_flush.clear
+    end
   end
 
   @resource_map.keys.each do |property|
