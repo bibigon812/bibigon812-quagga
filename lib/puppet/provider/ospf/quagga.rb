@@ -15,6 +15,7 @@ Puppet::Type.type(:ospf).provide :quagga do
   def initialize value={}
     super(value)
     @property_flush = {}
+    @property_remove = {}
   end
 
   def self.instances
@@ -65,6 +66,7 @@ Puppet::Type.type(:ospf).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
+        provider.purge
       end
     end
   end
@@ -103,7 +105,19 @@ Puppet::Type.type(:ospf).provide :quagga do
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
+    cmds = []
+    cmds << 'configure terminal'
     cmds << 'router ospf'
+
+    @property_remove.each do |property, value|
+      case property
+        when :abr_type
+          cmds << "no #{resource_map[property]} #{value}"
+        else
+          cmds << "no #{resource_map[property]}"
+      end
+    end
+
     @property_flush.each do |property, value|
       case value
         when :false
@@ -119,10 +133,21 @@ Puppet::Type.type(:ospf).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty?
+    unless @property_flush.empty? && @property_remove.empty?
       vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
       @property_flush.clear
+      @property_remove.clear
     end
+  end
+
+  def purge
+    debug '[purge]'
+
+    @property_hash.each do |property, value|
+      @proeprty_remove[property] = value if @resource[property].nil?
+    end
+
+    flush
   end
 
   @resource_map.keys.each do |property|
