@@ -1,21 +1,44 @@
 Puppet::Type.type(:ospf).provide :quagga do
-  @doc = %q{ Manages ospf parameters using quagga }
+  @doc = 'Manages ospf parameters using quagga'
 
   @resource_map = {
-    :router_id           => 'ospf router-id',
-    :opaque              => 'capability opaque',
-    :rfc1583             => 'compatible rfc1583',
-    :abr_type            => 'ospf abr-type',
+    :router_id => {
+      :regexp => /\A\sospf\srouter-id\s(.*)\Z/,
+      :template => 'ospf router-id<% unless value.nil? %> <%= value %><% end %>',
+      :type => :string,
+      :default => :absent
+    },
+    :opaque => {
+      :regexp => /\A\scapability\sopaque\Z/,
+      :template => 'capability opaque',
+      :type => :boolean,
+      :default => :false
+    },
+    :rfc1583 => {
+      :regexp => /\A\scompatible\srfc1583\Z/,
+      :template => 'compatible rfc1583',
+      :type => :boolean,
+      :default => :false
+    },
+    :abr_type => {
+      :regexp => /\A\sospf\sabr-type\s(\w+)\Z/,
+      :template => 'ospf abr-type<% unless value.nil? %> <%= value %><% end %>',
+      :type => :symbol,
+      :default => :cisco
+    },
+    :log_adjacency_changes => {
+      :regexp => /\A\slog-adjacency-changes(?:\s(detail))?\Z/,
+      :template => 'log-adjacency-changes<% unless value.nil? %> <%= value %><% end %>',
+      :type => :symbol,
+      :default => :false
+    }
   }
-
-  @known_booleans = [ :opaque, :rfc1583, ]
 
   commands :vtysh => 'vtysh'
 
   def initialize value={}
     super(value)
     @property_flush = {}
-    @property_remove = {}
   end
 
   def self.instances
@@ -25,32 +48,43 @@ Puppet::Type.type(:ospf).provide :quagga do
     hash = {}
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
+      line.chomp!
+
+      # skip comments
       next if line =~ /\A!\Z/
-      if line =~ /\Arouter (ospf)\Z/
+      if line =~ /\Arouter ospf\Z/
         as = $1
         found_section = true
+
+        hash[:name] = :ospf
         hash[:ensure] = :present
-        hash[:name] = as.to_sym
-        hash[:provider] = self.name
-        hash[:opaque] = :false
-        hash[:rfc1583] = :false
-        hash[:abr_type] = :cisco
+
+        @resource_map.each do |property, options|
+          hash[property] = options[:default]
+        end
       elsif line =~ /\A\w/ and found_section
         break
       elsif found_section
-        config_line = line.strip
-        @resource_map.each do |property, command|
-          if config_line.start_with? command
-            if @known_booleans.include? property
+        @resource_map.each do |property, options|
+          if line =~ options[:regexp]
+            value = $1
+
+            if value.nil?
               hash[property] = :true
             else
-              config_line.slice! command
-              hash[property] = case property
-                                 when :abr_type
-                                   config_line.strip.to_sym
-                                 else
-                                   config_line.strip
-                               end
+              case options[:type]
+                when :boolean
+                  hash[property] = :true
+
+                when :symbol
+                  hash[property] = value.gsub(/-/, '_').to_sym
+
+                when :fixnum
+                  hash[property] = value.to_i
+
+                else
+                  hash[property] = value
+              end
             end
           end
         end
@@ -66,20 +100,30 @@ Puppet::Type.type(:ospf).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        provider.purge
       end
     end
   end
 
   def create
+    debug '[create]'
+
     resource_map = self.class.instance_variable_get('@resource_map')
 
-    @property_hash[:ensure] = :present
-    @property_hash[:name] = @resource[:name]
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << 'router ospf'
 
-    resource_map.keys.each do |property|
-      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
+    resource_map.each do |property, options|
+      if @resource[property] and @resource[property] != :absent and @resource[property] != :false
+        value = @resource[property]
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      end
     end
+
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   def destroy
@@ -109,56 +153,34 @@ Puppet::Type.type(:ospf).provide :quagga do
     cmds << 'configure terminal'
     cmds << 'router ospf'
 
-    @property_remove.each do |property, value|
-      case property
-        when :abr_type
-          cmds << "no #{resource_map[property]} #{value}"
-        else
-          cmds << "no #{resource_map[property]}"
+    @property_flush.each do |property, v|
+      if v == :false or v == :absent
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+      elsif v == :true and resource_map[property][:type] == :symbol
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      elsif v == :true
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      else
+        value = v
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
-    end
 
-    @property_flush.each do |property, value|
-      case value
-        when :false
-          cmds << "no #{resource_map[property]}"
-        when :true
-          cmds << "#{resource_map[property]}"
-        else
-          cmds << "#{resource_map[property]} #{value}"
-      end
       @property_hash[property] = value
     end
 
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty? && @property_remove.empty?
+    unless @property_flush.empty?
       vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
       @property_flush.clear
-      @property_remove.clear
     end
-  end
-
-  def purge
-    debug '[purge]'
-
-    @property_hash.each do |property, value|
-      @proeprty_remove[property] = value if @resource[property].nil?
-    end
-
-    flush
   end
 
   @resource_map.keys.each do |property|
-    if @known_booleans.include?(property)
-      define_method "#{property}" do
-        @property_hash[property] || :false
-      end
-    else
-      define_method "#{property}" do
-        @property_hash[property] || :absent
-      end
+    define_method "#{property}" do
+      @property_hash[property] || :absent
     end
 
     define_method "#{property}=" do |value|
