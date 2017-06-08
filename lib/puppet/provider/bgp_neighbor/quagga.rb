@@ -293,14 +293,6 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
     cmds << 'configure terminal'
     cmds << "router bgp #{as}"
 
-    @property_remove.each do |property, value|
-      if resource_map[property].has_key?(:remove_template)
-        cmds << ERB.new(resource_map[property][:remove_template]).result(binding)
-      else
-        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-      end
-    end
-
     @property_flush.each do |property, value|
       cmd = ''
       if resource_map[property][:type] == :boolean && value == :false
