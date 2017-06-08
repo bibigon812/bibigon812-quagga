@@ -1,9 +1,15 @@
 ## [Unreleased]
+### Added
+- multicast-routing by [@m4ce](https://github.com/m4ce)
+
 ### Changed
 - boolean values of variables to `true` or `false`
 
 ### Removed
-- the method `purge` from the resource `bgp_neighbor`
+- the method `purge` from resources `bgp*`
+
+### Updated
+- changelog
 
 ## [1.2.1] - 07-06-2017
 ### Added

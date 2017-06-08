@@ -54,14 +54,18 @@ Puppet::Type.type(:as_path).provide :quagga do
   def create
     debug '[create]'
     @property_hash[:ensure] = :present
+    @property_hash[:name] = @resource[:name]
 
     self.rules = @resource[:rules]
   end
 
   def destroy
     debug '[destroy]'
+
     @property_hash[:ensure] = :absent
+
     self.rules = []
+
     @property_hash.clear
   end
 
@@ -75,7 +79,7 @@ Puppet::Type.type(:as_path).provide :quagga do
 
   def rules=(value)
     debug '[rules=]'
-    name = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
+    name = @property_hash[:name]
 
     cmds = []
     cmds << 'configure terminal'
