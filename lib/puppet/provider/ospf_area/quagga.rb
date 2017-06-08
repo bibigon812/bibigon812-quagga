@@ -192,10 +192,10 @@ Puppet::Type.type(:ospf_area).provide :quagga do
         when :Symbol
           cmd = ''
 
-          if desired_value == :enabled
+          if desired_value == :true
             value = ''
 
-          elsif desired_value == :disabled
+          elsif desired_value == :false
             cmd = 'no'
 
           else
