@@ -3,7 +3,7 @@
 - multicast-routing by [@m4ce](https://github.com/m4ce)
 
 ### Changed
-- boolean values of variables to `true` or `false`
+- boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 
 
 ### Removed
 - the method `purge` from resources `bgp*`
