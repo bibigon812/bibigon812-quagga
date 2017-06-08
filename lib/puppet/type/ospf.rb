@@ -1,19 +1,16 @@
 Puppet::Type.newtype(:ospf) do
   @doc = %q{
-This type provides the capabilities to manage ospf router within puppet.
+    This type provides the capabilities to manage ospf router within puppet.
 
-Examples:
+      Examples:
 
-```puppet
-ospf { 'ospf':
-  ensure              => present,
-  abr_type            => cisco,
-  opaque              => true,
-  rfc1583             => true,
-  router_id           => '192.168.0.1',
-}
-```
-
+        ospf { 'ospf':
+            ensure    => present,
+            abr_type  => cisco,
+            opaque    => true,
+            rfc1583   => true,
+            router_id => '192.168.0.1',
+        }
   }
 
   ensurable
@@ -40,40 +37,18 @@ ospf { 'ospf':
     end
   end
 
-  newproperty(:opaque) do
+  newproperty(:opaque, :boolean => true) do
     desc %q{ Enable the Opaque-LSA capability (rfc2370). Default to `disabled`. }
 
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
-
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    defaultto(:false)
+    newvalues(:false, :true)
   end
 
-  newproperty(:rfc1583) do
+  newproperty(:rfc1583, :boolean => true) do
     desc %q{ Enable the RFC1583Compatibility flag. Default to `disabled`. }
 
-    defaultto(:disabled)
-    newvalues(:disabled, :enabled, :false, :true)
-
-    munge do |value|
-      case value
-        when :false, 'false', false, 'disabled'
-          :disabled
-        when :true, 'true', true, 'enabled'
-          :enabled
-        else
-          value
-      end
-    end
+    defaultto(:false)
+    newvalues(:false, :true)
   end
 
   newproperty(:router_id) do

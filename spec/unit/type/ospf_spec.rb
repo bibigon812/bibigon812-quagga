@@ -73,33 +73,55 @@ describe Puppet::Type.type(:ospf) do
     end
   end
 
-  describe 'opaque' do
-    it 'should support true as a value' do
-      expect { described_class.new(:name => 'ospf', :opaque => true) }.to_not raise_error
-    end
+  [:opaque, :rfc1583].each do |property|
+    describe "boolean values of the property `#{property}`" do
+      it 'should support \'true\' as a value' do
+        expect { described_class.new(:name => 'ospf', property => 'true') }.to_not raise_error
+      end
 
-    it 'should support false as a value' do
-      expect { described_class.new(:name => 'ospf', :opaque => false) }.to_not raise_error
-    end
+      it 'should support :true as a value' do
+        expect { described_class.new(:name => 'ospf', property => :true) }.to_not raise_error
+      end
 
-    it 'should support \'true\' as a value' do
-      expect { described_class.new(:name => 'ospf', :opaque => 'true') }.to_not raise_error
-    end
+      it 'should support true as a value' do
+        expect { described_class.new(:name => 'ospf', property => true) }.to_not raise_error
+      end
 
-    it 'should support \'false\' as a value' do
-      expect { described_class.new(:name => 'ospf', :opaque => 'false') }.to_not raise_error
-    end
+      it 'should support \'false\' as a value' do
+        expect { described_class.new(:name => 'ospf', property => 'false') }.to_not raise_error
+      end
 
-    it 'should support \'tru\' as a value' do
-      expect { described_class.new(:name => 'ospf', :opaque => 'tru') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
+      it 'should support :false as a value' do
+        expect { described_class.new(:name => 'ospf', property => :false) }.to_not raise_error
+      end
 
-    it 'should contain true' do
-      expect(described_class.new(:name => 'ospf', :opaque => 'true')[:opaque]).to eq(:enabled)
-    end
+      it 'should support false as a value' do
+        expect { described_class.new(:name => 'ospf', property => false) }.to_not raise_error
+      end
 
-    it 'should contain false' do
-      expect(described_class.new(:name => 'ospf', :opaque => 'false')[:opaque]).to eq(:disabled)
+      it 'should not support :enabled as a value' do
+        expect { described_class.new(:name => 'ospf', property => :enabled) }.to raise_error(Puppet::Error, /Invalid value/)
+      end
+
+      it 'should not support \'disabled\' as a value' do
+        expect { described_class.new(:name => 'ospf', property => 'disabled') }.to raise_error(Puppet::Error, /Invalid value/)
+      end
+
+      it 'should contain :true' do
+        expect(described_class.new(:name => 'ospf', property => 'true')[property]).to eq(:true)
+      end
+
+      it 'should contain :true' do
+        expect(described_class.new(:name => 'ospf', property => true)[property]).to eq(:true)
+      end
+
+      it 'should contain :false' do
+        expect(described_class.new(:name => 'ospf', property => 'false')[property]).to eq(:false)
+      end
+
+      it 'should contain :false' do
+        expect(described_class.new(:name => 'ospf', property => false)[property]).to eq(:false)
+      end
     end
   end
 
