@@ -1,16 +1,16 @@
 Puppet::Type.newtype(:as_path) do
   @doc = %q{
-  This type provides the capabilities to manage as-path access-list within puppet.
+    This type provides the capabilities to manage as-path access-list within puppet.
 
-    Examples:
+      Examples:
 
-      as_path { 'as100':
-          ensure => present,
-          rules => [
-              { permit => '_100$', },
-              { permit => '_100_', },
-          ],
-      }
+        as_path { 'as100':
+            ensure => present,
+            rules => [
+                { permit => '_100$', },
+                { permit => '_100_', },
+            ],
+        }
   }
 
   ensurable
