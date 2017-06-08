@@ -3,7 +3,8 @@
 ## Overview
 
 This module provides management of network protocols without restarting
-services.
+services. All resources make changes to the configuration of services using
+commands, as if you are doing this through the CLI.
 
 Currently it supports:
 
@@ -15,11 +16,9 @@ Currently it supports:
   - community list
   - as-path list
 
-## At the beginning
+### How to use it?
 
-### quagga
-
-Describe quagga class.
+In the beginning, we must describe main class `quagga`, e.g.
 
 ```puppet
 class { 'quagga':
@@ -29,9 +28,9 @@ class { 'quagga':
 
 #### Reference
 
-  - `bgp`: Manages the BGP service. Default to `true`.
-  - `ospf`: Manages the OSPF service. Default to `true`.
-  - `pim`: Manages the PIM service. Default to `true`.
+  - `bgp`: Manage the BGP service. Default to `true`.
+  - `ospf`: Manage the OSPF service. Default to `true`.
+  - `pim`: Manage the PIM service. Default to `true`.
   - `owner`: User of quagga configuration files. Default to `quagga`.
   - `group`: Group of quagga configuration files. Default to `quagga`.
   - `mode`: Mode of quagga configuration files. Default to `600`.
@@ -39,15 +38,15 @@ class { 'quagga':
   - `package_ensure`: Ensure for the quagga package. Default to `present`.
   - `content`:  Initial content of configuration files. Default to `hostname ${::fqdn}\n`.
 
-## The most fat
+Then we can create different resources.
 
 ### bgp
 
 ```puppet
 bgp { '65000':
     ensure             => present,
-    import_check       => 'enabled',
-    ipv4_unicast       => 'enabled',
+    import_check       => true',
+    ipv4_unicast       => true',
     maximum_paths_ebgp => 10,
     maximum_paths_ibgp => 10,
     router_id          => '10.0.0.1',
@@ -57,8 +56,9 @@ bgp { '65000':
 #### Reference
 
   - `name`: AS number
+  - `ensure`: Manage the state of this BGP router: `absent`, `present`. Default to `present`.
   - `import_check`: Check BGP network route exists in IGP.
-  - `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default to `enabled`.
+  - `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default to `true`.
   - `maximum_paths_ebgp`: Forward packets over multiple paths ebgp. Default to `1`.
   - `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default to `1`.
   - `router_id`: Override configured router identifier.
@@ -68,9 +68,9 @@ bgp { '65000':
 ```puppet
 bgp_neighbor { '65000 internal':
     ensure        => present,
-    activate      => 'enabled',
-    next_hop_self => 'enabled',
-    peer_group    => 'enabled',
+    activate      => true,
+    next_hop_self => true,
+    peer_group    => true,
     remote_as     => 65000,
     update_source => '10.0.0.1',
 }
@@ -89,13 +89,14 @@ bgp_neighbor { '65000 10.0.0.3':
 #### Reference
 
   - `name`: It's consists of a AS number and a neighbor IP address or a peer-group name.
-  - `activate`: Enable the Address Family for this Neighbor. Default to `enabled`.
+  - `ensure`: Manage the state of this BGP neighbor: `absent`, `present`. Default to `present`.
+  - `activate`: Enable the Address Family for this Neighbor. Default to `true`.
   - `allow_as_in`: Accept as-path with my AS present in it.
-  - `default_originate`: Originate default route to this neighbor. Default to `disabled`.
+  - `default_originate`: Originate default route to this neighbor. Default to `false`.
   - `local_as`: Specify a local-as number.
-  - `next_hop_self`: Disable the next hop calculation for this neighbor. Default to `disabled`.
-  - `passive`: Don't send open messages to this neighbor. Default to `disabled`.
-  - `peer_group`: Member of the peer-group. Default to `disabled`.
+  - `next_hop_self`: Disable the next hop calculation for this neighbor. Default to `false`.
+  - `passive`: Don't send open messages to this neighbor. Default to `false`.
+  - `peer_group`: Member of the peer-group. Default to `false`.
   - `prefix_list_in`: Filter updates from this neighbor.
   - `prefix_list_out`: Filter updates to this neighbor.
   - `remote_as`: Specify a BGP neighbor as.
@@ -103,9 +104,9 @@ bgp_neighbor { '65000 10.0.0.3':
   - `route_map_import`: Apply map to routes going into a Route-Server client's table.
   - `route_map_in`: Apply map to incoming routes.
   - `route_map_out`: Apply map to outbound routes.
-  - `route_reflector_client`: Configure a neighbor as Route Reflector client. Default to `disabled`.
-  - `route_server_client`: Configure a neighbor as Route Server client. Default to `disabled`.
-  - `shutdown`: Administratively shut down this neighbor. Default to `disabled`.
+  - `route_reflector_client`: Configure a neighbor as Route Reflector client. Default to `false`.
+  - `route_server_client`: Configure a neighbor as Route Server client. Default to `false`.
+  - `shutdown`: Administratively shut down this neighbor. Default to `false`.
   - `update_source`: Source of routing updates. It can be the interface name or IP address.
 
 ### bgp_network
@@ -126,8 +127,8 @@ bgp_network { '65000 192.168.1.0/24':
 ospf { 'ospf':
     ensure    => present,
     abr_type  => 'cisco',
-    opaque    => 'disabled',
-    rfc1583   => 'disabled',
+    opaque    => true,
+    rfc1583   => true,
     router_id => '10.0.0.1',
 }
 ```
@@ -135,20 +136,23 @@ ospf { 'ospf':
 #### Reference
 
   - `name`: Name must be `ospf`.
+  - `ensure`: Manage the state of this OSPF router: `absent`, `present`. Default to `present`.
   - `abr_type`: Set OSPF ABR type. Default to `cisco`.
-  - `opaque`: Enable the Opaque-LSA capability (rfc2370). Default to `disabled`.
-  - `rfc1583`: Enable the RFC1583Compatibility flag. Default to `disabled`. 
+  - `opaque`: Enable the Opaque-LSA capability (rfc2370). Default to `false`.
+  - `rfc1583`: Enable the RFC1583Compatibility flag. Default to `false`.
   - `router_id`: Router-id for the OSPF process.
   
 ### ospf_area
 
 ```puppet
 ospf_area { '0.0.0.0':
+    ensure  => present,
     network => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
 }
 
 ospf_area { '0.0.0.1':
-    stub => 'enabled',
+    ensure => present,
+    stub   => true,
 }
 
 ospf_area { '0.0.0.2':
@@ -159,19 +163,20 @@ ospf_area { '0.0.0.2':
 #### Reference
 
   - `name`: OSPF area.
+  - `ensure`: Manage the state of this OSPF area: `absent`, `present`. Default to `present`.
   - `default_cost`: Set the summary-default cost of a NSSA or stub area.
   - `access_list_expor`: Set the filter for networks announced to other areas.
   - `access_list_import`: Set the filter for networks from other areas announced to the specified one.
   - `prefix_list_export`: Filter networks sent from this area.
   - `prefix_list_import`: Filter networks sent to this area.
   - `networks`: Enable routing on an IP network.
-  - `stub`: Configure OSPF area as stub: `enabled`, `disabled` or `no_summary`. Default to `disabled`.
+  - `stub`: Configure OSPF area as stub: `true`, `false` or `no_summary`. Default to `false`.
   
 ### ospf_interface
 
 ```puppet
 ospf_interface { 'eth0':
-    mtu_ignore     => 'enabled',
+    mtu_ignore     => true,
     hello_interval => 2,
     dead_interval  => 8,
 }
@@ -183,7 +188,7 @@ ospf_interface { 'eth0':
   - `cost`: Interface cos. Default to `10`.
   - `dead_interval`: Interval after which a neighbor is declared dead. Default to `40`. 
   - `hello_interval`: Time between HELLO packets. Default to `10`.
-  - `mtu_ignore`: Disable mtu mismatch detection. Default to `disabled`.
+  - `mtu_ignore`: Disable mtu mismatch detection. Default to `false`.
   - `network`: Network type: `broadcast`, `non_broadcast`, `point_to_point` or `loopback`. Default to `broadcast`.
   - `priority`: Router priority. Default to `1`.
   - `retransmit_interval`: Time between retransmitting lost link state advertisements. Default to `5`.
@@ -193,12 +198,14 @@ ospf_interface { 'eth0':
 
 ```puppet
 redistribution { 'ospf::connected':
+    ensure      => present,
     metric      => 100,
     metric_type => 2,
     route_map   => 'CONNECTED',
 }
 
 redistribution { 'bgp:65000:ospf':
+    ensure    => present,
     metric    => 100,
     route_map => 'WORD',
 }
@@ -207,6 +214,7 @@ redistribution { 'bgp:65000:ospf':
 #### Reference
 
   - `name`: The name contains the main protocol, the id and the protocol for redistribution.
+  - `ensure`: Manage the state of this redistribution: `absent`, `present`. Default to `present`.
   - `metric`: Metric for redistributed routes.
   - `metric_type`: OSPF exterior metric type for redistributed routes.
   - `route_map`: Route map reference.
@@ -236,6 +244,7 @@ route_map { 'bgp_out:permit:65000':
 #### Reference
 
   - `name`: Name of the route-map, action and sequence number of rule.
+  - `ensure`: Manage the state of this route map: `absent`, `present`. Default to `present`.
   - `match`: Match values from routing table.
   - `on_match`: Exit policy on matches.
   - `set`: Set values in destination routing protocol.
@@ -264,6 +273,7 @@ prefix_list {'ADVERTISED_PREFIXES:20':
 #### Reference
 
   - `name`: Name of the prefix-list and sequence number of rule: `name:sequence`.
+  - `ensure`: Manage the state of this prefix list: `absent`, `present`. Default to `present`.
   - `action`: Action can be `permit` or `deny`.
   - `ge`: Minimum prefix length to be matched.
   - `le`: Maximum prefix length to be matched.
@@ -274,6 +284,7 @@ prefix_list {'ADVERTISED_PREFIXES:20':
 
 ```puppet
 community_list { '100':
+    ensure => present,
     rules  => [
         permit => 65000:50952,
         permit => 65000:31500,
@@ -284,6 +295,7 @@ community_list { '100':
 #### Reference
 
   - `name`: Community list number.
+  - `ensure`: Manage the state of this community list: `absent`, `present`. Default to `present`.
   - `rules`: A rule of the community list `{ action => community }`.    
 
 ### as_path
@@ -301,13 +313,14 @@ as_path { 'TEST_AS_PATH':
 #### Reference
 
   - `name`: The name of the as-path access-list.
+  - `ensure`: Manage the state of this as-path list: `absent`, `present`. Default to `present`.
   - `rules`: A rule of the as-path access-list `{ action => regex }`.
   
 ### pim_interface
 
 ```puppet
 pim_interface { 'eth0':
-    ensure  => present,
+    pim_ssm => false,
 }
 ```
 
@@ -321,23 +334,21 @@ pim_interface { 'eth0':
 
 ## Hiera
 
-If Hierea is in your mind you can use something like this.
-
 ### bgp proxy
 
 ```yaml
 ---
 site::profiles::bgp:
   65000:
-    import_check: enabled
-    ipv4_unicast: disabled
+    import_check: true
+    ipv4_unicast: false
     router_id: 172.16.32.103
     neighbor:
       INTERNAL:
-        activate: enabled
+        activate: true
         allow_as_in: 1
-        next_hop_self: enabled
-        peer_group: enabled
+        next_hop_self: true
+        peer_group: true
         remote_as: 197888
       172.16.32.105:
         peer_group: INTERNAL
@@ -403,7 +414,7 @@ site::profiles::ospf:
         - 10.0.10.0/24
         - 10.0.100.0/24
     0.0.0.10:
-      stub: enabled
+      stub: true
       networks:
         - 192.168.1.0/24
         - 10.0.0.0/24
@@ -420,7 +431,7 @@ site::profiles::interface:
       ospf:
         dead_interval: 8
         hello_interval: 2
-        mtu_ignore: enabled
+        mtu_ignore: true
         network: broadcast
         priority: 100
         retransmit_interval: 4
@@ -590,7 +601,7 @@ class site::profiles::route_map {
 }
 ```
 
-## community_list proxy
+### community_list proxy
 
 ```yaml
 ---
@@ -621,7 +632,7 @@ class site::profiles::community_list {
 }
 ```
 
-## as_path proxy
+### as_path proxy
 
 ```yaml
 ---
