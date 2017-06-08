@@ -148,7 +148,7 @@ Puppet::Type.type(:bgp).provide :quagga do
 
     @property_flush.each do |property, value|
       cmd = ''
-      if resource_map[property][:type] == :boolean && value == :dalse
+      if resource_map[property][:type] == :boolean && value == :false
         cmd << 'no '
       end
       cmd << ERB.new(resource_map[property][:template]).result(binding)
