@@ -101,7 +101,6 @@ Puppet::Type.type(:ospf_interface).provide :quagga do
   end
 
   def destroy
-
   end
 
   def exists?

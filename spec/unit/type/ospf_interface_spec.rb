@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:ospf_interface) do
-  let(:networking_service) do
+  let(:ospf_interface) do
     @provider_class = describe_class.provide(:ospf_interface) {
       mk_resource_methods
     }
@@ -37,20 +37,6 @@ describe Puppet::Type.type(:ospf_interface) do
   end
 
   describe 'when validating values' do
-    describe 'ensure' do
-      it 'should support present as a value' do
-        expect { described_class.new(:name => 'foo', :ensure => :present) }.to_not raise_error
-      end
-
-      it 'should support absent as a value' do
-        expect { described_class.new(:name => 'foo', :ensure => :absent) }.to_not raise_error
-      end
-
-      it 'should not support other values' do
-        expect { described_class.new(:name => 'foo', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
-      end
-    end
-
     describe 'cost' do
       it 'should support 100 as a value' do
         expect { described_class.new(:name => 'foo', :cost => 100) }.to_not raise_error

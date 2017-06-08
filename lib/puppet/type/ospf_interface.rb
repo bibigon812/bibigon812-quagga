@@ -20,8 +20,6 @@ ospf_interface { 'eth0':
 
   }
 
-  ensurable
-
   newparam(:name) do
     desc %q{ The friendly name of the network interface. }
   end
