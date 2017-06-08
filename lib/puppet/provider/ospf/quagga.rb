@@ -153,7 +153,7 @@ Puppet::Type.type(:ospf).provide :quagga do
   @resource_map.keys.each do |property|
     if @known_booleans.include?(property)
       define_method "#{property}" do
-        @property_hash[property] || :disabled
+        @property_hash[property] || :false
       end
     else
       define_method "#{property}" do
