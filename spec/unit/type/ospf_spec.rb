@@ -147,15 +147,15 @@ describe Puppet::Type.type(:ospf) do
     end
 
     it 'should contain :true' do
-      expect(described_class.new(:name => 'ospf', property => true)[:log_adjacency_changes]).to eq(:true)
+      expect(described_class.new(:name => 'ospf', :log_adjacency_changes => true)[:log_adjacency_changes]).to eq(:true)
     end
 
     it 'should contain :false' do
-      expect(described_class.new(:name => 'ospf', property => false)[:log_adjacency_changes]).to eq(:false)
+      expect(described_class.new(:name => 'ospf', :log_adjacency_changes => false)[:log_adjacency_changes]).to eq(:false)
     end
 
     it 'should contain :detail' do
-      expect(described_class.new(:name => 'ospf', property => :detail)[:log_adjacency_changes]).to eq(:detail)
+      expect(described_class.new(:name => 'ospf', :log_adjacency_changes => :detail)[:log_adjacency_changes]).to eq(:detail)
     end
 
     it 'should not support foo as a value' do
