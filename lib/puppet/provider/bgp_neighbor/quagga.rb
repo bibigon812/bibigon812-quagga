@@ -122,6 +122,7 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
   def initialize(value)
     super(value)
     @property_flush = {}
+    @property_remove = {}
   end
 
   def self.instances
@@ -237,11 +238,10 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
 
   def self.prefetch(resources)
     providers = instances
-    found_providers = []
     resources.each_key do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        found_providers << provider
+        provider.purge
       end
     end
   end
@@ -293,6 +293,14 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
     cmds << 'configure terminal'
     cmds << "router bgp #{as}"
 
+    @property_remove.each do |property, value|
+      if resource_map[property].has_key?(:remove_template)
+        cmds << ERB.new(resource_map[property][:remove_template]).result(binding)
+      else
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+      end
+    end
+
     @property_flush.each do |property, value|
       cmd = ''
       if resource_map[property][:type] == :boolean && value == :false
@@ -306,10 +314,24 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty?
+    unless @property_flush.empty? && @property_remove.empty?
       vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
       @property_flush.clear
     end
+  end
+
+  def purge
+    debug '[purge]'
+
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    resource_map.each_key do |property|
+      if @resource[property].nil? && !@property_hash[property].nil?
+        @property_remove[property] = @property_hash[property]
+      end
+    end
+
+    flush
   end
 
   def reset
