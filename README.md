@@ -120,6 +120,7 @@ bgp_network { '65000 192.168.1.0/24':
 #### Reference
 
   - `name`: It's consists of a AS number and a network IP address.
+  - `ensure`: Manage the state of this BGP network: `absent`, `present`. Default to `present`.
 
 ### ospf
 
