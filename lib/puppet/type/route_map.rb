@@ -94,7 +94,9 @@ route_map {'TEST_ROUTE_MAP:permit:10':
   end
 
   autonotify(:bgp_neighbor) do
-    provider.bgp_neighbors
+    name = self[:name].splt(/:/).first
+    bgp_neighbors = catalog.resources.select { |resource| resource.type == :bgp_neighbor }
+    bgp_neighbors.select { |resource| resource[:route_map_in] == name || resource[:route_map_out] == name }
   end
 
   autorequire(:package) do

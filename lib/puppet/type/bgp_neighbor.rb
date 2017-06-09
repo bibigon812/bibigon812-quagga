@@ -211,6 +211,6 @@ Puppet::Type.newtype(:bgp_neighbor) do
   end
 
   def refresh
-    provider.class.reset if provider.class.respond_to?(:reset)
+    provider.reset
   end
 end

@@ -165,27 +165,6 @@ Puppet::Type.type(:route_map).provide :quagga do
     flush if need_flush
   end
 
-  def bgp_neighbors
-    bgp_neighbors = []
-
-    name = @property_hash[:name].split(/:/).first
-
-    config = vtysh('-c', 'show running-config')
-    config.split(/\n/).collect do |line|
-
-      # Skip comment
-      next if line =~ /\A!\Z/
-      if line =~ /\Arouter\sbgp\s(d+)\Z/
-        as = $1
-      elsif line =~ /\A\sneighbor\s([\h\.:]+)\sroute-map\s#{Regexp.escape(name)}\s(in|out)\Z/
-        neighbor = $1
-        bgp_neighbors << "#{as} #{neighbor}"
-      end
-    end
-
-    bgp_neighbors
-  end
-
   @resource_map.keys.each do |property|
     define_method "#{property}" do
       @property_hash[property] || :absent
