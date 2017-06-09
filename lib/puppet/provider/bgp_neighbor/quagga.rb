@@ -331,7 +331,7 @@ Puppet::Type.type(:bgp_neighbor).provide(:quagga) do
       end
     end
 
-    flush
+    flush unless @property_remove.empty?
   end
 
   def reset
