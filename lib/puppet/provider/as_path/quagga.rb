@@ -8,7 +8,7 @@ Puppet::Type.type(:as_path).provide :quagga do
   def self.instances
     debug '[instances]'
 
-    as_paths = []
+    providers = []
     hash = {}
     previous_name = ''
 
@@ -19,27 +19,31 @@ Puppet::Type.type(:as_path).provide :quagga do
         action = $2
         regex = $3
 
-        if name != previous_name
+        unless name == previous_name
           unless hash.empty?
-            debug "as_path: #{hash}"
-            as_paths << new(hash)
+            debug "as-path list: #{hash}"
+            providers << new(hash)
           end
-          hash = {}
-          hash[:ensure] = :present
-          hash[:provider] = self.name
-          hash[:name] = name
-          hash[:rules] = []
+
+          hash = {
+              :ensure => :present,
+              :name => name,
+              :provider => self.name,
+              :rules => [],
+          }
         end
-        hash[:rules] << {action.to_sym => regex}
+
+        hash[:rules] << { action.to_sym => regex }
 
         previous_name = name
       end
     end
+
     unless hash.empty?
-      debug "as_path: #{hash}"
-      as_paths << new(hash)
+      debug "as-path list: #{hash}"
+      providers << new(hash)
     end
-    as_paths
+    providers
   end
 
   def self.prefetch(resources)
@@ -84,7 +88,6 @@ Puppet::Type.type(:as_path).provide :quagga do
     cmds = []
     cmds << 'configure terminal'
 
-
     cmds << "no ip as-path access-list #{name}"
 
     value.each do |rule|
@@ -95,6 +98,7 @@ Puppet::Type.type(:as_path).provide :quagga do
 
     cmds << 'end'
     cmds << 'write memory'
+
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
 
     @property_hash[:rules] = value
