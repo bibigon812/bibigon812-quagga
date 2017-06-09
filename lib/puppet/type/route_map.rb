@@ -93,6 +93,10 @@ route_map {'TEST_ROUTE_MAP:permit:10':
     end
   end
 
+  autonotify(:bgp_neighbor) do
+    provider.bgp_neighbors
+  end
+
   autorequire(:package) do
     case value(:provider)
       when :quagga

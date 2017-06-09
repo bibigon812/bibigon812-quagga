@@ -67,9 +67,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
     newvalues(/\A\d+\Z/)
 
     validate do |value|
-      if value.to_i < 1
-        raise(ArgumentError, "Invalid value \"#{value}\", valid values are 1-4294967295")
-      end
+      raise(ArgumentError, "Invalid value \"#{value}\", valid values are 1-4294967295") unless value.to_i > 0
     end
 
     munge do |value|
@@ -114,9 +112,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
     newvalues(/\A\d+\Z/)
 
     validate do |value|
-      if value.to_i < 1
-        raise(ArgumentError, "Invalid value \"#{value}\", valid values are 1-4294967295")
-      end
+      raise ArgumentError, "Invalid value \"#{value}\", valid values are 1-4294967295" unless value.to_i > 0
     end
 
     munge do |value|
