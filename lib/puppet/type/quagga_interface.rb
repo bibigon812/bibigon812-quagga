@@ -109,7 +109,7 @@ Puppet::Type.newtype(:quagga_interface) do
 
     validate do |value|
       raise ArgumentError, "OSPF cost '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "IGMP cost '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
+      raise ArgumentError, "OSPF cost '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
     end
 
     defaultto(10)
@@ -147,7 +147,7 @@ Puppet::Type.newtype(:quagga_interface) do
   newproperty(:ospf_network) do
     desc 'OSPF network type'
 
-    newvalues('broadcast', 'non-broadcast', 'point-to-multipoint', 'point-to-point', 'loopback')
+    newvalues(/\A(broadcast|non-broadcast|point-to-multipoint|point-to-point|loopback)\Z/)
     defaultto('broadcast')
   end
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:ospf_interface).provider(:quagga) do
+describe Puppet::Type.type(:quagga_interface).provider(:quagga) do
   describe 'instances' do
     it 'should have an instance method' do
       expect(described_class).to respond_to :instances
@@ -25,6 +25,11 @@ interface eth1
  ip ospf priority 50
  ip ospf retransmit-interval 4
  ip ospf mtu-ignore
+ ip pim ssm
+ ip igmp
+ ip igmp query-interval 150
+ ip igmp query-max-response-time-dsec 200
+!
 !
 interface gre0
 !
@@ -47,14 +52,22 @@ interface tun0
         :ensure => :present,
         :name => 'eth0',
         :provider => :quagga,
-        :cost => 10,
-        :dead_interval => 40,
-        :hello_interval => 10,
-        :mtu_ignore => :disabled,
-        :network => :broadcast,
-        :priority => 1,
-        :retransmit_interval => 5,
-        :transmit_delay => 1,
+        :description => :absent,
+        :enable => :true,
+        :ipaddress => [],
+        :multicast => :false,
+        :ospf_cost => 10,
+        :ospf_dead_interval => 40,
+        :ospf_hello_interval => 10,
+        :ospf_mtu_ignore => :false,
+        :ospf_network => 'broadcast',
+        :ospf_priority => 1,
+        :ospf_retransmit_interval => 5,
+        :ospf_transmit_delay => 1,
+        :pim_ssm => :false,
+        :igmp => :false,
+        :igmp_query_interval => 125,
+        :igmp_query_max_response_time_dsec => 100
       })
     end
 
@@ -63,14 +76,22 @@ interface tun0
          :ensure => :present,
          :name => 'eth1',
          :provider => :quagga,
-         :cost => 10,
-         :dead_interval => 8,
-         :hello_interval => 2,
-         :mtu_ignore => :enabled,
-         :network => :broadcast,
-         :priority => 50,
-         :retransmit_interval => 4,
-         :transmit_delay => 1,
+         :description => :absent,
+         :enable => :true,
+         :ipaddress => [],
+         :multicast => :false,
+         :ospf_cost => 10,
+         :ospf_dead_interval => 8,
+         :ospf_hello_interval => 2,
+         :ospf_mtu_ignore => :true,
+         :ospf_network => 'broadcast',
+         :ospf_priority => 50,
+         :ospf_retransmit_interval => 4,
+         :ospf_transmit_delay => 1,
+         :pim_ssm => :true,
+         :igmp => :true,
+         :igmp_query_interval => 150,
+         :igmp_query_max_response_time_dsec => 200
       })
     end
   end

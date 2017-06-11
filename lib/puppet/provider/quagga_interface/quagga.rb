@@ -125,7 +125,8 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
         interface = {
           :name => name,
           :ensure => :present,
-          :enable => :true
+          :enable => :true,
+          :provider => self.name,
         }
 
         @resource_map.each do |property, options|
@@ -290,7 +291,7 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
 
-      @property_hash[property] = value
+      @property_hash[property] = v
     end
 
     cmds << 'end'
