@@ -8,13 +8,13 @@ commands, as if you are doing this through the CLI.
 
 Currently it supports:
 
-  - BGP
-  - OSPF
-  - PIM
-  - route map
-  - prefix list
-  - community list
-  - as-path list
+- BGP
+- OSPF
+- PIM
+- route map
+- prefix list
+- community list
+- as-path list
 
 ### How to use it?
 
@@ -28,17 +28,68 @@ class { 'quagga':
 
 #### Reference
 
-  - `bgp`: Manage the BGP service. Default to `true`.
-  - `ospf`: Manage the OSPF service. Default to `true`.
-  - `pim`: Manage the PIM service. Default to `true`.
-  - `owner`: User of quagga configuration files. Default to `quagga`.
-  - `group`: Group of quagga configuration files. Default to `quagga`.
-  - `mode`: Mode of quagga configuration files. Default to `600`.
-  - `package_name`: Name of the quagga package. Default to `quagga`.
-  - `package_ensure`: Ensure for the quagga package. Default to `present`.
-  - `content`:  Initial content of configuration files. Default to `hostname ${::fqdn}\n`.
+- `bgp`: Manage the BGP service. Default to `true`.
+- `ospf`: Manage the OSPF service. Default to `true`.
+- `pim`: Manage the PIM service. Default to `true`.
+- `owner`: User of quagga configuration files. Default to `quagga`.
+- `group`: Group of quagga configuration files. Default to `quagga`.
+- `mode`: Mode of quagga configuration files. Default to `600`.
+- `package_name`: Name of the quagga package. Default to `quagga`.
+- `package_ensure`: Ensure for the quagga package. Default to `present`.
+- `content`:  Initial content of configuration files. Default to `hostname ${::fqdn}\n`.
 
 Then we can create different resources.
+
+### quagga_as_path
+
+```puppet
+quagga_as_path { 'TEST_AS_PATH':
+    ensure => present,
+    rules => [
+        permit => '_100$',
+        permit => '_100_',
+    ],
+}
+```
+
+#### Reference
+
+- `name`: The name of the as-path access-list.
+- `ensure`: Manage the state of this as-path list: `absent`, `present`. Default to `present`.
+- `rules`: A rule of the as-path access-list `{ action => regex }`.
+
+### quagga_interface
+
+```puppet
+quagga_interface { 'eth0':
+    igmp                => true,
+    ipaddress           => [ '10.0.0.1/24', '172.16.0.1/24', ],
+    multicast           => true,
+    ospf_mtu_ignore     => true,
+    ospf_hello_interval => 2,
+    ospf_dead_interval  => 8,
+    pim_ssm             => true,
+}
+```
+
+#### Reference
+
+- `name`: The friendly name of the network interface.
+- `description`: Interface description.
+- `igmp`: Enable IGMP. Default to `false`.
+- `igmp_query_interval`: IGMP query interval. Default to `125`.
+- `igmp_query_max_response_time_dsec`: IGMP maximum query response time in deciseconds. Default to `100`.
+- `ipaddress`: IP addresses. Default to `[]`.
+- `multicast`: Enable multicast flag for the interface. Default to `false`.
+- `ospf_cost`: Interface cos. Default to `10`.
+- `ospf_dead_interval`: Interval after which a neighbor is declared dead. Default to `40`.
+- `ospf_hello_interval`: Time between HELLO packets. Default to `10`.
+- `ospf_mtu_ignore`: Disable mtu mismatch detection. Default to `false`.
+- `ospf_network`: Network type: `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`. Default to `broadcast`.
+- `ospf_priority`: Router priority. Default to `1`.
+- `ospf_retransmit_interval`: Time between retransmitting lost link state advertisements. Default to `5`.
+- `ospf_transmit_delay`: Link state transmit delay. Default to `1`.
+- `pim_ssm`: Enable PIM SSM operation. Default to `false`.
 
 ### bgp
 
@@ -55,13 +106,13 @@ bgp { '65000':
 
 #### Reference
 
-  - `name`: AS number
-  - `ensure`: Manage the state of this BGP router: `absent`, `present`. Default to `present`.
-  - `import_check`: Check BGP network route exists in IGP.
-  - `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default to `true`.
-  - `maximum_paths_ebgp`: Forward packets over multiple paths ebgp. Default to `1`.
-  - `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default to `1`.
-  - `router_id`: Override configured router identifier.
+- `name`: AS number
+- `ensure`: Manage the state of this BGP router: `absent`, `present`. Default to `present`.
+- `import_check`: Check BGP network route exists in IGP.
+- `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default to `true`.
+- `maximum_paths_ebgp`: Forward packets over multiple paths ebgp. Default to `1`.
+- `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default to `1`.
+- `router_id`: Override configured router identifier.
 
 ### bgp_neighbor
 
@@ -88,26 +139,26 @@ bgp_neighbor { '65000 10.0.0.3':
 
 #### Reference
 
-  - `name`: It's consists of a AS number and a neighbor IP address or a peer-group name.
-  - `ensure`: Manage the state of this BGP neighbor: `absent`, `present`. Default to `present`.
-  - `activate`: Enable the Address Family for this Neighbor. Default to `true`.
-  - `allow_as_in`: Accept as-path with my AS present in it.
-  - `default_originate`: Originate default route to this neighbor. Default to `false`.
-  - `local_as`: Specify a local-as number.
-  - `next_hop_self`: Disable the next hop calculation for this neighbor. Default to `false`.
-  - `passive`: Don't send open messages to this neighbor. Default to `false`.
-  - `peer_group`: Member of the peer-group. Default to `false`.
-  - `prefix_list_in`: Filter updates from this neighbor.
-  - `prefix_list_out`: Filter updates to this neighbor.
-  - `remote_as`: Specify a BGP neighbor as.
-  - `route_map_export`: Apply map to routes coming from a Route-Server client.
-  - `route_map_import`: Apply map to routes going into a Route-Server client's table.
-  - `route_map_in`: Apply map to incoming routes.
-  - `route_map_out`: Apply map to outbound routes.
-  - `route_reflector_client`: Configure a neighbor as Route Reflector client. Default to `false`.
-  - `route_server_client`: Configure a neighbor as Route Server client. Default to `false`.
-  - `shutdown`: Administratively shut down this neighbor. Default to `false`.
-  - `update_source`: Source of routing updates. It can be the interface name or IP address.
+- `name`: It's consists of a AS number and a neighbor IP address or a peer-group name.
+- `ensure`: Manage the state of this BGP neighbor: `absent`, `present`. Default to `present`.
+- `activate`: Enable the Address Family for this Neighbor. Default to `true`.
+- `allow_as_in`: Accept as-path with my AS present in it.
+- `default_originate`: Originate default route to this neighbor. Default to `false`.
+- `local_as`: Specify a local-as number.
+- `next_hop_self`: Disable the next hop calculation for this neighbor. Default to `false`.
+- `passive`: Don't send open messages to this neighbor. Default to `false`.
+- `peer_group`: Member of the peer-group. Default to `false`.
+- `prefix_list_in`: Filter updates from this neighbor.
+- `prefix_list_out`: Filter updates to this neighbor.
+- `remote_as`: Specify a BGP neighbor as.
+- `route_map_export`: Apply map to routes coming from a Route-Server client.
+- `route_map_import`: Apply map to routes going into a Route-Server client's table.
+- `route_map_in`: Apply map to incoming routes.
+- `route_map_out`: Apply map to outbound routes.
+- `route_reflector_client`: Configure a neighbor as Route Reflector client. Default to `false`.
+- `route_server_client`: Configure a neighbor as Route Server client. Default to `false`.
+- `shutdown`: Administratively shut down this neighbor. Default to `false`.
+- `update_source`: Source of routing updates. It can be the interface name or IP address.
 
 ### bgp_network
 
@@ -119,8 +170,8 @@ bgp_network { '65000 192.168.1.0/24':
 
 #### Reference
 
-  - `name`: It's consists of a AS number and a network IP address.
-  - `ensure`: Manage the state of this BGP network: `absent`, `present`. Default to `present`.
+- `name`: It's consists of a AS number and a network IP address.
+- `ensure`: Manage the state of this BGP network: `absent`, `present`. Default to `present`.
 
 ### ospf
 
@@ -136,12 +187,12 @@ ospf { 'ospf':
 
 #### Reference
 
-  - `name`: Name must be `ospf`.
-  - `ensure`: Manage the state of this OSPF router: `absent`, `present`. Default to `present`.
-  - `abr_type`: Set OSPF ABR type. Default to `cisco`.
-  - `opaque`: Enable the Opaque-LSA capability (rfc2370). Default to `false`.
-  - `rfc1583`: Enable the RFC1583Compatibility flag. Default to `false`.
-  - `router_id`: Router-id for the OSPF process.
+- `name`: Name must be `ospf`.
+- `ensure`: Manage the state of this OSPF router: `absent`, `present`. Default to `present`.
+- `abr_type`: Set OSPF ABR type. Default to `cisco`.
+- `opaque`: Enable the Opaque-LSA capability (rfc2370). Default to `false`.
+- `rfc1583`: Enable the RFC1583Compatibility flag. Default to `false`.
+- `router_id`: Router-id for the OSPF process.
   
 ### ospf_area
 
@@ -163,37 +214,15 @@ ospf_area { '0.0.0.2':
 
 #### Reference
 
-  - `name`: OSPF area.
-  - `ensure`: Manage the state of this OSPF area: `absent`, `present`. Default to `present`.
-  - `default_cost`: Set the summary-default cost of a NSSA or stub area.
-  - `access_list_expor`: Set the filter for networks announced to other areas.
-  - `access_list_import`: Set the filter for networks from other areas announced to the specified one.
-  - `prefix_list_export`: Filter networks sent from this area.
-  - `prefix_list_import`: Filter networks sent to this area.
-  - `networks`: Enable routing on an IP network.
-  - `stub`: Configure OSPF area as stub: `true`, `false` or `no_summary`. Default to `false`.
-  
-### ospf_interface
-
-```puppet
-ospf_interface { 'eth0':
-    mtu_ignore     => true,
-    hello_interval => 2,
-    dead_interval  => 8,
-}
-```
-
-#### Reference
-
-  - `name`: The friendly name of the network interface.
-  - `cost`: Interface cos. Default to `10`.
-  - `dead_interval`: Interval after which a neighbor is declared dead. Default to `40`. 
-  - `hello_interval`: Time between HELLO packets. Default to `10`.
-  - `mtu_ignore`: Disable mtu mismatch detection. Default to `false`.
-  - `network`: Network type: `broadcast`, `non_broadcast`, `point_to_point` or `loopback`. Default to `broadcast`.
-  - `priority`: Router priority. Default to `1`.
-  - `retransmit_interval`: Time between retransmitting lost link state advertisements. Default to `5`.
-  - `transmit_delay`: Link state transmit delay. Default to `1`.
+- `name`: OSPF area.
+- `ensure`: Manage the state of this OSPF area: `absent`, `present`. Default to `present`.
+- `default_cost`: Set the summary-default cost of a NSSA or stub area.
+- `access_list_expor`: Set the filter for networks announced to other areas.
+- `access_list_import`: Set the filter for networks from other areas announced to the specified one.
+- `prefix_list_export`: Filter networks sent from this area.
+- `prefix_list_import`: Filter networks sent to this area.
+- `networks`: Enable routing on an IP network.
+- `stub`: Configure OSPF area as stub: `true`, `false` or `no_summary`. Default to `false`.
 
 ### redistribution
 
@@ -214,11 +243,11 @@ redistribution { 'bgp:65000:ospf':
 
 #### Reference
 
-  - `name`: The name contains the main protocol, the id and the protocol for redistribution.
-  - `ensure`: Manage the state of this redistribution: `absent`, `present`. Default to `present`.
-  - `metric`: Metric for redistributed routes.
-  - `metric_type`: OSPF exterior metric type for redistributed routes.
-  - `route_map`: Route map reference.
+- `name`: The name contains the main protocol, the id and the protocol for redistribution.
+- `ensure`: Manage the state of this redistribution: `absent`, `present`. Default to `present`.
+- `metric`: Metric for redistributed routes.
+- `metric_type`: OSPF exterior metric type for redistributed routes.
+- `route_map`: Route map reference.
 
 ### route_map
 
@@ -244,11 +273,11 @@ route_map { 'bgp_out:permit:65000':
 
 #### Reference
 
-  - `name`: Name of the route-map, action and sequence number of rule.
-  - `ensure`: Manage the state of this route map: `absent`, `present`. Default to `present`.
-  - `match`: Match values from routing table.
-  - `on_match`: Exit policy on matches.
-  - `set`: Set values in destination routing protocol.
+- `name`: Name of the route-map, action and sequence number of rule.
+- `ensure`: Manage the state of this route map: `absent`, `present`. Default to `present`.
+- `match`: Match values from routing table.
+- `on_match`: Exit policy on matches.
+- `set`: Set values in destination routing protocol.
 
 
 ### prefix_list
@@ -273,13 +302,13 @@ prefix_list {'ADVERTISED_PREFIXES:20':
 
 #### Reference
 
-  - `name`: Name of the prefix-list and sequence number of rule: `name:sequence`.
-  - `ensure`: Manage the state of this prefix list: `absent`, `present`. Default to `present`.
-  - `action`: Action can be `permit` or `deny`.
-  - `ge`: Minimum prefix length to be matched.
-  - `le`: Maximum prefix length to be matched.
-  - `prefix`: IP prefix `<network>/<length>`.
-  - `proto`: IP protocol version: `ip`, `ipv6`. Default to `ip`.
+- `name`: Name of the prefix-list and sequence number of rule: `name:sequence`.
+- `ensure`: Manage the state of this prefix list: `absent`, `present`. Default to `present`.
+- `action`: Action can be `permit` or `deny`.
+- `ge`: Minimum prefix length to be matched.
+- `le`: Maximum prefix length to be matched.
+- `prefix`: IP prefix `<network>/<length>`.
+- `proto`: IP protocol version: `ip`, `ipv6`. Default to `ip`.
 
 ### community_list
 
@@ -295,43 +324,9 @@ community_list { '100':
 
 #### Reference
 
-  - `name`: Community list number.
-  - `ensure`: Manage the state of this community list: `absent`, `present`. Default to `present`.
-  - `rules`: A rule of the community list `{ action => community }`.    
-
-### as_path
-
-```puppet
-as_path { 'TEST_AS_PATH':
-    ensure => present,
-    rules => [
-        permit => '_100$',
-        permit => '_100_',
-    ],
-}
-```
-
-#### Reference
-
-  - `name`: The name of the as-path access-list.
-  - `ensure`: Manage the state of this as-path list: `absent`, `present`. Default to `present`.
-  - `rules`: A rule of the as-path access-list `{ action => regex }`.
-  
-### pim_interface
-
-```puppet
-pim_interface { 'eth0':
-    pim_ssm => false,
-}
-```
-
-#### Reference
-
-  - `name`: The friendly name of the network interface
-  - `igmp`: Enable IGMP. Default to `true`.
-  - `pim_ssm`: Enable PIM SSM operation. Default to `true`.
-  - `igmp_query_interval`: IGMP query interval. Default to `125`.
-  - `igmp_query_max_response_time_dsec`: IGMP maximum query response time in deciseconds. Default to `100`.
+- `name`: Community list number.
+- `ensure`: Manage the state of this community list: `absent`, `present`. Default to `present`.
+- `rules`: A rule of the community list `{ action => community }`.
 
 ## Hiera
 
