@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:bgp) do
-
   let :providerclass  do
     described_class.provide(:fake_quagga_provider) do
       attr_accessor :property_hash

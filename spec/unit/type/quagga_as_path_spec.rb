@@ -1,20 +1,20 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:as_path) do
-  let(:networking_service) do
-    @provider_class = describe_class.provide(:as_path) {
+describe Puppet::Type.type(:quagga_as_path) do
+  let :providerclass  do
+    described_class.provide(:fake_quagga_provider) do
+      attr_accessor :property_hash
+      def create; end
+      def destroy; end
+      def exists?
+        get(:ensure) == :present
+      end
       mk_resource_methods
-    }
-    @provider_class.stub(:suitable?).return true
-    @provider_class
+    end
   end
 
   before :each do
-    described_class.stubs(:defaultprovider).returns @provider_class
-  end
-
-  after :each do
-    described_class.unprovide(:as_path)
+    Puppet::Type.type(:quagga_as_path).stubs(:defaultprovider).returns providerclass
   end
 
   it 'should have :name be its namevar' do

@@ -1,10 +1,10 @@
-Puppet::Type.newtype(:as_path) do
+Puppet::Type.newtype(:quagga_as_path) do
   @doc = %q{
     This type provides the capabilities to manage as-path access-list within puppet.
 
       Examples:
 
-        as_path { 'as100':
+        quagga_as_path { 'as100':
             ensure => present,
             rules => [
                 { permit => '_100$', },
