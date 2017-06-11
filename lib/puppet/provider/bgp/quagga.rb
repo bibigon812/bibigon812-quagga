@@ -21,20 +21,20 @@ Puppet::Type.type(:bgp).provide :quagga do
       :maximum_paths_ebgp => {
           :default => 1,
           :regexp => /\A\smaximum-paths\s(\d+)\Z/,
-          :template => 'maximum-paths <%= value %>',
+          :template => 'maximum-paths<% unless value.nil? %> <%= value %><% end %>',
           :type => :fixnum,
           :value => '$1',
       },
       :maximum_paths_ibgp => {
           :default => 1,
           :regexp => /\A\smaximum-paths\sibgp\s(\d+)\Z/,
-          :template => 'maximum-paths ibgp <%= value %>',
+          :template => 'maximum-paths ibgp<% unless value.nil? %> <%= value %><% end %>',
           :type => :fixnum,
           :value => '$1',
       },
       :router_id => {
           :regexp => /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/,
-          :template => 'bgp router-id <%= value %>',
+          :template => 'bgp router-id<% unless value.nil? %> <%= value %><% end %>',
           :type => :string,
           :value => '$1',
       },
@@ -59,9 +59,11 @@ Puppet::Type.type(:bgp).provide :quagga do
         name = $1
         found_bgp = true
 
-        hash[:ensure] = :present
-        hash[:provider] = self.name
-        hash[:name] = name
+        hash = {
+            :ensure => :present,
+            :name => name,
+            :provider => self.name,
+        }
 
         # Added default values
         @resource_map.each do |property, options|
@@ -69,11 +71,15 @@ Puppet::Type.type(:bgp).provide :quagga do
             hash[property] = options[:default]
           end
         end
+
+      # Exit
       elsif line =~ /\A\w/ and found_bgp
         break
+
       elsif found_bgp
         @resource_map.each do |property, options|
           if line =~ options[:regexp]
+
             value = eval(options[:value])
             case options[:type]
               when :fixnum
@@ -115,6 +121,18 @@ Puppet::Type.type(:bgp).provide :quagga do
     end
   end
 
+  def default_router_id
+    def_router_id = :absent
+    config = vtysh('-c', 'show running-config')
+    config.split(/\n/).collect do |line|
+      if line =~ /\A\sbgp\srouter-id\s(\S)\Z/
+        def_router_id = $1
+        break
+      end
+    end
+    def_router_id
+  end
+
   def destroy
     name = @property_hash[:name]
 
@@ -146,13 +164,32 @@ Puppet::Type.type(:bgp).provide :quagga do
     cmds << 'configure terminal'
     cmds << "router bgp #{name}"
 
-    @property_flush.each do |property, value|
-      cmd = ''
-      if resource_map[property][:type] == :boolean && value == :false
-        cmd << 'no '
+    @property_flush.each do |property, v|
+      if v == :absent or v == :false
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+
+      elsif v == :true and resource_map[property][:type] == :symbol
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+
+      elsif v == :true
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+
+      elsif resource_map[property][:type] == :array
+        (@property_hash[property] - v).each do |value|
+          cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        end
+
+        v.each do |value|
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
+        end
+
+      else
+        value = v
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
-      cmd << ERB.new(resource_map[property][:template]).result(binding)
-      cmds << cmd
+
+      @property_hash[property] = v
     end
 
     cmds << 'end'

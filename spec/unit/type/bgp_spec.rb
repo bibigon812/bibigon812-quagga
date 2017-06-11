@@ -1,20 +1,24 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:bgp) do
-  let(:networking_service) do
-    @provider_class = describe_class.provide(:bgp) {
+
+  let :providerclass  do
+    described_class.provide(:fake_quagga_provider) do
+      attr_accessor :property_hash
+      def create; end
+      def destroy; end
+      def exists?
+        get(:ensure) == :present
+      end
+      def default_router_id
+        '10.0.0.1'
+      end
       mk_resource_methods
-    }
-    @provider_class.stub(:suitable?).return true
-    @provider_class
+    end
   end
 
   before :each do
-    described_class.stubs(:defaultprovider).returns @provider_class
-  end
-
-  after :each do
-    described_class.unprovide(:bgp)
+    Puppet::Type.type(:bgp).stubs(:defaultprovider).returns providerclass
   end
 
   it 'should have :name be its namevar' do
@@ -188,6 +192,10 @@ describe Puppet::Type.type(:bgp) do
 
     it 'should contain 1.1.1.1' do
       expect(described_class.new(:name => '197888', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
+    end
+
+    it 'should contain default 10.0.0.1' do
+      expect(described_class.new(:name => '197888')[:router_id]).to eq('10.0.0.1')
     end
   end
 end

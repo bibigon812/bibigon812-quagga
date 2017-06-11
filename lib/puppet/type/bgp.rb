@@ -65,6 +65,11 @@ Puppet::Type.newtype(:bgp) do
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
 
     newvalues(re)
+    newvalues(:absent)
+
+    defaultto do
+      provider.default_router_id
+    end
   end
 
   autorequire(:package) do
