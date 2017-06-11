@@ -48,8 +48,12 @@ Puppet::Type.newtype(:quagga_as_path) do
       new_value
     end
 
-    def should_to_s(value)
-      value.inspect
+    def should_to_s(newvalue = @should)
+      if newvalue
+        newvalue.inspect
+      else
+        nil
+      end
     end
   end
 
