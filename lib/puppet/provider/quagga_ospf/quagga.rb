@@ -1,4 +1,4 @@
-Puppet::Type.type(:ospf).provide :quagga do
+Puppet::Type.type(:quagga_ospf).provide :quagga do
   @doc = 'Manages ospf parameters using quagga'
 
   @resource_map = {
@@ -176,16 +176,6 @@ Puppet::Type.type(:ospf).provide :quagga do
       vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
       @property_flush.clear
     end
-  end
-
-  def purge
-    debug '[purge]'
-
-    @property_hash.each do |property, value|
-      @proeprty_remove[property] = value if @resource[property].nil?
-    end
-
-    flush unless @property_remove.empty?
   end
 
   @resource_map.keys.each do |property|

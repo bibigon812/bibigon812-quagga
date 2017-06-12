@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:ospf) do
+describe Puppet::Type.type(:quagga_ospf) do
   let(:networking_service) do
-    @provider_class = describe_class.provide(:ospf) {
+    @provider_class = describe_class.provide(:quagga_ospf) {
       mk_resource_methods
     }
     @provider_class.stub(:suitable?).return true
@@ -14,7 +14,7 @@ describe Puppet::Type.type(:ospf) do
   end
 
   after :each do
-    described_class.unprovide(:ospf)
+    described_class.unprovide(:quagga_ospf)
   end
 
   it 'should have :name be its namevar' do
