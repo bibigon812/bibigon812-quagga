@@ -66,32 +66,28 @@ describe Puppet::Type.type(:quagga_as_path) do
   end
 
   describe 'rules' do
-    it 'should support :premit => \'_100$\' as a value' do
-      expect { described_class.new(:name => 'as100', :rules => { :permit => '_100$' }) }.to_not raise_error
+    it 'should support \'premit _100$\' as a value' do
+      expect { described_class.new(:name => 'as100', :rules => 'permit _100$') }.to_not raise_error
     end
 
-    it 'should support [{:permit => \'_100$\'}, {:permit => \'_100_\'}] as a value' do
-      expect { described_class.new(:name => 'as100', :rules => [{:permit => '_100$'}, {:permit => '_100_'}]) }.to_not raise_error
+    it 'should support [\'permit _100$\', \'permit _100_\'] as a value' do
+      expect { described_class.new(:name => 'as100', :rules => ['permit _100$', 'permit _100_']) }.to_not raise_error
     end
 
-    it 'should not support [{:permit => \'_10X$\'}, {:permit => \'_100_\'}] as a value' do
-      expect { described_class.new(:name => 'as100', :rules => [{:permit => '_10X$'}, {:permit => '_100_'}]) }.to raise_error(Puppet::Error, /The regex _10X\$ is invalid/)
+    it 'should not support [\'permit _10X$\', \'permit _100_\'] as a value' do
+      expect { described_class.new(:name => 'as100', :rules => ['permit _10X$', 'permit _100_']) }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should not support [{:reject => \'_100$\'}, {:permit => \'_100_\'}] as a value' do
-      expect { described_class.new(:name => 'as100', :rules => [{:reject => '_100$'}, {:permit => '_100_'}]) }.to raise_error(Puppet::Error, /Use the action permit or deny instead of reject/)
+    it 'should not support [\'reject _100$\', \'permit _100_\'] as a value' do
+      expect { described_class.new(:name => 'as100', :rules => ['reject _100$', 'permit _100_']) }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
-    it 'should not support a string as a value' do
-      expect { described_class.new(:name => 'as100', :rules => 'permit => _100$') }.to raise_error(Puppet::Error, /Use a hash { action => regex }/)
+    it 'should contain [\'permit _100$\']' do
+      expect(described_class.new(:name => 'as100', :rules => 'permit _100$')[:rules]).to eq(['permit _100$'])
     end
 
-    it 'should contain [{:permit => \'_100$\'}]' do
-      expect(described_class.new(:name => 'as100', :rules => {:permit => '_100$'})[:rules]).to eq([{:permit => '_100$'}])
-    end
-
-    it 'should contain [{:permit => \'_100$\'}, {:permit => \'_100_\'}]' do
-      expect(described_class.new(:name => 'as100', :rules => [{:permit => '_100$'}, {:permit => '_100_'}])[:rules]).to eq([{:permit => '_100$'}, {:permit => '_100_'}])
+    it 'should contain [\'permit _100$\', \'permit _100_\']' do
+      expect(described_class.new(:name => 'as100', :rules => ['permit _100$', 'permit _100_'])[:rules]).to eq(['permit _100$', 'permit _100_'])
     end
   end
 end

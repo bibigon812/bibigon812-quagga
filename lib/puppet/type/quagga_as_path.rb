@@ -22,31 +22,9 @@ Puppet::Type.newtype(:quagga_as_path) do
   end
 
   newproperty(:rules, :array_matching => :all) do
-    desc %q{ Rules of the as-path access-list. `{ action => regex }`. }
+    desc %q{ Rules of the as-path access-list. `action regex`. }
 
-    validate do |value|
-      case value
-        when Hash
-          value.each do |action, regex|
-            unless [:deny, :permit].include?(action.to_s.to_sym)
-              raise(ArgumentError, "Use the action permit or deny instead of #{action}")
-            end
-            unless regex.match(/\A\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
-              raise(ArgumentError, "The regex #{regex} is invalid")
-            end
-          end
-        else
-          raise(ArgumentError, 'Use a hash { action => regex }')
-      end
-    end
-
-    munge do |value|
-      new_value = {}
-      value.each do |action, regex|
-        new_value[action.to_s.to_sym] = regex
-      end
-      new_value
-    end
+    newvalues(/\A(permit|deny)\s\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
 
     def should_to_s(newvalue = @should)
       if newvalue

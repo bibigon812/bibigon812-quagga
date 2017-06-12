@@ -42,7 +42,7 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
           :ensure => :present,
           :name => 'FROM_AS100',
           :provider => :quagga,
-          :rules => [{:permit => '_100$ _100_'}, {:permit => '_90_'}, {:permit => '_90$'},],
+          :rules => ['permit _100$ _100_', 'permit _90_', 'permit _90$',],
       })
     end
 
@@ -51,7 +51,7 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
           :ensure => :present,
           :name => 'FROM_AS20764',
           :provider => :quagga,
-          :rules => [{:permit => '_20764$'},],
+          :rules => ['permit _20764$',],
       })
     end
   end

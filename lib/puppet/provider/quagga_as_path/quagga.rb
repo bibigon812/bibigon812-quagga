@@ -33,7 +33,7 @@ Puppet::Type.type(:quagga_as_path).provide :quagga do
           }
         end
 
-        hash[:rules] << { action.to_sym => regex }
+        hash[:rules] <<  "#{action} #{regex}"
 
         previous_name = name
       end
@@ -91,9 +91,8 @@ Puppet::Type.type(:quagga_as_path).provide :quagga do
     cmds << "no ip as-path access-list #{name}"
 
     value.each do |rule|
-      rule.each do |action, regex|
-        cmds << "ip as-path access-list #{name} #{action} #{regex}"
-      end
+      action, regexp = rule.split(/\s/)
+      cmds << "ip as-path access-list #{name} #{action} #{regexp}"
     end
 
     cmds << 'end'
