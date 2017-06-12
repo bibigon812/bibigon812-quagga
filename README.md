@@ -94,13 +94,13 @@ quagga_bgp_peer { '65000 internal':
 }
 
 quagga_bgp_peer { '65000 10.0.0.2':
-    ensure            => present,
-    peer_group        => 'internal',
+    ensure     => present,
+    peer_group => 'internal',
 }
 
 quagga_bgp_peer { '65000 10.0.0.3':
-    ensure            => present,
-    peer_group        => 'internal',
+    ensure     => present,
+    peer_group => 'internal',
 }
 ```
 
