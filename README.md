@@ -58,6 +58,75 @@ quagga_as_path { 'TEST_AS_PATH':
 - `ensure`: Manage the state of this as-path list: `absent`, `present`. Default to `present`.
 - `rules`: A rule of the as-path access-list `{ action => regex }`.
 
+### quagga_bgp
+
+```puppet
+quagga_bgp { '65000':
+    ensure             => present,
+    import_check       => true',
+    ipv4_unicast       => true',
+    maximum_paths_ebgp => 10,
+    maximum_paths_ibgp => 10,
+    router_id          => '10.0.0.1',
+}
+```
+
+#### Reference
+
+- `name`: AS number
+- `ensure`: Manage the state of this BGP router: `absent`, `present`. Default to `present`.
+- `import_check`: Check BGP network route exists in IGP.
+- `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default to `true`.
+- `maximum_paths_ebgp`: Forward packets over multiple paths ebgp. Default to `1`.
+- `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default to `1`.
+- `router_id`: Override configured router identifier.
+
+### quagga_bgp_peer
+
+```puppet
+quagga_bgp_peer { '65000 internal':
+    ensure        => present,
+    activate      => true,
+    next_hop_self => true,
+    peer_group    => true,
+    remote_as     => 65000,
+    update_source => '10.0.0.1',
+}
+
+quagga_bgp_peer { '65000 10.0.0.2':
+    ensure            => present,
+    peer_group        => 'internal',
+}
+
+quagga_bgp_peer { '65000 10.0.0.3':
+    ensure            => present,
+    peer_group        => 'internal',
+}
+```
+
+#### Reference
+
+- `name`: It's consists of a AS number and a neighbor IP address or a peer-group name.
+- `ensure`: Manage the state of this BGP neighbor: `absent`, `present`. Default to `present`.
+- `activate`: Enable the Address Family for this Neighbor. Default to `true`.
+- `allow_as_in`: Accept as-path with my AS present in it.
+- `default_originate`: Originate default route to this neighbor. Default to `false`.
+- `local_as`: Specify a local-as number.
+- `next_hop_self`: Disable the next hop calculation for this neighbor. Default to `false`.
+- `passive`: Don't send open messages to this neighbor. Default to `false`.
+- `peer_group`: Member of the peer-group. Default to `false`.
+- `prefix_list_in`: Filter updates from this neighbor.
+- `prefix_list_out`: Filter updates to this neighbor.
+- `remote_as`: Specify a BGP neighbor as.
+- `route_map_export`: Apply map to routes coming from a Route-Server client.
+- `route_map_import`: Apply map to routes going into a Route-Server client's table.
+- `route_map_in`: Apply map to incoming routes.
+- `route_map_out`: Apply map to outbound routes.
+- `route_reflector_client`: Configure a neighbor as Route Reflector client. Default to `false`.
+- `route_server_client`: Configure a neighbor as Route Server client. Default to `false`.
+- `shutdown`: Administratively shut down this neighbor. Default to `false`.
+- `update_source`: Source of routing updates. It can be the interface name or IP address.
+
 ### quagga_interface
 
 ```puppet
@@ -90,75 +159,6 @@ quagga_interface { 'eth0':
 - `ospf_retransmit_interval`: Time between retransmitting lost link state advertisements. Default to `5`.
 - `ospf_transmit_delay`: Link state transmit delay. Default to `1`.
 - `pim_ssm`: Enable PIM SSM operation. Default to `false`.
-
-### bgp
-
-```puppet
-bgp { '65000':
-    ensure             => present,
-    import_check       => true',
-    ipv4_unicast       => true',
-    maximum_paths_ebgp => 10,
-    maximum_paths_ibgp => 10,
-    router_id          => '10.0.0.1',
-}
-```
-
-#### Reference
-
-- `name`: AS number
-- `ensure`: Manage the state of this BGP router: `absent`, `present`. Default to `present`.
-- `import_check`: Check BGP network route exists in IGP.
-- `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default to `true`.
-- `maximum_paths_ebgp`: Forward packets over multiple paths ebgp. Default to `1`.
-- `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default to `1`.
-- `router_id`: Override configured router identifier.
-
-### bgp_neighbor
-
-```puppet
-bgp_neighbor { '65000 internal':
-    ensure        => present,
-    activate      => true,
-    next_hop_self => true,
-    peer_group    => true,
-    remote_as     => 65000,
-    update_source => '10.0.0.1',
-}
-
-bgp_neighbor { '65000 10.0.0.2':
-    ensure            => present,
-    peer_group        => 'internal',
-}
-
-bgp_neighbor { '65000 10.0.0.3':
-    ensure            => present,
-    peer_group        => 'internal',
-}
-```
-
-#### Reference
-
-- `name`: It's consists of a AS number and a neighbor IP address or a peer-group name.
-- `ensure`: Manage the state of this BGP neighbor: `absent`, `present`. Default to `present`.
-- `activate`: Enable the Address Family for this Neighbor. Default to `true`.
-- `allow_as_in`: Accept as-path with my AS present in it.
-- `default_originate`: Originate default route to this neighbor. Default to `false`.
-- `local_as`: Specify a local-as number.
-- `next_hop_self`: Disable the next hop calculation for this neighbor. Default to `false`.
-- `passive`: Don't send open messages to this neighbor. Default to `false`.
-- `peer_group`: Member of the peer-group. Default to `false`.
-- `prefix_list_in`: Filter updates from this neighbor.
-- `prefix_list_out`: Filter updates to this neighbor.
-- `remote_as`: Specify a BGP neighbor as.
-- `route_map_export`: Apply map to routes coming from a Route-Server client.
-- `route_map_import`: Apply map to routes going into a Route-Server client's table.
-- `route_map_in`: Apply map to incoming routes.
-- `route_map_out`: Apply map to outbound routes.
-- `route_reflector_client`: Configure a neighbor as Route Reflector client. Default to `false`.
-- `route_server_client`: Configure a neighbor as Route Server client. Default to `false`.
-- `shutdown`: Administratively shut down this neighbor. Default to `false`.
-- `update_source`: Source of routing updates. It can be the interface name or IP address.
 
 ### bgp_network
 
