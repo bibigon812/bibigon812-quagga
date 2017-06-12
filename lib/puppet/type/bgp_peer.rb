@@ -1,4 +1,4 @@
-Puppet::Type.newtype(:bgp_neighbor) do
+Puppet::Type.newtype(:bgp_peer) do
   @doc = %q{
     This type provides the capability to manage bgp neighbor within puppet.
 
@@ -182,7 +182,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
     reqs
   end
 
-  autorequire(:bgp_neighbor) do
+  autorequire(:bgp_peer) do
     reqs = []
     peer_group = value(:peer_group)
     unless peer_group.nil? || peer_group == :enabled
