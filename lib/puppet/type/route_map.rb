@@ -93,9 +93,9 @@ route_map {'TEST_ROUTE_MAP:permit:10':
     end
   end
 
-  autonotify(:bgp_peer) do
+  autonotify(:quagga_bgp_peer) do
     name = self[:name].split(/:/).first
-    bgp_neighbors = catalog.resources.select { |resource| resource.type == :bgp_peer }
+    bgp_neighbors = catalog.resources.select { |resource| resource.type == :quagga_bgp_peer }
     bgp_neighbors.select { |resource| resource[:route_map_in] == name || resource[:route_map_out] == name }
   end
 

@@ -1,4 +1,4 @@
-Puppet::Type.type(:bgp_peer).provide(:quagga) do
+Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   @doc = %q{ Manages bgp neighbors using quagga }
 
   commands :vtysh => 'vtysh'

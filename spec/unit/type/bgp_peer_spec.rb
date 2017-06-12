@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:bgp_peer) do
-  let(:bgp_peer) do
-    @provider_class = describe_class.provide(:bgp_peer) {
+describe Puppet::Type.type(:quagga_bgp_peer) do
+  let(:quagga_bgp_peer) do
+    @provider_class = describe_class.provide(:quagga_bgp_peer) {
       mk_resource_methods
     }
     @provider_class.stub(:suitable?).return true
@@ -14,7 +14,7 @@ describe Puppet::Type.type(:bgp_peer) do
   end
 
   after :each do
-    described_class.unprovide(:bgp_peer)
+    described_class.unprovide(:quagga_bgp_peer)
   end
 
   it 'should have :name be its namevar' do
