@@ -39,6 +39,24 @@ describe Puppet::Type.type(:quagga_interface) do
   end
 
   describe 'when validating values' do
+    describe 'ipaddress' do
+      it 'should support 10.0.0.1/24 as a value' do
+        expect { described_class.new(:name => 'foo', :ipaddress => '10.0.0.1/24') }.to_not raise_error
+      end
+
+      it 'should not support 500.0.0.1/24 as a value' do
+        expect { described_class.new(:name => 'foo', :ipaddress => '500.0.0.1/24') }.to raise_error Puppet::Error, /Not a valid ip address/
+      end
+
+      it 'should not support 10.0.0.1 as a value' do
+        expect { described_class.new(:name => 'foo', :ipaddress => '10.0.0.1') }.to raise_error Puppet::Error, /Prefix length is not specified/
+      end
+
+      it 'should contain 10.0.0.1' do
+        expect(described_class.new(:name => 'foo', :ipaddress => '10.0.0.1/24')[:ipaddress]).to eq(['10.0.0.1/24'])
+      end
+    end
+
     describe 'ospf_cost' do
       it 'should support 100 as a value' do
         expect { described_class.new(:name => 'foo', :ospf_cost => 100) }.to_not raise_error

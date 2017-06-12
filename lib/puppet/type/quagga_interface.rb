@@ -1,3 +1,5 @@
+require 'ipaddr'
+
 Puppet::Type.newtype(:quagga_interface) do
   @doc = 'This type provides the capabilities to manage Quagga interface parameters'
 
@@ -37,7 +39,12 @@ Puppet::Type.newtype(:quagga_interface) do
     desc 'IP address'
 
     validate do |value|
-      raise ArgumentError, "Not a valid ip address '#{value}'" unless value =~ /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$/
+      begin
+        IPAddr.new value
+      rescue
+        raise ArgumentError, "Not a valid ip address '#{value}'"
+      end
+      raise ArgumentError, "Prefix length is not specified '#{value}'" unless value.include?('/')
     end
 
     def insync?(current)

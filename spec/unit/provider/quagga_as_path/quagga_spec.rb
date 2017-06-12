@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_as_path).provider(:quagga) do
+  let(:provider) { Puppet::Type.type(:quagga_as_path).provider(:quagga) }
+
   describe 'instances' do
     it 'should have an instance method' do
       expect(described_class).to respond_to :instances
