@@ -4,6 +4,10 @@
 
 ### Changed
 - boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 
+- `ospf_interface` and `pim_interface` types to `quagga_interface`
+- `as_path` type to `quagga_as_path`
+- `bgp` type to `quagga_bgp`
+- `bgp_neighbor` type to `quagga_bgp_peer`
 
 ### Removed
 - the method `purge` from resources `bgp*`
