@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:bgp_network) do
-  let(:networking_service) do
-    @provider_class = describe_class.provide(:bgp_network) {
+describe Puppet::Type.type(:quagga_bgp_network) do
+  let(:quagga_bgp_network) do
+    @provider_class = describe_class.provide(:quagga_bgp_network) {
       mk_resource_methods
     }
     @provider_class.stub(:suitable?).return true
@@ -14,7 +14,7 @@ describe Puppet::Type.type(:bgp_network) do
   end
 
   after :each do
-    described_class.unprovide(:bgp_network)
+    described_class.unprovide(:quagga_bgp_network)
   end
 
   it 'should have :name be its namevar' do

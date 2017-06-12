@@ -1,4 +1,4 @@
-Puppet::Type.type(:bgp_network).provide :quagga do
+Puppet::Type.type(:quagga_bgp_network).provide :quagga do
   @doc = %q{ Manages bgp neighbors using quagga }
 
   commands :vtysh => 'vtysh'
@@ -20,7 +20,7 @@ Puppet::Type.type(:bgp_network).provide :quagga do
         hash[:name] = "#{as} #{network}"
         hash[:provider] = self.name
         hash[:ensure] = :present
-        debug "bgp_network: #{hash}"
+        debug "bgp network: #{hash}"
         providers << new(hash)
       elsif line =~ /^\w/ and found_config
         break

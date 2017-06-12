@@ -81,6 +81,20 @@ quagga_bgp { '65000':
 - `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default to `1`.
 - `router_id`: Override configured router identifier.
 
+### quagga_bgp_network
+
+```puppet
+quagga_bgp_network { '65000 192.168.1.0/24':
+    ensure => present,
+}
+```
+
+#### Reference
+
+- `name`: It's consists of a AS number and a network IP address.
+- `ensure`: Manage the state of this BGP network: `absent`, `present`. Default to `present`.
+
+
 ### quagga_bgp_peer
 
 ```puppet
@@ -159,19 +173,6 @@ quagga_interface { 'eth0':
 - `ospf_retransmit_interval`: Time between retransmitting lost link state advertisements. Default to `5`.
 - `ospf_transmit_delay`: Link state transmit delay. Default to `1`.
 - `pim_ssm`: Enable PIM SSM operation. Default to `false`.
-
-### bgp_network
-
-```puppet
-bgp_network { '65000 192.168.1.0/24':
-    ensure => present,
-}
-```
-
-#### Reference
-
-- `name`: It's consists of a AS number and a network IP address.
-- `ensure`: Manage the state of this BGP network: `absent`, `present`. Default to `present`.
 
 ### ospf
 
