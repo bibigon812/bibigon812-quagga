@@ -1,4 +1,4 @@
-Puppet::Type.newtype(:ospf) do
+Puppet::Type.newtype(:quagga_ospf) do
   @doc = 'This type provides the capabilities to manage ospf router within puppet'
 
   ensurable
