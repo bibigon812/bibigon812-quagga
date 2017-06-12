@@ -63,8 +63,8 @@ quagga_as_path { 'TEST_AS_PATH':
 ```puppet
 quagga_bgp { '65000':
     ensure             => present,
-    import_check       => true',
-    ipv4_unicast       => true',
+    import_check       => true,
+    ipv4_unicast       => true,
     maximum_paths_ebgp => 10,
     maximum_paths_ibgp => 10,
     router_id          => '10.0.0.1',
