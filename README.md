@@ -46,8 +46,8 @@ Then we can create different resources.
 quagga_as_path { 'TEST_AS_PATH':
     ensure => present,
     rules => [
-        permit => '_100$',
-        permit => '_100_',
+        'permit _100$',
+        'permit _100_',
     ],
 }
 ```

@@ -14,6 +14,7 @@
 
 ### Updated
 - changelog
+- docs
 
 ## [1.2.1] - 07-06-2017
 ### Added
