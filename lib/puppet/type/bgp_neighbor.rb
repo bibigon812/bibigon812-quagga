@@ -171,7 +171,7 @@ Puppet::Type.newtype(:bgp_neighbor) do
     newvalues(/\A#{interface}\Z/)
   end
 
-  autorequire(:bgp) do
+  autorequire(:quagga_bgp) do
     reqs = []
     as = value(:name).split(/\s+/).first
 

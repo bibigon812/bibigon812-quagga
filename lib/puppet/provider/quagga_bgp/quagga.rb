@@ -1,4 +1,4 @@
-Puppet::Type.type(:bgp).provide :quagga do
+Puppet::Type.type(:quagga_bgp).provide :quagga do
   @doc = %q{ Manages as-path access-list using quagga }
 
   commands :vtysh => 'vtysh'
@@ -92,10 +92,12 @@ Puppet::Type.type(:bgp).provide :quagga do
         end
       end
     end
+
     unless hash.empty?
       debug "bgp: #{hash}"
       providers << new(hash)
     end
+
     providers
   end
 

@@ -27,7 +27,7 @@ Puppet::Type.newtype(:bgp_network) do
     end
   end
 
-  autorequire(:bgp) do
+  autorequire(:quagga_bgp) do
     reqs = []
     as = value(:name).split(/\s+/).first
 

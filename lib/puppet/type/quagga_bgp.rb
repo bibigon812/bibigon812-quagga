@@ -1,11 +1,11 @@
-Puppet::Type.newtype(:bgp) do
+Puppet::Type.newtype(:quagga_bgp) do
   @doc = %q{
 
     This type provides the capability to manage bgp parameters within puppet.
 
       Examples:
 
-        bgp { '65000':
+        quagga_bgp { '65000':
             ensure             => present,
             import_check       => true,
             ipv4_unicast       => false,
