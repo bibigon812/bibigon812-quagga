@@ -31,7 +31,7 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
       :networks => {
           :default => [],
           :regexp => /\A\snetwork\s(\S+)\Z/,
-          :template => '<% if value.include?(\':\') %>address-family ipv6\n<% end %>network<% unless value.nil? %> <%= value %><% end %><% if value.include?(\':\') %>\nexit-address-family<% end %>',
+          :template => 'network<% unless value.nil? %> <%= value %><% end %>',
           :type => :array,
       },
       :router_id => {
@@ -197,11 +197,15 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
 
       elsif resource_map[property][:type] == :array
         (@property_hash[property] - v).each do |value|
+          cmds << 'address-family ipv6' if property == :networks and value.include?(':')
           cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+          cmds << 'exit-address-family' if property == :networks and value.include?(':')
         end
 
         (v - @property_hash[property]).each do |value|
+          cmds << 'address-family ipv6' if property == :networks and value.include?(':')
           cmds << ERB.new(resource_map[property][:template]).result(binding)
+          cmds << 'exit-address-family' if property == :networks and value.include?(':')
         end
 
       else
