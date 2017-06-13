@@ -53,7 +53,6 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
       # skip comments
       next if line =~ /\A!\Z/
       if line =~ /\Arouter ospf\Z/
-        as = $1
         found_section = true
 
         hash[:name] = :ospf
