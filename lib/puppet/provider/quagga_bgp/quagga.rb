@@ -31,7 +31,7 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
       :networks => {
           :default => [],
           :regexp => /\A\snetwork\s(\S+)\Z/,
-          :template => '<% if value.include(\':\') %>address-family ipv6\n<% end %>network<% unless value.nil? %> <%= value %><% end %><% if value.include(\':\') %>\nexit-address-family<% end %>',
+          :template => '<% if value.include?(\':\') %>address-family ipv6\n<% end %>network<% unless value.nil? %> <%= value %><% end %><% if value.include?(\':\') %>\nexit-address-family<% end %>',
           :type => :array,
       },
       :router_id => {
