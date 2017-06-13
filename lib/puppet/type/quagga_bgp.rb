@@ -73,8 +73,8 @@ Puppet::Type.newtype(:quagga_bgp) do
     def insync?(current)
       return false if current == :absent
 
-      current.each do |v|
-        return false unless @should.include?(v)
+      @should.each do |v|
+        return false unless current.include?(v)
       end
 
       true
