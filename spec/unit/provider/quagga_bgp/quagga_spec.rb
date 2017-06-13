@@ -48,6 +48,8 @@ router bgp 197888
  maximum-paths ibgp 4
 !
  address-family ipv6
+ network 1::/64
+ network 2::/64
  exit-address-family
  exit
 !'
@@ -66,6 +68,7 @@ router bgp 197888
           :ipv4_unicast => :false,
           :maximum_paths_ebgp => 4,
           :maximum_paths_ibgp => 4,
+          :networks => %w{172.16.32.0/24 1::/64 2::/64},
           :router_id => '172.16.32.103',
       })
     end

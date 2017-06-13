@@ -31,7 +31,7 @@ describe Puppet::Type.type(:quagga_bgp) do
       end
     end
 
-    [:ipv4_unicast, :maximum_paths_ebgp, :maximum_paths_ibgp, :router_id].each do |property|
+    [:import_check, :ipv4_unicast, :maximum_paths_ebgp, :maximum_paths_ibgp, :networks, :router_id,].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -169,6 +169,32 @@ describe Puppet::Type.type(:quagga_bgp) do
 
     it 'should contain 8' do
       expect(described_class.new(:name => '197888', :maximum_paths_ibgp => 8)[:maximum_paths_ibgp]).to eq(8)
+    end
+  end
+
+  describe 'networks' do
+    it 'should support \'192.168.0.0/24\' as a value' do
+      expect { described_class.new(:name => '197888', :networks => '192.168.0.0/24') }.to_not raise_error
+    end
+
+    it 'should support \'10.0.0.0/8\' as a value' do
+      expect { described_class.new(:name => '197888', :networks => '10.0.0.0/8') }.to_not raise_error
+    end
+
+    it 'should not support \'256.0.0.0/0\' as a value' do
+      expect { described_class.new(:name => '197888', :networks => '256.0.0.0/0') }.to raise_error Puppet::Error, /Not a valid ip address/
+    end
+
+    it 'should not support \'10.0.0.0\' as a value' do
+      expect { described_class.new(:name => '197888', :networks => '10.0.0.0') }.to raise_error Puppet::Error, /Prefix length is not specified/
+    end
+
+    it 'should contain [\'10.0.0.0/24\', \'172.16.0.0/24\']' do
+      expect(described_class.new(:name => '197888', :networks => %w{10.0.0.0/24 172.16.0.0/24})[:networks]).to eq(%w{10.0.0.0/24 172.16.0.0/24})
+    end
+
+    it 'should contain \'192.168.0.0/24\'' do
+      expect(described_class.new(:name => '197888', :networks => '192.168.0.0/24')[:networks]).to eq(['192.168.0.0/24'])
     end
   end
 

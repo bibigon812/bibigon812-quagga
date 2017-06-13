@@ -9,34 +9,35 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
           :regexp => /\A\sbgp\snetwork\simport-check\Z/,
           :template => 'bgp network import-check',
           :type => :boolean,
-          :value => ':true',
       },
       :ipv4_unicast => {
           :default => :true,
           :regexp => /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
           :template => 'bgp default ipv4-unicast',
           :type => :boolean,
-          :value => ':false',
       },
       :maximum_paths_ebgp => {
           :default => 1,
           :regexp => /\A\smaximum-paths\s(\d+)\Z/,
           :template => 'maximum-paths<% unless value.nil? %> <%= value %><% end %>',
           :type => :fixnum,
-          :value => '$1',
       },
       :maximum_paths_ibgp => {
           :default => 1,
           :regexp => /\A\smaximum-paths\sibgp\s(\d+)\Z/,
           :template => 'maximum-paths ibgp<% unless value.nil? %> <%= value %><% end %>',
           :type => :fixnum,
-          :value => '$1',
+      },
+      :networks => {
+          :default => [],
+          :regexp => /\A\snetwork\s(\S+)\Z/,
+          :template => '<% if value.include(\':\') %>address-family ipv6\n<% end %>network<% unless value.nil? %> <%= value %><% end %><% if value.include(\':\') %>\nexit-address-family<% end %>',
+          :type => :array,
       },
       :router_id => {
           :regexp => /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/,
           :template => 'bgp router-id<% unless value.nil? %> <%= value %><% end %>',
           :type => :string,
-          :value => '$1',
       },
   }
 
@@ -67,7 +68,9 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
 
         # Added default values
         @resource_map.each do |property, options|
-          if options.has_key?(:default)
+          if [:array, :hash].include?(options[:type])
+            hash[property] = options[:default].clone
+          else
             hash[property] = options[:default]
           end
         end
@@ -79,13 +82,28 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
       elsif found_bgp
         @resource_map.each do |property, options|
           if line =~ options[:regexp]
+            value = $1
 
-            value = eval(options[:value])
-            case options[:type]
-              when :fixnum
-                value = value.to_i
+            if value.nil?
+              hash[property] = options[:default] == :false ? :true : :false
+            else
+              case options[:type]
+                when :array
+                  hash[property] << value
+
+                when :fixnum
+                  hash[property] = value.to_i
+
+                when :boolean
+                  hash[property] = :true
+
+                when :symbol
+                  hash[property] = value.gsub(/-/, '_').to_sym
+
+                when :string
+                  hash[property] = value
+              end
             end
-            hash[property] = value
 
             break
           end
@@ -182,7 +200,7 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
           cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
         end
 
-        v.each do |value|
+        (v - @property_hash[property]).each do |value|
           cmds << ERB.new(resource_map[property][:template]).result(binding)
         end
 

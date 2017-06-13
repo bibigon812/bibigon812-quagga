@@ -58,6 +58,39 @@ Puppet::Type.newtype(:quagga_bgp) do
     end
   end
 
+  newproperty(:networks, :array_matching => :all) do
+    desc 'Specify a network to announce via BGP. Default to `[]`.'
+
+    validate do |value|
+      begin
+        IPAddr.new value
+      rescue
+        raise ArgumentError, "Not a valid ip address '#{value}'"
+      end
+      raise ArgumentError, "Prefix length is not specified '#{value}'" unless value.include?('/')
+    end
+
+    def insync?(current)
+      return false if current == :absent
+
+      current.each do |v|
+        return false unless @should.include?(v)
+      end
+
+      true
+    end
+
+    def should_to_s(newvalue = @should)
+      if newvalue
+        newvalue.inspect
+      else
+        nil
+      end
+    end
+
+    defaultto([])
+  end
+
   newproperty(:router_id) do
     desc %q{ Override configured router identifier }
 
