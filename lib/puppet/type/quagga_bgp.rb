@@ -71,13 +71,11 @@ Puppet::Type.newtype(:quagga_bgp) do
     end
 
     def insync?(current)
-      return false if current == :absent
-
-      @should.each do |v|
-        return false unless current.include?(v)
+      if current == @should
+        true
+      else
+        false
       end
-
-      true
     end
 
     def should_to_s(newvalue = @should)
