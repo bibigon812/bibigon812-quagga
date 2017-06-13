@@ -67,6 +67,7 @@ quagga_bgp { '65000':
     ipv4_unicast       => true,
     maximum_paths_ebgp => 10,
     maximum_paths_ibgp => 10,
+    networks           => ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16',],
     router_id          => '10.0.0.1',
 }
 ```
@@ -79,20 +80,8 @@ quagga_bgp { '65000':
 - `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default to `true`.
 - `maximum_paths_ebgp`: Forward packets over multiple paths ebgp. Default to `1`.
 - `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default to `1`.
+- `networks`: Specify a networks to announce via BGP. Default to `[]`.
 - `router_id`: Override configured router identifier.
-
-### quagga_bgp_network
-
-```puppet
-quagga_bgp_network { '65000 192.168.1.0/24':
-    ensure => present,
-}
-```
-
-#### Reference
-
-- `name`: It's consists of a AS number and a network IP address.
-- `ensure`: Manage the state of this BGP network: `absent`, `present`. Default to `present`.
 
 
 ### quagga_bgp_peer

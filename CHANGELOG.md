@@ -12,6 +12,7 @@
 
 ### Removed
 - the method `purge` from resources `bgp*`
+- the resource `quagga_bgp_network`
 
 ### Updated
 - changelog
