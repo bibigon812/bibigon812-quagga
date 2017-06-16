@@ -13,6 +13,7 @@
 - the type `bgp_neighbor` to `quagga_bgp_peer`
 - the type `bgp_network` to `quagga_bgp_network`
 - the type `quagga_router` to `quagga_system`
+- the type `community_list` to `quagga_community_list`
 
 ### Removed
 - the method `purge` from resources `bgp*`

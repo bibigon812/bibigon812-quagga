@@ -130,6 +130,24 @@ quagga_bgp_peer { '65000 10.0.0.3':
 - `shutdown`: Administratively shut down this neighbor. Default to `false`.
 - `update_source`: Source of routing updates. It can be the interface name or IP address.
 
+### community_list
+
+```puppet
+community_list { '100':
+    ensure => present,
+    rules  => [
+        permit => 65000:50952,
+        permit => 65000:31500,
+    ],
+}
+```
+
+#### Reference
+
+- `name`: Community list number.
+- `ensure`: Manage the state of this community list: `absent`, `present`. Default to `present`.
+- `rules`: A rule of the community list `{ action => community }`.
+
 ### quagga_interface
 
 ```puppet
@@ -320,24 +338,6 @@ prefix_list {'ADVERTISED_PREFIXES:20':
 - `le`: Maximum prefix length to be matched.
 - `prefix`: IP prefix `<network>/<length>`.
 - `proto`: IP protocol version: `ip`, `ipv6`. Default to `ip`.
-
-### community_list
-
-```puppet
-community_list { '100':
-    ensure => present,
-    rules  => [
-        permit => 65000:50952,
-        permit => 65000:31500,
-    ],
-}
-```
-
-#### Reference
-
-- `name`: Community list number.
-- `ensure`: Manage the state of this community list: `absent`, `present`. Default to `present`.
-- `rules`: A rule of the community list `{ action => community }`.
 
 ## Hiera
 
