@@ -8,6 +8,14 @@ Puppet::Type.newtype(:quagga_system) do
   newproperty(:hostname) do
     desc 'Router hostname'
     defaultto {@resource[:name]}
+
+    munge do |value|
+      if value.empty?
+        @resource[:name]
+      else
+        value
+      end
+    end
   end
 
   newproperty(:password) do
