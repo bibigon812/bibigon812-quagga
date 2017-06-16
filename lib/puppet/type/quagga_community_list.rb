@@ -31,7 +31,7 @@ Puppet::Type.newtype(:quagga_community_list) do
   end
 
   newproperty(:rules, :array_matching => :all) do
-    desc %q{ Action and community. }
+    desc 'Array of rules `action community`.'
 
     newvalues(/\A(deny|permit)\s\d+:\d+\Z/)
 

@@ -56,7 +56,7 @@ quagga_as_path { 'TEST_AS_PATH':
 
 - `name`: The name of the as-path access-list.
 - `ensure`: Manage the state of this as-path list: `absent`, `present`. Default to `present`.
-- `rules`: A rule of the as-path access-list `{ action => regex }`.
+- `rules`: Array of rules `action regex`.
 
 ### quagga_bgp
 
@@ -146,7 +146,7 @@ quaggA_community_list { '100':
 
 - `name`: Community list number.
 - `ensure`: Manage the state of this community list: `absent`, `present`. Default to `present`.
-- `rules`: A rule of the community list `action community`.
+- `rules`: Array of rules `action community`.
 
 ### quagga_interface
 

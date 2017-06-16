@@ -7,8 +7,8 @@ Puppet::Type.newtype(:quagga_as_path) do
         quagga_as_path { 'as100':
             ensure => present,
             rules => [
-                { permit => '_100$', },
-                { permit => '_100_', },
+                'permit _100$',
+                'permit _100_',
             ],
         }
   }
@@ -22,7 +22,7 @@ Puppet::Type.newtype(:quagga_as_path) do
   end
 
   newproperty(:rules, :array_matching => :all) do
-    desc %q{ Rules of the as-path access-list. `action regex`. }
+    desc 'Array of rules `action regex`.'
 
     newvalues(/\A(permit|deny)\s\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
 
