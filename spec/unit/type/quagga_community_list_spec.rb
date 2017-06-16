@@ -66,32 +66,28 @@ describe Puppet::Type.type(:quagga_community_list) do
   end
 
   describe 'rules' do
-    it 'should support :premit => \'65000:1\' as a value' do
-      expect { described_class.new(:name => '100', :rules => { :permit => '65000:1' }) }.to_not raise_error
+    it 'should support \'premit 65000:1\' as a value' do
+      expect { described_class.new(:name => '100', :rules => 'permit 65000:1') }.to_not raise_error
     end
 
-    it 'should support [{:permit => \'65000:1\'}, {:permit => \'65000:2\'}] as a value' do
-      expect { described_class.new(:name => '100', :rules => [{:permit => '65000:1'}, {:permit => '65000:2'}]) }.to_not raise_error
+    it 'should support [\'permit 65000:1\', \'permit 65000:2\'] as a value' do
+      expect { described_class.new(:name => '100', :rules => ['permit 65000:1', 'permit 65000:2']) }.to_not raise_error
     end
 
-    it 'should not support [{:permit => \'AS65000:1\'}, {:permit => \'65000:2\'}] as a value' do
-      expect { described_class.new(:name => '100', :rules => [{:permit => 'AS65000:1'}, {:permit => '65000:2'}]) }.to raise_error(Puppet::Error, /The community AS65000:1 is invalid/)
+    it 'should not support [\'permit AS65000:1\', \'permit => 65000:2\'] as a value' do
+      expect { described_class.new(:name => '100', :rules => ['permit AS65000:1', 'permit 65000:2']) }.to raise_error Puppet::Error, /Invalid value/
     end
 
-    it 'should not support [{:reject => \'65000:1\'}, {:permit => \'65000:2\'}] as a value' do
-      expect { described_class.new(:name => '100', :rules => [{:reject => '65000:1'}, {:permit => '65000:2'}]) }.to raise_error(Puppet::Error, /Use the action permit or deny instead of reject/)
+    it 'should not support [\'reject 65000:1\', \'permit 65000:2\'] as a value' do
+      expect { described_class.new(:name => '100', :rules => ['reject 65000:1', 'permit 65000:2']) }.to raise_error Puppet::Error, /Invalid value/
     end
 
-    it 'should not support a string as a value' do
-      expect { described_class.new(:name => '100', :rules => 'permit => 65000:1') }.to raise_error(Puppet::Error, /Use a hash { action => community }/)
+    it 'should contain [\'permit 65000:1\']' do
+      expect(described_class.new(:name => '100', :rules => 'permit 65000:1')[:rules]).to eq(['permit 65000:1'])
     end
 
-    it 'should contain [{:permit => \'65000:1\'}]' do
-      expect(described_class.new(:name => '100', :rules => {:permit => '65000:1'})[:rules]).to eq([{:permit => '65000:1'}])
-    end
-
-    it 'should contain [{:permit => \'65000:1\'}, {:permit => \'65000:2\'}]' do
-      expect(described_class.new(:name => '100', :rules => [{:permit => '65000:1'}, {:permit => '65000:2'}])[:rules]).to eq([{:permit => '65000:1'}, {:permit => '65000:2'}])
+    it 'should contain [\'permit 65000:1\', \'permit 65000:2\']' do
+      expect(described_class.new(:name => '100', :rules => ['permit 65000:1', 'permit 65000:2'])[:rules]).to eq(['permit 65000:1', 'permit 65000:2'])
     end
   end
 end

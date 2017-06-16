@@ -9,11 +9,13 @@
 - boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 
 - types `ospf_interface` and `pim_interface` to `quagga_interface`
 - the type `as_path` to `quagga_as_path`
+- a syntax of `quagga_as_path` rules 
 - the type `bgp` to `quagga_bgp`
 - the type `bgp_neighbor` to `quagga_bgp_peer`
 - the type `bgp_network` to `quagga_bgp_network`
 - the type `quagga_router` to `quagga_system`
 - the type `community_list` to `quagga_community_list`
+- a syntax of `quagga_community_list` rules 
 
 ### Removed
 - the method `purge` from resources `bgp*`

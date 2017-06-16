@@ -130,14 +130,14 @@ quagga_bgp_peer { '65000 10.0.0.3':
 - `shutdown`: Administratively shut down this neighbor. Default to `false`.
 - `update_source`: Source of routing updates. It can be the interface name or IP address.
 
-### community_list
+### quagga_community_list
 
 ```puppet
-community_list { '100':
+quaggA_community_list { '100':
     ensure => present,
     rules  => [
-        permit => 65000:50952,
-        permit => 65000:31500,
+        'permit 65000:50952',
+        'permit 65000:31500',
     ],
 }
 ```
@@ -146,7 +146,7 @@ community_list { '100':
 
 - `name`: Community list number.
 - `ensure`: Manage the state of this community list: `absent`, `present`. Default to `present`.
-- `rules`: A rule of the community list `{ action => community }`.
+- `rules`: A rule of the community list `action community`.
 
 ### quagga_interface
 

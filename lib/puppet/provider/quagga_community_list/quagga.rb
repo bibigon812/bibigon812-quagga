@@ -1,5 +1,5 @@
 Puppet::Type.type(:quagga_community_list).provide :quagga do
-  @doc = %q{ Manages a community-list using quagga }
+  @doc = 'Manages a community-list using quagga.'
 
   commands :vtysh => 'vtysh'
 
@@ -29,28 +29,29 @@ Puppet::Type.type(:quagga_community_list).provide :quagga do
 
         if name != previous_name
           unless hash.empty?
-            debug "community_list: #{hash}"
+            debug "community-list: #{hash}"
             providers << new(hash)
           end
-          hash = {}
-          hash[:ensure] = :present
-          hash[:provider] = self.name
-          hash[:name] = name
-          hash[:rules] = []
+          hash = {
+              :ensure => :present,
+              :name => name,
+              :provider => self.name,
+              :rules => [],
+          }
         end
 
         communities.each do |community|
-          hash[:rules] << {action.to_sym => community}
+          hash[:rules] << "#{action} #{community}"
         end
 
         previous_name = name
-      elsif line =~ /^\w/ and found_community_list
+      elsif line =~ /\A\w/ and found_community_list
         break
       end
     end
 
     unless hash.empty?
-      debug "community_list: #{hash}"
+      debug "community-list: #{hash}"
       providers << new(hash)
     end
 
@@ -98,9 +99,7 @@ Puppet::Type.type(:quagga_community_list).provide :quagga do
     cmds << "no ip community-list #{name}"
 
     value.each do |rule|
-      rule.each do |action, community|
-        cmds << "ip community-list #{name} #{action} #{community}"
-      end
+      cmds << "ip community-list #{name} #{rule}"
     end
 
     cmds << 'end'

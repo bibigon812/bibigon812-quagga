@@ -9,8 +9,8 @@ Puppet::Type.newtype(:quagga_community_list) do
         quagga_community_list { '100':
             ensure => present,
             rules  => [
-                permit => 65000:50952,
-                permit => 65000:31500,
+                'permit 65000:50952',
+                'permit 65000:31500',
             ],
         }
   }
@@ -33,32 +33,14 @@ Puppet::Type.newtype(:quagga_community_list) do
   newproperty(:rules, :array_matching => :all) do
     desc %q{ Action and community. }
 
-    validate do |value|
-      case value
-        when Hash
-          value.each do |action, community|
-            unless [:deny, :permit].include?(action.to_s.to_sym)
-              raise(ArgumentError, "Use the action permit or deny instead of #{action}")
-            end
-            unless community.match(/\A\d+:\d+\Z/)
-              raise(ArgumentError, "The community #{community} is invalid")
-            end
-          end
-        else
-          raise(ArgumentError, 'Use a hash { action => community }')
-      end
-    end
+    newvalues(/\A(deny|permit)\s\d+:\d+\Z/)
 
-    munge do |value|
-      new_value = {}
-      value.each do |action, community|
-        new_value[action.to_s.to_sym] = community
+    def should_to_s(value = @should)
+      if value
+        value.inspect
+      else
+        nil
       end
-      new_value
-    end
-
-    def should_to_s(value)
-      value.inspect
     end
   end
 

@@ -38,7 +38,7 @@ end'
           :ensure => :present,
           :name => '100',
           :provider => :quagga,
-          :rules => [{:permit => '65000:31133'},],
+          :rules => ['permit 65000:31133',],
       })
     end
 
@@ -47,7 +47,7 @@ end'
           :ensure => :present,
           :name => '300',
           :provider => :quagga,
-          :rules => [{:permit => '65000:50952'}, {:permit => '65000:31500'}, {:permit => '65000:6939'},],
+          :rules => ['permit 65000:50952', 'permit 65000:31500', 'permit 65000:6939',],
       })
     end
 
@@ -56,7 +56,7 @@ end'
           :ensure => :present,
           :name => '500',
           :provider => :quagga,
-          :rules => [{:permit => '65000:8359'}, {:permit => '65000:12695'},],
+          :rules => ['permit 65000:8359', 'permit 65000:12695',],
       })
     end
   end
