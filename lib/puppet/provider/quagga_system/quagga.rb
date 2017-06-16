@@ -49,8 +49,6 @@ Puppet::Type.type(:quagga_system).provide :quagga do
       hash[property] = options[:default]
     end
 
-    hash[:name] = hash[:hostname] if hash[:hostname]
-
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
       # comment
@@ -83,6 +81,8 @@ Puppet::Type.type(:quagga_system).provide :quagga do
         end
       end
     end
+
+    hash[:name] = hash[:hostname]
 
     [new(hash)]
   end
