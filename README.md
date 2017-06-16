@@ -163,6 +163,27 @@ quagga_interface { 'eth0':
 - `ospf_transmit_delay`: Link state transmit delay. Default to `1`.
 - `pim_ssm`: Enable PIM SSM operation. Default to `false`.
 
+### quagga_system
+
+```puppet
+quagga_system { 'router-1.sandbox.local':
+    password => 'password',
+    enable_password => 'enable_password',
+    line_vty => true,
+    service_password_encryption => true,
+}
+```
+
+#### Reference
+
+- `name`: Router instance name.
+- `hastname`: Router hostname. Default to `name`.
+- `password`: Set password for vty interface. If there is no password, a vty won’t accept connections.
+- `enable_password`: Set enable password.
+- `line_vty`: Enter vty configuration mode. Default to `true`.
+- `service_password_encryption`: Encrypt passwords. Default to `false`.
+
+
 ### ospf
 
 ```puppet
