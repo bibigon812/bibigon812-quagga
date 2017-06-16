@@ -1,4 +1,4 @@
-Puppet::Type.newtype(:quagga_router) do
+Puppet::Type.newtype(:quagga_system) do
   @doc = 'This type provides the capabilities to manage the router'
 
   newparam(:name, :namevar => true) do
