@@ -22,12 +22,28 @@ Puppet::Type.newtype(:quagga_system) do
     desc 'Set password for vty interface. If there is no password, a vty won’t accept connections.'
 
     defaultto(:absent)
+
+    munge do |value|
+      if value.empty?
+        :absent
+      else
+        value
+      end
+    end
   end
 
   newproperty(:enable_password) do
     desc 'Set enable password'
 
     defaultto(:absent)
+
+    munge do |value|
+      if value.empty?
+        :absent
+      else
+        value
+      end
+    end
   end
 
   newproperty(:line_vty, :boolean => true) do
