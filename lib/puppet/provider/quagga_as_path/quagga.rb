@@ -91,8 +91,7 @@ Puppet::Type.type(:quagga_as_path).provide :quagga do
     cmds << "no ip as-path access-list #{name}"
 
     value.each do |rule|
-      action, regexp = rule.split(/\s/)
-      cmds << "ip as-path access-list #{name} #{action} #{regexp}"
+      cmds << "ip as-path access-list #{name} #{rule}"
     end
 
     cmds << 'end'
