@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:ospf_area).provider(:quagga) do
+describe Puppet::Type.type(:quagga_ospf_area).provider(:quagga) do
   describe 'instances' do
     it 'should have an instance method' do
       expect(described_class).to respond_to :instances
@@ -77,27 +77,28 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
     end
 
     it 'should return the first resource' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :default_cost => 100,
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
+        :access_list_export => :absent,
+        :access_list_import => :absent,
         :ensure => :present,
         :name => '0.0.15.211',
-        :networks => [ '10.255.1.0/24', '10.255.2.0/24', '10.255.3.0/24' ],
+        :networks => %w{10.255.1.0/24 10.255.2.0/24 10.255.3.0/24},
+        :prefix_list_export => :absent,
+        :prefix_list_import => :absent,
         :provider => :quagga,
-        :stub => :false,
       })
     end
 
     it 'should return the second resource' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
         :access_list_export => 'ACCESS_LIST_EXPORT',
         :access_list_import => 'ACCESS_LIST_IPMORT',
         :ensure => :present,
         :name => '0.10.10.10',
-        :networks => [ '192.168.1.0/24', '192.168.2.0/24' ],
+        :networks => %w{192.168.1.0/24 192.168.2.0/24},
         :prefix_list_export => 'PREFIX_LIST_EXPORT',
         :prefix_list_import => 'PREFIX_LIST_IMPORT',
         :provider => :quagga,
-        :stub => :true,
       })
     end
   end

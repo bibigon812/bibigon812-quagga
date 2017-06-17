@@ -15,11 +15,13 @@
 - the type `bgp_network` to `quagga_bgp_network`
 - the type `quagga_router` to `quagga_system`
 - the type `community_list` to `quagga_community_list`
-- a syntax of `quagga_community_list` rules 
+- a syntax of `quagga_community_list` rules
+- the type `ospf_area` to `quagga_ospf_area`
 
 ### Removed
 - the method `purge` from resources `bgp*`
 - the resource `quagga_bgp_network`
+- properties `default_cost` and `stub` from `quagga_ospf_area`
 
 ### Updated
 - changelog

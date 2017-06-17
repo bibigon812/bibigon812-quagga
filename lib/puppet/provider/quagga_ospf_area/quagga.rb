@@ -1,16 +1,39 @@
 require 'erb'
 
-Puppet::Type.type(:ospf_area).provide :quagga do
+Puppet::Type.type(:quagga_ospf_area).provide :quagga do
   @doc = %q{ Manages OSPF areas using quagga }
 
   @resource_map = {
-    :default_cost       => { :type => :fixnum,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sdefault-cost\s(\d+)\Z/,                :template => 'area <%= area %> default-cost <%= value %>' },
-    :access_list_export => { :type => :string,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sexport-list\s([\w-]+)\Z/,              :template => 'area <%= area %> export-list <%= value %>' },
-    :access_list_import => { :type => :string,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\simport-list\s([\w-]+)\Z/,              :template => 'area <%= area %> import-list <%= value %>' },
-    :prefix_list_export => { :type => :string,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sout\Z/, :template => 'area <%= area %> filter-list prefix <%= value %> out' },
-    :prefix_list_import => { :type => :string,  :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sfilter-list\sprefix\s([\w-]+)\sin\Z/,  :template => 'area <%= area %> filter-list prefix <%= value %> in' },
-    :stub               => { :type => :symbol, :regexp => /\A\sarea\s(\d+\.\d+\.\d+\.\d+)\sstub(\sno-summary)?\Z/,                :template => 'area <%= area %> stub <%= value %>', :default => :false },
-    :networks           => { :type => :array,   :regexp => /\A\snetwork\s(\d+\.\d+\.\d+\.\d+\/\d+)\sarea\s(\d+\.\d+\.\d+\.\d+)\Z/, :template => 'network <%= value %> area <%= area %>' },
+    :access_list_export => {
+        :type => :string,
+        :regexp => /\A\sarea\s(\S+)\sexport-list\s(\S+)\Z/,
+        :template => 'area <%= area %> export-list <%= value %>',
+        :default => :absent,
+    },
+    :access_list_import => {
+        :type => :string,
+        :regexp => /\A\sarea\s(\S+)\simport-list\s(\S+)\Z/,
+        :template => 'area <%= area %> import-list <%= value %>',
+        :default => :absent,
+    },
+    :prefix_list_export => {
+        :type => :string,
+        :regexp => /\A\sarea\s(\S+)\sfilter-list\sprefix\s(\S+)\sout\Z/,
+        :template => 'area <%= area %> filter-list prefix <%= value %> out',
+        :default => :absent,
+    },
+    :prefix_list_import => {
+        :type => :string,
+        :regexp => /\A\sarea\s(\S+)\sfilter-list\sprefix\s(\S+)\sin\Z/,
+        :template => 'area <%= area %> filter-list prefix <%= value %> in',
+        :default => :absent,
+    },
+    :networks => {
+        :type => :array,
+        :regexp => /\A\snetwork\s(\S+)\sarea\s(\S+)\Z/,
+        :template => 'network <%= value %> area <%= area %>',
+        :default => [],
+    },
   }
 
   commands :vtysh => 'vtysh'
@@ -18,12 +41,12 @@ Puppet::Type.type(:ospf_area).provide :quagga do
   def initialize(value={})
     super(value)
     @property_flush = {}
-    @property_remove = {}
   end
 
   def self.instances
     providers = []
     debug '[instances]'
+
     hash = {}
     found_router = false
     config = vtysh('-c', 'show running-config')
@@ -35,7 +58,7 @@ Puppet::Type.type(:ospf_area).provide :quagga do
         found_router = true
 
       elsif line =~ /\A\w/ && found_router
-        found_router = false
+        break
 
       elsif found_router
         @resource_map.each do |property, options|
@@ -51,42 +74,26 @@ Puppet::Type.type(:ospf_area).provide :quagga do
               value = second_param
             end
 
-            value = :true if value.nil?
-
-            case options[:type]
-            when :array
-              munged_value = [ value ]
-            when :fixnum
-              munged_value = value.to_i
-            when :Symbol
-              munged_value = value.to_s.gsub(/-/, '_').to_sym
-            else
-              munged_value = value
-            end
-
-            if hash.has_key?(area)
-
-              if options[:type] == :array
-                hash[area][property] ||= []
-                hash[area][property] << value
-              else
-                hash[area][property] = munged_value
-              end
-
-            else
+            unless hash.has_key? area
               hash[area] = {
                 :ensure => :present,
                 :name => area,
-                :provider => self.name
+                :provider => self.name,
+                :networks => [],
               }
-
               @resource_map.each do |property, options|
-                if options.has_key?(:default)
+                if options[:type] == :array
+                  hash[area][property] = options[:default].clone
+                else
                   hash[area][property] = options[:default]
                 end
               end
+            end
 
-              hash[area][property] = munged_value
+            if options[:type] == :array
+              hash[area][property] << value
+            else
+              hash[area][property] = value
             end
 
             break
@@ -108,7 +115,6 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        provider.purge
       end
     end
   end
@@ -149,25 +155,14 @@ Puppet::Type.type(:ospf_area).provide :quagga do
     cmds << 'configure terminal'
     cmds << 'router ospf'
 
-    @property_remove.each do |property, desired_value|
+    @property_remove.each do |property, v|
       debug "The #{property} property has been removed"
 
       case resource_map[property][:type]
         when :array
-          desired_value.each do |value|
+          v.each do |value|
             cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
           end
-
-        when :Symbol
-          next if resource_map[property][:default] == desired_value
-
-          if desired_value == :true
-            value = ''
-          else
-            value = desired_value.to_s.gsub(/_/, '-')
-          end
-
-          cmds << "no #{ERB.new(resource_map[property][:template]).result(binding).strip}"
 
         else
           value = @property_hash[property]
@@ -175,42 +170,28 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       end
     end
 
-    @property_flush.each do |property, desired_value|
-      debug "The #{property} property has been changed from #{@property_hash[property]} to #{desired_value}"
+    @property_flush.each do |property, v|
+      debug "The #{property} property has been changed from #{@property_hash[property]} to #{v}"
 
       case resource_map[property][:type]
         when :array
           old_value = @property_hash[property].nil? ? [] : @property_hash[property]
 
-          (old_value - desired_value).each do |value|
+          (old_value - v).each do |value|
             cmds << "no  #{ERB.new(resource_map[property][:template]).result(binding)}"
           end
 
-          (desired_value - old_value).each do |value|
+          (v - old_value).each do |value|
             cmds << ERB.new(resource_map[property][:template]).result(binding)
           end
 
-        when :symbol
-          cmd = ''
-
-          if desired_value == :true
-            value = ''
-
-          elsif desired_value == :false
-            cmd = 'no'
-
-          else
-            value = desired_value.to_s.gsub(/_/, '-')
-          end
-
-          cmds << "#{cmd} #{ERB.new(resource_map[property][:template]).result(binding)}".strip
         else
-          value = desired_value
+          value = v
 
           cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
 
-      @property_hash[property] = desired_value
+      @property_hash[property] = v
     end
 
     cmds << 'end'
@@ -222,19 +203,6 @@ Puppet::Type.type(:ospf_area).provide :quagga do
       @property_flush.clear
       @property_remove.clear
     end
-  end
-
-  def purge
-    debug '[purge]'
-    resource_map = self.class.instance_variable_get('@resource_map')
-
-    resource_map.keys.each do |property|
-      if (!@property_hash[property].nil?) && @resource[property].nil?
-        @property_remove[property] = @property_hash[property]
-      end
-    end
-
-    flush unless @property_remove.empty?
   end
 
   @resource_map.keys.each do |property|

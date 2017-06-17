@@ -181,6 +181,46 @@ quagga_interface { 'eth0':
 - `ospf_transmit_delay`: Link state transmit delay. Default to `1`.
 - `pim_ssm`: Enable PIM SSM operation. Default to `false`.
 
+### quagga_ospf
+
+```puppet
+quagga_ospf { 'ospf':
+    ensure    => present,
+    abr_type  => 'cisco',
+    opaque    => true,
+    rfc1583   => true,
+    router_id => '10.0.0.1',
+}
+```
+
+#### Reference
+
+- `name`: Name must be `ospf`.
+- `ensure`: Manage the state of this OSPF router: `absent`, `present`. Default to `present`.
+- `abr_type`: Set OSPF ABR type. Default to `cisco`.
+- `opaque`: Enable the Opaque-LSA capability (rfc2370). Default to `false`.
+- `rfc1583`: Enable the RFC1583Compatibility flag. Default to `false`.
+- `router_id`: Router-id for the OSPF process.
+  
+### quagga_ospf_area
+
+```puppet
+quagga_ospf_area { '0.0.0.0':
+    ensure  => present,
+    network => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
+}
+```
+
+#### Reference
+
+- `name`: OSPF area.
+- `ensure`: Manage the state of this OSPF area: `absent`, `present`. Default to `present`.
+- `access_list_expor`: Set the filter for networks announced to other areas.
+- `access_list_import`: Set the filter for networks from other areas announced to the specified one.
+- `prefix_list_export`: Filter networks sent from this area.
+- `prefix_list_import`: Filter networks sent to this area.
+- `networks`: Enable routing on an IP network. Default to `[]`.
+
 ### quagga_system
 
 ```puppet
@@ -201,57 +241,6 @@ quagga_system { 'router-1.sandbox.local':
 - `line_vty`: Enter vty configuration mode. Default to `true`.
 - `service_password_encryption`: Encrypt passwords. Default to `false`.
 
-
-### ospf
-
-```puppet
-ospf { 'ospf':
-    ensure    => present,
-    abr_type  => 'cisco',
-    opaque    => true,
-    rfc1583   => true,
-    router_id => '10.0.0.1',
-}
-```
-
-#### Reference
-
-- `name`: Name must be `ospf`.
-- `ensure`: Manage the state of this OSPF router: `absent`, `present`. Default to `present`.
-- `abr_type`: Set OSPF ABR type. Default to `cisco`.
-- `opaque`: Enable the Opaque-LSA capability (rfc2370). Default to `false`.
-- `rfc1583`: Enable the RFC1583Compatibility flag. Default to `false`.
-- `router_id`: Router-id for the OSPF process.
-  
-### ospf_area
-
-```puppet
-ospf_area { '0.0.0.0':
-    ensure  => present,
-    network => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
-}
-
-ospf_area { '0.0.0.1':
-    ensure => present,
-    stub   => true,
-}
-
-ospf_area { '0.0.0.2':
-    stub => 'no-summary',
-}
-```
-
-#### Reference
-
-- `name`: OSPF area.
-- `ensure`: Manage the state of this OSPF area: `absent`, `present`. Default to `present`.
-- `default_cost`: Set the summary-default cost of a NSSA or stub area.
-- `access_list_expor`: Set the filter for networks announced to other areas.
-- `access_list_import`: Set the filter for networks from other areas announced to the specified one.
-- `prefix_list_export`: Filter networks sent from this area.
-- `prefix_list_import`: Filter networks sent to this area.
-- `networks`: Enable routing on an IP network.
-- `stub`: Configure OSPF area as stub: `true`, `false` or `no_summary`. Default to `false`.
 
 ### redistribution
 
