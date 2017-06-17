@@ -41,6 +41,7 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
   def initialize(value={})
     super(value)
     @property_flush = {}
+    @property_remove = {}
   end
 
   def self.instances
