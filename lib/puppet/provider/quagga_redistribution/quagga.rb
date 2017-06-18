@@ -1,5 +1,5 @@
-Puppet::Type.type(:redistribution).provide :quagga do
-  @doc = %q{ Manages redistribution using quagga }
+Puppet::Type.type(:quagga_redistribution).provide :quagga do
+  @doc = 'Manages redistribution using quagga.'
 
   commands :vtysh => 'vtysh'
 
@@ -29,13 +29,16 @@ Puppet::Type.type(:redistribution).provide :quagga do
         metric_type = $5
         route_map = $7
 
-        hash = {}
-        hash[:ensure] = :present
-        hash[:provider] = self.name
-        hash[:name] = "#{main_protocol}:#{as}:#{protocol}"
+        hash = {
+            :ensure => :present,
+            :provider => self.name,
+            :name => "#{main_protocol}:#{as}:#{protocol}",
+        }
+
         hash[:metric] = metric.to_i unless metric.nil?
         hash[:metric_type] = metric_type.to_i unless metric_type.nil?
         hash[:route_map] = route_map unless route_map.nil?
+
         redistributes << new(hash)
 
         debug "#{main_protocol} redistribute: #{hash.inspect}"
@@ -54,16 +57,15 @@ Puppet::Type.type(:redistribution).provide :quagga do
         found_providers << provider
       end
     end
-    (providers - found_providers).each do |provider|
-      provider.destroy
-    end
   end
 
   def create
     debug '[create]'
     @property_hash[:ensure] = :present
+    @property_hash[:name] = @resource[:name]
+
     [:metric, :metric_type, :route_map].each do |property|
-      @property_hash[property] = @resource[property]
+      @property_hash[property] = @resource[property] unless @resource[property].nil?
     end
   end
 
@@ -101,6 +103,7 @@ Puppet::Type.type(:redistribution).provide :quagga do
 
     cmds << "end"
     cmds << "write memory"
+
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 end

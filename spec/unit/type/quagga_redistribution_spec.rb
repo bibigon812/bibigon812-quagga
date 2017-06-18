@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:redistribution) do
-  let(:networking_service) do
-    @provider_class = describe_class.provide(:redistribution) {
+describe Puppet::Type.type(:quagga_redistribution) do
+  let(:provider) do
+    @provider_class = describe_class.provide(:quagga_redistribution) {
       mk_resource_methods
     }
     @provider_class.stub(:suitable?).return true
@@ -14,7 +14,7 @@ describe Puppet::Type.type(:redistribution) do
   end
 
   after :each do
-    described_class.unprovide(:redistribution)
+    described_class.unprovide(:quagga_redistribution)
   end
 
   it 'should have :name be its namevar' do
