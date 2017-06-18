@@ -41,6 +41,9 @@ Puppet::Type.type(:route_map).provide :quagga do
             :ensure => :present,
             :name => "#{name}:#{action}:#{sequence}",
             :provider => self.name,
+            :match => [],
+            :on_match => :absent,
+            :set => [],
         }
 
       elsif line =~ /\A\s(match|on-match|set)\s(.+)\Z/ && found_route_map
@@ -49,7 +52,6 @@ Puppet::Type.type(:route_map).provide :quagga do
         action = action.gsub(/-/, '_').to_sym
 
         if [:match, :set].include?(action)
-          hash[action] ||= []
           hash[action] << value
         else
           hash[action] = value
@@ -75,7 +77,6 @@ Puppet::Type.type(:route_map).provide :quagga do
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
         found_providers << provider
-        provider.purge
       end
     end
   end
@@ -117,20 +118,8 @@ Puppet::Type.type(:route_map).provide :quagga do
 
     if @property_hash[:ensure] == :absent
       cmds << "no #{cmds.last}"
+
     else
-
-      @property_remove.each do |property, value|
-        if [:match, :set].include?(property)
-          value.each do |line|
-            cmds << "no #{resource_map[property]} #{line}"
-          end
-        else
-          cmds << "no #{resource_map[property]} #{value}"
-        end
-      end
-
-      @property_remove.clear
-
       @property_flush.each do |property, value|
         if [:match, :set].include?(property)
           old_value = @property_hash[property] || []
@@ -145,28 +134,15 @@ Puppet::Type.type(:route_map).provide :quagga do
         end
         @property_hash[property] = value
       end
-
-      @property_flush.clear
-
     end
 
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){|cmds, cmd| cmds << '-c' << cmd})
-  end
-
-  def purge
-    debug '[purge]'
-    need_flush = false
-    resource_map = self.class.instance_variable_get('@resource_map')
-    resource_map.keys.each do |property|
-      if @resource[property].nil? && !@property_hash[property].nil?
-        @property_remove[property] = @property_hash[property]
-        need_flush = true
-      end
+    unless @property_flush.empty?
+      vtysh(cmds.reduce([]){|cmds, cmd| cmds << '-c' << cmd})
+      @property_flush.clear
     end
-    flush if need_flush
   end
 
   @resource_map.keys.each do |property|

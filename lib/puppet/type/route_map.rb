@@ -66,6 +66,8 @@ route_map {'TEST_ROUTE_MAP:permit:10':
     def should_to_s(value)
       value.inspect
     end
+
+    defaultto([])
   end
 
   newproperty(:on_match) do
@@ -73,6 +75,8 @@ route_map {'TEST_ROUTE_MAP:permit:10':
 
     newvalues(/\Agoto\s(\d+)\Z/)
     newvalues(/\Anext\Z/)
+    newvalues(:absent)
+    defaultto(:absent)
   end
 
   newproperty(:set, :array_matching => :all) do
@@ -115,6 +119,8 @@ route_map {'TEST_ROUTE_MAP:permit:10':
     def should_to_s(value)
       value.inspect
     end
+
+    defaultto([])
   end
 
   autonotify(:quagga_bgp_peer) do
