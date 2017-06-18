@@ -46,6 +46,24 @@ Puppet::Type.newtype(:quagga_system) do
     end
   end
 
+  newproperty(:ip_multicast_routing, :boolean => true) do
+    desc 'Enable IP multicast forwarding'
+    defaultto(:true)
+    newvalues(:true, :false)
+  end
+
+  newproperty(:ip_forwarding, :boolean => true) do
+    desc 'Enable IP forwarding'
+    defaultto(:true)
+    newvalues(:true, :false)
+  end
+
+  newproperty(:ipv6_forwarding, :boolean => true) do
+    desc 'Enable IPv6 forwarding'
+    defaultto(:true)
+    newvalues(:true, :false)
+  end
+
   newproperty(:line_vty, :boolean => true) do
     desc 'Enter vty configuration mode'
 
@@ -61,10 +79,14 @@ Puppet::Type.newtype(:quagga_system) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    %w{quagga}
   end
 
   autorequire(:service) do
-    ['zebra']
+    if self[:multicast_routing]
+      %w{zebra pimd}
+    else
+      %w{zebra}
+    end
   end
 end

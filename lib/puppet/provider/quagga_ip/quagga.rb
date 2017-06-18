@@ -13,7 +13,7 @@ Puppet::Type.type(:quagga_ip).provide :quagga do
       :template => 'ip multicast-routing',
       :type => :boolean,
       :default => :false
-    }
+    },
   }
 
   commands :vtysh => 'vtysh'

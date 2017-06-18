@@ -6,31 +6,49 @@ Puppet::Type.type(:quagga_system).provide :quagga do
       :regexp => /\Ahostname\s(.*)\Z/,
       :template => 'hostname<% unless value.nil? %> <%= value %><% end %>',
       :type => :string,
-      :default => :absent
+      :default => :absent,
     },
     :password => {
       :regexp => /\Apassword\s(?:\d\s)?(.*)\Z/,
       :template => 'password<% unless value.nil? %><% if encrypted %> 8<% end %> <%= value %><% end %>',
       :type => :string,
-      :default => :absent
+      :default => :absent,
     },
     :enable_password => {
       :regexp => /\Aenable\spassword\s(?:\d\s)?(.*)\Z/,
       :template => 'enable password<% unless value.nil? %><% if encrypted %> 8<% end %> <%= value %><% end %>',
       :type => :string,
-      :default => :absent
+      :default => :absent,
     },
     :line_vty => {
       :regexp => /\Aline\svty\Z/,
       :template => 'line vty',
       :type => :boolean,
-      :default => :true
+      :default => :true,
+    },
+    :ip_forwarding => {
+        :regexp => /\Aip\sforwarding\Z/,
+        :template => 'ip forwarding',
+        :type => :boolean,
+        :default => :false,
+    },
+    :ipv6_forwarding => {
+        :regexp => /\Aipv6\sforwarding\Z/,
+        :template => 'ipv6 forwarding',
+        :type => :boolean,
+        :default => :false,
+    },
+    :ip_multicast_routing => {
+        :regexp => /\Aip\smulticast-routing\Z/,
+        :template => 'ip multicast-routing',
+        :type => :boolean,
+        :default => :false,
     },
     :service_password_encryption => {
       :regexp => /\Aservice\spassword-encryption\Z/,
       :template => 'service password-encryption',
       :type => :boolean,
-      :default => :false
+      :default => :false,
     }
   }
 

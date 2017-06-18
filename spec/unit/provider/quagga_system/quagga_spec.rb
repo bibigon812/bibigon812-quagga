@@ -23,6 +23,8 @@ hostname router-1.sandbox.local
 ip forwarding
 ipv6 forwarding
 !
+ip multicast-routing
+!
 line vty
 !
 end'
@@ -32,10 +34,13 @@ end'
       expect(described_class.instances.size).to eq(1)
     end
 
-    it 'should return the resource ospf' do
+    it 'should return the resource `quagga_system`' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
         :name => 'router-1.sandbox.local',
         :hostname => 'router-1.sandbox.local',
+        :ip_forwarding => :true,
+        :ipv6_forwarding => :true,
+        :ip_multicast_routing => :true,
         :password => :absent,
         :enable_password => :absent,
         :line_vty => :true,
