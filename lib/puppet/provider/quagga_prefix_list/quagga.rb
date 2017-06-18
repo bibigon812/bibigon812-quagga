@@ -16,25 +16,34 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
+
       next if line =~ /\A!\Z/
+
       if line =~ /^(ip|ipv6) prefix-list ([\w-]+) seq (\d+) (permit|deny) ([\d\.\/:]+|any)( (ge|le) (\d+)( (ge|le) (\d+))?)?$/
-        hash = {}
-        hash[:provider] = self.name
-        hash[:ensure] = :present
-        hash[:name] = "#{$2}:#{$3}"
-        hash[:proto] = $1.to_sym
-        hash[:action] = $4.to_sym
-        hash[:prefix] = $5
+
+        hash = {
+            :action => $4.to_sym,
+            :ensure => :present,
+            :name => "#{$2}:#{$3}",
+            :prefix => $5,
+            :proto => $1.to_sym,
+            :provider => self.name,
+        }
+
         hash[$7.to_sym] = $8.to_i unless $7.nil?
         hash[$10.to_sym] = $11.to_i unless $10.nil?
+
         debug "prefix_list: #{hash}"
+
         providers << new(hash)
 
         found_prefix_list = true unless found_prefix_list
+
       elsif line =~ /\A\w/ and found_prefix_list
         break
       end
     end
+
     providers
   end
 
