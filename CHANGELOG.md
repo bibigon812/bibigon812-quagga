@@ -4,6 +4,7 @@
 - the resource `quagga_router` by [@m4ce](https://github.com/m4ce)
 - the property `networks` to the resource `quagga_bgp`
 - tests
+- `quagga_ip` properties to the resource `quagga_system`
 
 ### Changed
 - boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 
@@ -25,6 +26,7 @@
 - the method `purge` from resources `bgp*`
 - the resource `quagga_bgp_network`
 - properties `default_cost` and `stub` from `quagga_ospf_area`
+- the resource `quagga_ip`
 
 ### Updated
 - changelog

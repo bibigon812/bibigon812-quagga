@@ -312,6 +312,9 @@ quagga_route_map { 'bgp_out:permit:65000':
 quagga_system { 'router-1.sandbox.local':
     password => 'password',
     enable_password => 'enable_password',
+    ip_forwarding => true,
+    ipv6_forwarding => true,
+    ip_multicast_routing => true,
     line_vty => true,
     service_password_encryption => true,
 }
@@ -320,8 +323,11 @@ quagga_system { 'router-1.sandbox.local':
 #### Reference
 
 - `name`: Router instance name.
-- `hastname`: Router hostname. Default to `name`.
+- `hostname`: Router hostname. Default to `name`.
 - `password`: Set password for vty interface. If there is no password, a vty won’t accept connections.
 - `enable_password`: Set enable password.
+- `ip_forwarding`: Enable IP forwarding. Default to `false`.
+- `ip_multicast_routing`: Enable IP multicast forwarding. Default to `false`.
+- `ipv6_forwarding`: Enable IPv6 forwarding. Default to `false`.
 - `line_vty`: Enter vty configuration mode. Default to `true`.
 - `service_password_encryption`: Encrypt passwords. Default to `false`.
