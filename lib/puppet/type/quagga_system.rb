@@ -83,7 +83,7 @@ Puppet::Type.newtype(:quagga_system) do
   end
 
   autorequire(:service) do
-    if self[:ip_multicast_routing]
+    if value(:ip_multicast_routing) == :true
       %w{zebra pimd}
     else
       %w{zebra}
