@@ -310,12 +310,12 @@ quagga_route_map { 'bgp_out:permit:65000':
 
 ```puppet
 quagga_system { 'router-1.sandbox.local':
-    password => 'password',
-    enable_password => 'enable_password',
-    ip_forwarding => true,
-    ipv6_forwarding => true,
-    ip_multicast_routing => true,
-    line_vty => true,
+    password                    => 'password',
+    enable_password             => 'enable_password',
+    ip_forwarding               => true,
+    ipv6_forwarding             => true,
+    ip_multicast_routing        => true,
+    line_vty                    => true,
     service_password_encryption => true,
 }
 ```
