@@ -8,6 +8,7 @@ describe 'quagga' do
   it { is_expected.to contain_service('zebra') }
   it { is_expected.to contain_service('bgpd') }
   it { is_expected.to contain_service('ospfd') }
+  it { is_expected.to contain_service('pimd') }
 
   it do
     is_expected.to contain_file('/etc/sysconfig/quagga').with_content('BABELD_OPTS="-P 0"
@@ -25,4 +26,5 @@ ZEBRA_OPTS="-P 0"
   it { is_expected.to contain_file('/etc/quagga/zebra.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
   it { is_expected.to contain_file('/etc/quagga/bgpd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
   it { is_expected.to contain_file('/etc/quagga/ospfd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
+  it { is_expected.to contain_file('/etc/quagga/pimd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
 end

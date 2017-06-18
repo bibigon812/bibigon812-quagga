@@ -11,10 +11,10 @@ class quagga (
   String  $content        = $::quagga::params::content,
 
 ) inherits ::quagga::params {
+
   package { 'quagga':
     ensure => $package_ensure,
     name   => $package_name,
-    before => Service['zebra', 'bgpd', 'ospfd', 'pimd']
   }
 
   file { '/etc/sysconfig/quagga':
@@ -46,7 +46,7 @@ class quagga (
     ensure  => $zebra,
     enable  => $zebra,
     require => [
-      File['/etc/quagga/zebra.conf'],
+      File['/etc/sysconfig/quagga', '/etc/quagga/zebra.conf'],
       Package['quagga'],
     ],
   }
@@ -55,7 +55,7 @@ class quagga (
     ensure  => $bgp,
     enable  => $bgp,
     require => [
-      File['/etc/quagga/bgpd.conf'],
+      File['/etc/sysconfig/quagga', '/etc/quagga/bgpd.conf'],
       Package['quagga'],
     ],
   }
@@ -64,7 +64,7 @@ class quagga (
     ensure  => $ospf,
     enable  => $ospf,
     require => [
-      File['/etc/quagga/ospfd.conf'],
+      File['/etc/sysconfig/quagga', '/etc/quagga/ospfd.conf'],
       Package['quagga'],
     ],
   }
@@ -73,7 +73,7 @@ class quagga (
     ensure  => $pim,
     enable  => $pim,
     require => [
-      File['/etc/quagga/pimd.conf'],
+      File['/etc/sysconfig/quagga', '/etc/quagga/pimd.conf',],
       Package['quagga'],
     ],
   }
