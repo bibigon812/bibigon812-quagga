@@ -1,5 +1,5 @@
 Puppet::Type.type(:route_map).provide :quagga do
-  @doc = %q{ Manages redistribution using quagga }
+  @doc = 'Manages redistribution using quagga'
 
   @resource_map = {
       :match => 'match',
@@ -18,13 +18,14 @@ Puppet::Type.type(:route_map).provide :quagga do
   def self.instances
     debug '[instances]'
 
-    route_maps = []
+    providers = []
     found_route_map = false
     hash = {}
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
       next if line =~ /\A!\Z/
+
       if line =~ /\Aroute-map\s([\w-]+)\s(deny|permit)\s(\d+)\Z/
         name = $1
         action = $2
@@ -33,12 +34,15 @@ Puppet::Type.type(:route_map).provide :quagga do
 
         unless hash.empty?
           debug "route_map: #{hash.inspect}"
-          route_maps << new(hash)
+          providers << new(hash)
         end
-        hash = {}
-        hash[:ensure] = :present
-        hash[:name] = "#{name}:#{action}:#{sequence}"
-        hash[:provider] = self.name
+
+        hash = {
+            :ensure => :present,
+            :name => "#{name}:#{action}:#{sequence}",
+            :provider => self.name,
+        }
+
       elsif line =~ /\A\s(match|on-match|set)\s(.+)\Z/ && found_route_map
         action = $1
         value = $2
@@ -50,15 +54,18 @@ Puppet::Type.type(:route_map).provide :quagga do
         else
           hash[action] = value
         end
+
       elsif line =~ /\A\w/ && found_route_map
         break
       end
     end
+
     unless hash.empty?
       debug "route_map: #{hash.inspect}"
-      route_maps << new(hash)
+      providers << new(hash)
     end
-    route_maps
+
+    providers
   end
 
   def self.prefetch(resources)
@@ -70,9 +77,6 @@ Puppet::Type.type(:route_map).provide :quagga do
         found_providers << provider
         provider.purge
       end
-    end
-    (providers - found_providers).each do |provider|
-      provider.destroy
     end
   end
 
