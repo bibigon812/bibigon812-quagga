@@ -144,7 +144,9 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
         case options[:type]
           when :array
             @resource[property].each do |value|
+              cmds << 'address-family ipv6' if property == :networks and value.include?(':')
               cmds << ERB.new(options[:template]).result(binding)
+              cmds << 'exit-address-family' if property == :networks and value.include?(':')
             end
 
           when :boolean
