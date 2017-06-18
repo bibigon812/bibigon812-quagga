@@ -17,6 +17,9 @@
 - the type `community_list` to `quagga_community_list`
 - a syntax of `quagga_community_list` rules
 - the type `ospf_area` to `quagga_ospf_area`
+- the type `prefix_list` to `quagga_prefix_list`
+- the type `redistribution` to `quagga_redistribution`
+- the type `route_map` to `quagga_route_map`
 
 ### Removed
 - the method `purge` from resources `bgp*`

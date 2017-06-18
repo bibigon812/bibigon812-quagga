@@ -221,6 +221,91 @@ quagga_ospf_area { '0.0.0.0':
 - `prefix_list_import`: Filter networks sent to this area.
 - `networks`: Enable routing on an IP network. Default to `[]`.
 
+### quagga_prefix_list
+
+The prefix_list resource is a single sequence. You can use a chain of resources
+to describe compex prefix lists, for example:
+
+```puppet
+quagga_prefix_list {'ADVERTISED_PREFIXES:10':
+    ensure => present,
+    action => 'permit',
+    prefix => '192.168.0.0/16',
+    le     => 24,
+}
+quagga_prefix_list {'ADVERTISED_PREFIXES:20':
+    ensure => present,
+    action => 'permit',
+    prefix => '172.16.0.0/12',
+    le     => 24,
+}
+```
+
+#### Reference
+
+- `name`: Name of the prefix-list and sequence number of rule: `name:sequence`.
+- `ensure`: Manage the state of this prefix list: `absent`, `present`. Default to `present`.
+- `action`: Action can be `permit` or `deny`.
+- `ge`: Minimum prefix length to be matched.
+- `le`: Maximum prefix length to be matched.
+- `prefix`: IP prefix `<network>/<length>`.
+- `proto`: IP protocol version: `ip`, `ipv6`. Default to `ip`.
+
+### quagga_redistribution
+
+```puppet
+quagga_redistribution { 'ospf::connected':
+    ensure      => present,
+    metric      => 100,
+    metric_type => 2,
+    route_map   => 'CONNECTED',
+}
+
+quagga_redistribution { 'bgp:65000:ospf':
+    ensure    => present,
+    metric    => 100,
+    route_map => 'WORD',
+}
+```
+
+#### Reference
+
+- `name`: The name contains the main protocol, the id and the protocol for redistribution.
+- `ensure`: Manage the state of this redistribution: `absent`, `present`. Default to `present`.
+- `metric`: Metric for redistributed routes.
+- `metric_type`: OSPF exterior metric type for redistributed routes.
+- `route_map`: Route map reference.
+
+### quagga_route_map
+
+The route_map resource is a single sequence. You can use a chain of resources
+to describe complex route maps, for example:
+
+```puppet
+quagga_route_map { 'bgp_out:permit:10':
+    ensure   => present,
+    match    => 'ip address prefix-list ADVERTISED-PREFIXES'
+    on_match => 'goto 65000',
+}
+
+quagga_route_map { 'bgp_out:deny:99':
+    ensure => present,
+}
+
+quagga_route_map { 'bgp_out:permit:65000':
+    ensure => present,
+    set    => 'community 0:666',
+}
+```
+
+#### Reference
+
+- `name`: Name of the route-map, action and sequence number of rule.
+- `ensure`: Manage the state of this route map: `absent`, `present`. Default to `present`.
+- `match`: Match values from routing table.
+- `on_match`: Exit policy on matches.
+- `set`: Set values in destination routing protocol.
+
 ### quagga_system
 
 ```puppet
@@ -240,413 +325,3 @@ quagga_system { 'router-1.sandbox.local':
 - `enable_password`: Set enable password.
 - `line_vty`: Enter vty configuration mode. Default to `true`.
 - `service_password_encryption`: Encrypt passwords. Default to `false`.
-
-
-### redistribution
-
-```puppet
-redistribution { 'ospf::connected':
-    ensure      => present,
-    metric      => 100,
-    metric_type => 2,
-    route_map   => 'CONNECTED',
-}
-
-redistribution { 'bgp:65000:ospf':
-    ensure    => present,
-    metric    => 100,
-    route_map => 'WORD',
-}
-```
-
-#### Reference
-
-- `name`: The name contains the main protocol, the id and the protocol for redistribution.
-- `ensure`: Manage the state of this redistribution: `absent`, `present`. Default to `present`.
-- `metric`: Metric for redistributed routes.
-- `metric_type`: OSPF exterior metric type for redistributed routes.
-- `route_map`: Route map reference.
-
-### route_map
-
-The route_map resource is a single sequence. You can use a chain of resources
-to describe complex route maps, for example:
-
-```puppet
-route_map { 'bgp_out:permit:10':
-    ensure   => present,
-    match    => 'ip address prefix-list ADVERTISED-PREFIXES'
-    on_match => 'goto 65000',
-}
-
-route_map { 'bgp_out:deny:99':
-    ensure => present,
-}
-
-route_map { 'bgp_out:permit:65000':
-    ensure => present,
-    set    => 'community 0:666',
-}
-```
-
-#### Reference
-
-- `name`: Name of the route-map, action and sequence number of rule.
-- `ensure`: Manage the state of this route map: `absent`, `present`. Default to `present`.
-- `match`: Match values from routing table.
-- `on_match`: Exit policy on matches.
-- `set`: Set values in destination routing protocol.
-
-
-### prefix_list
-
-The prefix_list resource is a single sequence. You can use a chain of resources
-to describe compex prefix lists, for example:
-
-```puppet
-prefix_list {'ADVERTISED_PREFIXES:10':
-    ensure => present,
-    action => 'permit',
-    prefix => '192.168.0.0/16',
-    le     => 24,
-}
-prefix_list {'ADVERTISED_PREFIXES:20':
-    ensure => present,
-    action => 'permit',
-    prefix => '172.16.0.0/12',
-    le     => 24,
-}
-```
-
-#### Reference
-
-- `name`: Name of the prefix-list and sequence number of rule: `name:sequence`.
-- `ensure`: Manage the state of this prefix list: `absent`, `present`. Default to `present`.
-- `action`: Action can be `permit` or `deny`.
-- `ge`: Minimum prefix length to be matched.
-- `le`: Maximum prefix length to be matched.
-- `prefix`: IP prefix `<network>/<length>`.
-- `proto`: IP protocol version: `ip`, `ipv6`. Default to `ip`.
-
-## Hiera
-
-### bgp proxy
-
-```yaml
----
-site::profiles::bgp:
-  65000:
-    import_check: true
-    ipv4_unicast: false
-    router_id: 172.16.32.103
-    neighbor:
-      INTERNAL:
-        activate: true
-        allow_as_in: 1
-        next_hop_self: true
-        peer_group: true
-        remote_as: 197888
-      172.16.32.105:
-        peer_group: INTERNAL
-    network:
-      - 172.16.32.0/24
-      - 192.168.0.0/24
-```
-
-```puppet
-class site::profiles::bgp {
-
-  $bgp = hiera_hash('site::profiles::bgp', {}).reduce({}) |$bgp, $bgp_config| {
-
-    $as = $bgp_config[0]
-    $ensure = dig($bgp_config[1], ['ensure'], 'present')
-
-    $bgp_configs = $bgp_config[1].reduce({}) |$params, $param| {
-
-      if $param[0] == 'network' {
-
-        if $param[1] {
-          any2array($param[1]).each |$network| {
-            create_resources('bgp_network', { "${as} ${network}" => { ensure => $ensure } })
-          }
-        }
-
-        $hash = {}
-
-      } elsif $param[0] == 'neighbor' {
-
-        if $param[1] {
-          $param[1].each |$neighbor, $neighbor_config| {
-            create_resources('bgp_neighbor', {"${as} ${neighbor}" => merge({ ensure => $ensure }, $neighbor_config)})
-          }
-        }
-
-        $hash = {}
-
-      } else {
-        $hash = { $param[0] => $param[1] }
-      }
-
-      merge($params, $hash)
-    }
-
-    merge($bgp, { $as => $bgp_configs })
-  }
-
-  unless empty($bgp) {
-    create_resources('bgp', $bgp)
-  }
-}
-```
-
-### ospf proxy
-
-```yaml
----
-site::profiles::ospf:
-  area:
-    0.0.0.0:
-      networks:
-        - 10.0.10.0/24
-        - 10.0.100.0/24
-    0.0.0.10:
-      stub: true
-      networks:
-        - 192.168.1.0/24
-        - 10.0.0.0/24
-        - 172.16.100.0/24
-  redistribute:
-    - bgp:
-        metric: 100
-        route_map: ROUTE_MAP
-    - connected
-
-site::profiles::interface:
-  eth1:
-    ip:
-      ospf:
-        dead_interval: 8
-        hello_interval: 2
-        mtu_ignore: true
-        network: broadcast
-        priority: 100
-        retransmit_interval: 4
-        transmit_delay: 1
-```
-
-```puppet
-class site::profiles::ospf {
-  $config = hiera_hash('site::profiles::ospf', {})
-
-  unless empty($config) {
-
-    $ospf = { 'ospf' => delete(delete($config, 'redistribute'), 'area') }
-
-    $ospf_areas = dig($config, ['area'], {}).reduce({}) |$memo, $value| {
-      $area = $value[0]
-      $options = $value[1].reduce({}) |$memo, $value| {
-        if $value[0] == 'networks' {
-          $options = sort($value[1])
-        } else {
-          $options = $value[1]
-        }
-        merge($memo, { $value[0] => $options })
-      }
-      merge($memo, { $area => $options })
-    }
-
-    $redistribution = dig($config, ['redistribute'], {}).reduce({}) |$memo, $value| {
-      $name = $value ? {
-        Hash    => $value.keys[0],
-        default => $value,
-      }
-
-      $config = $value ? {
-        Hash    => $value[$name],
-        default => {},
-      }
-
-      merge($memo, { "ospf::${name}" => $config })
-    }
-
-    $defaults = {
-      ensure => dig($ospf, ['ospf', 'ensure'], 'present'),
-    }
-
-    create_resources('ospf', $ospf, $defaults)
-    create_resources('redistribution', $redistribution, $defaults)
-    create_resources('ospf_area', $ospf_areas, $defaults)
-  }
-
-  $ospf_interface = hiera_hash('site::profiles::interface', {}).reduce({}) |$memo, $iface| {
-    $iface_name = $iface[0]
-    $ospf_interface = dig($iface[1], ['ip','ospf'], {})
-    unless empty($ospf_interface) {
-      merge($memo, { $iface_name => $ospf_interface })
-    }
-  }
-
-  unless empty($ospf_interface) {
-    create_resources('ospf_interface', $ospf_interface)
-  }
-}
-```
-
-### prefix_list proxy
-
-```yaml
----
-site::profiles::prefix_list:
-  ADVERTISED_ROUTES:
-    rules:
-      10:
-        action: 'permit'
-        prefix: '192.168.0.0/24'
-      1000:
-        action: 'deny'
-        le: 32
-        prefix: '0.0.0.0/0'
-```
-
-```puppet
-class site::profiles::prefix_list {
-  $prefix_lists = hiera_hash('site::profiles::prefix_list', {}).reduce({}) |$memo, $value| {
-    $name = $value[0]
-    $ensure = $value[1]['ensure'] ? {
-      'absent' => 'absent',
-      default  => 'present',
-    }
-    $prefix_list = $value[1]['rules'].reduce({}) |$memo, $value| {
-      merge($memo, {"${name}:${value[0]}" => merge({ensure => $ensure}, $value[1])})
-    }
-    merge($memo, $prefix_list)
-  }
-  create_resources('prefix_list', $prefix_lists)
-}
-```
-
-### route_map proxy
-
-```yaml
----
-site::profiles::route_map:
-  AS1234_in:
-    rules:
-      1:
-        action: deny
-        match: ip address prefix-list AS_LOCAL
-      31:
-        action: permit
-        match: as-path FROM_AS2345
-        set: local-preference 800
-      60:
-        action: permit
-        match: ip address prefix-list ABCD_1
-        on_match: goto 100
-        set: local-preference 800
-      63:
-        action: permit
-        match: ip address prefix-list ABCD_2
-        on_match: goto 100
-        set: local-preference 800
-      100:
-        action: permit
-        on_match: goto 200
-        set: local-preference 200
-      200:
-        action: permit
-        set: community 65000:1234 additive
-```
-
-```puppet
-class site::profiles::route_map {
-
-  $route_maps = hiera_hash('site::profiles::route_map', {}).reduce({}) |$route_maps, $route_map| {
-  
-    $name = $route_map[0]
-    
-    $ensure = dig($route_map[1], ['ensure'], 'present') ? {
-      'absent' => 'absent',
-      default  => 'present',
-    }
-    
-    $new_route_map = dig($route_map[1], ['rules'], {}).reduce({}) |$route_map, $sequence| {
-    
-      $index = $sequence[0]
-      $action = dig($sequence[1], ['action'], 'permit')
-      
-      $params = $sequence[1].reduce({}) |$params, $param| {
-      
-        $new_param = $param[1] ? {
-          Array   => sort($param[1]),
-          default => $param[1],
-        }
-        
-        unless $param[0] == 'action' {
-          merge($params, {$param[0] => $new_param})
-        }
-      }
-      
-      merge($route_map, {"${name}:${action}:${index}" => merge({ ensure => $ensure }, $params)})
-    }
-    
-    merge($route_maps, $new_route_map)
-  }
-
-  create_resources('route_map', $route_maps)
-}
-```
-
-### community_list proxy
-
-```yaml
----
-site::profiles::community_list:
-  100:
-    ensure: present
-    rules:
-      - permit: 65000:12345
-  300:
-    ensure: present
-    rules:
-      - permit: 65000:23456
-      - permit: 65000:34567
-      - permit: 65000:1234
-  500:
-    rules:
-      - permit: 65000:2345
-      - permit: 65000:56789
-```
-
-```puppet
-class site::profiles::community_list {
-  $community_list = hiera_hash('site::profiles::community_list', {})
-
-  unless empty($community_list) {
-    create_resources('community_list', $community_list)
-  }
-}
-```
-
-### as_path proxy
-
-```yaml
----
-site::profiles::as_path:
-  FROM_AS12345:
-    rules:
-      - permit: '_12345$'
-  FROM_AS23456:
-    rules:
-      - permit: '_23456$'
-```
-
-```puppet
-class site::profiles::as_path {
-  $as_paths = hiera_hash('site::profiles::as_path', {})
-
-  unless empty($as_paths) {
-    create_resources('as_path', $as_paths)
-  }
-}
-```
