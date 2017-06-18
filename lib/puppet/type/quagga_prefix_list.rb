@@ -76,20 +76,10 @@ Example:
   end
 
   autorequire(:package) do
-    case value(:provider)
-      when :quagga
-        %w{quagga}
-      else
-        []
-    end
+    %w{quagga}
   end
 
   autorequire(:service) do
-    case value(:provider)
-      when :quagga
-        %w{zebra bgpd ospfd}
-      else
-        []
-    end
+    %w{zebra}
   end
 end

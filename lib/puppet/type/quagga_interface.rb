@@ -192,10 +192,14 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    %w{quagga}
   end
 
   autorequire(:service) do
-    ['quagga', 'ospfd', 'pimd']
+    if self[:pim_ssm]
+      %w{quagga ospfd pimd}
+    else
+      %w{quagga ospfd}
+    end
   end
 end

@@ -36,20 +36,10 @@ Puppet::Type.newtype(:quagga_as_path) do
   end
 
   autorequire(:package) do
-    case value(:provider)
-      when :quagga
-        %w{quagga}
-      else
-        []
-    end
+    %w{quagga}
   end
 
   autorequire(:service) do
-    case value(:provider)
-      when :quagga
-        %w{zebra ospfd}
-      else
-        []
-    end
+    %w{zebra bgpd}
   end
 end

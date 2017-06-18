@@ -48,10 +48,10 @@ Puppet::Type.newtype(:quagga_ospf) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    %w{quagga}
   end
 
   autorequire(:service) do
-    ['zebra', 'ospfd']
+    %w{zebra ospfd}
   end
 end

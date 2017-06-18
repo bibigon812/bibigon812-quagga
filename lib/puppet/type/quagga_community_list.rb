@@ -45,20 +45,10 @@ Puppet::Type.newtype(:quagga_community_list) do
   end
 
   autorequire(:package) do
-    case value(:provider)
-      when :quagga
-        %w{quagga}
-      else
-        []
-    end
+    %w{quagga}
   end
 
   autorequire(:service) do
-    case value(:provider)
-      when :quagga
-        %w{zebra bgpd}
-      else
-        []
-    end
+    %w{zebra bgpd}
   end
 end

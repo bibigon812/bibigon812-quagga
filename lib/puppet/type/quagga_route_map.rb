@@ -130,6 +130,6 @@ Puppet::Type.newtype(:quagga_route_map) do
   end
 
   autorequire(:service) do
-    %w{zebra bgpd ospfd}
+    %w{zebra bgpd}
   end
 end

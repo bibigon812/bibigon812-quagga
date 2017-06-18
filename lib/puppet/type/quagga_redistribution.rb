@@ -60,8 +60,8 @@ Puppet::Type.newtype(:quagga_redistribution) do
   end
 
   autorequire(:service) do
-    protocol = value(:name).split(/:/).first
+    main_protocol, _, protocol = value(:name).split(/:/).first
 
-    [ 'zebra', "#{protocol}d" ]
+    ['zebra', "#{main_protocol}", "#{protocol}d",]
   end
 end
