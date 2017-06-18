@@ -51,6 +51,18 @@ route_map {'TEST_ROUTE_MAP:permit:10':
     newvalues(/\Aprobability\s(\d+)\Z/)
     newvalues(/\Atag\s(\d+)\Z/)
 
+    def insync?(current)
+      @should.each do |value|
+        return false unless current.include?(value)
+      end
+
+      current.each do |value|
+        return false unless @should.include?(value)
+      end
+
+      true
+    end
+
     def should_to_s(value)
       value.inspect
     end
@@ -88,6 +100,18 @@ route_map {'TEST_ROUTE_MAP:permit:10':
     newvalues(/\Avpn4\snext-hop\s(\d+\.\d+\.\d+\.\d+)\Z/)
     newvalues(/\Aweight\s(\d+)\Z/)
 
+    def insync?(current)
+      @should.each do |value|
+        return false unless current.include?(value)
+      end
+
+      current.each do |value|
+        return false unless @should.include?(value)
+      end
+
+      true
+    end
+
     def should_to_s(value)
       value.inspect
     end
@@ -100,20 +124,10 @@ route_map {'TEST_ROUTE_MAP:permit:10':
   end
 
   autorequire(:package) do
-    case value(:provider)
-      when :quagga
-        %w{quagga}
-      else
-        []
-    end
+    %w{quagga}
   end
 
   autorequire(:service) do
-    case value(:provider)
-      when :quagga
-        %w{zebra bgpd ospfd}
-      else
-        []
-    end
+    %w{zebra bgpd ospfd}
   end
 end
