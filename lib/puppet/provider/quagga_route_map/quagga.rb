@@ -115,7 +115,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   def create
     debug '[create]'
 
-    name, action, sequence = @property_hash[:name].split(/:/)
+    name, action, sequence = @resource[:name].split(/:/)
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
@@ -123,9 +123,17 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     cmds << "route-map #{name} #{action} #{sequence}"
 
     resource_map.each do |property, options|
-      if @resource[property] and @resource[property] != :absent and @resource[property] != :false
-        value = @resource[property]
-        cmds << ERB.new(options[:template]).result(binding)
+      if @resource[property] and @resource[property] != options[:default]
+        case options[:type]
+          when :array
+            @resource[property].each do |value|
+              cmds << ERB.new(options[:template]).result(binding)
+            end
+
+          else
+            value = @resource[property]
+            cmds << ERB.new(options[:template]).result(binding)
+        end
       end
     end
 

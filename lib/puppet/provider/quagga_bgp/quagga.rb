@@ -129,16 +129,44 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
   end
 
   def create
-    debug '[create]'
+    name = @resource[:name]
+
+    debug "[create][#{name}]"
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
-    @property_hash[:ensure] = :present
-    @property_hash[:name] = @resource[:name]
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << "router bgp #{name}"
 
-    resource_map.keys.each do |property|
-      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
+    resource_map.each do |property, options|
+      if @resource[property] and @resource[property] != options[:default]
+        case options[:type]
+          when :array
+            @resource[property].each do |value|
+              cmds << ERB.new(options[:template]).result(binding)
+            end
+
+          when :boolean
+            value = @resource[property]
+            if value == :false
+              cmds << "no #{ERB.new(options[:template]).result(binding)}"
+            else
+              cmds << ERB.new(options[:template]).result(binding)
+            end
+
+          else
+            value = @resource[property]
+            cmds << ERB.new(options[:template]).result(binding)
+        end
+
+      end
     end
+
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   def default_router_id
