@@ -1,4 +1,4 @@
-Puppet::Type.newtype(:prefix_list) do
+Puppet::Type.newtype(:quagga_prefix_list) do
   @doc = %q{
 
 This type provides the capability to manage prefix-lists within puppet.

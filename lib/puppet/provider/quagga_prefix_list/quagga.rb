@@ -1,4 +1,4 @@
-Puppet::Type.type(:prefix_list).provide :quagga do
+Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   @doc = %q{ Manages prefix lists using quagga }
 
   @known_resources = [

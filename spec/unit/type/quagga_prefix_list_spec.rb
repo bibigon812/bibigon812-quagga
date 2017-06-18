@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:prefix_list) do
-  let(:networking_service) do
-    @provider_class = describe_class.provide(:prefix_list) {
+describe Puppet::Type.type(:quagga_prefix_list) do
+  let(:provider) do
+    @provider_class = describe_class.provide(:quagga_prefix_list) {
       mk_resource_methods
     }
     @provider_class.stub(:suitable?).return true
@@ -14,7 +14,7 @@ describe Puppet::Type.type(:prefix_list) do
   end
 
   after :each do
-    described_class.unprovide(:prefix_list)
+    described_class.unprovide(:quagga_prefix_list)
   end
 
   it 'should have :name be its namevar' do
