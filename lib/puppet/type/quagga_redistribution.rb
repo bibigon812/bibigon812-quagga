@@ -62,6 +62,15 @@ Puppet::Type.newtype(:quagga_redistribution) do
   autorequire(:service) do
     main_protocol, _, protocol = value(:name).split(/:/).first
 
-    ['zebra', "#{main_protocol}", "#{protocol}d",]
+    protocols = [main_protocol, protocol]
+    reqs = %w{zebra}
+
+    protocols.each do |protocol|
+      if [:bgp, :ospf, :rip,].include?(protocol)
+        reqs << protocol
+      end
+    end
+
+    reqs
   end
 end
