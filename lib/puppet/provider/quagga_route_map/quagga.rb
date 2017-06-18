@@ -2,9 +2,24 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   @doc = 'Manages redistribution using quagga'
 
   @resource_map = {
-      :match => 'match',
-      :on_match => 'on-match',
-      :set => 'set',
+      :match => {
+          :default => [],
+          :regexp => /\A\smatch\s(.+)\Z/,
+          :template => 'match <%= value %>',
+          :type => :array,
+      },
+      :on_match => {
+          :default => :absent,
+          :regexp => /\A\son-match\s(.+)\Z/,
+          :template => 'on-match <%= value %>',
+          :type => :string,
+      },
+      :set => {
+          :default => [],
+          :regexp => /\A\sset\s(.+)\Z/,
+          :template => 'set <%= value %>',
+          :type => :array,
+      },
   }
 
   commands :vtysh => 'vtysh'
@@ -41,20 +56,36 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
             :ensure => :present,
             :name => "#{name}:#{action}:#{sequence}",
             :provider => self.name,
-            :match => [],
-            :on_match => :absent,
-            :set => [],
         }
 
-      elsif line =~ /\A\s(match|on-match|set)\s(.+)\Z/ && found_route_map
-        action = $1
-        value = $2
-        action = action.gsub(/-/, '_').to_sym
+        # Added default values
+        @resource_map.each do |property, options|
+          if [:array, :hash].include?(options[:type])
+            hash[property] = options[:default].clone
+          else
+            hash[property] = options[:default]
+          end
+        end
 
-        if [:match, :set].include?(action)
-          hash[action] << value
-        else
-          hash[action] = value
+      elsif line =~ /\A\s(match|on-match|set)/ && found_route_map
+        @resource_map.each do |property, options|
+          if line =~ options[:regexp]
+            value = $1
+
+            if value.nil?
+              hash[property] = :true
+            else
+              case options[:type]
+                when :array
+                  hash[property] << value
+
+                else
+                  hash[property] = value
+              end
+            end
+
+            break
+          end
         end
 
       elsif line =~ /\A\w/ && found_route_map
@@ -84,21 +115,42 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   def create
     debug '[create]'
 
+    name, action, sequence = @property_hash[:name].split(/:/)
     resource_map = self.class.instance_variable_get('@resource_map')
 
-    @property_hash[:name] = @resource[:name]
-    @property_hash[:ensure] = :present
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << "route-map #{name} #{action} #{sequence}"
 
-    resource_map.keys.each do |property|
-      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
+    resource_map.each do |property, options|
+      if @resource[property] and @resource[property] != :absent and @resource[property] != :false
+        value = @resource[property]
+        cmds << ERB.new(options[:template]).result(binding)
+      end
     end
+
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   def destroy
     debug '[destroy]'
 
-    @property_hash[:ensure] = :absent
-    flush
+    name, action, sequence = @property_hash[:name].split(/:/)
+
+    debug "[flush][#{name}:#{action}:#{sequence}]"
+
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << "route-map #{name} #{action} #{sequence}"
+    cmds << "no #{cmds.last}"
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){|cmds, cmd| cmds << '-c' << cmd})
+    @property_hash.clear
   end
 
   def exists?
@@ -116,24 +168,25 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     cmds << 'configure terminal'
     cmds << "route-map #{name} #{action} #{sequence}"
 
-    if @property_hash[:ensure] == :absent
-      cmds << "no #{cmds.last}"
+    @property_flush.each do |property, v|
+      if v == :false or v == :absent
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
 
-    else
-      @property_flush.each do |property, value|
-        if [:match, :set].include?(property)
-          old_value = @property_hash[property] || []
-          (old_value - value).each do |line|
-            cmds << "no #{resource_map[property]} #{line}"
-          end
-          (value - old_value).each do |line|
-            cmds << "#{resource_map[property]} #{line}"
-          end
-        else
-          cmds << "#{resource_map[property]} #{value}"
+      elsif resource_map[property][:type] == :array
+        (@property_hash[property] - v).each do |value|
+          cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
         end
-        @property_hash[property] = value
+
+        (v - @property_hash[property]).each do |value|
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
+        end
+
+      else
+        value = v
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
+
+      @property_hash[property] = v
     end
 
     cmds << 'end'

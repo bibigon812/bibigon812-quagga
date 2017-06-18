@@ -115,7 +115,7 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != :absent and @resource[property] != :false
         value = @resource[property]
-        cmds << ERB.new(resource_map[property][:template]).result(binding)
+        cmds << ERB.new(options[:template]).result(binding)
       end
     end
 
@@ -165,7 +165,7 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
 
-      @property_hash[property] = value
+      @property_hash[property] = v
     end
 
     cmds << 'end'
