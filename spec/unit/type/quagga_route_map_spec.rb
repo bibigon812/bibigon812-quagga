@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:route_map) do
-  let(:networking_service) do
-    @provider_class = describe_class.provide(:route_map) {
+describe Puppet::Type.type(:quagga_route_map) do
+  let(:provider) do
+    @provider_class = describe_class.provide(:quagga_route_map) {
       mk_resource_methods
     }
     @provider_class.stub(:suitable?).return true
@@ -14,7 +14,7 @@ describe Puppet::Type.type(:route_map) do
   end
 
   after :each do
-    described_class.unprovide(:route_map)
+    described_class.unprovide(:quagga_route_map)
   end
 
   it 'should have :name be its namevar' do

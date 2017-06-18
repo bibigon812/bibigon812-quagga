@@ -1,4 +1,4 @@
-Puppet::Type.type(:route_map).provide :quagga do
+Puppet::Type.type(:quagga_route_map).provide :quagga do
   @doc = 'Manages redistribution using quagga'
 
   @resource_map = {
