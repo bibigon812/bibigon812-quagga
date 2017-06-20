@@ -28,7 +28,7 @@ Puppet::Type.newtype(:quagga_route_map) do
   end
 
   newproperty(:action) do
-    desc 'Route map actions. Default to `permit`.'
+    desc 'Route map actions.'
 
     newvalues(:deny, :permit)
   end

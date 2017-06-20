@@ -208,6 +208,14 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     end
   end
 
+  def action
+    @property_hash[:action] || :absent
+  end
+
+  def action=(value)
+    @property_hash[:action] = value
+  end
+
   @resource_map.keys.each do |property|
     define_method "#{property}" do
       @property_hash[property] || :absent

@@ -28,7 +28,7 @@ describe Puppet::Type.type(:quagga_route_map) do
       end
     end
 
-    [ :match, :on_match, :set ].each do |property|
+    [:action, :match, :on_match, :set].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
