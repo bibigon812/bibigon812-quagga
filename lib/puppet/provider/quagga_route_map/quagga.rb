@@ -144,12 +144,10 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   end
 
   def destroy
-    debug '[destroy]'
-
     name, sequence = @property_hash[:name].split(/:/)
     action = @property_hash[:action]
 
-    debug "[flush][#{name}:#{action}:#{sequence}]"
+    debug "[destroy][#{name}:#{action}:#{sequence}]"
 
     cmds = []
     cmds << 'configure terminal'
