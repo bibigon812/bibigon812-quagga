@@ -165,6 +165,9 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   end
 
   def flush
+    # Exit if nothing to do
+    return if @property_flush.empty?
+
     name, sequence = @property_hash[:name].split(/:/)
     action = @property_hash[:action]
 
@@ -197,13 +200,12 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
       @property_hash[property] = v
     end
 
+    @property_flush.clear
+
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty?
-      vtysh(cmds.reduce([]){|cmds, cmd| cmds << '-c' << cmd})
-      @property_flush.clear
-    end
+    vtysh(cmds.reduce([]){|cmds, cmd| cmds << '-c' << cmd})
   end
 
   def action
