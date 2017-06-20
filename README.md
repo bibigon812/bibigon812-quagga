@@ -49,7 +49,7 @@ quagga::bgp:
         networks:
             - 1.1.1.0/24
             - 1.1.2.0/24
-        router_id: 10.0.0.1
+        router_id: 10.255.255.1
         peers:
             192.168.0.2:
                 peer_group: INTERNAL
@@ -69,7 +69,7 @@ quagga::ospf:
     abr_type: cisco
     opaque: true
     rfc1583: true
-    router_id: 192.168.0.1
+    router_id: 10.255.255.1
     areas:
         0.0.0.0:
             networks:
