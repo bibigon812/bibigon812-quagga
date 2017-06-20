@@ -11,10 +11,114 @@ Currently it supports:
 - BGP
 - OSPF
 - PIM
-- route map
-- prefix list
-- community list
-- as-path list
+- Route maps
+- Prefix lists
+- Community lists
+- AS-path lists
+
+## Hiera
+
+Hiera support will be implemented in the future release.
+
+```yaml
+qyagga::system:
+    ip_forwarding: true
+    ip_multicast_routing: true
+    ipv6_forwarding: true
+    service_password_encryption: true
+
+quagga::interfaces:
+    lo:
+        ip_addresses:
+            - 10.255.255.1/32
+    eth0:
+        igmp: true
+        ip_addresses:
+            - 172.16.0.1/24
+        ospf_dead_interval: 8
+        ospf_hello_interval: 2
+        ospf_mtu_ignore: true
+        pim_ssm: true
+
+quagga::bgp:
+    65000:
+        import_check: true
+        ipv4_unicast: false
+        maximum_paths_ebgp: 2
+        maximum_paths_ibgp: 10
+        networks:
+            - 1.1.1.0/24
+            - 1.1.2.0/24
+        router_id: 10.0.0.1
+        peers:
+            192.168.0.2:
+                peer_group: INTERNAL
+            192.168.0.3:
+                peer_group: INTERNAL
+        peer_groups:
+            INTERNAL:
+                activate: true
+                next_hop_self: true
+                remote_as: 65000
+                update_source: 192.168.0.1
+        redistribute:
+            - ospf:
+                route_map: BGP_FROM_OSPF
+
+quagga::ospf:
+    abr_type: cisco
+    opaque: true
+    rfc1583: true
+    router_id: 192.168.0.1
+    areas:
+        0.0.0.0:
+            networks:
+                - 172.16.0.0/12
+    redistribute:
+        - connected:
+            route_map: CONNECTED
+
+quagga::as_paths:
+    FROM_AS100:
+        rules:
+            - permit _100$
+
+quagga::community_lists:
+    100:
+        rules:
+            - permit 65000:101
+            - permit 65000:102
+            - permit 65000:103
+    200:
+        rules:
+            - permit 65000:201
+            - permit 65000:202
+
+quagga::prefix_lists:
+    CONNECTED_NETWORKS:
+        rules:
+            500:
+                action: permit
+                le: 32
+                prefix: 10.255.255.0/24
+    OSPF_NETWORKS:
+        rules:
+            10:
+                action: permit
+                prefix: 172.31.255.0/24
+
+quagga::route_maps:
+    BGP_FROM_OSPF:
+        rules:
+            10:
+                action: permit
+                match: ip address prefix-list OSPF_NETWORKS
+    CONNECTED:
+        rules:
+            10:
+                action: permit
+                match: ip address prefix-list CONNECTED_NETWORKS
+```
 
 ### How to use it?
 

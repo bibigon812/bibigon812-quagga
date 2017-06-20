@@ -1,16 +1,25 @@
 class quagga (
-  Boolean $bgp            = true,
-  Boolean $ospf           = true,
-  Boolean $pim            = true,
-  Boolean $zebra          = true,
   String  $owner          = $::quagga::params::owner,
   String  $group          = $::quagga::params::group,
   String  $mode           = $::quagga::params::mode,
   String  $package_name   = $::quagga::params::package_name,
   String  $package_ensure = $::quagga::params::package_ensure,
   String  $content        = $::quagga::params::content,
+  Hash    $as_paths        = {},
+  Hash    $bgps            = {},
+  Hash    $community_lists = {},
+  Hash    $interfaces      = {},
+  Hash    $ospf            = {},
+  Hash    $prefix_lists    = {},
+  Hash    $route_maps      = {},
 
 ) inherits ::quagga::params {
+
+  $real_route_maps = deep_merge($route_maps, hiera_hash('quagga::route_maps', {}))
+
+  class { '::quagga::route_maps':
+    settings => $real_route_maps,
+  }
 
   package { 'quagga':
     ensure => $package_ensure,
@@ -43,8 +52,8 @@ class quagga (
   }
 
   service { 'zebra':
-    ensure  => $zebra,
-    enable  => $zebra,
+    ensure  => running,
+    enable  => enabled,
     require => [
       File['/etc/sysconfig/quagga', '/etc/quagga/zebra.conf'],
       Package['quagga'],
@@ -52,8 +61,8 @@ class quagga (
   }
 
   service { 'bgpd':
-    ensure  => $bgp,
-    enable  => $bgp,
+    ensure  => running,
+    enable  => enabled,
     require => [
       File['/etc/sysconfig/quagga', '/etc/quagga/bgpd.conf'],
       Package['quagga'],
@@ -61,8 +70,8 @@ class quagga (
   }
 
   service { 'ospfd':
-    ensure  => $ospf,
-    enable  => $ospf,
+    ensure  => running,
+    enable  => enabled,
     require => [
       File['/etc/sysconfig/quagga', '/etc/quagga/ospfd.conf'],
       Package['quagga'],
@@ -70,8 +79,8 @@ class quagga (
   }
 
   service { 'pimd':
-    ensure  => $pim,
-    enable  => $pim,
+    ensure  => running,
+    enable  => enabled,
     require => [
       File['/etc/sysconfig/quagga', '/etc/quagga/pimd.conf',],
       Package['quagga'],
