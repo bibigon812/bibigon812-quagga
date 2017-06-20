@@ -13,7 +13,7 @@ class quagga::route_maps (
       default  => 'present',
     }
 
-    $config = dig44($route_map[1], ['rules'], {}).reduce({}) |$memo, $value| {
+    $config = dig44(value[1], ['rules'], {}).reduce({}) |$memo, $value| {
       $index = $value[0]
       merge($memo, {"${name}:${index}" => merge({ ensure => $ensure }, $value[1])})
     }
@@ -22,6 +22,6 @@ class quagga::route_maps (
   }
 
   unless empty($real_settings) {
-    create_resources('quagga_route_map', $route_maps)
+    create_resources('quagga_route_map', $real_settings)
   }
 }
