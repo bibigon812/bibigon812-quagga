@@ -237,7 +237,7 @@ quagga_bgp_peer { '65000 10.0.0.3':
 ### quagga_community_list
 
 ```puppet
-quaggA_community_list { '100':
+quagga_community_list { '100':
     ensure => present,
     rules  => [
         'permit 65000:50952',
