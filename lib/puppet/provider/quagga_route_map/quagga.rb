@@ -27,7 +27,6 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   def initialize(value)
     super(value)
     @property_flush = {}
-    @property_remove = {}
   end
 
   def self.instances
@@ -54,8 +53,9 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
         hash = {
             :ensure => :present,
-            :name => "#{name}:#{action}:#{sequence}",
+            :name => "#{name}:#{sequence}",
             :provider => self.name,
+            :action => action.to_sym,
         }
 
         # Added default values
@@ -103,11 +103,9 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    found_providers = []
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
-        found_providers << provider
       end
     end
   end
@@ -115,7 +113,9 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   def create
     debug '[create]'
 
-    name, action, sequence = @resource[:name].split(/:/)
+    name, sequence = @resource[:name].split(/:/)
+    action = @resource[:action]
+
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
@@ -146,7 +146,8 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   def destroy
     debug '[destroy]'
 
-    name, action, sequence = @property_hash[:name].split(/:/)
+    name, sequence = @property_hash[:name].split(/:/)
+    action = @property_hash[:action]
 
     debug "[flush][#{name}:#{action}:#{sequence}]"
 
@@ -166,7 +167,8 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   end
 
   def flush
-    name, action, sequence = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
+    name, sequence = @property_hash[:name].split(/:/)
+    action = @property_hash[:action]
 
     debug "[flush][#{name}:#{action}:#{sequence}]"
     resource_map = self.class.instance_variable_get('@resource_map')

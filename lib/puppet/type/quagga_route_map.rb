@@ -4,8 +4,9 @@ Puppet::Type.newtype(:quagga_route_map) do
 
       Example:
 
-        route_map {'TEST_ROUTE_MAP:permit:10':
+        route_map {'TEST_ROUTE_MAP:10':
             ensure   => present,
+            action   => 'permit',
             match    => [
                 'as-path PATH_LIST',
                 'community COMMUNITY_LIST',
@@ -23,7 +24,13 @@ Puppet::Type.newtype(:quagga_route_map) do
   newparam(:name) do
     desc 'Name of the route-map, action and sequence number of rule.'
 
-    newvalues(/\A\w[\w-]+:(deny|permit):\d+\Z/)
+    newvalues(/\A\w[\w-]+:\d+\Z/)
+  end
+
+  newproperty(:action) do
+    desc 'Route map actions. Default to `permit`.'
+
+    newvalues(:deny, :permit)
   end
 
   newproperty(:match, :array_matching => :all) do

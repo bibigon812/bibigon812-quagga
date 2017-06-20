@@ -37,10 +37,11 @@ route-map AS8631_out permit 20
       expect(described_class.instances.size).to eq(3)
     end
 
-    it 'should return the resource CONNECTED:permit:500' do
+    it 'should return the resource CONNECTED:500' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'CONNECTED:permit:500',
+          :action => :permit,
+          :name => 'CONNECTED:500',
           :provider => :quagga,
           :match => ['ip address prefix-list CONNECTED_NETWORKS',],
           :on_match => :absent,
@@ -48,10 +49,11 @@ route-map AS8631_out permit 20
       })
     end
 
-    it 'should return the resource AS8631_out:permit:10' do
+    it 'should return the resource AS8631_out:10' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'AS8631_out:permit:10',
+          :action => :permit,
+          :name => 'AS8631_out:10',
           :provider => :quagga,
           :match => ['origin igp',],
           :on_match => :absent,
@@ -59,10 +61,11 @@ route-map AS8631_out permit 20
       })
     end
 
-    it 'should return the resource AS8631_out:permit:20' do
+    it 'should return the resource AS8631_out:20' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
           :ensure => :present,
-          :name => 'AS8631_out:permit:20',
+          :action => :permit,
+          :name => 'AS8631_out:20',
           :provider => :quagga,
           :match => ['origin igp',],
           :on_match => :absent,
