@@ -55,10 +55,10 @@ quagga::bgp:
                 peer_group: INTERNAL
             192.168.0.3:
                 peer_group: INTERNAL
-        peer_groups:
             INTERNAL:
                 activate: true
                 next_hop_self: true
+                peer_group: true
                 remote_as: 65000
                 update_source: 192.168.0.1
         redistribute:
