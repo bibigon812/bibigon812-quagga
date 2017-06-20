@@ -282,18 +282,21 @@ The route_map resource is a single sequence. You can use a chain of resources
 to describe complex route maps, for example:
 
 ```puppet
-quagga_route_map { 'bgp_out:permit:10':
+quagga_route_map { 'bgp_out:10':
     ensure   => present,
+    action   => 'permit',
     match    => 'ip address prefix-list ADVERTISED-PREFIXES'
     on_match => 'goto 65000',
 }
 
-quagga_route_map { 'bgp_out:deny:99':
+quagga_route_map { 'bgp_out:99':
     ensure => present,
+    action => 'deny',
 }
 
-quagga_route_map { 'bgp_out:permit:65000':
+quagga_route_map { 'bgp_out:65000':
     ensure => present,
+    action => 'permit',
     set    => 'community 0:666',
 }
 ```
@@ -301,6 +304,7 @@ quagga_route_map { 'bgp_out:permit:65000':
 #### Reference
 
 - `name`: Name of the route-map, action and sequence number of rule.
+- `action`: Route map actions: `deny`,`permit`.
 - `ensure`: Manage the state of this route map: `absent`, `present`. Default to `present`.
 - `match`: Match values from routing table.
 - `on_match`: Exit policy on matches.

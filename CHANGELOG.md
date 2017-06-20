@@ -5,6 +5,7 @@
 - the property `networks` to the resource `quagga_bgp`
 - tests
 - `quagga_ip` properties to the resource `quagga_system`
+- the property `action` to the resource `quagga_route_map`
 
 ### Changed
 - boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 
@@ -21,6 +22,7 @@
 - the type `prefix_list` to `quagga_prefix_list`
 - the type `redistribution` to `quagga_redistribution`
 - the type `route_map` to `quagga_route_map`
+- the name of the resource `quagga_route_map`
 
 ### Removed
 - the method `purge` from resources `bgp*`
