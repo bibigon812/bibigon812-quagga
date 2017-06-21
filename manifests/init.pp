@@ -52,8 +52,8 @@ class quagga (
   }
 
   service { 'zebra':
-    ensure  => running,
-    enable  => enabled,
+    ensure  => true,
+    enable  => true,
     require => [
       File['/etc/sysconfig/quagga', '/etc/quagga/zebra.conf'],
       Package['quagga'],
@@ -61,8 +61,8 @@ class quagga (
   }
 
   service { 'bgpd':
-    ensure  => running,
-    enable  => enabled,
+    ensure  => true,
+    enable  => true,
     require => [
       File['/etc/sysconfig/quagga', '/etc/quagga/bgpd.conf'],
       Package['quagga'],
@@ -70,8 +70,8 @@ class quagga (
   }
 
   service { 'ospfd':
-    ensure  => running,
-    enable  => enabled,
+    ensure  => true,
+    enable  => true,
     require => [
       File['/etc/sysconfig/quagga', '/etc/quagga/ospfd.conf'],
       Package['quagga'],
@@ -79,8 +79,8 @@ class quagga (
   }
 
   service { 'pimd':
-    ensure  => running,
-    enable  => enabled,
+    ensure  => true,
+    enable  => true,
     require => [
       File['/etc/sysconfig/quagga', '/etc/quagga/pimd.conf',],
       Package['quagga'],
