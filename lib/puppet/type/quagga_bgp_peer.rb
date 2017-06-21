@@ -195,11 +195,12 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   autorequire(:quagga_bgp_peer) do
-    if not [:false, :true].include? value(:peer_group)
-      [value(:peer_group)]
-    else
-      []
-    end
+    reqs = []
+
+    peer_group = value(:peer_group)
+    reqs << peer_group unless peer_group == :false or peer_group == :true
+
+    reqs
   end
 
   autorequire :package do
