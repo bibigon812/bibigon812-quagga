@@ -25,7 +25,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
         }
   }
 
-  feature :refreshable, 'The provider can execute the clearing bgp session.', methods: [:reset]
+  feature :refreshable, 'The provider can execute the clearing bgp session.', :methods => [:reset]
 
   ensurable
 
@@ -275,5 +275,13 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     end
 
     reqs
+  end
+
+  def refresh
+    if value(:shutdown) == :false
+      provider.reset
+    else
+      debug 'Skipping clear; bgp session shutdown'
+    end
   end
 end
