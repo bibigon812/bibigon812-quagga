@@ -119,10 +119,12 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     end
 
     # Destroy providers that manage unused sequences of found route-maps
-    route_map_names.each do |route_map_name|
-      (providers - found_providers).select { |provider| provider.name.start_with?("#{route_map_name}:") }
-          .each do |provider|
-        provider.destroy
+    (providers - found_providers).each do |provider|
+      route_map_names.each do |route_map_name|
+        if provider.name.start_with?("#{route_map_name}:")
+          provider.destroy
+          break
+        end
       end
     end
   end
