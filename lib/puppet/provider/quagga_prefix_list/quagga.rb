@@ -50,10 +50,30 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   def self.prefetch(resources)
     debug '[prefetch]'
     providers = instances
+
+    found_providers = []
+    prefix_list_names = []
+
     resources.keys.each do |name|
       if provider = providers.find{ |prefix_list| prefix_list.name == name }
         resources[name].provider = provider
         provider.purge
+
+        found_providers << provider
+      end
+
+      # Store prefix-list names which that were found
+      prefix_list_name = name.split(/:/).first
+      prefix_list_names << prefix_list_name unless prefix_list_names.include?(prefix_list_name)
+    end
+
+    # Destroy providers that manage unused sequences of found prefix-lists
+    (providers - found_providers).each do |provider|
+      prefix_list_names.each do |prefix_list_name|
+        if provider.name.start_with?("#{prefix_list_name}:")
+          provider.destroy
+          break
+        end
       end
     end
   end
