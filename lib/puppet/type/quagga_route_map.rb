@@ -66,8 +66,12 @@ Puppet::Type.newtype(:quagga_route_map) do
       true
     end
 
-    def should_to_s(value)
-      value.inspect
+    def should_to_s(value = @should)
+      if value
+        value.inspect
+      else
+        nil
+      end
     end
 
     defaultto([])
@@ -119,8 +123,12 @@ Puppet::Type.newtype(:quagga_route_map) do
       true
     end
 
-    def should_to_s(value)
-      value.inspect
+    def should_to_s(value = @should)
+      if value
+        value.inspect
+      else
+        nil
+      end
     end
 
     defaultto([])
