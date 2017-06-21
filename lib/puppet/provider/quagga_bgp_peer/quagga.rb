@@ -141,12 +141,15 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
+
+      # Skip comments
       next if line =~ /\A!/
+
       if line =~ /\Arouter\sbgp\s(\d+)\Z/
         as = $1
         found_router = true
 
-      # I store a default value of the property `ipv4_unicast`
+      # Store a default value of the property `ipv4_unicast`
       elsif found_router && line =~/\A\sno\sbgp\sdefault\sipv4-unicast\Z/
         default_ipv4_unicast = :false
 
@@ -160,28 +163,33 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
         unless name == previous_name
           unless hash.empty?
+
             unless hash.include?(:activate)
               hash[:activate] = (activate[hash[:peer_group]].nil? ? default_ipv4_unicast : activate[hash[:peer_group]])
             end
 
             debug "bgp_neighbor: #{hash}"
 
-            if hash[:peer_group]
-              # If it's peer_group I store a activate value.
+            if hash[:peer_group] == :true
+              # Store a value of the property `activate` if it's peer-group
               activate[previous_name] = hash[:activate]
             end
 
             providers << new(hash)
           end
 
-          hash = {}
-          hash[:provider] = self.name
-          hash[:name] = "#{as} #{name}"
-          hash[:ensure] = :present
+          hash = {
+              :ensure => :present,
+              :name => "#{as} #{name}",
+              :provider => self.name,
+          }
 
-          # I add defult values
+          # Add default values
           @resource_map.each do |property, options|
+
+            # Skip the property `activate` because it could be inherited
             next if property == :activate
+
             hash[property] = eval(options[:default]) if options.has_key?(:default)
           end
         end
@@ -282,7 +290,8 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   end
 
   def flush
-    # as, name = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/\s+/)
+    return if @property_flush.empty?
+
     as, name = @property_hash[:name].split(/\s+/)
 
     debug "[flush][#{as} #{name}]"
@@ -314,9 +323,10 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty? && @property_remove.empty?
-      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    unless @property_flush.empty? and @property_remove.empty?
+      vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
       @property_flush.clear
+      @property_remove.clear
     end
   end
 

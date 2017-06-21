@@ -42,7 +42,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   newproperty :activate, :boolean => true do
-    desc 'Enable the Address Family for this Neighbor. Default to `enabled`.'
+    desc 'Enable the Address Family for this Neighbor. Default to `true`.'
 
     newvalues :false, :true
     defaultto :true
@@ -52,11 +52,9 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     desc 'Accept as-path with my AS present in it.'
 
     newvalues /\A(10|[1-9])\Z/
-    newvalues :absent
-    defaultto :absent
 
     munge do |value|
-      value.to_i unless value == :absent
+      value.to_i
     end
   end
 
@@ -69,20 +67,15 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
 
   newproperty :local_as do
     desc 'Specify a local-as number.'
+
     newvalues /\A\d+\Z/
-    newvalues :absent
-    defaultto :absent
 
     validate do |value|
-      super value
-
-      unless value == :absent or value.to_i > 0
-        raise ArgumentError, "Invalid value \"#{value}\", valid values are 1-4294967295"
-      end
+      raise ArgumentError, "Invalid value \"#{value}\", valid values are 1-4294967295" unless value.to_i > 0
     end
 
     munge do |value|
-      value.to_i unless value == :absent
+      value.to_i
     end
   end
 
@@ -112,35 +105,25 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     desc 'Filter updates from this neighbor.'
 
     newvalues /\A[[:alpha:]][\w-]+\Z/
-    newvalues :absent
-    defaultto :absent
   end
 
   newproperty :prefix_list_out do
     desc 'Filter updates to this neighbor.'
 
     newvalues /\A[[:alpha:]][\w-]+\Z/
-    newvalues :absent
-    defaultto :absent
   end
 
   newproperty :remote_as do
     desc 'Specify a BGP neighbor as.'
 
     newvalues /\A\d+\Z/
-    newvalues :absent
-    defaultto :absent
 
     validate do |value|
-      super value
-
-      unless value == :absent or value.to_i > 0
-        raise ArgumentError, "Invalid value \"#{value}\", valid values are 1-4294967295"
-      end
+      raise ArgumentError, "Invalid value \"#{value}\", valid values are 1-4294967295" unless value.to_i > 0
     end
 
     munge do |value|
-      value.to_i unless value == :absent
+      value.to_i
     end
   end
 
@@ -148,32 +131,24 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     desc 'Apply map to routes coming from a Route-Server client.'
 
     newvalues /\A[[:alpha:]][\w-]+\Z/
-    newvalues :absent
-    defaultto :absent
   end
 
   newproperty :route_map_import do
     desc 'Apply map to routes going into a Route-Server client\'s table.'
 
     newvalues /\A[[:alpha:]][\w-]+\Z/
-    newvalues :absent
-    defaultto :absent
   end
 
   newproperty :route_map_in do
     desc 'Apply map to incoming routes.'
 
     newvalues /\A[[:alpha:]][\w-]+\Z/
-    newvalues :absent
-    defaultto :absent
   end
 
   newproperty :route_map_out do
     desc 'Apply map to outbound routes.'
 
     newvalues /\A[[:alpha:]][\w-]+\Z/
-    newvalues :absent
-    defaultto :absent
   end
 
   newproperty :route_reflector_client, :boolean => true do
@@ -206,8 +181,6 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     newvalues /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
     newvalues /\A\h+:[\h:]+\Z/
     newvalues /\A#{interface}\Z/
-    newvalues :absent
-    defaultto :absent
   end
 
   autorequire(:quagga_bgp) do
@@ -222,7 +195,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   autorequire(:quagga_bgp_peer) do
-    unless value(:peer_group).nil? || value(:peer_group) == :enabled
+    if not [:false, :true].include? value(:peer_group)
       [value(:peer_group)]
     else
       []
