@@ -103,9 +103,26 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
+
+    found_providers = []
+    route_map_names = []
+
     resources.keys.each do |name|
       if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
+        found_providers << provider
+      end
+
+      # Store route-map names which that were found
+      route_map_name = name.split(/:/).first
+      route_map_names << route_map_name unless route_map_names.include?(route_map_name)
+    end
+
+    # Destroy providers that manage unused sequences of found route-maps
+    route_map_names.each do |route_map_name|
+      (providers - found_providers).select { |provider| provider.name.start_with?("#{route_map_name}:") }
+          .each do |provider|
+        provider.destroy
       end
     end
   end
