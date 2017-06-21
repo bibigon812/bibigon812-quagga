@@ -216,20 +216,20 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     peer_group_prefix_lists = {}
     reqs = []
 
-    unless value :peer_group == :true
+    unless value(:peer_group) == :true
       # Collect peer's prefix-lists unless it's a peer-group
       [:prefix_list_in, :prefix_list_out].each do |property|
-        peer_prefix_lists[property] = value property unless value property == :absent
+        peer_prefix_lists[property] = value(property) unless value(property).nil?
       end
 
-      unless value :peer_group == :false
+      unless value(:peer_group) == :false
         # Collect peer-group's prefix-lists if peer has parent peer-group
-        peer_group = value :peer_group
+        peer_group = value(:peer_group)
 
         catalog.resources.select { |resource| resource.type == :quagga_bgp_peer }
             .select { |resource| resource[:name] == "#{as} #{peer_group}" }.each do |resource|
           [:prefix_list_in, :prefix_list_out].each do |property|
-            peer_group_prefix_lists[property] = resource[property] unless resource[property] == :absent
+            peer_group_prefix_lists[property] = resource[property] unless resource[property].nil?
           end
         end
       end
@@ -249,15 +249,15 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     peer_group_route_maps = {}
     reqs = []
 
-    unless value :peer_group == :true
+    unless value(:peer_group) == :true
       # Collect peer's route-maps unless it's a peer-group
       [:route_map_export, :route_map_import, :route_map_in, :route_map_out].each do |property|
-        peer_route_maps[property] = value property unless value property == :absent
+        peer_route_maps[property] = value(property) unless value(property).nil?
       end
 
-      unless value :peer_group == :false
+      unless value(:peer_group) == :false
         # Collect peer-group's route-maps if peer has parent peer-group
-        peer_group = value :peer_group
+        peer_group = value(:peer_group)
 
         catalog.resources.select { |resource| resource.type == :quagga_bgp_peer }
           .select { |resource| resource[:name] == "#{as} #{peer_group}" }.each do |resource|
