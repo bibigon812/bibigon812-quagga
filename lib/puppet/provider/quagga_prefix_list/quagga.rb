@@ -1,9 +1,11 @@
 Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   @doc = %q{ Manages prefix lists using quagga }
 
-  @known_resources = [
+  @resource_properties = [
       :action, :prefix, :ge, :le, :proto,
   ]
+
+  @resource_template = '<%= proto %> prefix-list <%= name %> seq <%= seq %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
 
   commands :vtysh => 'vtysh'
 
@@ -19,7 +21,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
       next if line =~ /\A!\Z/
 
-      if line =~ /^(ip|ipv6) prefix-list ([\w-]+) seq (\d+) (permit|deny) ([\d\.\/:]+|any)( (ge|le) (\d+)( (ge|le) (\d+))?)?$/
+      if line =~ /^(ip|ipv6)\sprefix-list\s([\w-]+)\sseq\s(\d+)\s(permit|deny)\s([\d\.\/:]+|any)(\s(ge|le)\s(\d+)(\s(ge|le)\s(\d+))?)?$/
 
         hash = {
             :action => $4.to_sym,
@@ -37,7 +39,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
         providers << new(hash)
 
-        found_prefix_list = true unless found_prefix_list
+        found_prefix_list = true
 
       elsif line =~ /\A\w/ and found_prefix_list
         break
@@ -79,19 +81,48 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   end
 
   def create
-    debug '[create]'
-    known_resources = self.class.instance_variable_get('@known_resources')
+    template = self.class.instance_variable_get('@resource_template')
+    name, seq = @resource[:name].split(/:/)
 
-    @property_hash[:ensure] = :present
-    @property_hash[:name] = @resource[:name]
+    debug "[create][prefix-list #{name}:#{seq}"
 
-    known_resources.each do |property|
-      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
-    end
+    cmds = []
+    cmds << 'configure terminal'
+
+    proto = @resource[:proto]
+    action = @resource[:action]
+    prefix = @resource[:prefix]
+    ge = @resource[:ge]
+    le = @resource[:le]
+
+    cmds << ERB.new(template).result(binding)
+
+    cmds << 'end'
+    cmds << 'write memory'
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   def destroy
-    debug '[destroy]'
+    template = self.class.instance_variable_get('@resource_template')
+    name, seq = @property_hash[:name].split(/:/)
+
+    debug "[destroy][prefix-list #{name}:#{seq}]"
+
+    cmds = []
+    cmds << 'configure terminal'
+
+    proto = @property_hash[:proto]
+    action = @property_hash[:action]
+    prefix = @property_hash[:prefix]
+    ge = @property_hash[:ge]
+    le = @property_hash[:le]
+
+    cmds << "no #{ERB.new(template).result(binding)}"
+
+    cmds << 'end'
+    cmds << 'write memory'
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
     @property_hash[:ensure] = :absent
   end
 
@@ -100,50 +131,21 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   end
 
   def flush
-    name, sequence = (@property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]).split(/:/)
+    return unless @property_hash[:ensure] == :present
 
-    debug "[flush][#{name}:#{sequence}]"
+    name, sequence = @property_hash[:name].split(/:/)
 
-    cmds = []
-    cmds << 'configure terminal'
-    if @property_hash[:ensure] == :absent
-      proto = @property_hash[:proto]
-      action = @property_hash[:action]
-      prefix = @property_hash[:prefix]
-      ge = @property_hash[:ge]
-      le = @property_hash[:le]
+    debug "[flush][prefix-list #{name}:#{sequence}]"
 
-      cmd = ''
-      cmd << "no #{proto} prefix-list #{name} seq #{sequence} #{action} #{prefix}"
-      cmd << " ge #{ge}" unless ge.nil?
-      cmd << " le #{le}" unless le.nil?
-
-      cmds << cmd
-    else
-      proto = @resource[:proto]
-      action = @resource[:action]
-      prefix = @resource[:prefix]
-      ge = @resource[:ge]
-      le = @resource[:le]
-
-      cmd = ''
-      cmd << "#{proto} prefix-list #{name} seq #{sequence} #{action} #{prefix}"
-      cmd << " ge #{ge}" unless ge.nil?
-      cmd << " le #{le}" unless le.nil?
-
-      cmds << cmd
-    end
-    cmds << 'end'
-    cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    create
   end
 
   def purge
     debug '[purge]'
 
-    known_resources = self.class.instance_variable_get('@known_resources')
+    known_resources = self.class.instance_variable_get('@resource_properties')
     known_resources.each do |property|
-      if @resource[property].nil? && !@property_hash[property].nil?
+      if @resource[property].nil? and not @property_hash[property].nil?
         flush
         break
       end
