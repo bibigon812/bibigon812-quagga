@@ -2,26 +2,26 @@ class quagga::route_maps (
   Hash $settings = {},
 
 ) {
-  assert_private()
-  # TODO:
+  unless empty($settings) {
 
-  $real_settings = $settings.reduce({}) |$memo, $value| {
-    $name = $value[0]
+    $route_maps = $settings.reduce({ }) |$memo, $value| {
+      $name = $value[0]
 
-    $ensure = dig44($value[1], ['ensure'], 'present') ? {
-      'absent' => 'absent',
-      default  => 'present',
+      $ensure = dig44($value[1], ['ensure'], 'present') ? {
+        'absent' => 'absent',
+        default  => 'present',
+      }
+
+      $config = dig44(value[1], ['rules'], { }).reduce({ }) |$memo, $value| {
+        $index = $value[0]
+        merge($memo, { "${name}:${index}" => merge({ ensure => $ensure }, $value[1]) })
+      }
+
+      merge($memo, $config)
     }
 
-    $config = dig44(value[1], ['rules'], {}).reduce({}) |$memo, $value| {
-      $index = $value[0]
-      merge($memo, {"${name}:${index}" => merge({ ensure => $ensure }, $value[1])})
+    unless empty($route_maps) {
+      create_resources('quagga_route_map', $route_maps)
     }
-
-    merge($memo, $config)
-  }
-
-  unless empty($real_settings) {
-    create_resources('quagga_route_map', $real_settings)
   }
 }
