@@ -66,9 +66,6 @@ quagga::bgp:
                 route_map: BGP_FROM_OSPF
 
 quagga::ospf:
-    abr_type: cisco
-    opaque: true
-    rfc1583: true
     router_id: 10.255.255.1
     areas:
         0.0.0.0:
