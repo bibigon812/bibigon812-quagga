@@ -1,35 +1,40 @@
 Puppet::Type.newtype(:quagga_prefix_list) do
   @doc = %q{
+    This type provides the capability to manage prefix-lists within puppet.
 
-This type provides the capability to manage prefix-lists within puppet.
+      Example:
 
-Example:
-
-```puppet
-  prefix_list {'TEST_PREFIX_LIST:10':
-    ensure => present,
-    action => permit,
-    prefix => '224.0.0.0/4',
-    ge     => 8,
-    le     => 24,
-  }
-```
-
+        quagga_prefix_list {'TEST_PREFIX_LIST:10':
+          ensure => present,
+          action => permit,
+          prefix => '224.0.0.0/4',
+          ge     => 8,
+          le     => 24,
+        }
   }
 
   ensurable
 
-  newparam(:name) do
-    desc %q{ Name of the prefix-list and sequence number of rule. }
+  newparam :name do
+    desc 'Name of the prefix-list and sequence number of rule.'
 
-    newvalues(/\A[\w-]+:\d+\Z/)
+    newvalues /\A[\w-]+:\d+\Z/
+
+    isnamevar
   end
 
-  newproperty(:proto) do
-    desc %q{ IP protocol version: `ip`, `ipv6`. Default to `ip`. }
+  newproperty :proto do
+    desc 'IP protocol version: `ip`, `ipv6`. Default to `ip`.'
 
-    defaultto :ip
-    newvalues(:ip, :ipv6)
+    newvalues :ip, :ipv6
+
+    defaultto {
+      if @resource[:prefix].nil?
+        :ip
+      else
+        @resource[:prefix].to_s.include?(':') ? :ipv6 : :ip
+      end
+    }
   end
 
   newproperty(:action) do
@@ -50,7 +55,7 @@ Example:
     validate do |value|
       value_i = value.to_i
       if value_i < 1 or value_i > 32
-        raise ArgumentError, 'Minimum prefix length: 1-32'
+        raise ArgumentError, 'Invalid value. Minimum prefix length: 1-32'
       end
     end
 
@@ -66,7 +71,7 @@ Example:
     validate do |value|
       value_i = value.to_i
       if value_i < 1 or value_i > 32
-        raise ArgumentError, 'Maximum prefix length: 1-32'
+        raise ArgumentError, 'Invalid value. Maximum prefix length: 1-32'
       end
     end
 

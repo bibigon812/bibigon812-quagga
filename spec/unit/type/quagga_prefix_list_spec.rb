@@ -22,13 +22,13 @@ describe Puppet::Type.type(:quagga_prefix_list) do
   end
 
   describe "when validating attributes" do
-    [ :name, :provider ].each do |param|
+    [:name, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end
     end
 
-    [ :action, :prefix, :ge, :le ].each do |property|
+    [:action, :prefix, :ge, :le,].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -61,7 +61,7 @@ describe Puppet::Type.type(:quagga_prefix_list) do
     end
 
     it 'should not support as100 as a value' do
-      expect { described_class.new(:name => 'prefix_list') }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => 'prefix_list|D') }.to raise_error(Puppet::Error, /Invalid value/)
     end
   end
 
