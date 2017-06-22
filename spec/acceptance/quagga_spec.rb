@@ -5,14 +5,7 @@ describe 'quagga' do
     it 'should work with no errors' do
       pp = <<-EOS
         class { 'quagga': }
-        ospf_interface { 'eth0':
-          ensure              => present,
-          cost                => 100,
-          dead_interval       => 8,
-          hello_interval      => 2,
-          retransmit_interval => 4,
-        }
-        ospf { 'ospf':
+        quagga_ospf { 'ospf':
           ensure => present,
           router_id => '1.1.1.1',
         }

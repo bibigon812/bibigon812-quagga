@@ -21,7 +21,7 @@ Currently it supports:
 Hiera support will be implemented in the future release.
 
 ```yaml
-qyagga::system:
+quagga::system:
     ip_forwarding: true
     ip_multicast_routing: true
     ipv6_forwarding: true
