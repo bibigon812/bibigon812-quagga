@@ -29,12 +29,12 @@ quagga::system:
 
 quagga::interfaces:
     lo:
-        ip_addresses:
+        ip_address: 
             - 10.255.255.1/32
+            - 172.16.255.1/32
     eth0:
         igmp: true
-        ip_addresses:
-            - 172.16.0.1/24
+        ip_address: 172.16.0.1/24
         ospf_dead_interval: 8
         ospf_hello_interval: 2
         ospf_mtu_ignore: true
