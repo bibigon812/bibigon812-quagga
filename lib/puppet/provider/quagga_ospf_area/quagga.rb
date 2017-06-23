@@ -143,6 +143,11 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
       end
     end
 
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
     @property_hash[:ensure] = :present
   end
 
@@ -168,6 +173,11 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
         end
       end
     end
+
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
 
     @property_hash.clear
   end
