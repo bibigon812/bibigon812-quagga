@@ -56,16 +56,16 @@ Puppet::Type.newtype(:quagga_redistribution) do
   end
 
   autorequire(:quagga_bgp) do
-    main_protocol, as, _ = value(:name).split(/:/)
+    main_protocol, as, _ = self[:name].split(/:/)
     if main_protocol == 'bgp'
-      [as]
+      ["#{as}"]
     else
       []
     end
   end
 
   autorequire(:quagga_ospf) do
-    main_protocol, _, _ = value(:name).split(/:/)
+    main_protocol, _, _ = self[:name].split(/:/)
     if main_protocol == 'ospf'
       ['ospf']
     else
@@ -78,7 +78,7 @@ Puppet::Type.newtype(:quagga_redistribution) do
   end
 
   autorequire(:service) do
-    main_protocol, _, protocol = value(:name).split(/:/).first
+    main_protocol, _, protocol = self[:name].split(/:/).first
 
     protocols = [main_protocol, protocol]
     reqs = %w{zebra}
