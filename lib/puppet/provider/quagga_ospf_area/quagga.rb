@@ -130,9 +130,9 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
     cmds << 'configure terminal'
     cmds << 'router ospf'
 
-    resource_map.keys.each do |property|
+    resource_map.each do |property, options|
       if @resource[property] and @resource[property] != :absent and @resource[property] != :false
-        if resource_map[property][:type] == :array
+        if options[:type] == :array
           @resource[property].each do |value|
             cmds << ERB.new(options[:template]).result(binding)
           end
