@@ -184,7 +184,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   autorequire(:quagga_bgp) do
-    as, _= value(:name).split(/\s+/)
+    as, _= self[:name].split(/\s+/)
 
     [as]
   end
@@ -192,7 +192,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   autorequire(:quagga_bgp_peer) do
     reqs = []
 
-    peer_group = value(:peer_group)
+    peer_group = self[:peer_group]
     reqs << peer_group unless peer_group == :false or peer_group == :true
 
     reqs
