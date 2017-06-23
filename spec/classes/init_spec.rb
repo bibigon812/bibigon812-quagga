@@ -1,6 +1,28 @@
 require 'spec_helper'
 
 describe 'quagga' do
+  let(:title) { 'quagga' }
+
+  let(:params) { #{:interfaces => {:eth1 => {:pim_ssm => true } }}
+    {
+      'interfaces' => {
+        'eth1' => {
+          'igmp' => true,
+          'ospf_mtu_ignore' => true,
+          'pim_ssm' => true,
+        },
+      },
+      'bgp' => {
+        '65000' => {
+          'router_id' => '10.0.0.1',
+        },
+      },
+      'ospf' => {
+        'router_id' => '10.0.0.1'
+      },
+    }
+  }
+
   it { is_expected.to compile.with_all_deps }
 
   it { is_expected.to contain_package('quagga') }

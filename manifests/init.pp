@@ -23,7 +23,7 @@ class quagga (
   $pim_config = '/etc/quagga/pimd.conf'
   $zebra_config = '/etc/quagga/zebra.conf'
 
-  $bgp_service = {
+  $services = {
     'bgpd' => {
       'ensure' => true,
       'enable' => true,
@@ -31,10 +31,7 @@ class quagga (
         File[$quagga_system_config, $bgp_config,],
         Package[$package_name,],
       ],
-    }
-  }
-
-  $ospf_service = {
+    },
     'ospfd' => {
       'ensure' => true,
       'enable' => true,
@@ -42,10 +39,7 @@ class quagga (
         File[$quagga_system_config, $ospf_config,],
         Package[$package_name,],
       ],
-    }
-  }
-
-  $pim_service = {
+    },
     'pimd' => {
       'ensure' => true,
       'enable' => true,
@@ -53,10 +47,7 @@ class quagga (
         File[$quagga_system_config, $pim_config,],
         Package[$package_name,],
       ],
-    }
-  }
-
-  $zebra_service = {
+    },
     'zebra' => {
       'ensure' => true,
       'enable' => true,
@@ -64,48 +55,102 @@ class quagga (
         File[$quagga_system_config, $zebra_config,],
         Package[$package_name,],
       ],
+    },
+  }
+
+  $real_interfaces = deep_merge($interfaces, hiera_hash('quagga::interfaces', {}))
+  unless empty($real_interfaces) {
+    $needed_services = $real_interfaces.reduce([]) |$memo, $value| {
+      union($memo, $value[1].reduce([]) |$memo, $value| {
+        if $value[0] =~ /pim/ {
+          union($memo, ['pimd'])
+        } elsif $value[0] =~ /^ospf/ {
+          union($memo, ['ospfd'])
+        } else {
+          union($memo, ['zebra'])
+        }
+      })
+    }
+
+    $needed_services.each |$service| {
+      ensure_resource('service', $service, $services[$service])
+    }
+
+    class { '::quagga::interfaces':
+      settings => $real_interfaces,
+    }
+  }
+
+  $real_bgp = deep_merge($bgp, hiera_hash('quagga::bgp', {}))
+  unless empty($real_bgp) {
+    ['bgpd', 'zebra'].each |$service| {
+      ensure_resource('service', $service, $services[$service])
+    }
+
+    class { '::quagga::bgp':
+      settings => $real_bgp,
+    }
+  }
+
+  $real_ospf = deep_merge($ospf, hiera_hash('quagga::ospf', {}))
+  unless empty($real_ospf) {
+    ['ospfd', 'zebra'].each |$service| {
+      ensure_resource('service', $service, $services[$service])
+    }
+
+    class { '::quagga::ospf':
+      settings => $real_ospf,
+    }
+  }
+
+  $real_route_maps = deep_merge($route_maps, hiera_hash('quagga::route_maps', {}))
+  unless empty($real_route_maps) {
+    ['bgpd', 'zebra'].each |$service| {
+      ensure_resource('service', $service, $services[$service])
+    }
+
+    class { '::quagga::route_maps':
+      settings => $real_route_maps,
+    }
+  }
+
+  $real_as_paths = deep_merge($as_paths, hiera_hash('quagga::as_paths', {}))
+  unless empty($real_as_paths) {
+    ['bgpd', 'zebra'].each |$service| {
+      ensure_resource('service', $service, $services[$service])
+    }
+
+    class { '::quagga::as_paths':
+      settings => $real_as_paths,
     }
   }
 
 
-  $real_interfaces = deep_merge($interfaces, hiera_hash('quagga::interfaces', {}))
-  class { '::quagga::interfaces':
-    settings => $real_interfaces,
-  }
-
-  $real_bgp = deep_merge($bgp, hiera_hash('quagga::bgp', {}))
-  class { '::quagga::bgp':
-    settings => $real_bgp,
-  }
-
-  $real_ospf = deep_merge($ospf, hiera_hash('quagga::ospf', {}))
-  class { '::quagga::ospf':
-    settings => $real_ospf,
-  }
-
-  $real_route_maps = deep_merge($route_maps, hiera_hash('quagga::route_maps', {}))
-  class { '::quagga::route_maps':
-    settings => $real_route_maps,
-  }
-
-  $real_as_paths = deep_merge($as_paths, hiera_hash('quagga::as_paths', {}))
-  class { '::quagga::as_paths':
-    settings => $real_as_paths,
-  }
-
   $real_community_lists = deep_merge($community_lists, hiera_hash('quagga::community_lists', {}))
-  class { '::quagga::community_lists':
-    settings => $real_community_lists,
+  unless empty($real_community_lists) {
+    ['bgpd', 'zebra'].each |$service| {
+      ensure_resource('service', $service, $services[$service])
+    }
+
+    class { '::quagga::community_lists':
+      settings => $real_community_lists,
+    }
   }
 
   $real_prefix_lists = deep_merge($prefix_lists, hiera_hash('quagga::prefix_lists', {}))
-  class { '::quagga::prefix_lists':
-    settings => $real_prefix_lists,
+  unless empty($real_prefix_lists) {
+    ensure_resource('service', 'zebra', $services['zebra'])
+    class { '::quagga::prefix_lists':
+      settings => $real_prefix_lists,
+    }
   }
 
   $real_system = deep_merge($system, hiera_hash('quagga::system', {}))
-  class { '::quagga::system':
-    settings => $real_system,
+  unless empty($real_system) {
+    ensure_resource('service', 'zebra', $services['zebra'])
+    class { '::quagga::system':
+      settings => $real_system,
+    }
   }
 
   package { 'quagga':
@@ -120,7 +165,7 @@ class quagga (
     mode    => '0644',
     content => file('quagga/quagga'),
     require => Package[$package_name],
-    notify  => Service['zebra', 'bgpd', 'ospfd', 'pimd'],
+    # notify  => Service['zebra', 'bgpd', 'ospfd', 'pimd'],
   }
 
   file {[
@@ -137,9 +182,4 @@ class quagga (
     replace => 'no',
     require => Package[$package_name],
   }
-
-  ensure_resources('service', $zebra_service)
-  ensure_resources('service', $bgp_service)
-  ensure_resources('service', $ospf_service)
-  ensure_resources('service', $pim_service)
 }

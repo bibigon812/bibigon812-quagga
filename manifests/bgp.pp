@@ -1,9 +1,7 @@
 class quagga::bgp (
   Hash $settings = {},
-
 ) {
   unless empty($settings) {
-
     # Quagga supports only one bgp router
     $as = $settings.keys[0]
     $options = $settings.values[0]
