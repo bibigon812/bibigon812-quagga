@@ -35,7 +35,7 @@ class quagga::bgp (
     }
 
     unless empty($bgp_peers) {
-      create_resources('quagga_bgp', $bgp_peers)
+      create_resources('quagga_bgp_peers', $bgp_peers)
     }
 
     unless empty($redistribution) {
