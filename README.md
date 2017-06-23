@@ -141,7 +141,8 @@ class { 'quagga':
 
 Then we can create different resources.
 
-### quagga_as_path
+### Resources
+#### quagga_as_path
 
 ```puppet
 quagga_as_path { 'TEST_AS_PATH':
@@ -153,13 +154,11 @@ quagga_as_path { 'TEST_AS_PATH':
 }
 ```
 
-#### Reference
-
 - `name`: The name of the as-path access-list.
 - `ensure`: Manage the state of this as-path list: `absent`, `present`. Default to `present`.
 - `rules`: Array of rules `action regex`.
 
-### quagga_bgp
+#### quagga_bgp
 
 ```puppet
 quagga_bgp { '65000':
@@ -173,8 +172,6 @@ quagga_bgp { '65000':
 }
 ```
 
-#### Reference
-
 - `name`: AS number
 - `ensure`: Manage the state of this BGP router: `absent`, `present`. Default to `present`.
 - `import_check`: Check BGP network route exists in IGP.
@@ -185,7 +182,7 @@ quagga_bgp { '65000':
 - `router_id`: Override configured router identifier.
 
 
-### quagga_bgp_peer
+#### quagga_bgp_peer
 
 ```puppet
 quagga_bgp_peer { '65000 internal':
@@ -208,8 +205,6 @@ quagga_bgp_peer { '65000 10.0.0.3':
 }
 ```
 
-#### Reference
-
 - `name`: It's consists of a AS number and a neighbor IP address or a peer-group name.
 - `ensure`: Manage the state of this BGP neighbor: `absent`, `present`. Default to `present`.
 - `activate`: Enable the Address Family for this Neighbor. Default to `true`.
@@ -231,7 +226,7 @@ quagga_bgp_peer { '65000 10.0.0.3':
 - `shutdown`: Administratively shut down this neighbor. Default to `false`.
 - `update_source`: Source of routing updates. It can be the interface name or IP address.
 
-### quagga_community_list
+#### quagga_community_list
 
 ```puppet
 quagga_community_list { '100':
@@ -243,13 +238,11 @@ quagga_community_list { '100':
 }
 ```
 
-#### Reference
-
 - `name`: Community list number.
 - `ensure`: Manage the state of this community list: `absent`, `present`. Default to `present`.
 - `rules`: Array of rules `action community`.
 
-### quagga_interface
+#### quagga_interface
 
 ```puppet
 quagga_interface { 'eth0':
@@ -262,8 +255,6 @@ quagga_interface { 'eth0':
     pim_ssm             => true,
 }
 ```
-
-#### Reference
 
 - `name`: The friendly name of the network interface.
 - `description`: Interface description.
@@ -282,7 +273,7 @@ quagga_interface { 'eth0':
 - `ospf_transmit_delay`: Link state transmit delay. Default to `1`.
 - `pim_ssm`: Enable PIM SSM operation. Default to `false`.
 
-### quagga_ospf
+#### quagga_ospf
 
 ```puppet
 quagga_ospf { 'ospf':
@@ -294,8 +285,6 @@ quagga_ospf { 'ospf':
 }
 ```
 
-#### Reference
-
 - `name`: Name must be `ospf`.
 - `ensure`: Manage the state of this OSPF router: `absent`, `present`. Default to `present`.
 - `abr_type`: Set OSPF ABR type. Default to `cisco`.
@@ -304,7 +293,7 @@ quagga_ospf { 'ospf':
 - `rfc1583`: Enable the RFC1583Compatibility flag. Default to `false`.
 - `router_id`: Router-id for the OSPF process.
   
-### quagga_ospf_area
+#### quagga_ospf_area
 
 ```puppet
 quagga_ospf_area { '0.0.0.0':
@@ -312,8 +301,6 @@ quagga_ospf_area { '0.0.0.0':
     network => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ],
 }
 ```
-
-#### Reference
 
 - `name`: OSPF area.
 - `ensure`: Manage the state of this OSPF area: `absent`, `present`. Default to `present`.
@@ -323,7 +310,7 @@ quagga_ospf_area { '0.0.0.0':
 - `prefix_list_import`: Filter networks sent to this area.
 - `networks`: Enable routing on an IP network. Default to `[]`.
 
-### quagga_prefix_list
+#### quagga_prefix_list
 
 The prefix_list resource is a single sequence. You can use a chain of resources
 to describe compex prefix lists, for example:
@@ -343,8 +330,6 @@ quagga_prefix_list {'ADVERTISED_PREFIXES:20':
 }
 ```
 
-#### Reference
-
 - `name`: Name of the prefix-list and sequence number of rule: `name:sequence`.
 - `ensure`: Manage the state of this prefix list: `absent`, `present`. Default to `present`.
 - `action`: Action can be `permit` or `deny`.
@@ -353,7 +338,7 @@ quagga_prefix_list {'ADVERTISED_PREFIXES:20':
 - `prefix`: IP prefix `<network>/<length>`.
 - `proto`: IP protocol version: `ip`, `ipv6`. Default to `ip`.
 
-### quagga_redistribution
+#### quagga_redistribution
 
 ```puppet
 quagga_redistribution { 'ospf::connected':
@@ -370,15 +355,13 @@ quagga_redistribution { 'bgp:65000:ospf':
 }
 ```
 
-#### Reference
-
 - `name`: The name contains the main protocol, the id and the protocol for redistribution.
 - `ensure`: Manage the state of this redistribution: `absent`, `present`. Default to `present`.
 - `metric`: Metric for redistributed routes.
 - `metric_type`: OSPF exterior metric type for redistributed routes.
 - `route_map`: Route map reference.
 
-### quagga_route_map
+#### quagga_route_map
 
 The route_map resource is a single sequence. You can use a chain of resources
 to describe complex route maps, for example:
@@ -403,8 +386,6 @@ quagga_route_map { 'bgp_out:65000':
 }
 ```
 
-#### Reference
-
 - `name`: Name of the route-map, action and sequence number of rule.
 - `action`: Route map actions: `deny`,`permit`.
 - `ensure`: Manage the state of this route map: `absent`, `present`. Default to `present`.
@@ -412,7 +393,7 @@ quagga_route_map { 'bgp_out:65000':
 - `on_match`: Exit policy on matches.
 - `set`: Set values in destination routing protocol.
 
-### quagga_system
+#### quagga_system
 
 ```puppet
 quagga_system { 'router-1.sandbox.local':
@@ -425,8 +406,6 @@ quagga_system { 'router-1.sandbox.local':
     service_password_encryption => true,
 }
 ```
-
-#### Reference
 
 - `name`: Router instance name.
 - `hostname`: Router hostname. Default to `name`.
