@@ -57,6 +57,12 @@ Puppet::Type.type(:quagga_redistribution).provide :quagga do
         found_providers << provider
       end
     end
+
+    # Remove other redistributions
+    (providers - found_providers).each do |provider|
+      notice "Remove the redistribution \"#{provider.name}\""
+      provider.destroy
+    end
   end
 
   def create
