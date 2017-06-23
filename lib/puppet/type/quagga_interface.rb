@@ -35,7 +35,7 @@ Puppet::Type.newtype(:quagga_interface) do
     defaultto(:absent)
   end
 
-  newproperty(:ipaddress, :array_matching => :all) do
+  newproperty(:ip_address, :array_matching => :all) do
     desc 'IP address'
 
     validate do |value|
@@ -52,6 +52,10 @@ Puppet::Type.newtype(:quagga_interface) do
 
       current.each do |v|
         return false unless @should.include?(v)
+      end
+
+      @should.each do |v|
+        return false unless current.include?(v)
       end
 
       true

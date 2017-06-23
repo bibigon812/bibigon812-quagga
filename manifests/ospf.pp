@@ -4,9 +4,13 @@ class quagga::ospf (
 ) {
   unless empty($settings) {
 
+    $ensure = dig44($settings, ['ensure'], 'present')
+
     $ospf = { 'ospf' => delete(delete($settings, 'redistribute'), 'area') }
 
-    $ospf_areas = dig44($settings, ['area'], {})
+    $ospf_areas = dig44($settings, ['area'], {}).reduce({}) |$memo, $value| {
+      merge($memo, { $value[0] => merge({ ensure => $ensure }, $value[1]) })
+    }
 
     $redistribution = dig44($config, ['redistribute'], {}).reduce({}) |$memo, $value| {
       $name = $value ? {
@@ -19,7 +23,7 @@ class quagga::ospf (
         default => {},
       }
 
-      merge($memo, { "ospf::${name}" => $config })
+      merge($memo, { "ospf::${name}" => merge({ ensure => $ensure }, $config) })
     }
 
     $defaults = {

@@ -8,11 +8,11 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
       :type => :string,
       :default => :absent
     },
-    :ipaddress => {
+    :ip_address => {
       :regexp => /\A\sip\saddress\s(.*)\Z/,
       :template => 'ip address <%= value %>',
       :type => :array,
-      :default => []
+      :default => [],
     },
     :multicast => {
       :regexp => /\A\smulticast\Z/,

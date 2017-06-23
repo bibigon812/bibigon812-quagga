@@ -12,7 +12,7 @@ class quagga::route_maps (
         default  => 'present',
       }
 
-      $config = dig44(value[1], ['rules'], { }).reduce({ }) |$memo, $value| {
+      $config = dig44($value[1], ['rules'], { }).reduce({ }) |$memo, $value| {
         $index = $value[0]
         merge($memo, { "${name}:${index}" => merge({ ensure => $ensure }, $value[1]) })
       }
