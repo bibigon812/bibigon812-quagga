@@ -12,7 +12,7 @@ class quagga::ospf (
       merge($memo, { $value[0] => merge({ ensure => $ensure }, $value[1]) })
     }
 
-    $redistribution = dig44($config, ['redistribute'], {}).reduce({}) |$memo, $value| {
+    $redistribution = dig44($settings, ['redistribute'], {}).reduce({}) |$memo, $value| {
       $name = $value ? {
         Hash    => $value.keys[0],
         default => $value,
