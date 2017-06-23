@@ -7,10 +7,7 @@ class quagga::route_maps (
     $route_maps = $settings.reduce({ }) |$memo, $value| {
       $name = $value[0]
 
-      $ensure = dig44($value[1], ['ensure'], 'present') ? {
-        'absent' => 'absent',
-        default  => 'present',
-      }
+      $ensure = dig44($value[1], ['ensure'], 'present')
 
       $config = dig44($value[1], ['rules'], { }).reduce({ }) |$memo, $value| {
         $index = $value[0]
