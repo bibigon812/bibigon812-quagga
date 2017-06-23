@@ -8,7 +8,7 @@ class quagga::prefix_lists (
       $ensure = dig44($value[1], ['ensure'], 'present')
 
       $config = dig44($value[1], ['rules'], {}).reduce({}) |$memo, $value| {
-        merge($memo, {"${name}:${value[0]}" => merge({ensure => $ensure}, $value[1])})
+        merge($memo, {"${name}:${value[0]}" => merge({ ensure => $ensure }, $value[1])})
       }
 
       merge($memo, $config)
