@@ -114,8 +114,12 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
 
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != :absent and @resource[property] != :false
-        value = @resource[property]
-        cmds << ERB.new(options[:template]).result(binding)
+        if @resource[property] == :true
+          cmds << ERB.new(options[:template]).result(binding)
+        else
+          value = @resource[property]
+          cmds << ERB.new(options[:template]).result(binding)
+        end
       end
     end
 
