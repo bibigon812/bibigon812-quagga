@@ -23,11 +23,7 @@ class quagga::ospf (
         default => {},
       }
 
-      merge($memo, { "ospf::${name}" => merge({ ensure => $ensure }, $config) })
-    }
-
-    $defaults = {
-      ensure => dig44($ospf, ['ospf', 'ensure'], 'present'),
+      merge($memo, { "ospf::${name}" => merge({ enusre => $ensure }, $config) })
     }
 
     unless empty($ospf) {
