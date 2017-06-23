@@ -299,6 +299,7 @@ quagga_ospf { 'ospf':
 - `name`: Name must be `ospf`.
 - `ensure`: Manage the state of this OSPF router: `absent`, `present`. Default to `present`.
 - `abr_type`: Set OSPF ABR type. Default to `cisco`.
+- `log_adjacency_changes`: Log changes in adjacency. Default to `false`.
 - `opaque`: Enable the Opaque-LSA capability (rfc2370). Default to `false`.
 - `rfc1583`: Enable the RFC1583Compatibility flag. Default to `false`.
 - `router_id`: Router-id for the OSPF process.
