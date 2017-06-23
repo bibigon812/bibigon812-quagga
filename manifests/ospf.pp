@@ -6,9 +6,9 @@ class quagga::ospf (
 
     $ensure = dig44($settings, ['ensure'], 'present')
 
-    $ospf = { 'ospf' => delete(delete($settings, 'redistribute'), 'area') }
+    $ospf = { 'ospf' => delete(delete($settings, 'redistribute'), 'areas') }
 
-    $ospf_areas = dig44($settings, ['area'], {}).reduce({}) |$memo, $value| {
+    $ospf_areas = dig44($settings, ['areas'], {}).reduce({}) |$memo, $value| {
       merge($memo, { $value[0] => merge({ ensure => $ensure }, $value[1]) })
     }
 
