@@ -122,24 +122,54 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
 
   def create
     resource_map = self.class.instance_variable_get('@resource_map')
+    area = @resource[:name]
 
-    @property_hash[:ensure] = :present
+    debug "[create][ospf area #{area}]"
+
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << 'router ospf'
 
     resource_map.keys.each do |property|
-      @property_flush[property] = @resource[property] unless @resource[property].nil?
+      if @resource[proeprty] and @resource[property] != :absent and @resource[property] != :false
+        if resource_map[property][:type] == :array
+          @resource[property].each do |value|
+            cmds << ERB.new(options[:template]).result(binding)
+          end
+        else
+          value = @resource[property]
+          cmds << ERB.new(options[:template]).result(binding)
+        end
+      end
     end
+
+    @property_hash[:ensure] = :present
   end
 
   def destroy
     resource_map = self.class.instance_variable_get('@resource_map')
+    area = @property_hash[:name]
 
-    @property_hash[:ensure] = :absent
+    debug "[destroy][ospf area #{area}]"
 
-    resource_map.keys.each do |property|
-      @property_remove[property] = @property_hash[property] unless @property_hash[property].nil?
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << 'router ospf'
+
+    resource_map.each do |property, options|
+      unless @property_hash[property] == options[:default]
+        if options[:type] = :array
+          @property_hash[property].each do |value|
+            cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+          end
+        else
+          value = @property_hash[property]
+          cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        end
+      end
     end
 
-    flush unless @property_remove.empty?
+    @property_hash.clear
   end
 
   def exists?
@@ -147,48 +177,30 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
   end
 
   def flush
-    resource_map = self.class.instance_variable_get('@resource_map')
-    area = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
+    return unless @property_flush.empty?
 
-    debug "[flush][#{area}]"
+    resource_map = self.class.instance_variable_get('@resource_map')
+    area = @property_hash[:name]
+
+    debug "[flush][ospf area #{area}]"
 
     cmds = []
     cmds << 'configure terminal'
     cmds << 'router ospf'
 
-    @property_remove.each do |property, v|
-      debug "The #{property} property has been removed"
-
-      case resource_map[property][:type]
-        when :array
-          v.each do |value|
-            cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-          end
-
-        else
-          value = @property_hash[property]
-          cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-      end
-    end
-
     @property_flush.each do |property, v|
-      debug "The #{property} property has been changed from #{@property_hash[property]} to #{v}"
-
       case resource_map[property][:type]
         when :array
-          old_value = @property_hash[property].nil? ? [] : @property_hash[property]
-
-          (old_value - v).each do |value|
+          (@property_hash[property] - v).each do |value|
             cmds << "no  #{ERB.new(resource_map[property][:template]).result(binding)}"
           end
 
-          (v - old_value).each do |value|
+          (v - @property_hash[property]).each do |value|
             cmds << ERB.new(resource_map[property][:template]).result(binding)
           end
 
         else
           value = v
-
           cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
 
@@ -198,12 +210,8 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty? && @property_remove.empty?
-      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-
-      @property_flush.clear
-      @property_remove.clear
-    end
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    @property_flush.clear
   end
 
   @resource_map.keys.each do |property|
