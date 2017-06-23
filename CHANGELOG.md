@@ -6,6 +6,8 @@
 - tests
 - `quagga_ip` properties to the resource `quagga_system`
 - the property `action` to the resource `quagga_route_map`
+- wrappers for resources
+- hiera support
 
 ### Changed
 - boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 
@@ -23,6 +25,7 @@
 - the type `redistribution` to `quagga_redistribution`
 - the type `route_map` to `quagga_route_map`
 - the name of the resource `quagga_route_map`
+- the property `ipaddress` to `ip_address` of the resource `quagga_interface`
 
 ### Removed
 - the method `purge` from resources `bgp*`
