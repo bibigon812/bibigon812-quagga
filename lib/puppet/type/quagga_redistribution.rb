@@ -55,6 +55,24 @@ Puppet::Type.newtype(:quagga_redistribution) do
     end
   end
 
+  autorequire(:quagga_bgp) do
+    main_protocol, as, _ = value(:name).split(/:/)
+    if main_protocol == 'bgp'
+      [as]
+    else
+      []
+    end
+  end
+
+  autorequire(:quagga_ospf) do
+    main_protocol, _, _ = value(:name).split(/:/)
+    if main_protocol == 'ospf'
+      ['ospf']
+    else
+      []
+    end
+  end
+
   autorequire(:package) do
     %w{quagga}
   end

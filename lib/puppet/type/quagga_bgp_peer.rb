@@ -184,14 +184,9 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   autorequire(:quagga_bgp) do
-    reqs = []
-    as = value(:name).split(/\s+/).first
+    as, _= value(:name).split(/\s+/)
 
-    unless as.nil?
-      reqs << as
-    end
-
-    reqs
+    [as]
   end
 
   autorequire(:quagga_bgp_peer) do
