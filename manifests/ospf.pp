@@ -31,7 +31,5 @@ class quagga::ospf (
     create_resources('quagga_ospf_area', $ospf_areas)
   }
 
-  unless empty($redistribution) {
-    create_resources('quagga_redistribution', $redistribution)
-  }
+  create_resources('quagga_redistribution', $redistribution)
 }

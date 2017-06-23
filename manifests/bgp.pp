@@ -36,8 +36,6 @@ class quagga::bgp (
       create_resources('quagga_bgp_peer', $bgp_peers)
     }
 
-    unless empty($redistribution) {
-      create_resources('quagga_redistribution', $redistribution)
-    }
+    create_resources('quagga_redistribution', $redistribution)
   }
 }
