@@ -198,6 +198,28 @@ describe Puppet::Type.type(:quagga_bgp) do
     end
   end
 
+  describe 'redistribute' do
+    it 'should support \'ospf\' as a value' do
+      expect { described_class.new(:name => '65000', :redistribute => 'ospf') }.to_not raise_error
+    end
+
+    it 'should support \'connected route-map QWER\' as a value' do
+      expect { described_class.new(:name => '65000', :redistribute => 'connected route-map QWER') }.to_not raise_error
+    end
+
+    it 'should not support \'ospf\' as a value' do
+      expect { described_class.new(:name => '65000', :redistribute => 'bgp') }.to raise_error Puppet::Error, /Invalid value/
+    end
+
+    it 'should not support \'kernel metric 100 metric-type 3 route-map QWER\' as a value' do
+      expect { described_class.new(:name => '65000', :redistribute => 'kernel metric 100 metric-type 3 route-map QWER') }.to raise_error Puppet::Error, /Invalid value/
+    end
+
+    it 'should contain \'connected metric 100 metric-type 2 route-map QWER\'' do
+      expect(described_class.new(:name => '65000', :redistribute => 'connected metric 100 metric-type 2 route-map QWER')[:redistribute]).to eq(['connected metric 100 route-map QWER'])
+    end
+  end
+
   describe 'router_id' do
     it 'should support 192.168.1.1 as a value' do
       expect { described_class.new(:name => '197888', :router_id => '192.168.1.1') }.to_not raise_error

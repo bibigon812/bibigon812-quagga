@@ -70,6 +70,7 @@ router bgp 197888
           :maximum_paths_ibgp => 4,
           :networks => %w{172.16.32.0/24 1::/64 2::/64},
           :router_id => '172.16.32.103',
+          :redistribute => [],
       })
     end
   end

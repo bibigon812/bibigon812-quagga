@@ -93,6 +93,35 @@ Puppet::Type.newtype(:quagga_bgp) do
     defaultto([])
   end
 
+  newproperty(:redistribute, :array_matching => :all) do
+    desc 'Redistribute information from another routing protocol'
+
+    newvalues(/\A(babel|connected|isis|kernel|ospf|rip|static)(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
+
+    munge do |value|
+      value.gsub(/\smetric-type\s2/, '')
+    end
+
+    def insync?(current)
+      @should.each do |value|
+        return false unless current.include?(value)
+      end
+
+      current.each do |value|
+        return false unless @should.include?(value)
+      end
+
+      true
+    end
+
+    def should_to_s(value)
+      value.inspect
+    end
+
+    defaultto([])
+  end
+
+
   newproperty(:router_id) do
     desc %q{ Override configured router identifier }
 

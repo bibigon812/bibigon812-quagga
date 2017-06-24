@@ -34,6 +34,12 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
           :template => 'network<% unless value.nil? %> <%= value %><% end %>',
           :type => :array,
       },
+      :redistribute => {
+          :regexp => /\A\sredistribute\s(.+)\Z/,
+          :template => 'redistribute <%= value %>',
+          :type => :array,
+          :default => [],
+      },
       :router_id => {
           :regexp => /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/,
           :template => 'bgp router-id<% unless value.nil? %> <%= value %><% end %>',
