@@ -40,11 +40,28 @@ Puppet::Type.newtype(:quagga_ospf) do
     desc 'Redistribute information from another routing protocol'
 
     newvalues(/\A(babel|bgp|connected|isis|kernel|rip|static)(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
-    defaultto([])
 
     munge do |value|
       value.gsub(/\smetric-type\s2/, '')
     end
+
+    def insync?(current)
+      @should.each do |value|
+        return false unless current.include?(value)
+      end
+
+      current.each do |value|
+        return false unless @should.include?(value)
+      end
+
+      true
+    end
+
+    def should_to_s(value)
+      value.inspect
+    end
+
+    defaultto([])
   end
 
   newproperty(:rfc1583, :boolean => true) do
