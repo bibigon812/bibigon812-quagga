@@ -216,7 +216,7 @@ describe Puppet::Type.type(:quagga_bgp) do
     end
 
     it 'should contain \'connected metric 100 metric-type 2 route-map QWER\'' do
-      expect(described_class.new(:name => '65000', :redistribute => 'connected metric 100 metric-type 2 route-map QWER')[:redistribute]).to eq(['connected metric 100 route-map QWER'])
+      expect(described_class.new(:name => '65000', :redistribute => 'connected metric 100 route-map QWER')[:redistribute]).to eq(['connected metric 100 route-map QWER'])
     end
   end
 
