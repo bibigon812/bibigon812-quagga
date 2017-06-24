@@ -62,8 +62,7 @@ quagga::bgp:
                 remote_as: 65000
                 update_source: 192.168.0.1
         redistribute:
-            - ospf:
-                route_map: BGP_FROM_OSPF
+            - ospf route-map BGP_FROM_OSPF
 
 quagga::ospf:
     router_id: 10.255.255.1
@@ -72,8 +71,7 @@ quagga::ospf:
             networks:
                 - 172.16.0.0/12
     redistribute:
-        - connected:
-            route_map: CONNECTED
+        - connected route-map CONNECTED
 
 quagga::as_paths:
     FROM_AS100:

@@ -8,6 +8,7 @@
 - the property `action` to the resource `quagga_route_map`
 - wrappers for resources
 - hiera support
+- the property `redistribute` to the resource `quagga_ospf`
 
 ### Changed
 - boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 
