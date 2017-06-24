@@ -96,7 +96,7 @@ Puppet::Type.newtype(:quagga_bgp) do
   newproperty(:redistribute, :array_matching => :all) do
     desc 'Redistribute information from another routing protocol'
 
-    newvalues(/\A(babel|connected|isis|kernel|ospf|rip|static)(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
+    newvalues(/\A(babel|connected|isis|kernel|ospf|rip|static)(\smetric\s\d+)?(\sroute-map\s\w+)?\Z/)
 
     munge do |value|
       value.gsub(/\smetric-type\s2/, '')
