@@ -47,6 +47,12 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
         :ensure => :present,
         :name => :ospf,
         :opaque => :false,
+        :redistribute => [
+            'kernel route-map KERNEL',
+            'connected route-map CONNECTED',
+            'static route-map STATIC',
+            'rip route-map RIP',
+        ],
         :rfc1583 => :false,
         :router_id => '10.255.78.4',
         :log_adjacency_changes => :false

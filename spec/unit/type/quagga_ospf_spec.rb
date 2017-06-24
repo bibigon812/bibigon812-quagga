@@ -28,7 +28,7 @@ describe Puppet::Type.type(:quagga_ospf) do
       end
     end
 
-    [:abr_type, :opaque, :rfc1583, :router_id, :log_adjacency_changes].each do |property|
+    [:abr_type, :opaque, :rfc1583, :router_id, :log_adjacency_changes, :redistribute].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -104,6 +104,28 @@ describe Puppet::Type.type(:quagga_ospf) do
       it 'should not support foo as a value' do
         expect { described_class.new(:name => 'ospf', property => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
+    end
+  end
+
+  describe 'redistribute' do
+    it 'should support \'bgp\' as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'bgp') }.to_not raise_error
+    end
+
+    it 'should support \'connected route-map QWER\' as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'connected route-map QWER') }.to_not raise_error
+    end
+
+    it 'should not support \'ospf\' as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'ospf') }.to raise_error Puppet::Error, /Invalid value/
+    end
+
+    it 'should not support \'kernel metric 100 metric-type 3 route-map QWER\' as a value' do
+      expect { described_class.new(:name => 'ospf', :redistribute => 'kernel metric 100 metric-type 3 route-map QWER') }.to raise_error Puppet::Error, /Invalid value/
+    end
+
+    it 'should contain \'connected metric 100 metric-type 2 route-map QWER\'' do
+      expect(described_class.new(:name => 'ospf', :redistribute => 'connected metric 100 metric-type 2 route-map QWER')[:redistribute]).to eq(['connected metric 100 route-map QWER'])
     end
   end
 

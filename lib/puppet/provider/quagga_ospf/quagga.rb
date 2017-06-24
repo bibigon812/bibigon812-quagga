@@ -6,32 +6,38 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
       :regexp => /\A\sospf\srouter-id\s(.*)\Z/,
       :template => 'ospf router-id<% unless value.nil? %> <%= value %><% end %>',
       :type => :string,
-      :default => :absent
+      :default => :absent,
     },
     :opaque => {
       :regexp => /\A\scapability\sopaque\Z/,
       :template => 'capability opaque',
       :type => :boolean,
-      :default => :false
+      :default => :false,
     },
     :rfc1583 => {
       :regexp => /\A\scompatible\srfc1583\Z/,
       :template => 'compatible rfc1583',
       :type => :boolean,
-      :default => :false
+      :default => :false,
     },
     :abr_type => {
       :regexp => /\A\sospf\sabr-type\s(\w+)\Z/,
       :template => 'ospf abr-type<% unless value.nil? %> <%= value %><% end %>',
       :type => :symbol,
-      :default => :cisco
+      :default => :cisco,
     },
     :log_adjacency_changes => {
       :regexp => /\A\slog-adjacency-changes(?:\s(detail))?\Z/,
       :template => 'log-adjacency-changes<% unless value.nil? %> <%= value %><% end %>',
       :type => :symbol,
-      :default => :false
-    }
+      :default => :false,
+    },
+    :redistribute => {
+        :regexp => /\A\sredistribute\s(.+)\Z/,
+        :template => 'redistribute <%= value %>',
+        :type => :array,
+        :default => [],
+    },
   }
 
   commands :vtysh => 'vtysh'
@@ -59,7 +65,11 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
         hash[:ensure] = :present
 
         @resource_map.each do |property, options|
-          hash[property] = options[:default]
+          if options[:type] == :array or options[:type] == :hash
+            hash[property] = options[:default].clone
+          else
+            hash[property] = options[:default]
+          end
         end
       elsif line =~ /\A\w/ and found_section
         break
@@ -72,6 +82,9 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
               hash[property] = :true
             else
               case options[:type]
+                when :array
+                  hash[property] << value
+
                 when :boolean
                   hash[property] = :true
 
@@ -114,8 +127,10 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
 
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != :absent and @resource[property] != :false
-        if @resource[property] == :true
-          cmds << ERB.new(options[:template]).result(binding)
+        if options[:type] == :array
+          @resource[property].each do |value|
+            cmds << ERB.new(options[:template]).result(binding)
+          end
         else
           value = @resource[property]
           cmds << ERB.new(options[:template]).result(binding)
@@ -164,6 +179,20 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       elsif v == :true
         cmds << ERB.new(resource_map[property][:template]).result(binding)
+      elsif resource_map[property][:type] == :array
+        (@property_hash[property] - v).each do |v|
+          if property == :redistribute
+            value = v.split(/\s+/).first
+          else
+            value = v
+          end
+
+          cmds << "no  #{ERB.new(resource_map[property][:template]).result(binding)}"
+        end
+
+        (v - @property_hash[property]).each do |value|
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
+        end
       else
         value = v
         cmds << ERB.new(resource_map[property][:template]).result(binding)

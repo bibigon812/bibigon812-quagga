@@ -1,5 +1,18 @@
 Puppet::Type.newtype(:quagga_ospf) do
-  @doc = 'This type provides the capabilities to manage ospf router within puppet'
+  @doc = %q{
+    This type provides the capabilities to manage ospf router within puppet.
+
+      Examples:
+
+        quagga_ospf { 'ospf':
+            ensure => present,
+            redistribute => [
+              'connected route-map QWER',
+              'kernel',
+            ],
+            router_id => '10.0.0.1',
+        }
+  }
 
   ensurable
 
@@ -21,6 +34,17 @@ Puppet::Type.newtype(:quagga_ospf) do
 
     defaultto(:false)
     newvalues(:true, :false)
+  end
+
+  newproperty(:redistribute, :array_matching => :all) do
+    desc 'Redistribute information from another routing protocol'
+
+    newvalues(/\A(babel|bgp|connected|isis|kernel|rip|static)(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
+    defaultto([])
+
+    munge do |value|
+      value.gsub(/\smetric-type\s2/, '')
+    end
   end
 
   newproperty(:rfc1583, :boolean => true) do
