@@ -256,7 +256,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   def create
     as, name = @resource[:name].split(/\s+/)
 
-    debug "[create][bgp peer #{name}]"
+    debug "[create][bgp peer #{as} #{name}]"
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
