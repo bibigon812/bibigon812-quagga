@@ -8,11 +8,11 @@ class quagga (
   Hash    $as_paths        = {},
   Hash    $bgp             = {},
   Hash    $community_lists = {},
+  Hash    $global          = {},
   Hash    $interfaces      = {},
   Hash    $ospf            = {},
   Hash    $prefix_lists    = {},
   Hash    $route_maps      = {},
-  Hash    $global          = {},
 
 ) inherits ::quagga::params {
 
