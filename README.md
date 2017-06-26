@@ -21,7 +21,7 @@ Currently it supports:
 Hiera support will be implemented in the future release.
 
 ```yaml
-quagga::system:
+quagga::global:
     ip_forwarding: true
     ip_multicast_routing: true
     ipv6_forwarding: true
@@ -55,6 +55,11 @@ quagga::bgp:
                 peer_group: INTERNAL
             192.168.0.3:
                 peer_group: INTERNAL
+            CLIENTS:
+                activate: true
+                default_originate: true
+                passive: true
+                peer_group: true
             INTERNAL:
                 activate: true
                 next_hop_self: true
@@ -65,13 +70,14 @@ quagga::bgp:
             - ospf route-map BGP_FROM_OSPF
 
 quagga::ospf:
-    router_id: 10.255.255.1
     areas:
         0.0.0.0:
             networks:
                 - 172.16.0.0/12
+    default_originate: true
     redistribute:
         - connected route-map CONNECTED
+    router_id: 10.255.255.1
 
 quagga::as_paths:
     FROM_AS100:
@@ -115,31 +121,29 @@ quagga::route_maps:
                 match: ip address prefix-list CONNECTED_NETWORKS
 ```
 
-### How to use it?
+## Reference
 
-In the beginning, we must describe main class `quagga`, e.g.
+### Classes
 
-```puppet
-class { 'quagga':
-    pim => false,
-}
-```
+#### quagga
 
-#### Reference
+- `owner`. Overrides the default owner of quagga configuration files in the file system. Default value: `quagga`.
+- `group`. Overrides the default group of quagga configuration files in the file system. Default value: `quagga`.
+- `mode`. Overrides the default mode of quagga configuration files in the system. Default value: `600`.
+- `package_name`. Overrides the default package name for the distribution you are installing to. Default value: `quagga`.
+- `package_ensure`. Overrides the 'ensure' parameter during package installation. Default value: `present`.
+- `content`. Overrides the initial content of quagga configuration files. Default value: `hostname ${::fqdn}\n`.
+- `as_paths`. Contains as-path list settings. Default value: `{}`.
+- `bgp`. Contains the setting of the bgp router. Default value: `{}`.
+- `community_lists`: Contains community list settings. Default value: `{}`.
+- `interfaces`: Contains network interface settings. Default value: `{}`.
+- `global`: Contain global settings. Default value: `{}`.
+- `ospf`. Contains the settings of the ospf router. Default value: `{}`.
+- `prefix_lists`. Contains prefix list settings. Default value: `{}`.
+- `route_maps`. Contains route-map settings. Default value: `{}`.
 
-- `bgp`: Manage the BGP service. Default to `true`.
-- `ospf`: Manage the OSPF service. Default to `true`.
-- `pim`: Manage the PIM service. Default to `true`.
-- `owner`: User of quagga configuration files. Default to `quagga`.
-- `group`: Group of quagga configuration files. Default to `quagga`.
-- `mode`: Mode of quagga configuration files. Default to `600`.
-- `package_name`: Name of the quagga package. Default to `quagga`.
-- `package_ensure`: Ensure for the quagga package. Default to `present`.
-- `content`:  Initial content of configuration files. Default to `hostname ${::fqdn}\n`.
+### Types
 
-Then we can create different resources.
-
-### Resources
 #### quagga_as_path
 
 ```puppet

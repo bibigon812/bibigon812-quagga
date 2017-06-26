@@ -9,6 +9,8 @@
 - wrappers for resources
 - hiera support
 - the property `redistribute` to the resource `quagga_ospf`
+- the property `redistribute` to the resource `quagga_bgp`
+- the property `default_originate` to the resource `quagga_ospf`
 
 ### Changed
 - boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 

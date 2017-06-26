@@ -125,7 +125,6 @@ class quagga (
     }
   }
 
-
   $real_community_lists = deep_merge($community_lists, hiera_hash('quagga::community_lists', {}))
   unless empty($real_community_lists) {
     ['bgpd', 'zebra'].each |$service| {
