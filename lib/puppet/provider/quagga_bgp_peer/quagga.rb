@@ -288,6 +288,8 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
       end
     end
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   def destroy
