@@ -12,7 +12,7 @@ class quagga (
   Hash    $ospf            = {},
   Hash    $prefix_lists    = {},
   Hash    $route_maps      = {},
-  Hash    $system          = {},
+  Hash    $global          = {},
 
 ) inherits ::quagga::params {
 
@@ -145,11 +145,11 @@ class quagga (
     }
   }
 
-  $real_system = deep_merge($system, hiera_hash('quagga::system', {}))
-  unless empty($real_system) {
+  $real_global = deep_merge($global, hiera_hash('quagga::global', {}))
+  unless empty($real_global) {
     ensure_resource('service', 'zebra', $services['zebra'])
-    class { '::quagga::system':
-      settings => $real_system,
+    class { '::quagga::global':
+      settings => $real_global,
     }
   }
 
