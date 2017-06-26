@@ -255,18 +255,40 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   end
 
   def create
-    debug '[create]'
+    as, name = @resource[:name]
+
+    debug "[create][bgp peer #{name}]"
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
-    @property_hash[:ensure] = :present
-    @property_hash[:name] = @resource[:name]
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << "router bgp #{as}"
 
-    resource_map.keys.each do |property|
-      self.method("#{property}=").call(@resource[property]) unless @resource[property].nil?
+    resource_map.each do |property, options|
+      if @resource[property] and @resource[property] != options[:default]
+        case options[:type]
+          when :array
+            @resource[property].each do |value|
+              cmds << ERB.new(options[:template]).result(binding)
+            end
+
+          when :boolean
+            value = @resource[property]
+            if value == :false
+              cmds << "no #{ERB.new(options[:template]).result(binding)}"
+            else
+              cmds << ERB.new(options[:template]).result(binding)
+            end
+
+          else
+            value = @resource[property]
+            cmds << ERB.new(options[:template]).result(binding)
+        end
+
+      end
     end
   end
-
 
   def destroy
     as, name = @property_hash[:name].split(/\s+/)
@@ -294,7 +316,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
     as, name = @property_hash[:name].split(/\s+/)
 
-    debug "[flush][#{as} #{name}]"
+    debug "[flush][bgp peer #{as} #{name}]"
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
@@ -302,32 +324,40 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     cmds << 'configure terminal'
     cmds << "router bgp #{as}"
 
-    @property_remove.each do |property, value|
-      if resource_map[property].has_key?(:remove_template)
-        cmds << ERB.new(resource_map[property][:remove_template]).result(binding)
-      else
+    @property_flush.each do |property, v|
+      if v == :absent or v == :false
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-      end
-    end
 
-    @property_flush.each do |property, value|
-      cmd = ''
-      if resource_map[property][:type] == :boolean && value == :false
-        cmd << 'no '
+      elsif v == :true and [:symbol, :string].include?(resource_map[property][:type])
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+
+      elsif v == :true
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+
+      elsif resource_map[property][:type] == :array
+        (@property_hash[property] - v).each do |value|
+          cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        end
+
+        (v - @property_hash[property]).each do |value|
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
+        end
+
+      else
+        value = v
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
-      value = nil if property == :peer_group && (value == :true || value == :false)
-      cmd << ERB.new(resource_map[property][:template]).result(binding)
-      cmds << cmd
+
+      @property_hash[property] = v
     end
 
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty? and @property_remove.empty?
-      vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
-      @property_flush.clear
-      @property_remove.clear
-    end
+    vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_flush.clear
   end
 
   def purge
@@ -336,17 +366,17 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     resource_map = self.class.instance_variable_get('@resource_map')
 
     resource_map.each_key do |property|
-      if @resource[property].nil? && !@property_hash[property].nil?
-        @property_remove[property] = @property_hash[property]
+      if @resource[property].nil? and !@property_hash[property].nil?
+        @property_flash[property] = :absent
       end
     end
 
-    flush unless @property_remove.empty?
+    flush unless @property_flush.empty?
   end
 
   def reset
     as, name = @property_hash[:name].split(/\s+/)
-    debug "[reset][#{as} #{name}]"
+    debug "[reset][bgp peer #{as} #{name}]"
 
     cmds = []
     proto = name.include?('.') ? 'ip' : 'ipv6'
