@@ -5,12 +5,11 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
   @resource_map = {
       :peer_group => {
-          :value => '$1',
+          :default => :false,
           :template => 'neighbor <%= name %> peer-group <%= value %>',
           :type => :string,
       },
       :remote_as => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sremote-as\s(\d+)\Z/,
           :template => 'neighbor <%= name %> remote-as <%= value %>',
           :type => :fixnum,
@@ -21,53 +20,44 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
           :type => :boolean,
       },
       :allow_as_in => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sallowas-in\s(\d+)\Z/,
-          :template => 'neighbor <%= name %> allowas-in <%= value %>',
-          :remove_template => 'no neighbor <%= name %> allowas-in',
+          :template => 'neighbor <%= name %> allowas-in<% unless value.nil? %> <%= value %><% end %>',
           :type => :fixnum,
       },
       :default_originate => {
-          :default => ':false',
-          :value => ':true',
+          :default => :false,
           :regexp => /\A\sneighbor\s\S+\sdefault-originate\Z/,
           :template => 'neighbor <%= name %> default-originate',
           :type => :boolean,
       },
       :local_as => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\slocal-as\s(\d+)\Z/,
-          :template => 'neighbor <%= name %> local-as <%= value %>',
+          :template => 'neighbor <%= name %> local-as<% unless value.nil? %> <%= value %><% end %>',
           :type => :fixnum,
       },
       :next_hop_self => {
-          :default => ':false',
-          :value => ':true',
+          :default => :false,
           :regexp => /\A\sneighbor\s\S+\snext-hop-self\Z/,
           :template => 'neighbor <%= name %> next-hop-self',
           :type => :boolean,
       },
       :passive => {
-          :default => ':false',
-          :value => ':true',
+          :default => :false,
           :regexp => /\A\sneighbor\s\S+\spassive\Z/,
           :template => 'neighbor <%= name %> passive',
           :type => :boolean,
       },
       :prefix_list_in => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sprefix-list\s(\S+)\sin\Z/,
           :template => 'neighbor <%= name %> prefix-list <%= value %> in',
           :type => :string,
       },
       :prefix_list_out => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sprefix-list\s(\S+)\sout\Z/,
           :template => 'neighbor <%= name %> prefix-list <%= value %> out',
           :type => :string,
       },
       :route_map_export => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sroute-map\s(\S+)\sexport\Z/,
           :template => 'neighbor <%= name %> route-map <%= value %> export',
           :type => :string,
@@ -79,42 +69,36 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
           :type => :string,
       },
       :route_map_in => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sroute-map\s(\S+)\sin\Z/,
           :template => 'neighbor <%= name %> route-map <%= value %> in',
           :type => :string,
       },
       :route_map_out => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\sroute-map\s(\S+)\sout\Z/,
           :template => 'neighbor <%= name %> route-map <%= value %> out',
           :type => :string,
       },
       :route_reflector_client => {
-          :default => ':false',
-          :value => ':true',
+          :default => :false,
           :regexp => /\A\sneighbor\s\S+\sroute-reflector-client\Z/,
           :template => 'neighbor <%= name %> route-reflector-client',
           :type => :boolean,
       },
       :route_server_client => {
-          :default => ':false',
-          :value => ':true',
+          :default => :false,
           :regexp => /\A\sneighbor\s\S+\sroute-server-client\Z/,
           :template => 'neighbor <%= name %> route-server-client',
           :type => :boolean,
       },
       :shutdown => {
-          :default => ':false',
-          :value => ':true',
+          :default => :false,
           :regexp => /\A\sneighbor\s\S+\sshutdown\Z/,
           :template => 'neighbor <%= name %> shutdown',
           :type => :boolean,
       },
       :update_source => {
-          :value => '$1',
           :regexp => /\A\sneighbor\s\S+\supdate-source\s(\S+)\Z/,
-          :template => 'neighbor <%= name %> update-source <%= value %>',
+          :template => 'neighbor <%= name %> update-source<% unless value.nil? %> <%= value %><% end %>',
           :type => :string,
       },
   }
@@ -122,7 +106,6 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   def initialize(value)
     super(value)
     @property_flush = {}
-    @property_remove = {}
   end
 
   def self.instances
@@ -190,7 +173,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
             # Skip the property `activate` because it could be inherited
             next if property == :activate
 
-            hash[property] = eval(options[:default]) if options.has_key?(:default)
+            hash[property] = options[:default] if options.has_key?(:default)
           end
         end
 
@@ -201,6 +184,8 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
           if options.has_key?(:regexp)
             if line =~ options[:regexp]
 
+              value = $1
+
               if property == :activate
                 hash[:activate] = case (activate[hash[:peer_group]].nil? ? default_ipv4_unicast : activate[hash[:peer_group]])
                                     when :true
@@ -210,13 +195,27 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
                                   end
 
               else
-                value = eval(options[:value])
-                hash[property] = case options[:type]
-                                   when :fixnum
-                                     value.to_i
-                                   else
-                                     value
-                                 end
+                if value == nil
+                  hash[property] = :true
+
+                else
+                  case options[:type]
+                    when :array
+                      hash[property] << value
+
+                    when :boolean
+                      hash[property] = :true
+
+                    when :symbol
+                      hash[property] = value.gsub(/-/, '_').to_sym
+
+                    when :fixnum
+                      hash[property] = value.to_i
+
+                    else
+                      hash[property] = value
+                  end
+                end
               end
 
               break
@@ -255,7 +254,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   end
 
   def create
-    as, name = @resource[:name]
+    as, name = @resource[:name].split(/\s+/)
 
     debug "[create][bgp peer #{name}]"
 
