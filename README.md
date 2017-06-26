@@ -74,10 +74,10 @@ class { '::quagga':
         },
     },
     global => {
-        ip_forwarding               => true
-        ip_multicast_routing        => true
-        ipv6_forwarding             => true
-        service_password_encryption => true
+        ip_forwarding               => true,
+        ip_multicast_routing        => true,
+        ipv6_forwarding             => true,
+        service_password_encryption => true,
     },
     interfaces => {
         lo => {
