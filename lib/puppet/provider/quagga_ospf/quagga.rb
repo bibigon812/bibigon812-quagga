@@ -38,6 +38,12 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
         :type => :array,
         :default => [],
     },
+    :default_originate => {
+        :regexp => /\A\sdefault-information\soriginate\s(.+)\Z/,
+        :template => 'default-information originate<% unless value.nil? %> <%= value %><% end %>',
+        :type => :string,
+        :default => :false,
+    }
   }
 
   commands :vtysh => 'vtysh'
@@ -174,7 +180,7 @@ Puppet::Type.type(:quagga_ospf).provide :quagga do
     @property_flush.each do |property, v|
       if v == :false or v == :absent
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-      elsif v == :true and resource_map[property][:type] == :symbol
+      elsif v == :true and [:symbol, :string].include?(resource_map[property][:type])
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       elsif v == :true

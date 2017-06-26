@@ -181,7 +181,41 @@ describe Puppet::Type.type(:quagga_ospf) do
     end
 
     it 'should not support foo as a value' do
-      expect { described_class.new(:name => 'ospf', :log_adjacency_changes => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => 'ospf', :log_adjacency_changes => :foo) }.to raise_error Puppet::Error, /Invalid value/
+    end
+  end
+
+  describe 'default_originate' do
+    it 'should support \'always metric 100 metric-type 2 route-map QWER\'' do
+      expect{described_class.new(:name => 'ospf', :default_originate => 'always metric 100 metric-type 2 route-map QWER')}.to_not raise_error
+    end
+
+    it 'should support \'always\'' do
+      expect{described_class.new(:name => 'ospf', :default_originate => 'always')}.to_not raise_error
+    end
+
+    it 'should support :true' do
+      expect{described_class.new(:name => 'ospf', :default_originate => :true)}.to_not raise_error
+    end
+
+    it 'should support \'true\'' do
+      expect{described_class.new(:name => 'ospf', :default_originate => 'true')}.to_not raise_error
+    end
+
+    it 'should not support \'always metric 100 metric-type 3 route-map QWER\'' do
+      expect{described_class.new(:name => 'ospf', :default_originate => 'always metric 100 metric-type 3 route-map QWER')}.to raise_error Puppet::Error, /Invalid value/
+    end
+
+    it 'should contain \'always metric 100 metric-type 2 route-map QWER\'' do
+      expect(described_class.new(:name => 'ospf', :default_originate => 'always metric 100 metric-type 2 route-map QWER')[:default_originate]).to eq('always metric 100 route-map QWER')
+    end
+
+    it 'should contain \'always metric 100 metric-type 1 route-map QWER\'' do
+      expect(described_class.new(:name => 'ospf', :default_originate => 'always metric 100 metric-type 1 route-map QWER')[:default_originate]).to eq('always metric 100 metric-type 1 route-map QWER')
+    end
+
+    it 'should contain \'false\'' do
+      expect(described_class.new(:name => 'ospf')[:default_originate]).to eq(:false)
     end
   end
 end

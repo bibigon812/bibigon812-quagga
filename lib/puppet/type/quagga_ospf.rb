@@ -29,6 +29,24 @@ Puppet::Type.newtype(:quagga_ospf) do
     defaultto(:cisco)
   end
 
+  newproperty(:default_originate) do
+    desc 'Control distribution of default information.'
+
+    newvalues :true, :false
+    newvalues /\Aalways(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/
+
+    defaultto :false
+
+    munge do |value|
+      case value
+        when String
+          value.gsub(/\smetric-type\s2/, '')
+        else
+          value
+      end
+    end
+  end
+
   newproperty(:opaque, :boolean => true) do
     desc 'Enable the Opaque-LSA capability (rfc2370). Default to `false`.'
 

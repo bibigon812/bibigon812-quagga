@@ -44,6 +44,7 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
     it 'should return the resource ospf' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
         :abr_type => :cisco,
+        :default_originate => 'always metric 100 metric-type 1 route-map ABCD',
         :ensure => :present,
         :name => :ospf,
         :opaque => :false,
