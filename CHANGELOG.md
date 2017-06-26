@@ -1,3 +1,7 @@
+## [Unreleased]
+### Fixed
+- creating the resource `quagga_bgp_peer`
+
 ## [2.0.1] - 2017-06-26
 ### Fixed
 - the router_id default value of the type `quagga_bgp`
