@@ -1,3 +1,7 @@
+## [Unreleased]
+### Fixed
+- the router_id default value of the type `quagga_bgp`
+
 ## [2.0.0] - 2017-06-26
 ### Added
 - multicast-routing by [@m4ce](https://github.com/m4ce)

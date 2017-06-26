@@ -240,9 +240,5 @@ describe Puppet::Type.type(:quagga_bgp) do
     it 'should contain 1.1.1.1' do
       expect(described_class.new(:name => '197888', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
     end
-
-    it 'should contain default 10.0.0.1' do
-      expect(described_class.new(:name => '197888')[:router_id]).to eq('10.0.0.1')
-    end
   end
 end
