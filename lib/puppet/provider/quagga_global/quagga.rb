@@ -1,4 +1,4 @@
-Puppet::Type.type(:quagga_system).provide :quagga do
+Puppet::Type.type(:quagga_global).provide :quagga do
   @doc = 'Manages quagga router settings'
 
   @resource_map = {

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_system) do
+describe Puppet::Type.type(:quagga_global) do
   let(:provider) do
     @provider_class = describe_class.provide(:quagga_ospf) {
       mk_resource_methods
