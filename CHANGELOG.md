@@ -1,6 +1,9 @@
-## [Unreleased]
+## [2.0.2] - 2017-06026
 ### Fixed
 - creating the resource `quagga_bgp_peer`
+
+### Updated
+- the provider of the type `quagga_bgp_peer`
 
 ## [2.0.1] - 2017-06-26
 ### Fixed
