@@ -66,6 +66,9 @@ describe Puppet::Type.type(:quagga_bgp_peer) do
       expect { described_class.new(:name => '65000 10.1.1.0') }.to_not raise_error
     end
 
+    it 'should support 65000 2aff::1 as a value' do
+      expect { described_class.new(:name => '65000 2aff::1') }.to_not raise_error
+    end
 
     it 'should not support 10.256.0.0 as a value' do
       expect { described_class.new(:name => '100:10.256.0.0') }.to raise_error(Puppet::Error, /Invalid value/)
