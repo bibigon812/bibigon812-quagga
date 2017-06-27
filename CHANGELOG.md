@@ -1,4 +1,15 @@
-## [2.0.2] - 2017-06026
+## [Unreleased]
+### Added
+- tests
+
+### Fixed
+- a name validation of the type `quagga_bgp_peer`
+
+### Updated
+- docs
+- changelog
+
+## [2.0.2] - 2017-06-26
 ### Fixed
 - creating the resource `quagga_bgp_peer`
 
