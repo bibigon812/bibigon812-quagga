@@ -1,4 +1,4 @@
-## [Unreleased]
+## [2.0.3] - 2017-06-27
 ### Added
 - tests
 
