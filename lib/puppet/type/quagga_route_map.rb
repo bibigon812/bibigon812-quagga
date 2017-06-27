@@ -93,7 +93,7 @@ Puppet::Type.newtype(:quagga_route_map) do
     newvalues(/\Acomm-list\s(\d+|\w[\w-]+)\sdelete\Z/)
     newvalues(/\Acommunity(\s(\d+:\d+))+(\sadditive)?\Z/)
     newvalues(/\Acommunity\snone\Z/)
-    newvalues(/\Aforwarding-adsress\s([\d:]+)\Z/)
+    newvalues(/\Aforwarding-address\s([\d:]+)\Z/)
     newvalues(/\Aip\snext-hop\s((\d+\.\d+\.\d+\.\d+)|peer-address)\Z/)
     newvalues(/\Aipv6\snext-hop\s(global|local)\s([\d:]+)\Z/)
     newvalues(/\Aipv6\snext-hop\speer-address\Z/)
