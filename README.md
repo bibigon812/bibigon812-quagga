@@ -548,15 +548,66 @@ quagga_route_map { 'bgp_out:99':
 }
 
 quagga_route_map { 'bgp_out:65000':
-    ensure => present,
-    action => 'permit',
-    set    => 'community 0:666',
+    ensure   => present,
+    action   => 'permit',
+    match    => [
+        'as-path AS_PATH_LIST',
+        'community 100',
+        'community 300 exact-match',
+        'extcommunity 200',
+        'interface eth0',
+        'ip address 100',
+        'ip next-hop ACCESS_LIST',
+        'ip route-source prefix-list PREFIX_LIST',
+        'ipv6 address IPV6_ACCESS_LIST',
+        'ipv6 next-hop prefix-list IPV6_PREFIX_LIST',
+        'local-preference 1000',
+        'metric 0',
+        'origin igp',
+        'origin egp',
+        'origin incomplete',
+        'peer 1.1.1.1',
+        'peer 100',
+        'peer local',
+        'probability 50',
+        'tag 100',
+    ],
+    on_match => 'next',
+    set      => [
+        'aggregator as 65000',
+        'as-path exclude 100 200',
+        'as-path prepend 100 100 100',
+        'as-path prepend last-as 5',
+        'atomic-aggregate',
+        'comm-list 100 delete',
+        'community 0:666 additive',
+        'community none',
+        'forwarding address 1fff::',
+        'ip next-hop 1.1.1.1',
+        'ip next-hop peer-address',
+        'ipv6 next-hop global 1::',
+        'ipv6 next-hop local 1::',
+        'ipv6 next-hop peer-address',
+        'local-preference 1000',
+        'metric 0',
+        'metric-type type-1',
+        'origin egp',
+        'origin igp',
+        'origin incomplete',
+        'originator-id 1.1.1.1',
+        'src 1.1.1.1',
+        'tag 100',
+        'vpn4 next-hop 1.1.1.1',
+        'weight 100',
+    ],
 }
 ```
 
 - `name`: Name of the route-map, action and sequence number of rule.
 - `action`: Route map actions: `deny`,`permit`.
 - `ensure`: Manage the state of this route map: `absent`, `present`. Default value: `present`.
-- `match`: Match values from routing table.
+- `match`: Match values from routing table. Default value: `[]`.
 - `on_match`: Exit policy on matches.
-- `set`: Set values in destination routing protocol.
+- `set`: Set values in destination routing protocol. Default value: `[]`.
+    
+    
