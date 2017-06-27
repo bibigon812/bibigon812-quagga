@@ -33,7 +33,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     desc 'It\'s consists of a AS number and a neighbor IP address or a peer-group name.'
 
     newvalues /\A\d+\s+(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\Z/
-    newvalues /\A\d+\s+[\h:]\Z/
+    newvalues /\A\d+\s+[\h:]+\Z/
     newvalues /\A\d+\s+\w+\Z/
 
     munge do |value|
