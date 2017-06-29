@@ -46,17 +46,22 @@ router bgp 197888
  neighbor 172.16.32.108 peer-group INTERNAL
  neighbor 172.16.32.108 default-originate
  neighbor 172.16.32.108 shutdown
+ neighbor 1a03:d000:20a0::91 remote-as 31113
+ neighbor 1a03:d000:20a0::91 update-source 1a03:d000:20a0::92
  maximum-paths 4
  maximum-paths ibgp 4
 !
  address-family ipv6
+ network 1a04:6d40::/48
+ neighbor 1a03:d000:20a0::91 activate
+ neighbor 1a03:d000:20a0::91 allowas-in 1
  exit-address-family
- exit
-!'
+!
+end'
     end
 
     it 'should return a resource' do
-      expect(described_class.instances.size).to eq(4)
+      expect(described_class.instances.size).to eq(5)
     end
 
     it 'should return the 197888:INTERNAL resource' do
@@ -128,6 +133,25 @@ router bgp 197888
         :route_reflector_client => :false,
         :route_server_client => :false,
         :shutdown => :true,
+      })
+    end
+
+    it 'should return the 197888:1a03:d000:20a0::91 resource' do
+      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
+        :activate => :true,
+        :allow_as_in => 1,
+        :default_originate => :false,
+        :ensure => :present,
+        :name => '197888 1a03:d000:20a0::91',
+        :next_hop_self => :false,
+        :passive => :false,
+        :peer_group => :false,
+        :provider => :quagga,
+        :remote_as => 31113,
+        :route_reflector_client => :false,
+        :route_server_client => :false,
+        :shutdown => :false,
+        :update_source => '1a03:d000:20a0::92',
       })
     end
   end
@@ -178,17 +202,22 @@ router bgp 197888
  neighbor 172.16.32.108 peer-group INTERNAL
  neighbor 172.16.32.108 default-originate
  neighbor 172.16.32.108 shutdown
+ neighbor 1a03:d000:20a0::91 remote-as 31113
+ neighbor 1a03:d000:20a0::91 update-source 1a03:d000:20a0::92
  maximum-paths 4
  maximum-paths ibgp 4
 !
  address-family ipv6
+ network 1a04:6d40::/48
+ neighbor 1a03:d000:20a0::91 activate
+ neighbor 1a03:d000:20a0::91 allowas-in 1
  exit-address-family
- exit
-!'
+!
+end'
     end
 
     it 'should return a resource' do
-      expect(described_class.instances.size).to eq(4)
+      expect(described_class.instances.size).to eq(5)
     end
 
     it 'should return the 197888:INTERNAL resource' do
@@ -262,5 +291,24 @@ router bgp 197888
         :shutdown => :true,
       })
     end
+
+    # it 'should return the 197888:1a03:d000:20a0::91 resource' do
+    #   expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
+    #     :activate => :true,
+    #     :allow_as_in => 1,
+    #     :default_originate => :false,
+    #     :ensure => :present,
+    #     :name => '197888 1a03:d000:20a0::91',
+    #     :next_hop_self => :false,
+    #     :passive => :false,
+    #     :peer_group => :false,
+    #     :provider => :quagga,
+    #     :remote_as => 31113,
+    #     :route_reflector_client => :false,
+    #     :route_server_client => :false,
+    #     :shutdown => :false,
+    #     :update_source => '1a03:d000:20a0::92',
+    #   })
+    # end
   end
 end
