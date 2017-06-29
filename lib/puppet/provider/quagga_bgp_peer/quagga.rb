@@ -273,8 +273,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
             end
 
           when :boolean
-            value = @resource[property]
-            if value == :false
+            if @resource[property] == :false
               cmds << "no #{ERB.new(options[:template]).result(binding)}"
             else
               cmds << ERB.new(options[:template]).result(binding)
@@ -287,6 +286,9 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
       end
     end
+
+    cmds << 'end'
+    cmds << 'write memory'
 
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
