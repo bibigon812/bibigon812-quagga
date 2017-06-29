@@ -1,25 +1,52 @@
 class quagga::bgp (
-  Hash $settings = {},
+  String $config_file,
+  Boolean $config_file_manage,
+  String $service_name,
+  Boolean $service_enable,
+  Boolean $service_manage,
+  Enum["running", "stopped"] $service_ensure,
+  String $service_opts,
+  Hash $router,
+  Hash $peers,
+  Hash $route_maps,
+  Hash $as_paths,
+  Hash $community_lists
 ) {
-  unless empty($settings) {
-    # Quagga supports only one bgp router
-    $as = $settings.keys[0]
-    $options = $settings.values[0]
+  include quagga::bgp::config
+  include quagga::bgp::service
 
-    $ensure = dig44($options, ['ensure'], 'present')
+  # Quagga only supports a single router instance
+  if size($router) > 1 {
+    fail("Quagga only supports a single BGP router instance in ${title}")
+  }
 
-    $bgp = { $as => delete($options, 'peers') }
-
-    $bgp_peers = dig44($options, ['peers'], {}).reduce({}) |$memo, $value| {
-      merge($memo, { "${as} ${value[0]}" => merge({ ensure => $ensure }, $value[1]) })
+  $router.each |String $router_name, Hash $router| {
+    quagga_bgp {$router_name:
+      * => $router
     }
+  }
 
-    unless empty($bgp) {
-      create_resources('quagga_bgp', $bgp)
+  $peers.each |String $peer_name, Hash $peer| {
+    quagga_bgp_peer {$peer_name:
+      * => $peer
     }
+  }
 
-    unless empty($bgp_peers) {
-      create_resources('quagga_bgp_peer', $bgp_peers)
+  $route_maps.each |String $route_map_name, Hash $route_map| {
+    quagga_route_map {$route_map_name:
+      * => $route_map
+    }
+  }
+
+  $as_paths.each |String $as_path_name, Hash $as_path| {
+    quagga_as_path {$as_path_name:
+      * => $as_path
+    }
+  }
+
+  $community_lists.each |String $community_list_name, Hash $community_list| {
+    quagga_community_list {$community_list_name:
+      * => $community_list
     }
   }
 }
