@@ -1,3 +1,7 @@
+## [Unreleased]
+### Added
+- the resource `quagga_bgp_address_family`
+
 ## [2.0.3] - 2017-06-27
 ### Added
 - tests
