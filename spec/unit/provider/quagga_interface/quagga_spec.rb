@@ -49,12 +49,14 @@ interface tun0
 
     it 'should return the resource eth0' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
+        :bandwidth => :absent,
         :ensure => :present,
         :name => 'eth0',
         :provider => :quagga,
         :description => :absent,
         :enable => :true,
         :ip_address => [],
+        :link_detect => :false,
         :multicast => :false,
         :ospf_cost => 10,
         :ospf_dead_interval => 40,
@@ -73,25 +75,27 @@ interface tun0
 
     it 'should return the resource eth1' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-         :ensure => :present,
-         :name => 'eth1',
-         :provider => :quagga,
-         :description => :absent,
-         :enable => :true,
-         :ip_address => [],
-         :multicast => :false,
-         :ospf_cost => 10,
-         :ospf_dead_interval => 8,
-         :ospf_hello_interval => 2,
-         :ospf_mtu_ignore => :true,
-         :ospf_network => 'broadcast',
-         :ospf_priority => 50,
-         :ospf_retransmit_interval => 4,
-         :ospf_transmit_delay => 1,
-         :pim_ssm => :true,
-         :igmp => :true,
-         :igmp_query_interval => 150,
-         :igmp_query_max_response_time_dsec => 200
+        :bandwidth => :absent,
+        :ensure => :present,
+        :name => 'eth1',
+        :provider => :quagga,
+        :description => :absent,
+        :enable => :true,
+        :ip_address => [],
+        :link_detect => :false,
+        :multicast => :false,
+        :ospf_cost => 10,
+        :ospf_dead_interval => 8,
+        :ospf_hello_interval => 2,
+        :ospf_mtu_ignore => :true,
+        :ospf_network => 'broadcast',
+        :ospf_priority => 50,
+        :ospf_retransmit_interval => 4,
+        :ospf_transmit_delay => 1,
+        :pim_ssm => :true,
+        :igmp => :true,
+        :igmp_query_interval => 150,
+        :igmp_query_max_response_time_dsec => 200
       })
     end
   end

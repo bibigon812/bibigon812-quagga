@@ -21,7 +21,7 @@ describe Puppet::Type.type(:quagga_interface) do
     expect(described_class.key_attributes).to eq([:name])
   end
 
-  describe "when validating attributes" do
+  describe 'when validating attributes' do
     [:name, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
@@ -29,8 +29,9 @@ describe Puppet::Type.type(:quagga_interface) do
     end
 
     [:ospf_cost, :ospf_dead_interval, :ospf_hello_interval, :ospf_mtu_ignore, :ospf_network,
-      :ospf_priority, :ospf_retransmit_interval, :ospf_transmit_delay,
+     :ospf_priority, :ospf_retransmit_interval, :ospf_transmit_delay,
      :igmp, :pim_ssm, :igmp_query_interval, :igmp_query_max_response_time_dsec,
+     :bandwidth, :link_detect, :multicast,
     ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
@@ -123,59 +124,62 @@ describe Puppet::Type.type(:quagga_interface) do
       end
     end
 
-    describe 'ospf_ospf_mtu_ignore' do
-      it 'should support true as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_mtu_ignore => true) }.to_not raise_error
-      end
+    [:ospf_mtu_ignore, :igmp, :pim_ssm, :link_detect, :multicast].each do |property|
+      describe "#{property}" do
+        it 'should support true as a value' do
+          expect { described_class.new(:name => 'foo', property => true) }.to_not raise_error
+        end
 
-      it 'should support :true as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_mtu_ignore => :true) }.to_not raise_error
-      end
+        it 'should support :true as a value' do
+          expect { described_class.new(:name => 'foo', property => :true) }.to_not raise_error
+        end
 
-      it 'should support :true as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_mtu_ignore => 'true') }.to_not raise_error
-      end
+        it 'should support :true as a value' do
+          expect { described_class.new(:name => 'foo', property => 'true') }.to_not raise_error
+        end
 
-      it 'should support false as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_mtu_ignore => false) }.to_not raise_error
-      end
+        it 'should support false as a value' do
+          expect { described_class.new(:name => 'foo', property => false) }.to_not raise_error
+        end
 
-      it 'should support :false as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_mtu_ignore => :false) }.to_not raise_error
-      end
+        it 'should support :false as a value' do
+          expect { described_class.new(:name => 'foo', property => :false) }.to_not raise_error
+        end
 
-      it 'should support :false as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_mtu_ignore => 'false') }.to_not raise_error
-      end
+        it 'should support :false as a value' do
+          expect { described_class.new(:name => 'foo', property => 'false') }.to_not raise_error
+        end
 
-      it 'should not support foo as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_mtu_ignore => :disabled) }.to raise_error Puppet::Error, /Invalid value/
-      end
+        it 'should not support foo as a value' do
+          expect { described_class.new(:name => 'foo', property => :disabled) }.to raise_error Puppet::Error, /Invalid value/
+        end
 
-      it 'should contain enabled' do
-        expect(described_class.new(:name => 'foo', :ospf_mtu_ignore => 'true')[:ospf_mtu_ignore]).to eq(:true)
-      end
+        it 'should contain enabled' do
+          expect(described_class.new(:name => 'foo', property => 'true')[property]).to eq(:true)
+        end
 
-      it 'should contain enabled' do
-        expect(described_class.new(:name => 'foo', :ospf_mtu_ignore => :true)[:ospf_mtu_ignore]).to eq(:true)
-      end
+        it 'should contain enabled' do
+          expect(described_class.new(:name => 'foo', property => :true)[property]).to eq(:true)
+        end
 
-      it 'should contain enabled' do
-        expect(described_class.new(:name => 'foo', :ospf_mtu_ignore => true)[:ospf_mtu_ignore]).to eq(:true)
-      end
+        it 'should contain enabled' do
+          expect(described_class.new(:name => 'foo', property => true)[property]).to eq(:true)
+        end
 
-      it 'should contain disabled' do
-        expect(described_class.new(:name => 'foo', :ospf_mtu_ignore => 'false')[:ospf_mtu_ignore]).to eq(:false)
-      end
+        it 'should contain disabled' do
+          expect(described_class.new(:name => 'foo', property => 'false')[property]).to eq(:false)
+        end
 
-      it 'should contain disabled' do
-        expect(described_class.new(:name => 'foo', :ospf_mtu_ignore => :false)[:ospf_mtu_ignore]).to eq(:false)
-      end
+        it 'should contain disabled' do
+          expect(described_class.new(:name => 'foo', property => :false)[property]).to eq(:false)
+        end
 
-      it 'should contain disabled' do
-        expect(described_class.new(:name => 'foo', :ospf_mtu_ignore => false)[:ospf_mtu_ignore]).to eq(:false)
+        it 'should contain disabled' do
+          expect(described_class.new(:name => 'foo', property => false)[property]).to eq(:false)
+        end
       end
     end
+
 
     describe 'ospf_network' do
       it 'should support :broadcast as value' do
@@ -262,34 +266,6 @@ describe Puppet::Type.type(:quagga_interface) do
 
       it 'should not support \'51\'' do
         expect { described_class.new(:name => 'foo', :ospf_transmit_delay => '51') }.to raise_error Puppet::Error, /is not an Integer/
-      end
-    end
-
-    describe 'igmp' do
-      it 'should support true as a value' do
-        expect { described_class.new(:name => 'foo', :igmp => true) }.to_not raise_error
-      end
-
-      it 'should support false as a value' do
-        expect { described_class.new(:name => 'foo', :igmp => false) }.to_not raise_error
-      end
-
-      it 'should not support foo as a value' do
-        expect { described_class.new(:name => 'foo', :igmp => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
-      end
-    end
-
-    describe 'pim_ssm' do
-      it 'should support true as a value' do
-        expect { described_class.new(:name => 'foo', :pim_ssm => true) }.to_not raise_error
-      end
-
-      it 'should support false as a value' do
-        expect { described_class.new(:name => 'foo', :pim_ssm => false) }.to_not raise_error
-      end
-
-      it 'should not support foo as a value' do
-        expect { described_class.new(:name => 'foo', :pim_ssm => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
     end
 
