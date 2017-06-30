@@ -42,9 +42,9 @@ Puppet::Type.newtype(:quagga_interface) do
       begin
         IPAddr.new value
       rescue
-        raise ArgumentError, "Not a valid ip address '#{value}'"
+        fail "Not a valid ip address '#{value}'"
       end
-      raise ArgumentError, "Prefix length is not specified '#{value}'" unless value.include?('/')
+      fail "Prefix length is not specified '#{value}'" unless value.include?('/')
     end
 
     def insync?(current)
@@ -86,8 +86,8 @@ Puppet::Type.newtype(:quagga_interface) do
 
     validate do |value|
       if value != :absent
-        raise ArgumentError, "Interface bandwidth '#{value}' is not an Integer" unless value.is_a?(Integer)
-        raise ArgumentError, "Interface bandwidth '#{value}' must be between 1-10000000" unless value >= 1 and value <= 10000000
+        fail "Interface bandwidth '#{value}' is not an Integer" unless value.is_a?(Integer)
+        fail "Interface bandwidth '#{value}' must be between 1-10000000" unless value >= 1 and value <= 10000000
       end
     end
   end
@@ -117,8 +117,8 @@ Puppet::Type.newtype(:quagga_interface) do
     desc 'IGMP query interval'
 
     validate do |value|
-      raise ArgumentError, "IGMP query interval '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "IGMP query interval '#{value}' must be between 1-1800" unless value >= 1 and value <= 1800
+      fail "IGMP query interval '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail "IGMP query interval '#{value}' must be between 1-1800" unless value >= 1 and value <= 1800
     end
 
     defaultto(125)
@@ -128,8 +128,8 @@ Puppet::Type.newtype(:quagga_interface) do
     desc 'IGMP maximum query response time in deciseconds'
 
     validate do |value|
-      raise ArgumentError, "IGMP max query response time '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "IGMP max query response time '#{value}' must be between 10-250" unless value >= 10 and value <= 250
+      fail "IGMP max query response time '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail "IGMP max query response time '#{value}' must be between 10-250" unless value >= 10 and value <= 250
     end
 
     defaultto(100)
@@ -139,8 +139,8 @@ Puppet::Type.newtype(:quagga_interface) do
     desc 'Interface OSPF cost'
 
     validate do |value|
-      raise ArgumentError, "OSPF cost '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "OSPF cost '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
+      fail "OSPF cost '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail "OSPF cost '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
     end
 
     defaultto(10)
@@ -150,8 +150,8 @@ Puppet::Type.newtype(:quagga_interface) do
     desc  'Interval after which an OSPF neighbor is declared dead'
 
     validate do |value|
-      raise ArgumentError, "OSPF dead interval '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "OSPF dead interval '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
+      fail "OSPF dead interval '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail "OSPF dead interval '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
     end
 
     defaultto(40)
@@ -161,8 +161,8 @@ Puppet::Type.newtype(:quagga_interface) do
     desc 'HELLO packets interval between OSPF neighbours'
 
     validate do |value|
-      raise ArgumentError, "OSPF hello packets interval '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "OSPF hello packets interval '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
+      fail "OSPF hello packets interval '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail "OSPF hello packets interval '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
     end
 
     defaultto(10)
@@ -186,8 +186,8 @@ Puppet::Type.newtype(:quagga_interface) do
     desc 'Router OSPF priority'
 
     validate do |value|
-      raise ArgumentError, "Router OSPF priority '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "Router OSPF priority '#{value}' must be between 1-65535" unless value >= 1 and value <= 255
+      fail "Router OSPF priority '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail "Router OSPF priority '#{value}' must be between 1-65535" unless value >= 1 and value <= 255
     end
 
     defaultto(1)
@@ -197,8 +197,8 @@ Puppet::Type.newtype(:quagga_interface) do
     desc 'Time between retransmitting lost OSPF link state advertisements'
 
     validate do |value|
-      raise ArgumentError, "OSPF retransmit interval '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "OSPF retransmit interval '#{value}' must be between 3-65535" unless value >= 3 and value <= 65535
+      fail "OSPF retransmit interval '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail "OSPF retransmit interval '#{value}' must be between 3-65535" unless value >= 3 and value <= 65535
     end
 
     defaultto(5)
@@ -208,8 +208,8 @@ Puppet::Type.newtype(:quagga_interface) do
     desc 'Link state transmit delay'
 
     validate do |value|
-      raise ArgumentError, "OSPF transmit delay '#{value}' is not an Integer" unless value.is_a?(Integer)
-      raise ArgumentError, "OSPF transmit delay '#{value}' must be between 3-65535" unless value >= 1 and value <= 65535
+      fail "OSPF transmit delay '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail "OSPF transmit delay '#{value}' must be between 3-65535" unless value >= 1 and value <= 65535
     end
 
     defaultto(1)
