@@ -6,6 +6,9 @@ lookup_options:
   quagga::interfaces:
     merge:
       strategy: deep
+  quagga::prefix_lists:
+    merge:
+      strategy: deep
   quagga::bgp::router:
     merge:
       strategy: hash
@@ -18,11 +21,12 @@ lookup_options:
   quagga::bgp::as_paths:
     merge:
       strategy: deep
-  quagga::bgp::community_list_maps:
+  quagga::bgp::community_lists:
     merge:
       strategy: deep
 quagga::global_opts: {}
 quagga::interfaces: {}
+quagga::prefix_lists: {}
 quagga::default_owner: "quagga"
 quagga::default_group: "quagga"
 quagga::default_mode: "0600"
