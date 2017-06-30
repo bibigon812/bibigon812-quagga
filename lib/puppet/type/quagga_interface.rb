@@ -72,6 +72,26 @@ Puppet::Type.newtype(:quagga_interface) do
     defaultto([])
   end
 
+  newproperty(:link_detect, :boolean => true) do
+    desc 'Enable link state detection'
+
+    defaultto(:false)
+    newvalues(:true, :false)
+  end
+
+  newproperty(:bandwidth) do
+    desc 'Set bandwidth value of the interface in kilobits/sec'
+
+    defaultto(:absent)
+
+    validate do |value|
+      if value != :absent
+        raise ArgumentError, "Interface bandwidth '#{value}' is not an Integer" unless value.is_a?(Integer)
+        raise ArgumentError, "Interface bandwidth '#{value}' must be between 1-10000000" unless value >= 1 and value <= 10000000
+      end
+    end
+  end
+
   newproperty(:multicast, :boolean => true) do
     desc 'Enable multicast flag for the interface'
 
