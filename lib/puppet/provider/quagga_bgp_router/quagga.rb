@@ -1,4 +1,4 @@
-Puppet::Type.type(:quagga_bgp).provide :quagga do
+Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   @doc = %q{ Manages as-path access-list using quagga }
 
   commands :vtysh => 'vtysh'
@@ -10,29 +10,17 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
           :template => 'bgp network import-check',
           :type => :boolean,
       },
-      :ipv4_unicast => {
+      :default_ipv4_unicast => {
           :default => :true,
           :regexp => /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
           :template => 'bgp default ipv4-unicast',
           :type => :boolean,
       },
-      :maximum_paths_ebgp => {
-          :default => 1,
-          :regexp => /\A\smaximum-paths\s(\d+)\Z/,
-          :template => 'maximum-paths<% unless value.nil? %> <%= value %><% end %>',
-          :type => :fixnum,
-      },
-      :maximum_paths_ibgp => {
-          :default => 1,
-          :regexp => /\A\smaximum-paths\sibgp\s(\d+)\Z/,
-          :template => 'maximum-paths ibgp<% unless value.nil? %> <%= value %><% end %>',
-          :type => :fixnum,
-      },
-      :networks => {
-          :default => [],
-          :regexp => /\A\snetwork\s(\S+)\Z/,
-          :template => 'network<% unless value.nil? %> <%= value %><% end %>',
-          :type => :array,
+      default_local_preference: {
+          default: 100,
+          regexp: /\A\sbgp\sdefault\slocal-preference\s(\d+)\Z/,
+          template: 'bgp default local-preference<% unless value.nil? %> <%= value %><% end %>',
+          type: :fixnum,
       },
       :redistribute => {
           :regexp => /\A\sredistribute\s(.+)\Z/,
@@ -156,8 +144,7 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
             end
 
           when :boolean
-            value = @resource[property]
-            if value == :false
+            if @resource[property] == :false
               cmds << "no #{ERB.new(options[:template]).result(binding)}"
             else
               cmds << ERB.new(options[:template]).result(binding)
@@ -210,6 +197,8 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
   end
 
   def flush
+    return if @property_flush.empty?
+
     name = @property_hash[:name]
 
     debug "[flush][#{name}]"
@@ -248,17 +237,15 @@ Puppet::Type.type(:quagga_bgp).provide :quagga do
         value = v
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
-
-      @property_hash[property] = v
     end
 
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty?
-      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-      @property_flush.clear
-    end
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_hash = resource.to_hash
+    @property_flush.clear
   end
 
   @resource_map.keys.each do |property|

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_bgp) do
+describe Puppet::Type.type(:quagga_bgp_router) do
   let :providerclass  do
     described_class.provide(:fake_quagga_provider) do
       attr_accessor :property_hash
@@ -17,7 +17,7 @@ describe Puppet::Type.type(:quagga_bgp) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_bgp).stubs(:defaultprovider).returns providerclass
+    Puppet::Type.type(:quagga_bgp_router).stubs(:defaultprovider).returns providerclass
   end
 
   it 'should have :name be its namevar' do
