@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_as_path) do
+describe Puppet::Type.type(:quagga_bgp_as_path) do
   let :providerclass  do
     described_class.provide(:fake_quagga_provider) do
       attr_accessor :property_hash
@@ -14,14 +14,14 @@ describe Puppet::Type.type(:quagga_as_path) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_as_path).stubs(:defaultprovider).returns providerclass
+    Puppet::Type.type(:quagga_bgp_as_path).stubs(:defaultprovider).returns providerclass
   end
 
   it 'should have :name be its namevar' do
     expect(described_class.key_attributes).to eq([:name])
   end
 
-  describe "when validating attributes" do
+  describe 'when validating attributes' do
     [:name, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)

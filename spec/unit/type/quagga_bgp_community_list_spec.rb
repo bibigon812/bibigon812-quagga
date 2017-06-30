@@ -1,16 +1,20 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_bgp_community_list) do
-  let(:provider) do
-    @provider_class = describe_class.provide(:quagga_bgp_community_list) {
+  let :providerclass  do
+    described_class.provide(:fake_quagga_provider) do
+      attr_accessor :property_hash
+      def create; end
+      def destroy; end
+      def exists?
+        get(:ensure) == :present
+      end
       mk_resource_methods
-    }
-    @provider_class.stub(:suitable?).return true
-    @provider_class
+    end
   end
 
   before :each do
-    described_class.stubs(:defaultprovider).returns @provider_class
+    Puppet::Type.type(:quagga_bgp_as_path).stubs(:defaultprovider).returns providerclass
   end
 
   after :each do
