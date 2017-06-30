@@ -32,7 +32,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   }
 
   def self.instances
-    provider = []
+    providers = []
     hash = {}
     found_router = false
     address_family = 'ipv4 unicast'
@@ -43,8 +43,8 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
       # Skip comments
       next if line =~ /\A!/
 
+      # Found the router bgp
       if line =~ /\Arouter\sbgp\s(\d+)\Z/
-        # Found the router bgp
         as = $1
         found_router = true
 
@@ -65,15 +65,15 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
           end
         end
 
+      # Found the address family
       elsif found_router and line =~ /\A\saddress-family\s(ipv4|ipv6)(?:\s(multicast))?\Z/
-        # Found the address family
         proto = $1
         type = $2
         address_family = type.nil? ? proto : "#{proto} #{type}"
 
         # Store a previous address family
         debug 'Instantiated bgp address family %{name}.' % { name: hash[:name] }
-        provider << new(hash)
+        providers << new(hash)
 
         # Create new address family
         hash = {
@@ -97,8 +97,8 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
         # Exit from the router bgp
         break
 
+      # Inside the router bgp
       elsif found_router
-        # Inside the router bgp
         @resource_map.each do |property, options|
           if line =~ options[:regexp]
             value = $1
@@ -125,10 +125,10 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
 
     unless hash.empty?
       debug 'Instantiated bgp address family %{name}.' % { name: hash[:name]}
-      provider << new(hash)
+      providers << new(hash)
     end
 
-    provider
+    providers
   end
 
   def self.prefetch(resources)
