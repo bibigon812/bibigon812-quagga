@@ -4,7 +4,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
 
       Examples:
 
-        quagga_bgp_address_family { '65000 ipv4 unicast':
+        quagga_bgp_address_family { 'ipv4 unicast':
           aggregate_address => '192.168.0.0/24 summary-only',
           maximum_ebgp_paths => 2,
           maximum_ibgp_paths => 2,
@@ -15,15 +15,16 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
   ensurable
 
   newparam(:name, :namevar => true) do
-    desc 'Contains an AS number, an address-family.'
+    desc 'The address family: ipv4 unicast, ipv4 multicast or ipv6 unicast.'
 
-    newvalues(/\A\d+\sipv4\s(unicast|multicast)\Z/)
-    newvalues(/\A\d+\sipv6\Z/)
+    newvalues(/\Aipv4\s(unicast|multicast)\Z/)
+    newvalues(/\Aipv6\s(unicast)\Z/)
   end
 
-  newproperty(:aggregate_address) do
+  newproperty(:aggregate_address, array_matching: :all) do
     desc 'Configure BGP aggregate entries.'
 
+    defaultto([])
     newvalues(/\A(\d+\.\d+\.\d+\.\d+\/\d+)(\sas-set)?(\ssummary-only)?\Z/)
     newvalues(/\A([\h:\/]+)(\ssummary-only)?\Z/)
 
@@ -31,7 +32,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = value.split(/\s/).first
-      _, proto, _ = @resource[:name].split(/\s/)
+      proto, _ = @resource[:name].split(/\s/)
 
       begin
         ip = IPAddr.new(v)
@@ -43,7 +44,27 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     end
 
     def insync?(is)
-      is == @should
+      is.each do |v|
+        return false unless @should.include?(v)
+      end
+
+      @should.each do |v|
+        return false unless is.include?(v)
+      end
+
+      true
+    end
+
+    def should_to_s(value)
+      value.inspect
+    end
+
+    def is_to_s(value)
+      value.inspect
+    end
+
+    def change_to_s(is, should)
+      "removing #{(is - should).inspect}, adding #{(should - is).inspect}."
     end
   end
 
@@ -56,14 +77,8 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     validate do |value|
       super(value)
 
-      v = case value
-            when String
-              value.to_i
-            else
-              value
-          end
-
-      _, proto, type = @resource[:name].split(/\s/)
+      v = Integer(value)
+      proto, type = @resource[:name].split(/\s/)
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
@@ -89,14 +104,9 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     validate do |value|
       super(value)
 
-      v = case value
-            when String
-              value.to_i
-            else
-              value
-          end
+      v = Integer(value)
 
-      _, proto, type = @resource[:name].split(/\s/)
+      proto, type = @resource[:name].split(/\s/)
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
@@ -104,16 +114,11 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     end
 
     munge do |value|
-      case value
-        when String
-          value.to_i
-        else
-          value
-      end
+      Integer(value)
     end
   end
 
-  newproperty(:networks, :array_matching => :all) do
+  newproperty(:networks, array_matching: :all) do
     desc 'Specify a network to announce via BGP.'
 
     defaultto([])
@@ -122,7 +127,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     validate do |value|
       super(value)
 
-      _, proto, type = @resource[:name].split(/\s/)
+      proto, type = @resource[:name].split(/\s/)
 
       begin
         ip = IPAddr.new(value)
@@ -158,12 +163,12 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     end
 
     def change_to_s(is, should)
-      "removing #{(is - should)}, adding #{(should - is)}."
+      "removing #{(is - should).inspect}, adding #{(should - is).inspect}."
     end
   end
 
-  autorequire(:quagga_bgp) do
-    [value(:name).split(/\s/).first]
+  autorequire(:quagga_bgp_router) do
+    %w{bgp}
   end
 
   autorequire(:package) do
