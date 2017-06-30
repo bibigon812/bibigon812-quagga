@@ -1,4 +1,4 @@
-Puppet::Type.type(:quagga_as_path).provide :quagga do
+Puppet::Type.type(:quagga_bgp_as_path).provide :quagga do
   @doc = %q{
     Manages as-path access-list using quagga.
   }

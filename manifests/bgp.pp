@@ -6,11 +6,12 @@ class quagga::bgp (
   Boolean $service_manage,
   Enum["running", "stopped"] $service_ensure,
   String $service_opts,
+  Optional[Integer] $as_number = undef,
   Hash $router,
   Hash $peers,
-  Hash $route_maps,
   Hash $as_paths,
-  Hash $community_lists
+  Hash $community_lists,
+  Hash $address_families
 ) {
   include quagga::bgp::config
   include quagga::bgp::service
@@ -20,33 +21,37 @@ class quagga::bgp (
     fail("Quagga only supports a single BGP router instance in ${title}")
   }
 
-  $router.each |String $router_name, Hash $router| {
-    quagga_bgp {$router_name:
+  if $service_enable and $service_ensure == 'running' {
+    unless $as_number {
+      fail("Must specify BGP AS router number when service is enabled")
+    }
+
+    quagga_bgp {$as_number:
       * => $router
     }
-  }
 
-  $peers.each |String $peer_name, Hash $peer| {
-    quagga_bgp_peer {$peer_name:
-      * => $peer
+    $peers.each |String $peer_name, Hash $peer| {
+      quagga_bgp_peer {"$as_number $peer_name":
+        * => $peer
+      }
     }
-  }
 
-  $route_maps.each |String $route_map_name, Hash $route_map| {
-    quagga_route_map {$route_map_name:
-      * => $route_map
+    $as_paths.each |String $as_path_name, Hash $as_path| {
+      quagga_bgp_as_path {$as_path_name:
+        * => $as_path
+      }
     }
-  }
 
-  $as_paths.each |String $as_path_name, Hash $as_path| {
-    quagga_as_path {$as_path_name:
-      * => $as_path
+    $community_lists.each |String $community_list_name, Hash $community_list| {
+      quagga_bgp_community_list {$community_list_name:
+        * => $community_list
+      }
     }
-  }
 
-  $community_lists.each |String $community_list_name, Hash $community_list| {
-    quagga_community_list {$community_list_name:
-      * => $community_list
+    $address_families.each |String $address_family_name, Hash $address_family| {
+      quagga_bgp_address_family {"$as_number $address_family_name":
+        * => $address_family
+      }
     }
   }
 }

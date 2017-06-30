@@ -2,6 +2,7 @@ class quagga (
   Hash $global_opts,
   Hash $interfaces,
   Hash $prefix_lists,
+  Hash $route_maps,
   String $default_owner,
   String $default_group,
   String $default_mode,
@@ -54,6 +55,12 @@ class quagga (
   $prefix_lists.each |String $prefix_list_name, Hash $prefix_list| {
     quagga_interface {$prefix_list_name:
       * => $prefix_list
+    }
+  }
+
+  $route_maps.each |String $route_map_name, Hash $route_map| {
+    quagga_route_map {$route_map_name:
+      * => $route_map
     }
   }
 }
