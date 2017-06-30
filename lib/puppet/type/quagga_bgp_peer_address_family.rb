@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
-  require 'puppet/property/boolean'
-
   @doc = %q{
     This type provides capabilities to manage Quagga bgp address family parameters.
 
@@ -32,8 +30,8 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   newparam(:name, :namevar => true) do
     desc 'Contains the AS number, the neighbor IP address or the peer-group name, the address family.'
 
-    newvalues(/\A\d+\s([\d\.]+)ipv4\s(unicast|multicast)\Z/)
-    newvalues(/\A\d+\s([\h\.:]+)\sipv6\Z/)
+    newvalues(/\A([\d\.]+)ipv4\s(unicast|multicast)\Z/)
+    newvalues(/\A([\h\.:]+)\sipv6\s(unicast)\Z/)
   end
 
   newproperty(:activate, boolean: true) do
