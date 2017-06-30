@@ -181,44 +181,94 @@ quagga::interfaces:
         ospf_mtu_ignore: true
         pim_ssm: true
 
-quagga::bgp:
+
+# bgp router parameters
+quagga::bgp::router:
     65000:
         import_check: true
-        ipv4_unicast: false
-        maximum_paths_ebgp: 2
-        maximum_paths_ibgp: 10
-        networks:
-            - 1.1.1.0/24
-            - 1.1.2.0/24
+        default_ipv4_unicast: false
         router_id: 10.255.255.1
-        peers:
-            192.168.0.2:
-                peer_group: INTERNAL
-            192.168.0.3:
-                peer_group: INTERNAL
-            CLIENTS:
-                activate: true
-                default_originate: true
-                passive: true
-                peer_group: true
-            INTERNAL:
-                activate: true
-                next_hop_self: true
-                peer_group: true
-                remote_as: 65000
-                update_source: 192.168.0.1
         redistribute:
             - ospf route-map BGP_FROM_OSPF
 
-quagga::ospf:
-    areas:
-        0.0.0.0:
-            networks:
-                - 172.16.0.0/12
+quagga::bgp::peers:
+    CLIENTS:
+        passive: true
+        peer_group: true
+    INTERNAL:
+        local_as: 65000
+        peer_group: true
+        remote_as: 65000
+        shutdown: false
+        update_source: 192.168.0.1
+    172.16.0.2:
+        remote_as: 65001
+    192.168.0.2:
+        peer_group: INTERNAL
+
+quagga::bgp::address_families:
+    ipv4_unicast:
+        maximum_ebgp_paths: 2
+        maximum_ibgp_paths: 10
+        networks:
+            - 1.1.1.0/24
+            - 1.1.2.0/24
+    ipv4_multicast:
+        networks:
+            - 230.0.0.0/24
+            - 230.0.255.0/24
+    ipv6_unicast:
+        networks:
+            - 1::/64
+            - 2::/64
+
+# bgp peer parameters
+quagga::bgp::peers:
+    CLIENTS:
+        passive: true
+        peer_group: true
+        address_family:
+            ipv4_unicast:
+                activate: true
+    INTERNAL:
+        local_as: 65000
+        peer_group: true
+        remote_as: 65000
+        shutdown: false
+        update_source: 192.168.0.1
+        address_family:
+            ipv4_unicast:
+                activate: true
+                alliw_as_in: 1
+                next_hop_self: true
+    172.16.0.2:
+        remote_as: 65001
+        address_family:
+            ipv4_unicast:
+                activate: true
+    192.168.0.2:
+        peer_group: INTERNAL
+        address_family:
+            ipv4_unicast:
+                activate: true
+            ipv4_multicast:
+                activate: true
+            ipv6_unicast:
+                activate: true
+
+
+# OSPF
+quagga::ospf::router:
     default_originate: true
     redistribute:
         - connected route-map CONNECTED
     router_id: 10.255.255.1
+
+quagga::ospf::areas:
+    0.0.0.0:
+        networks:
+            - 172.16.0.0/12
+
 
 quagga::as_paths:
     FROM_AS100:
