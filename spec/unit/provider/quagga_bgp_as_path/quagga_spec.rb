@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_as_path).provider(:quagga) do
-  let(:provider) { Puppet::Type.type(:quagga_as_path).provider(:quagga) }
+describe Puppet::Type.type(:quagga_bgp_as_path).provider(:quagga) do
+  let(:provider) { Puppet::Type.type(:quagga_bgp_as_path).provider(:quagga) }
 
   describe 'instances' do
     it 'should have an instance method' do

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_community_list) do
+describe Puppet::Type.type(:quagga_bgp_community_list) do
   let(:provider) do
-    @provider_class = describe_class.provide(:quagga_community_list) {
+    @provider_class = describe_class.provide(:quagga_bgp_community_list) {
       mk_resource_methods
     }
     @provider_class.stub(:suitable?).return true
@@ -14,7 +14,7 @@ describe Puppet::Type.type(:quagga_community_list) do
   end
 
   after :each do
-    described_class.unprovide(:quagga_community_list)
+    described_class.unprovide(:quagga_bgp_community_list)
   end
 
   it 'should have :name be its namevar' do
