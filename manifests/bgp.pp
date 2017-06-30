@@ -6,6 +6,7 @@ class quagga::bgp (
   Boolean $service_manage,
   Enum["running", "stopped"] $service_ensure,
   String $service_opts,
+  Integer $as_number,
   Hash $router,
   Hash $peers,
   Hash $as_paths,
@@ -20,14 +21,12 @@ class quagga::bgp (
     fail("Quagga only supports a single BGP router instance in ${title}")
   }
 
-  $router.each |String $router_name, Hash $router| {
-    quagga_bgp {$router_name:
-      * => $router
-    }
+  quagga_bgp {$as_number:
+    * => $router
   }
 
   $peers.each |String $peer_name, Hash $peer| {
-    quagga_bgp_peer {$peer_name:
+    quagga_bgp_peer {"$as_number $peer_name":
       * => $peer
     }
   }
@@ -45,7 +44,7 @@ class quagga::bgp (
   }
 
   $address_families.each |String $address_family_name, Hash $address_family| {
-    quagga_bgp_address_family {$address_family_name:
+    quagga_bgp_address_family {"$as_number $address_family_name":
       * => $address_family
     }
   }
