@@ -14,6 +14,18 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
       :type => :array,
       :default => [],
     },
+    :bandwidth => {
+      :regexp => /\A\sbandwidth\s(\d+)\Z/,
+      :template => 'bandwidth<% unless value.nil? %> <%= value %><% end %>',
+      :type => :fixnum,
+      :default => :absent
+    },
+    :link_detect => {
+      :regexp => /\A\slink-detect\Z/,
+      :template => 'link-detect',
+      :type => :boolean,
+      :default => :false
+    },
     :multicast => {
       :regexp => /\A\smulticast\Z/,
       :template => 'multicast',
