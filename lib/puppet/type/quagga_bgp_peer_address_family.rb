@@ -28,10 +28,12 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   ensurable
 
   newparam(:name, :namevar => true) do
-    desc 'Contains the AS number, the neighbor IP address or the peer-group name, the address family.'
+    desc 'Contains the neighbor IP address or the peer-group name, the address family.'
 
     newvalues(/\A([\d\.]+)ipv4\s(unicast|multicast)\Z/)
     newvalues(/\A([\h\.:]+)\sipv6\s(unicast)\Z/)
+    newvalues(/\A\w+\sipv4\s(unicast|multicast)\Z/)
+    newvalues(/\A\w+\sipv6\s(unicast)\Z/)
   end
 
   newproperty(:activate, boolean: true) do
@@ -54,13 +56,13 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   end
 
   newproperty(:default_originate, boolean: true) do
-    desc 'Originate default route to this neighbor. Default to `false`.'
+    desc 'Originate default route to this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
   end
 
   newproperty(:next_hop_self, boolean: true) do
-    desc 'Disable the next hop calculation for this neighbor. Default to `false`.'
+    desc 'Disable the next hop calculation for this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
   end
@@ -102,7 +104,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   end
 
   newproperty(:route_server_client, boolean: true) do
-    desc 'Configure a neighbor as Route Server client. Default to `false`.'
+    desc 'Configure a neighbor as Route Server client.'
     defaultto(:false)
     newvalues(:false, :true)
   end
