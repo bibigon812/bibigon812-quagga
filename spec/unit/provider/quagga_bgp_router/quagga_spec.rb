@@ -18,7 +18,7 @@ describe Puppet::Type.type(:quagga_bgp_router).provider(:quagga) do
       described_class.expects(:vtysh).with(
         '-c', 'show running-config'
       ).returns '!
-router bgp 197888
+router bgp 65000
  bgp router-id 172.16.32.103
  no bgp default ipv4-unicast
  bgp graceful-restart stalepath-time 300
@@ -61,16 +61,15 @@ router bgp 197888
 
     it 'should return the resource bgp' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-          :ensure => :present,
-          :name => '197888',
-          :provider => :quagga,
-          :import_check => :true,
-          :ipv4_unicast => :false,
-          :maximum_paths_ebgp => 4,
-          :maximum_paths_ibgp => 4,
-          :networks => %w{172.16.32.0/24 1::/64 2::/64},
-          :router_id => '172.16.32.103',
-          :redistribute => [],
+          as: '65000',
+          default_ipv4_unicast: :false,
+          default_local_preference: 100,
+          ensure: :present,
+          import_check: :true,
+          name: :bgp,
+          provider: :quagga,
+          redistribute: [],
+          router_id: '172.16.32.103',
       })
     end
   end

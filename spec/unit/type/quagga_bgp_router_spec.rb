@@ -79,14 +79,6 @@ describe Puppet::Type.type(:quagga_bgp_router) do
         expect { described_class.new(:name => 'bgp', property => true) }.to_not raise_error
       end
 
-      it 'should support \'yes\' as a value' do
-        expect { described_class.new(:name => 'bgp', property => 'yes') }.to_not raise_error
-      end
-
-      it 'should support :yes as a value' do
-        expect { described_class.new(:name => 'bgp', property => :yes) }.to_not raise_error
-      end
-
       it 'should support \'false\' as a value' do
         expect { described_class.new(:name => 'bgp', property => 'false') }.to_not raise_error
       end
@@ -99,14 +91,6 @@ describe Puppet::Type.type(:quagga_bgp_router) do
         expect { described_class.new(:name => 'bgp', property => false) }.to_not raise_error
       end
 
-      it 'should support \'no\' as a value' do
-        expect { described_class.new(:name => 'bgp', property => 'no') }.to_not raise_error
-      end
-
-      it 'should support :no as a value' do
-        expect { described_class.new(:name => 'bgp', property => :no) }.to_not raise_error
-      end
-
       it 'should not support :enabled as a value' do
         expect { described_class.new(:name => 'bgp', property => :enabled) }.to raise_error Puppet::Error
       end
@@ -116,31 +100,27 @@ describe Puppet::Type.type(:quagga_bgp_router) do
       end
 
       it 'should contain \'true\' => true' do
-        expect(described_class.new(:name => 'bgp', property => 'true')[property]).to eq(true)
+        expect(described_class.new(:name => 'bgp', property => 'true')[property]).to eq(:true)
       end
 
       it 'should contain true => true' do
-        expect(described_class.new(:name => 'bgp', property => true)[property]).to eq(true)
+        expect(described_class.new(:name => 'bgp', property => true)[property]).to eq(:true)
       end
 
       it 'should contain :true => true' do
-        expect(described_class.new(:name => 'bgp', property => true)[property]).to eq(true)
-      end
-
-      it 'should contain \'yes\' => true' do
-        expect(described_class.new(:name => 'bgp', property => 'yes')[property]).to eq(true)
-      end
-
-      it 'should contain :yes => true' do
-        expect(described_class.new(:name => 'bgp', property => :yes)[property]).to eq(true)
+        expect(described_class.new(:name => 'bgp', property => :true)[property]).to eq(:true)
       end
 
       it 'should contain \'false\' => false' do
-        expect(described_class.new(:name => 'bgp', property => 'false')[property]).to eq(false)
+        expect(described_class.new(:name => 'bgp', property => 'false')[property]).to eq(:false)
       end
 
       it 'should contain false => false' do
-        expect(described_class.new(:name => 'bgp', property => false)[property]).to eq(false)
+        expect(described_class.new(:name => 'bgp', property => false)[property]).to eq(:false)
+      end
+
+      it 'should contain false => false' do
+        expect(described_class.new(:name => 'bgp', property => :false)[property]).to eq(:false)
       end
     end
   end

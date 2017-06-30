@@ -5,8 +5,9 @@ Puppet::Type.newtype(:quagga_bgp_router) do
 
       Examples:
 
-        quagga_bgp { '65000':
+        quagga_bgp { 'bgp':
             ensure                   => present,
+            as                       => '65000',
             import_check             => true,
             default_ipv4_unicast     => false,
             default_local_preference => 100,
@@ -17,22 +18,36 @@ Puppet::Type.newtype(:quagga_bgp_router) do
   ensurable
 
   newparam(:name) do
+    desc 'BGP router instance. Must be set to \'bgp\'.'
+    newvalues(:bgp)
+  end
+
+  newproperty(:as) do
     desc 'The AS number.'
     newvalues(/\A\d+\Z/)
+
+    validate do |value|
+      super(value)
+
+      v = Integer(value)
+      fail "Invalid value '#{value}'. Valid values are 1-4294967295" unless v >= 1 and v <= 4294967295
+    end
+
+    munge do |value|
+      Integer(value)
+    end
   end
 
-  newproperty(:import_check) do
+  newproperty(:import_check, boolean: true) do
     desc 'Check BGP network route exists in IGP.'
-
-    newvalues(:false, :true)
     defaultto(:false)
+    newvalues(:false, :true)
   end
 
-  newproperty(:default_ipv4_unicast) do
+  newproperty(:default_ipv4_unicast, boolean: true) do
     desc 'Activate ipv4-unicast for a peer by default.'
-
-    newvalues(:false, :true)
     defaultto(:true)
+    newvalues(:false, :true)
   end
 
   newproperty(:default_local_preference) do
@@ -40,6 +55,13 @@ Puppet::Type.newtype(:quagga_bgp_router) do
 
     defaultto(100)
     newvalues(/\A\d+\Z/)
+
+    validate do |value|
+      super(value)
+
+      v = Integer(value)
+      fail "Invalid value #{value}. Valid values are 0-4294967295" unless v >= 0 and v <= 4294967295
+    end
 
     munge do |value|
       Integer(value)
@@ -73,13 +95,13 @@ Puppet::Type.newtype(:quagga_bgp_router) do
     end
 
     def change_to_s(is, should)
-      "removing #{(is - should)}, adding #{(should - is)}."
+      "removing #{(is - should).inspect}, adding #{(should - is).inspect}."
     end
   end
 
 
   newproperty(:router_id) do
-    desc %q{ Override configured router identifier }
+    desc 'Override configured router identifier.'
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
