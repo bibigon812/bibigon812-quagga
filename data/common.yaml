@@ -9,13 +9,13 @@ lookup_options:
   quagga::prefix_lists:
     merge:
       strategy: deep
+  quagga::route_maps:
+    merge:
+      strategy: deep
   quagga::bgp::router:
     merge:
       strategy: hash
   quagga::bgp::peers:
-    merge:
-      strategy: deep
-  quagga::bgp::route_maps:
     merge:
       strategy: deep
   quagga::bgp::as_paths:
@@ -24,9 +24,13 @@ lookup_options:
   quagga::bgp::community_lists:
     merge:
       strategy: deep
+  quagga::bgp::address_families:
+    merge:
+      strategy: deep
 quagga::global_opts: {}
 quagga::interfaces: {}
 quagga::prefix_lists: {}
+quagga::route_maps: {}
 quagga::default_owner: "quagga"
 quagga::default_group: "quagga"
 quagga::default_mode: "0600"
@@ -59,9 +63,9 @@ quagga::bgp::service_ensure: "running"
 quagga::bgp::service_opts: "-P 0"
 quagga::bgp::router: {}
 quagga::bgp::peers: {}
-quagga::bgp::route_maps: {}
 quagga::bgp::as_paths: {}
 quagga::bgp::community_lists: {}
+quagga::bgp::address_families: {}
 quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
 quagga::ospf::config_file_manage: true
 quagga::ospf::service_name: "ospfd"

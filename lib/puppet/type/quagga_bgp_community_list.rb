@@ -1,12 +1,11 @@
-Puppet::Type.newtype(:quagga_community_list) do
+Puppet::Type.newtype(:quagga_bgp_community_list) do
   @doc = %q{
 
-    This type provides the capability to manage community-list
-    within puppet.
+    This type provides the capability to manage BGP community-list within puppet.
 
       Examples:
 
-        quagga_community_list { '100':
+        quagga_bgp_community_list { '100':
             ensure => present,
             rules  => [
                 'permit 65000:50952',

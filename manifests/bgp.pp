@@ -8,9 +8,9 @@ class quagga::bgp (
   String $service_opts,
   Hash $router,
   Hash $peers,
-  Hash $route_maps,
   Hash $as_paths,
-  Hash $community_lists
+  Hash $community_lists,
+  Hash $address_families
 ) {
   include quagga::bgp::config
   include quagga::bgp::service
@@ -32,21 +32,21 @@ class quagga::bgp (
     }
   }
 
-  $route_maps.each |String $route_map_name, Hash $route_map| {
-    quagga_route_map {$route_map_name:
-      * => $route_map
-    }
-  }
-
   $as_paths.each |String $as_path_name, Hash $as_path| {
-    quagga_as_path {$as_path_name:
+    quagga_bgp_as_path {$as_path_name:
       * => $as_path
     }
   }
 
   $community_lists.each |String $community_list_name, Hash $community_list| {
-    quagga_community_list {$community_list_name:
+    quagga_bgp_community_list {$community_list_name:
       * => $community_list
+    }
+  }
+
+  $address_families.each |String $address_family_name, Hash $address_family| {
+    quagga_bgp_address_family {$address_family_name:
+      * => $address_family
     }
   }
 }

@@ -1,4 +1,4 @@
-Puppet::Type.type(:quagga_community_list).provide :quagga do
+Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
   @doc = 'Manages a community-list using quagga.'
 
   commands :vtysh => 'vtysh'

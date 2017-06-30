@@ -1,10 +1,10 @@
-Puppet::Type.newtype(:quagga_as_path) do
+Puppet::Type.newtype(:quagga_bgp_as_path) do
   @doc = %q{
-    This type provides the capabilities to manage as-path access-list within puppet.
+    This type provides the capabilities to manage BGP as-path access-list within puppet.
 
       Examples:
 
-        quagga_as_path { 'as100':
+        quagga_bgp_as_path { 'as100':
             ensure => present,
             rules => [
                 'permit _100$',
