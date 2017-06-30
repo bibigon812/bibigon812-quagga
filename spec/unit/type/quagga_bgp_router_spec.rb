@@ -31,7 +31,8 @@ describe Puppet::Type.type(:quagga_bgp_router) do
       end
     end
 
-    [:import_check, :ipv4_unicast, :maximum_paths_ebgp, :maximum_paths_ibgp, :networks, :router_id,].each do |property|
+    [:import_check, :default_ipv4_unicast, :default_local_preference,
+     :router_id,].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -41,26 +42,22 @@ describe Puppet::Type.type(:quagga_bgp_router) do
   describe 'when validating values' do
     describe 'ensure' do
       it 'should support present as a value' do
-        expect { described_class.new(:name => '197888', :ensure => :present) }.to_not raise_error
+        expect { described_class.new(:name => 'bgp', :ensure => :present) }.to_not raise_error
       end
 
       it 'should support absent as a value' do
-        expect { described_class.new(:name => '197888', :ensure => :absent) }.to_not raise_error
+        expect { described_class.new(:name => 'bgp', :ensure => :absent) }.to_not raise_error
       end
 
       it 'should not support other values' do
-        expect { described_class.new(:name => '197888', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+        expect { described_class.new(:name => 'bgp', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
       end
     end
   end
 
   describe 'name' do
-    it 'should support as100 as a value' do
-      expect { described_class.new(:name => '197888') }.to_not raise_error
-    end
-
-    it 'should support 197888 as a value' do
-      expect { described_class.new(:name => '197888') }.to_not raise_error
+    it 'should support \'bgp\' as a value' do
+      expect { described_class.new(:name => 'bgp') }.to_not raise_error
     end
 
     it 'should not support AS197888 as a value' do
@@ -68,177 +65,157 @@ describe Puppet::Type.type(:quagga_bgp_router) do
     end
   end
 
-  [:import_check, :ipv4_unicast].each do |property|
+  [:import_check, :default_ipv4_unicast].each do |property|
     describe "boolean values of the property `#{property}`" do
       it 'should support \'true\' as a value' do
-        expect { described_class.new(:name => '65000', property => 'true') }.to_not raise_error
+        expect { described_class.new(:name => 'bgp', property => 'true') }.to_not raise_error
       end
 
       it 'should support :true as a value' do
-        expect { described_class.new(:name => '65000', property => :true) }.to_not raise_error
+        expect { described_class.new(:name => 'bgp', property => :true) }.to_not raise_error
       end
 
       it 'should support true as a value' do
-        expect { described_class.new(:name => '65000', property => true) }.to_not raise_error
+        expect { described_class.new(:name => 'bgp', property => true) }.to_not raise_error
+      end
+
+      it 'should support \'yes\' as a value' do
+        expect { described_class.new(:name => 'bgp', property => 'yes') }.to_not raise_error
+      end
+
+      it 'should support :yes as a value' do
+        expect { described_class.new(:name => 'bgp', property => :yes) }.to_not raise_error
       end
 
       it 'should support \'false\' as a value' do
-        expect { described_class.new(:name => '65000', property => 'false') }.to_not raise_error
+        expect { described_class.new(:name => 'bgp', property => 'false') }.to_not raise_error
       end
 
       it 'should support :false as a value' do
-        expect { described_class.new(:name => '65000', property => :false) }.to_not raise_error
+        expect { described_class.new(:name => 'bgp', property => :false) }.to_not raise_error
       end
 
       it 'should support false as a value' do
-        expect { described_class.new(:name => '65000', property => false) }.to_not raise_error
+        expect { described_class.new(:name => 'bgp', property => false) }.to_not raise_error
+      end
+
+      it 'should support \'no\' as a value' do
+        expect { described_class.new(:name => 'bgp', property => 'no') }.to_not raise_error
+      end
+
+      it 'should support :no as a value' do
+        expect { described_class.new(:name => 'bgp', property => :no) }.to_not raise_error
       end
 
       it 'should not support :enabled as a value' do
-        expect { described_class.new(:name => '65000', property => :enabled) }.to raise_error(Puppet::Error, /Invalid value/)
+        expect { described_class.new(:name => 'bgp', property => :enabled) }.to raise_error Puppet::Error
       end
 
       it 'should not support \'disabled\' as a value' do
-        expect { described_class.new(:name => '65000', property => 'disabled') }.to raise_error(Puppet::Error, /Invalid value/)
+        expect { described_class.new(:name => 'bgp', property => 'disabled') }.to raise_error Puppet::Error
       end
 
-      it 'should contain :true' do
-        expect(described_class.new(:name => '65000', property => 'true')[property]).to eq(:true)
+      it 'should contain \'true\' => true' do
+        expect(described_class.new(:name => 'bgp', property => 'true')[property]).to eq(true)
       end
 
-      it 'should contain :true' do
-        expect(described_class.new(:name => '65000', property => true)[property]).to eq(:true)
+      it 'should contain true => true' do
+        expect(described_class.new(:name => 'bgp', property => true)[property]).to eq(true)
       end
 
-      it 'should contain :false' do
-        expect(described_class.new(:name => '65000', property => 'false')[property]).to eq(:false)
+      it 'should contain :true => true' do
+        expect(described_class.new(:name => 'bgp', property => true)[property]).to eq(true)
       end
 
-      it 'should contain :false' do
-        expect(described_class.new(:name => '65000', property => false)[property]).to eq(:false)
+      it 'should contain \'yes\' => true' do
+        expect(described_class.new(:name => 'bgp', property => 'yes')[property]).to eq(true)
+      end
+
+      it 'should contain :yes => true' do
+        expect(described_class.new(:name => 'bgp', property => :yes)[property]).to eq(true)
+      end
+
+      it 'should contain \'false\' => false' do
+        expect(described_class.new(:name => 'bgp', property => 'false')[property]).to eq(false)
+      end
+
+      it 'should contain false => false' do
+        expect(described_class.new(:name => 'bgp', property => false)[property]).to eq(false)
       end
     end
   end
 
-  describe 'maximum_paths_ebgp' do
-    it 'should support 5 as a value' do
-      expect { described_class.new(:name => '197888', :maximum_paths_ebgp => '5') }.to_not raise_error
+  describe 'default_local_preference' do
+    it 'should support \'100\' as a value' do
+      expect { described_class.new(:name => 'bgp', :default_local_preference => '100') }.to_not raise_error
     end
 
-    it 'should support 5 as a value' do
-      expect { described_class.new(:name => '197888', :maximum_paths_ebgp => 5) }.to_not raise_error
+    it 'should support 200 as a value' do
+      expect { described_class.new(:name => 'bgp', :default_local_preference => 200) }.to_not raise_error
     end
 
-    it 'should not support 0 as a value' do
-      expect { described_class.new(:name => '197888', :maximum_paths_ebgp => '0') }.to raise_error(Puppet::Error, /Invalid value/)
+    it 'should not support \'0\' as a value' do
+      expect { described_class.new(:name => 'bgp', :default_local_preference => '0') }.to_not raise_error
     end
 
-    it 'should not support 70 as a value' do
-      expect { described_class.new(:name => '197888', :maximum_paths_ebgp => 70) }.to raise_error(Puppet::Error, /Invalid value/)
+    it 'should not support 4294967296 as a value' do
+      expect { described_class.new(:name => 'bgp', :default_local_preference => 4294967296) }.to raise_error Puppet::Error, /Invalid value/
     end
 
-    it 'should contain 5' do
-      expect(described_class.new(:name => '197888', :maximum_paths_ebgp => '5')[:maximum_paths_ebgp]).to eq(5)
+    it 'should not support -100 as a value' do
+      expect { described_class.new(:name => 'bgp', :default_local_preference => -100) }.to raise_error Puppet::Error, /Invalid value/
     end
 
-    it 'should contain 8' do
-      expect(described_class.new(:name => '197888', :maximum_paths_ebgp => 8)[:maximum_paths_ebgp]).to eq(8)
-    end
-  end
-
-  describe 'maximum_paths_ibgp' do
-    it 'should support 5 as a value' do
-      expect { described_class.new(:name => '197888', :maximum_paths_ibgp => '5') }.to_not raise_error
+    it 'should contain 500' do
+      expect(described_class.new(:name => 'bgp', :default_local_preference => '500')[:default_local_preference]).to eq(500)
     end
 
-    it 'should support 5 as a value' do
-      expect { described_class.new(:name => '197888', :maximum_paths_ibgp => 5) }.to_not raise_error
-    end
-
-    it 'should not support 0 as a value' do
-      expect { described_class.new(:name => '197888', :maximum_paths_ibgp => '0') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should not support 70 as a value' do
-      expect { described_class.new(:name => '197888', :maximum_paths_ibgp => 70) }.to raise_error(Puppet::Error, /Invalid value/)
-    end
-
-    it 'should contain 5' do
-      expect(described_class.new(:name => '197888', :maximum_paths_ibgp => '5')[:maximum_paths_ibgp]).to eq(5)
-    end
-
-    it 'should contain 8' do
-      expect(described_class.new(:name => '197888', :maximum_paths_ibgp => 8)[:maximum_paths_ibgp]).to eq(8)
-    end
-  end
-
-  describe 'networks' do
-    it 'should support \'192.168.0.0/24\' as a value' do
-      expect { described_class.new(:name => '197888', :networks => '192.168.0.0/24') }.to_not raise_error
-    end
-
-    it 'should support \'10.0.0.0/8\' as a value' do
-      expect { described_class.new(:name => '197888', :networks => '10.0.0.0/8') }.to_not raise_error
-    end
-
-    it 'should not support \'256.0.0.0/0\' as a value' do
-      expect { described_class.new(:name => '197888', :networks => '256.0.0.0/0') }.to raise_error Puppet::Error, /Not a valid ip address/
-    end
-
-    it 'should not support \'10.0.0.0\' as a value' do
-      expect { described_class.new(:name => '197888', :networks => '10.0.0.0') }.to raise_error Puppet::Error, /Prefix length is not specified/
-    end
-
-    it 'should contain [\'10.0.0.0/24\', \'172.16.0.0/24\']' do
-      expect(described_class.new(:name => '197888', :networks => %w{10.0.0.0/24 172.16.0.0/24})[:networks]).to eq(%w{10.0.0.0/24 172.16.0.0/24})
-    end
-
-    it 'should contain \'192.168.0.0/24\'' do
-      expect(described_class.new(:name => '197888', :networks => '192.168.0.0/24')[:networks]).to eq(['192.168.0.0/24'])
+    it 'should contain 800' do
+      expect(described_class.new(:name => 'bgp', :default_local_preference => 800)[:default_local_preference]).to eq(800)
     end
   end
 
   describe 'redistribute' do
     it 'should support \'ospf\' as a value' do
-      expect { described_class.new(:name => '65000', :redistribute => 'ospf') }.to_not raise_error
+      expect { described_class.new(:name => 'bgp', :redistribute => 'ospf') }.to_not raise_error
     end
 
     it 'should support \'connected route-map QWER\' as a value' do
-      expect { described_class.new(:name => '65000', :redistribute => 'connected route-map QWER') }.to_not raise_error
+      expect { described_class.new(:name => 'bgp', :redistribute => 'connected route-map QWER') }.to_not raise_error
     end
 
     it 'should not support \'ospf\' as a value' do
-      expect { described_class.new(:name => '65000', :redistribute => 'bgp') }.to raise_error Puppet::Error, /Invalid value/
+      expect { described_class.new(:name => 'bgp', :redistribute => 'bgp') }.to raise_error Puppet::Error, /Invalid value/
     end
 
     it 'should not support \'kernel metric 100 metric-type 3 route-map QWER\' as a value' do
-      expect { described_class.new(:name => '65000', :redistribute => 'kernel metric 100 metric-type 3 route-map QWER') }.to raise_error Puppet::Error, /Invalid value/
+      expect { described_class.new(:name => 'bgp', :redistribute => 'kernel metric 100 metric-type 3 route-map QWER') }.to raise_error Puppet::Error, /Invalid value/
     end
 
     it 'should contain \'connected metric 100 metric-type 2 route-map QWER\'' do
-      expect(described_class.new(:name => '65000', :redistribute => 'connected metric 100 route-map QWER')[:redistribute]).to eq(['connected metric 100 route-map QWER'])
+      expect(described_class.new(:name => 'bgp', :redistribute => 'connected metric 100 route-map QWER')[:redistribute]).to eq(['connected metric 100 route-map QWER'])
     end
   end
 
   describe 'router_id' do
     it 'should support 192.168.1.1 as a value' do
-      expect { described_class.new(:name => '197888', :router_id => '192.168.1.1') }.to_not raise_error
+      expect { described_class.new(:name => 'bgp', :router_id => '192.168.1.1') }.to_not raise_error
     end
 
     it 'should not support 256.1.1.1 as a value' do
-      expect { described_class.new(:name => '197888', :router_id => '256.1.1.1') }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => 'bgp', :router_id => '256.1.1.1') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
     it 'should not support 1.-1.1.1 as a value' do
-      expect { described_class.new(:name => '197888', :router_id => '1.-1.1.1') }.to raise_error(Puppet::Error, /Invalid value/)
+      expect { described_class.new(:name => 'bgp', :router_id => '1.-1.1.1') }.to raise_error(Puppet::Error, /Invalid value/)
     end
 
     it 'should contain 192.168.1.1' do
-      expect(described_class.new(:name => '197888', :router_id => '192.168.1.1')[:router_id]).to eq('192.168.1.1')
+      expect(described_class.new(:name => 'bgp', :router_id => '192.168.1.1')[:router_id]).to eq('192.168.1.1')
     end
 
     it 'should contain 1.1.1.1' do
-      expect(described_class.new(:name => '197888', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
+      expect(described_class.new(:name => 'bgp', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
     end
   end
 end
