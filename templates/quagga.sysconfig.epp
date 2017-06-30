@@ -1,0 +1,8 @@
+#
+# Managed by Puppet in the <%= $::environment %> environment
+#
+
+BGPD_OPTS="<%= $quagga::bgp::service_opts %>"
+OSPFD_OPTS="<%= $quagga::ospf::service_opts %>"
+PIMD_OPTS="<%= $quagga::pim::service_opts %>"
+ZEBRA_OPTS="<%= $quagga::zebra::service_opts %>"

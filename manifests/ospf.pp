@@ -1,19 +1,31 @@
 class quagga::ospf (
-  Hash $settings = {},
+  String $config_file,
+  Boolean $config_file_manage,
+  String $service_name,
+  Boolean $service_enable,
+  Enum["running", "stopped"] $service_ensure,
+  Boolean $service_manage,
+  String $service_opts,
+  Hash $router,
+  Hash $areas
 ) {
-  $ensure = dig44($settings, ['ensure'], 'present')
+  include quagga::ospf::config
+  include quagga::ospf::service
 
-  $ospf = { 'ospf' => delete($settings, 'areas') }
-
-  $ospf_areas = dig44($settings, ['areas'], {}).reduce({}) |$memo, $value| {
-    merge($memo, { $value[0] => merge({ ensure => $ensure }, $value[1]) })
+  # Quagga only supports a single OSPF instance
+  if size($router) > 1 {
+    fail("Quagga only supports a single OSPF router instance in ${title}")
   }
 
-  unless empty($ospf) {
-    create_resources('quagga_ospf', $ospf)
+  $router.each |String $router_name, Hash $router| {
+    quagga_ospf {$router_name:
+      * => $router
+    }
   }
 
-  unless empty($ospf_areas) {
-    create_resources('quagga_ospf_area', $ospf_areas)
+  $areas.each |String $area_name, Hash $area| {
+    quagga_ospf_area {$area_name:
+      * => $area
+    }
   }
 }

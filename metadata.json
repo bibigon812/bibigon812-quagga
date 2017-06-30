@@ -1,18 +1,14 @@
 {
-    "name": "bibigon812-quagga",
-    "version": "2.0.3",
     "author": "Dmitriy Yakovlev",
-    "summary": "puppet module to manage Quagga",
-    "license": "Apache-2.0",
-    "source": "https://github.com/bibigon812/bibigon812-quagga.git",
-    "project_page": "https://github.com/bibigon812/bibigon812-quagga",
-    "issues_url": "https://github.com/bibigon812/bibigon812-quagga/issues",
     "dependencies": [
         {
             "name": "puppetlabs-stdlib",
-            "version_requirement": ">=3.2.0 <5.0.0"
+            "version_requirement": ">= 4.10.0 < 5.0.0"
         }
     ],
+    "issues_url": "https://github.com/bibigon812/bibigon812-quagga/issues",
+    "license": "Apache-2.0",
+    "name": "bibigon812-quagga",
     "operatingsystem_support": [
         {
             "operatingsystem": "CentOS",
@@ -26,5 +22,9 @@
                 "7"
             ]
         }
-    ]
+    ],
+    "project_page": "https://github.com/bibigon812/bibigon812-quagga",
+    "source": "https://github.com/bibigon812/bibigon812-quagga.git",
+    "summary": "Puppet module to manage Quagga",
+    "version": "2.0.3"
 }
