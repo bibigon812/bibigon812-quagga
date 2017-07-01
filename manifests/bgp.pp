@@ -15,11 +15,6 @@ class quagga::bgp (
   include quagga::bgp::config
   include quagga::bgp::service
 
-  # Quagga only supports a single router instance
-  if size($router) > 1 {
-    fail("Quagga only supports a single BGP router instance in ${title}")
-  }
-
   if $service_enable and $service_ensure == 'running' {
     quagga_bgp_router {'bgp':
       * => $router
