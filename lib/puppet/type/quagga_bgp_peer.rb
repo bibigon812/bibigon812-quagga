@@ -17,7 +17,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
         }
   }
 
-  feature :refreshable, 'The provider can execute the clearing bgp session.', :methods => [:clear]
+  feature :refreshable, 'The provider can clean a bgp session.', :methods => [:clear]
 
   ensurable
 
@@ -43,6 +43,10 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     munge do |value|
       Integer(value)
     end
+
+    def insync?(is)
+      is == should
+    end
   end
 
   newproperty(:passive, boolean: true) do
@@ -62,6 +66,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
          :true
        end
     end
+
     newvalues(:false, :true)
     newvalues(/\A[[:alpha:]]\w+\Z/)
   end
@@ -97,6 +102,10 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\Z/)
     newvalues(/\A\h+:[\h:]+\Z/)
     newvalues(/\A#{interface}\Z/)
+
+    def insync?(is)
+      is == should
+    end
   end
 
   autorequire(:quagga_bgp_router) do
