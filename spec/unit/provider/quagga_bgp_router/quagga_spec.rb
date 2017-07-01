@@ -61,7 +61,7 @@ router bgp 65000
 
     it 'should return the resource bgp' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-          as: '65000',
+          as_number: '65000',
           default_ipv4_unicast: :false,
           default_local_preference: 100,
           ensure: :present,

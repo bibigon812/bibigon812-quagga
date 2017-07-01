@@ -65,6 +65,12 @@ describe Puppet::Type.type(:quagga_bgp_router) do
     end
   end
 
+  describe 'as_number' do
+    it 'should support 65000 as a value' do
+      expect{described_class.new(name: 'bgp', as_number: 65000)}.to_not raise_error
+    end
+  end
+
   [:import_check, :default_ipv4_unicast].each do |property|
     describe "boolean values of the property `#{property}`" do
       it 'should support \'true\' as a value' do
