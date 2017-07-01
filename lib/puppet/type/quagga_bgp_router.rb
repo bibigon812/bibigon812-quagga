@@ -7,7 +7,7 @@ Puppet::Type.newtype(:quagga_bgp_router) do
 
         quagga_bgp { 'bgp':
             ensure                   => present,
-            as                       => '65000',
+            as_number                => 65000,
             import_check             => true,
             default_ipv4_unicast     => false,
             default_local_preference => 100,
@@ -22,7 +22,7 @@ Puppet::Type.newtype(:quagga_bgp_router) do
     newvalues(:bgp)
   end
 
-  newproperty(:as) do
+  newproperty(:as_number) do
     desc 'The AS number.'
     newvalues(/\A\d+\Z/)
 
