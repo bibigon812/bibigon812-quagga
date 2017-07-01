@@ -4,7 +4,7 @@ class quagga::bgp (
   String $service_name,
   Boolean $service_enable,
   Boolean $service_manage,
-  Enum["running", "stopped"] $service_ensure,
+  Enum['running', 'stopped'] $service_ensure,
   String $service_opts,
   Hash $router,
   Hash $peers,
@@ -21,7 +21,7 @@ class quagga::bgp (
     }
 
     $peers.each |String $peer_name, Hash $peer| {
-      quagga_bgp_peer {"${peer_name}":
+      quagga_bgp_peer {$peer_name:
         * => $peer
       }
     }
@@ -39,7 +39,7 @@ class quagga::bgp (
     }
 
     $address_families.each |String $address_family_name, Hash $address_family| {
-      quagga_bgp_address_family {"${address_family_name}":
+      quagga_bgp_address_family {$address_family_name:
         * => $address_family
       }
     }

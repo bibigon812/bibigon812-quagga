@@ -18,12 +18,12 @@ class quagga (
   }
 
   File {
-    owner => $default_owner,
-    group => $default_group,
-    mode => $default_mode,
+    owner   => $default_owner,
+    group   => $default_group,
+    mode    => $default_mode,
     content => $default_content,
     replace => false,
-    ensure => "present",
+    ensure  => present,
     require => Package[keys($packages)]
   }
 
@@ -34,11 +34,11 @@ class quagga (
 
   if $service_file_manage {
     file {$service_file:
-      owner => "root",
-      group => "root",
-      mode => "0644",
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
       replace => true,
-      content => epp("quagga/quagga.sysconfig.epp")
+      content => epp('quagga/quagga.sysconfig.epp')
     }
   }
 

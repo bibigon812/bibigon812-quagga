@@ -4,7 +4,7 @@ class quagga::pim (
   String $service_name,
   Boolean $service_enable,
   Boolean $service_manage,
-  Enum["running", "stopped"] $service_ensure,
+  Enum['running', 'stopped'] $service_ensure,
   String $service_opts
 ) {
   include quagga::pim::config

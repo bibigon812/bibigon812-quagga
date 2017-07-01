@@ -3,7 +3,7 @@ class quagga::ospf (
   Boolean $config_file_manage,
   String $service_name,
   Boolean $service_enable,
-  Enum["running", "stopped"] $service_ensure,
+  Enum['running', 'stopped'] $service_ensure,
   Boolean $service_manage,
   String $service_opts,
   Hash $router,
