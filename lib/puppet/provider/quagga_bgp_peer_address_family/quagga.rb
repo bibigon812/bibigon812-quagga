@@ -1,9 +1,82 @@
 Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   @doc = 'Manages the address family of bgp peers using quagga.'
 
-  confine :osfamily => :redhat
+  confine osfamily: :redhat
 
   commands vtysh: 'vtysh'
+
+  @resource_map = {
+      peer_group: {
+          default: :false,
+          template: 'neighbor <%= name %> peer-group <%= value %>',
+          type: :string,
+      },
+      activate: {
+          regexp: /\A\s(no\s)?neighbor\s\S+\sactivate\Z/,
+          template: 'neighbor <%= name %> activate',
+          type: :boolean,
+      },
+      allow_as_in: {
+          regexp: /\A\sneighbor\s\S+\sallowas-in\s(\d+)\Z/,
+          template: 'neighbor <%= name %> allowas-in<% unless value.nil? %> <%= value %><% end %>',
+          type: :fixnum,
+      },
+      default_originate: {
+          default: :false,
+          regexp: /\A\sneighbor\s\S+\sdefault-originate\Z/,
+          template: 'neighbor <%= name %> default-originate',
+          type: :boolean,
+      },
+      next_hop_self: {
+          default: :false,
+          regexp: /\A\sneighbor\s\S+\snext-hop-self\Z/,
+          template: 'neighbor <%= name %> next-hop-self',
+          type: :boolean,
+      },
+      prefix_list_in: {
+          regexp: /\A\sneighbor\s\S+\sprefix-list\s(\S+)\sin\Z/,
+          template: 'neighbor <%= name %> prefix-list <%= value %> in',
+          type: :string,
+      },
+      prefix_list_out: {
+          regexp: /\A\sneighbor\s\S+\sprefix-list\s(\S+)\sout\Z/,
+          template: 'neighbor <%= name %> prefix-list <%= value %> out',
+          type: :string,
+      },
+      route_map_export: {
+          regexp: /\A\sneighbor\s\S+\sroute-map\s(\S+)\sexport\Z/,
+          template: 'neighbor <%= name %> route-map <%= value %> export',
+          type: :string,
+      },
+      route_map_import: {
+          value: '$1',
+          regexp: /\A\sneighbor\s\S+\sroute-map\s(\S+)\simport\Z/,
+          template: 'neighbor <%= name %> route-map <%= value %> import',
+          type: :string,
+      },
+      route_map_in: {
+          regexp: /\A\sneighbor\s\S+\sroute-map\s(\S+)\sin\Z/,
+          template: 'neighbor <%= name %> route-map <%= value %> in',
+          type: :string,
+      },
+      route_map_out: {
+          regexp: /\A\sneighbor\s\S+\sroute-map\s(\S+)\sout\Z/,
+          template: 'neighbor <%= name %> route-map <%= value %> out',
+          type: :string,
+      },
+      route_reflector_client: {
+          default: :false,
+          regexp: /\A\sneighbor\s\S+\sroute-reflector-client\Z/,
+          template: 'neighbor <%= name %> route-reflector-client',
+          type: :boolean,
+      },
+      route_server_client: {
+          default: :false,
+          regexp: /\A\sneighbor\s\S+\sroute-server-client\Z/,
+          template: 'neighbor <%= name %> route-server-client',
+          type: :boolean,
+      },
+  }
 
   def self.instaneces
     # TODO
