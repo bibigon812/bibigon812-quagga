@@ -51,11 +51,11 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
     config.split(/\n/).collect do |line|
       next if line =~ /\A!/
       if line =~ /\Arouter\sbgp\s(\d+)\Z/
-        as = $1
+        as_number = $1
         found_bgp = true
 
         hash = {
-            as: as,
+            as_number: as_number,
             ensure: :present,
             name: :bgp,
             provider: self.name,
@@ -117,22 +117,22 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   def self.prefetch(resources)
     providers = instances
     resources.keys.each do |name|
-      if provider = providers.find { |provider| provider.name == name }
+      if provider = providers.find { |p| p.name == name }
         resources[name].provider = provider
       end
     end
   end
 
   def create
-    as = @resource[:as]
+    as_number = @resource[:as_number]
 
-    debug 'Creating the bgp router %{as}' % { as: as }
+    debug 'Creating the bgp router %{as_number}' % { as_number: as_number }
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as}' % { as: as }
+    cmds << 'router bgp %{as_number}' % { as_number: as_number }
 
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != options[:default]
@@ -159,7 +159,7 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
 
     @property_hash[:ensure] = :present
   end
@@ -178,17 +178,17 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   end
 
   def destroy
-    as = @property_hash[:as]
+    as_number = @property_hash[:as_number]
 
-    debug 'Destroying the bgp router %{as}' % { as: as }
+    debug 'Destroying the bgp router %{as_number}' % { as_number: as_number }
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'no router bgp %{as}' % { as: as }
+    cmds << 'no router bgp %{as_number}' % { as_number: as_number }
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
 
     @property_hash.clear
   end
@@ -200,15 +200,15 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   def flush
     return if @property_flush.empty?
 
-    as = @property_hash[:as]
+    as_number = @property_hash[:as_number]
 
-    debug 'Flushing the bgp router %{as}' % { as: as }
+    debug 'Flushing the bgp router %{as_number}' % { as_number: as_number }
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as}' % { as: as }
+    cmds << 'router bgp %{as_number}' % { as_number: as_number }
 
     @property_flush.each do |property, v|
       if v == :absent or v == :false
@@ -239,7 +239,7 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
 
     @property_hash = resource.to_hash
     @property_flush.clear
