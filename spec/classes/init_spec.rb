@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'quagga' do
-  let(:hiera_config) { 'spec/fixtures/hieradata/hiera.yaml' }
+  let(:hiera_config) { 'spec/hieradata/hiera.yaml' }
   let(:title) { 'quagga' }
   let(:facts) {
     {

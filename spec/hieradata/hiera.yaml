@@ -1,0 +1,7 @@
+---
+:backends:
+  - yaml
+:hierarchy:
+  - quagga
+:yaml:
+  :datadir: 'spec/hieradata'

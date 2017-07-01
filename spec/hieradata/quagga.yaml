@@ -1,0 +1,74 @@
+---
+quagga::default_owner: quagga
+quagga::default_group: quagga
+quagga::default_mode: '0600'
+quagga::default_content: "hostname %{::facts.networking.fqdn}\n"
+quagga::config_dir: /etc/quagga
+quagga::service_file: /etc/sysconfig/quagga
+quagga::service_file_manage: true
+quagga::packages:
+  quagga:
+    ensure: present
+
+quagga::global_opts: {}
+quagga::interfaces: {}
+quagga::prefix_lists: {}
+quagga::route_maps: {}
+
+
+quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
+quagga::zebra::config_file_manage: true
+quagga::zebra::service_name: zebra
+quagga::zebra::service_enable: true
+quagga::zebra::service_manage: true
+quagga::zebra::service_ensure: running
+quagga::zebra::service_opts: -P 0
+
+
+quagga::pim::config_file: "%{lookup('quagga::config_dir')}/pimd.conf"
+quagga::pim::config_file_manage: true
+quagga::pim::service_name: pimd
+quagga::pim::service_enable: true
+quagga::pim::service_manage: true
+quagga::pim::service_ensure: running
+quagga::pim::service_opts: -P 0
+
+
+quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
+quagga::bgp::config_file_manage: true
+quagga::bgp::service_name: bgpd
+quagga::bgp::service_enable: true
+quagga::bgp::service_manage: true
+quagga::bgp::service_ensure: running
+quagga::bgp::service_opts: -P 0
+
+quagga::bgp::router:
+  as_number: 65000
+  router_id: 10.0.0.1
+quagga::bgp::peers: {}
+quagga::bgp::as_paths: {}
+quagga::bgp::community_lists: {}
+quagga::bgp::address_families: {}
+
+
+quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
+quagga::ospf::config_file_manage: true
+quagga::ospf::service_name: ospfd
+quagga::ospf::service_enable: true
+quagga::ospf::service_manage: true
+quagga::ospf::service_ensure: running
+quagga::ospf::service_opts: -P 0
+
+quagga::ospf::router:
+  abr_type: cisco
+  log_adjacency_changes: true
+  opaque: false
+  redistribute:
+    - connected
+  rfc1583: false
+  router_id: 10.0.0.1
+quagga::ospf::areas:
+  0.0.0.0:
+    networks:
+      - 172.16.0.0/12
+      - 192.168.0.0/16
