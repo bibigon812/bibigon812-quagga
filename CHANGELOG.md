@@ -1,38 +1,54 @@
+
 ## [Unreleased]
+
 ### Added
+
 - the resource `quagga_bgp_address_family`
 - the property `as` to the resource `quagga_bgp_router`
 
 ### Changed
+
 - the resource `quagga_bgp` to `quagga_bgp_router`
 
 ### Removed
+
 - the resource `quagga_redistribution` 
 
 ## [2.0.3] - 2017-06-27
+
 ### Added
+
 - tests
 
 ### Fixed
+
 - a name validation of the type `quagga_bgp_peer`
 
 ### Updated
+
 - docs
 - changelog
 
 ## [2.0.2] - 2017-06-26
+
 ### Fixed
+
 - creating the resource `quagga_bgp_peer`
 
 ### Updated
+
 - the provider of the type `quagga_bgp_peer`
 
 ## [2.0.1] - 2017-06-26
+
 ### Fixed
+
 - the router_id default value of the type `quagga_bgp`
 
 ## [2.0.0] - 2017-06-26
+
 ### Added
+
 - multicast-routing by [@m4ce](https://github.com/m4ce)
 - the resource `quagga_router` by [@m4ce](https://github.com/m4ce)
 - the property `networks` to the resource `quagga_bgp`
@@ -46,10 +62,11 @@
 - the property `default_originate` to the resource `quagga_ospf`
 
 ### Changed
-- boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*` 
+
+- boolean values of variables to `true` or `false` in resource `bgp*`, `ospf*`
 - types `ospf_interface` and `pim_interface` to `quagga_interface`
 - the type `as_path` to `quagga_as_path`
-- a syntax of `quagga_as_path` rules 
+- a syntax of `quagga_as_path` rules
 - the type `bgp` to `quagga_bgp`
 - the type `bgp_neighbor` to `quagga_bgp_peer`
 - the type `bgp_network` to `quagga_bgp_network`
@@ -64,123 +81,166 @@
 - the property `ipaddress` to `ip_address` of the resource `quagga_interface`
 
 ### Deprecated
+
 - the type `quagga_redistribution`
 
 ### Removed
+
 - the method `purge` from resources `bgp*`
 - the resource `quagga_bgp_network`
 - properties `default_cost` and `stub` from `quagga_ospf_area`
 - the resource `quagga_ip`
 
 ### Updated
+
 - changelog
 - docs
 
 ## [1.2.1] - 2017-06-07
+
 ### Added
+
 - pim support by [@m4ce](https://github.com/m4ce) 
 
 ### Fixed
+
 - the ipv6 support of the resource `bgp_network`
 
 ## [1.1.4] - 2017-06-05
+
 ### Added
+
 - the property `update_source` to the resource `bgp_neighbor`
 
 ### Updated
+
 - docs
 
 ## [1.1.3] - 2017-06-01
+
 ### Fixed
+
 - creation of the resource `ospf`
 
 ### Removed
+
 - the property `reference_bandwidth` from the provider
 
 ### Updated
+
 - the method `flush` of the resource `ospf`
 
 ## [1.1.2] - 2017-06-01
+
 ### Fixed
+
 - removing of `bgp` and `bgp_neighbor` resources
 - the `flush` method in the `ospf` resource
 
 ### Removed
+
 - an unused code
 
 ### Updated
+
 - changelog
 - proxy classes
 
 ## [1.1.1] - 2017-05-31
+
 ### Fixed
+
 - NilClass in flush methods
 - errors on creating all resources 
 
 ### Updated
+
 - docs
 - the ensurable method in types
 - changelog
 
 ## [1.1.0] - 2017-05-31
+
 ### Fixed
+
 - reading the activate property of the bgp_neighbor resource
 
 ### Removed
+
 - the shortcut property of the ospf_area type
 
 ### Updated
+
 - docs
 - changelog
 
 ## [1.0.5] - 2017-05-30
+
 ### Added
+
 - a default value of the activate property of the bgp_neighbor resource
 
 ### Fixed
+
 - an instantiation of the bgp_neighbor resource
 - removing the allow_as_in property of the bgp_neighbor resource
 
 ### Updated
+
 - changelog
 
 ## [1.0.4] - 2017-05-30
+
 ### Fixed
+
 - an instantiation of the ospf resource
 
 ### Removed
+
 - a default value of the activate property of the bgp_neighbor resource
 
 ## [1.0.3] - 2017-05-30
+
 ### Fixed
+
 - typos
 - autorequires in bgp_netighbor and bgp_network resources
 
 ### Updated
+
 - docs
 - changelog
 
 ## [1.0.2] - 2017-05-30
+
 ### Added
+
 - proxy classes to use hiera
 
 ### Updated
+
 - changelog
 - docs
 
 ### Fixed
+
 - a control of services
 
 ## [1.0.1] - 2017-05-29
+
 ### Changed
+
 - values of the stub property
 
 ### Updated
+
 - changelog
 - docs
 
 ## [1.0.0] - 2017-05-29
+
 ### Added
+
 - the ospf_interface type
 - the quagga provider of the ospf_interface type
 - the ospf type
@@ -196,5 +256,6 @@
 - the bgp_network type and a provider for it
 
 ### Updated
+
 - changelog
 - docs
