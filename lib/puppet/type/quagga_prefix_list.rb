@@ -4,29 +4,68 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
       Example:
 
-        quagga_prefix_list {'TEST_PREFIX_LIST:10':
-          ensure => present,
-          action => permit,
-          prefix => '224.0.0.0/4',
-          ge     => 8,
-          le     => 24,
+        quagga_prefix_list {'TEST_PREFIX_LIST 10':
+          ensure      => present,
+          action      => permit,
+          ge          => 8,
+          le          => 24,
+          prefix      => '224.0.0.0/4',
+          protocol    => 'ip',
         }
   }
 
   ensurable
 
-  newparam :name do
-    desc 'Name of the prefix-list and sequence number of rule.'
+  newparam(:name, namevar: true) do
+    desc 'The name of the prefix-list and the sequence number of rule.'
 
-    newvalues /\A[\w-]+:\d+\Z/
-
-    isnamevar
+    newvalues(/\A[\w-]+\s\d+\Z/)
   end
 
-  newproperty :proto do
-    desc 'IP protocol version: `ip`, `ipv6`. Default to `ip`.'
+  newproperty(:action) do
+    desc 'The action of this rule.'
+    newvalues(:deny, :permit)
+  end
 
-    newvalues :ip, :ipv6
+  newproperty(:ge) do
+    desc 'Minimum prefix length to be matched.'
+    newvalues(/\A\d+\Z/)
+
+    validate do |value|
+      super(value)
+      v = Integer(value)
+      fail 'Invalid value. Minimum prefix length: 1-32' unless v >= 1 and v <= 32
+    end
+
+    munge do |value|
+      Integer(value)
+    end
+  end
+
+  newproperty(:le) do
+    desc 'Maximum prefix length to be matched.'
+    newvalues(/\A\d+\Z/)
+
+    validate do |value|
+      super(value)
+      v = value.to_i
+      fail 'Invalid value. Maximum prefix length: 1-32' unless v >= 1 and v <= 32
+    end
+
+    munge do |value|
+      Integer(value)
+    end
+  end
+
+  newproperty(:prefix) do
+    desc 'The IP prefix `<network>/<length>`.'
+    newvalues(/\A([\d\.:\/]+|any)\Z/)
+  end
+
+  newproperty(:protocol) do
+    desc 'The IP protocol version.'
+
+    newvalues(:ip, :ipv6)
 
     defaultto {
       if @resource[:prefix].nil?
@@ -35,49 +74,6 @@ Puppet::Type.newtype(:quagga_prefix_list) do
         @resource[:prefix].to_s.include?(':') ? :ipv6 : :ip
       end
     }
-  end
-
-  newproperty(:action) do
-    desc %q{ Action can be `permit` or `deny`. }
-    newvalues(:deny, :permit)
-  end
-
-  newproperty(:prefix) do
-    desc %q{ IP prefix `<network>/<length>`. }
-
-    newvalues(/\A([\d\.:\/]+|any)\Z/)
-  end
-
-  newproperty(:ge) do
-    desc %q{ Minimum prefix length to be matched. }
-    newvalues(/^\d+$/)
-
-    validate do |value|
-      value_i = value.to_i
-      if value_i < 1 or value_i > 32
-        raise ArgumentError, 'Invalid value. Minimum prefix length: 1-32'
-      end
-    end
-
-    munge do |value|
-      value.to_i
-    end
-  end
-
-  newproperty(:le) do
-    desc %q{ Maximum prefix length to be matched. }
-    newvalues(/^\d+$/)
-
-    validate do |value|
-      value_i = value.to_i
-      if value_i < 1 or value_i > 32
-        raise ArgumentError, 'Invalid value. Maximum prefix length: 1-32'
-      end
-    end
-
-    munge do |value|
-      value.to_i
-    end
   end
 
   autorequire(:package) do

@@ -2,10 +2,10 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   @doc = %q{ Manages prefix lists using quagga }
 
   @resource_properties = [
-      :action, :prefix, :ge, :le, :proto,
+      :action, :prefix, :ge, :le, :protocol,
   ]
 
-  @resource_template = '<%= proto %> prefix-list <%= name %> seq <%= seq %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
+  @resource_template = '<%= protocol %> prefix-list <%= name %> seq <%= seq %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
 
   commands :vtysh => 'vtysh'
 
@@ -26,9 +26,9 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
         hash = {
             :action => $4.to_sym,
             :ensure => :present,
-            :name => "#{$2}:#{$3}",
+            :name => "#{$2} #{$3}",
             :prefix => $5,
-            :proto => $1.to_sym,
+            :protocol => $1.to_sym,
             :provider => self.name,
         }
 
@@ -50,7 +50,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   end
 
   def self.prefetch(resources)
-    debug '[prefetch]'
+    debug 'Prefetch prefix-list resources.'
     providers = instances
 
     found_providers = []
@@ -84,12 +84,12 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     template = self.class.instance_variable_get('@resource_template')
     name, seq = @resource[:name].split(/:/)
 
-    debug "[create][prefix-list #{name}:#{seq}"
+    debug 'Creating the prefix-list %{name}.' % { name: "#{name}:#{seq}" }
 
     cmds = []
     cmds << 'configure terminal'
 
-    proto = @resource[:proto]
+    protocol = @resource[:protocol]
     action = @resource[:action]
     prefix = @resource[:prefix]
     ge = @resource[:ge]
@@ -99,14 +99,14 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
     cmds << 'end'
     cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
   end
 
   def destroy
     template = self.class.instance_variable_get('@resource_template')
     name, seq = @property_hash[:name].split(/:/)
 
-    debug "[destroy][prefix-list #{name}:#{seq}]"
+    debug 'Destroying the prefix-list %{name}.' % { name: "#{name}:#{seq}" }
 
     cmds = []
     cmds << 'configure terminal'
@@ -117,11 +117,11 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     ge = @property_hash[:ge]
     le = @property_hash[:le]
 
-    cmds << "no #{ERB.new(template).result(binding)}"
+    cmds << 'no %{command}' % { command: ERB.new(template).result(binding) }
 
     cmds << 'end'
     cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
 
     @property_hash[:ensure] = :absent
   end
@@ -135,7 +135,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
     name, sequence = @property_hash[:name].split(/:/)
 
-    debug "[flush][prefix-list #{name}:#{sequence}]"
+    debug 'Flushing the prefix-list %{name}.' % { name: "#{name}:#{sequence}" }
 
     create
   end
