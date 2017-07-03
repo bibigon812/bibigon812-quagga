@@ -1,16 +1,23 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_ospf) do
-  let(:networking_service) do
-    @provider_class = describe_class.provide(:quagga_ospf) {
+  let :providerclass  do
+    described_class.provide(:fake_quagga_provider) do
+      attr_accessor :property_hash
+      def create; end
+      def destroy; end
+      def exists?
+        get(:ensure) == :present
+      end
+      def router_id
+        '10.0.0.1'
+      end
       mk_resource_methods
-    }
-    @provider_class.stub(:suitable?).return true
-    @provider_class
+    end
   end
 
   before :each do
-    described_class.stubs(:defaultprovider).returns @provider_class
+    Puppet::Type.type(:quagga_bgp_as_path).stubs(:defaultprovider).returns providerclass
   end
 
   after :each do
@@ -152,6 +159,18 @@ describe Puppet::Type.type(:quagga_ospf) do
 
     it 'should contain \'1.1.1.1\'' do
       expect(described_class.new(:name => 'ospf', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
+    end
+
+    it 'the default value should insync with :absent' do
+      expect(described_class.new(name: :ospf).property(:router_id).insync?(:absent)).to eq(true)
+    end
+
+    it 'the default value should not insync with \'10.0.0.1\'' do
+      expect(described_class.new(name: :ospf).property(:router_id).insync?('10.0.0.1')).to eq(false)
+    end
+
+    it '\'10.0.0.1\' should not insync with :absent' do
+      expect(described_class.new(name: :ospf, router_id: '10.0.0.1').property(:router_id).insync?(:absent)).to eq(false)
     end
   end
 
