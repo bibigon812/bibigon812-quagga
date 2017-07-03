@@ -21,7 +21,7 @@ class quagga::bgp (
     }
 
     $peers.each |String $peer_name, Hash $peer| {
-      quagga_bgp_peer {$peer_name:
+      quagga::bgp::peer {$peer_name:
         * => $peer
       }
     }
