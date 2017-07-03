@@ -24,6 +24,7 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
   newproperty(:action) do
     desc 'The action of this rule.'
+    defaultto(:permit)
     newvalues(:deny, :permit)
   end
 
@@ -39,6 +40,11 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
     munge do |value|
       Integer(value)
+    end
+
+    def insync?(is)
+      return false unless @should or is == :absent
+      super(is)
     end
   end
 
