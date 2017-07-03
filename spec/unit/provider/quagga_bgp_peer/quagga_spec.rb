@@ -76,6 +76,7 @@ end'
     it 'should return the INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: 'INTERNAL',
         passive: :false,
         peer_group: :true,
@@ -89,6 +90,7 @@ end'
     it 'should return the RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: 'RR',
         passive: :false,
         peer_group: :true,
@@ -102,6 +104,7 @@ end'
     it 'should return the RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: 'RR_WEAK',
         passive: :false,
         peer_group: :true,
@@ -115,10 +118,12 @@ end'
     it 'should return the 172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: '172.16.32.108',
         passive: :false,
         peer_group: 'INTERNAL',
         provider: :quagga,
+        remote_as: :absent,
         shutdown: :true,
         update_source: :absent,
       })
@@ -127,6 +132,7 @@ end'
     it 'should return the 1a03:d000:20a0::91 resource' do
       expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: '1a03:d000:20a0::91',
         passive: :false,
         peer_group: :false,
@@ -202,6 +208,7 @@ end'
     it 'should return the INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: 'INTERNAL',
         passive: :false,
         peer_group: :true,
@@ -215,6 +222,7 @@ end'
     it 'should return the RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: 'RR',
         passive: :false,
         peer_group: :true,
@@ -228,6 +236,7 @@ end'
     it 'should return the RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: 'RR_WEAK',
         passive: :false,
         peer_group: :true,
@@ -241,10 +250,12 @@ end'
     it 'should return the 172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
         ensure: :present,
+        local_as: :absent,
         name: '172.16.32.108',
         passive: :false,
         peer_group: 'INTERNAL',
         provider: :quagga,
+        remote_as: :absent,
         shutdown: :true,
         update_source: :absent,
       })

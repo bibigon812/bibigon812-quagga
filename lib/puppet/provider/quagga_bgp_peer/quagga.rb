@@ -10,11 +10,13 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
       type: :string,
     },
     remote_as: {
+      default: :absent,
       regexp: /\A\sneighbor\s\S+\sremote-as\s(\d+)\Z/,
       template: 'neighbor <%= name %> remote-as <%= value %>',
       type: :fixnum,
     },
     local_as: {
+      default: :absent,
       regexp: /\A\sneighbor\s\S+\slocal-as\s(\d+)\Z/,
       template: 'neighbor <%= name %> local-as<% unless value.nil? %> <%= value %><% end %>',
       type: :fixnum,

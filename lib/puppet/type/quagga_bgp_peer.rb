@@ -32,20 +32,13 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   newproperty(:local_as) do
     desc 'Specify a local-as number.'
 
-    newvalues(/\A\d+\Z/)
+    defaultto(:absent)
 
     validate do |value|
-      super(value)
-      v = Integer(value)
-      fail "Invalid value \"#{value}\", valid values are 1-4294967295" unless v >= 1 and v <= 4294967295
-    end
-
-    munge do |value|
-      Integer(value)
-    end
-
-    def insync?(is)
-      is == should
+      unless value == :absent
+        fail "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
+        fail "Invalid value \"#{value}\", valid values are 1-4294967295" unless value >= 1 and value <= 4294967295
+      end
     end
   end
 
@@ -74,16 +67,13 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   newproperty(:remote_as) do
     desc 'Specify a BGP neighbor as.'
 
-    newvalues(/\A\d+\Z/)
+    defaultto(:absent)
 
     validate do |value|
-      super(value)
-      v = Integer(value)
-      fail "Invalid value \"#{value}\", valid values are 1-4294967295" unless v >= 1 and v <= 4294967295
-    end
-
-    munge do |value|
-      Integer(value)
+      unless value == :absent
+        fail "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
+        fail "Invalid value \"#{value}\", valid values are 1-4294967295" unless value >= 1 and value <= 4294967295
+      end
     end
   end
 

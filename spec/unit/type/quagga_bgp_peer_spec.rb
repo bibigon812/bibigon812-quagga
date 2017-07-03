@@ -227,29 +227,25 @@ describe Puppet::Type.type(:quagga_bgp_peer) do
 
   [:local_as, :remote_as].each do |property|
     describe "#{property}" do
-    it 'should support 100 as a value' do
-      expect { described_class.new(:name => '192.168.1.1', property => '100') }.to_not raise_error
-    end
+      it 'should support 100 as a value' do
+        expect { described_class.new(:name => '192.168.1.1', property => '100') }.to raise_error Puppet::Error, /Invalid value/
+      end
 
-    it 'should support 100 as a value' do
-      expect { described_class.new(:name => '192.168.1.1', property => 100) }.to_not raise_error
-    end
+      it 'should support 100 as a value' do
+        expect { described_class.new(:name => '192.168.1.1', property => 100) }.to_not raise_error
+      end
 
-    it 'should not support 0 as a value' do
-      expect { described_class.new(:name => '192.168.1.1', property => 0) }.to raise_error(Puppet::Error, /Invalid value/)
-    end
+      it 'should not support 0 as a value' do
+        expect { described_class.new(:name => '192.168.1.1', property => 0) }.to raise_error(Puppet::Error, /Invalid value/)
+      end
 
-    it 'should not support AS100 as a value' do
-      expect { described_class.new(:name => '192.168.1.1', property => 'AS100') }.to raise_error(Puppet::Error, /Invalid value/)
-    end
+      it 'should not support AS100 as a value' do
+        expect { described_class.new(:name => '192.168.1.1', property => 'AS100') }.to raise_error(Puppet::Error, /Invalid value/)
+      end
 
-    it 'should contain 100' do
-      expect(described_class.new(:name => '192.168.1.1', property => '100')[property]).to eq(100)
-    end
-
-    it 'should contain 100' do
-      expect(described_class.new(:name => '192.168.1.1', property => 100)[property]).to eq(100)
-    end
+      it 'should contain 100' do
+        expect(described_class.new(:name => '192.168.1.1', property => 100)[property]).to eq(100)
+      end
     end
   end
 
