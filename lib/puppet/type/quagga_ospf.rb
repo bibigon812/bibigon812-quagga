@@ -25,8 +25,8 @@ Puppet::Type.newtype(:quagga_ospf) do
   newproperty(:abr_type) do
     desc 'Set OSPF ABR type. Default to `cisco`.'
 
-    newvalues(:cisco, :ibm, :shortcut, :standard)
     defaultto(:cisco)
+    newvalues(:cisco, :ibm, :shortcut, :standard)
   end
 
   newproperty(:default_originate) do
@@ -93,12 +93,9 @@ Puppet::Type.newtype(:quagga_ospf) do
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
 
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(re)
-
-    def insync?(is)
-      return false unless @should or is == :absent
-      super(is)
-    end
   end
 
   newproperty(:log_adjacency_changes) do
