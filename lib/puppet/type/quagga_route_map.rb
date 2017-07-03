@@ -4,7 +4,7 @@ Puppet::Type.newtype(:quagga_route_map) do
 
       Example:
 
-        route_map {'TEST_ROUTE_MAP:10':
+        route_map {'TEST_ROUTE_MAP 10':
             ensure   => present,
             action   => 'permit',
             match    => [
@@ -22,20 +22,22 @@ Puppet::Type.newtype(:quagga_route_map) do
   ensurable
 
   newparam(:name) do
-    desc 'Name of the route-map, action and sequence number of rule.'
+    desc 'The name of the route-map and the action are separated by space.'
 
-    newvalues(/\A\w[\w-]+:\d+\Z/)
+    newvalues(/\A\w[\w-]+\s\d+\Z/)
   end
 
   newproperty(:action) do
-    desc 'Route map actions.'
+    desc 'The route-map action.'
 
+    defaultto(:permit)
     newvalues(:deny, :permit)
   end
 
   newproperty(:match, :array_matching => :all) do
     desc 'Match values from routing table.'
 
+    defaultto([])
     newvalues(/\Aas-path\s(\w+)\Z/)
     newvalues(/\Acommunity\s(\w+)(\s(exact-match))?\Z/)
     newvalues(/\Aextcommunity\s(\w+)\Z/)
@@ -54,12 +56,12 @@ Puppet::Type.newtype(:quagga_route_map) do
     newvalues(/\Aprobability\s(\d+)\Z/)
     newvalues(/\Atag\s(\d+)\Z/)
 
-    def insync?(current)
+    def insync?(is)
       @should.each do |value|
-        return false unless current.include?(value)
+        return false unless is.include?(value)
       end
 
-      current.each do |value|
+      is.each do |value|
         return false unless @should.include?(value)
       end
 
@@ -69,8 +71,6 @@ Puppet::Type.newtype(:quagga_route_map) do
     def should_to_s(value)
       value.inspect
     end
-
-    defaultto([])
   end
 
   newproperty(:on_match) do
@@ -78,8 +78,11 @@ Puppet::Type.newtype(:quagga_route_map) do
 
     newvalues(/\Agoto\s(\d+)\Z/)
     newvalues(/\Anext\Z/)
-    newvalues(:absent)
-    defaultto(:absent)
+
+    def insync?(is)
+      return false unless @should or is == :absent
+      super(is)
+    end
   end
 
   newproperty(:set, :array_matching => :all) do
@@ -107,12 +110,12 @@ Puppet::Type.newtype(:quagga_route_map) do
     newvalues(/\Avpn4\snext-hop\s(\d+\.\d+\.\d+\.\d+)\Z/)
     newvalues(/\Aweight\s(\d+)\Z/)
 
-    def insync?(current)
+    def insync?(is)
       @should.each do |value|
-        return false unless current.include?(value)
+        return false unless is.include?(value)
       end
 
-      current.each do |value|
+      is.each do |value|
         return false unless @should.include?(value)
       end
 
