@@ -32,10 +32,9 @@ Puppet::Type.newtype(:quagga_ospf) do
   newproperty(:default_originate) do
     desc 'Control distribution of default information.'
 
-    newvalues :true, :false
-    newvalues /\Aalways(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/
-
-    defaultto :false
+    defaultto(:false)
+    newvalues(:true, :false)
+    newvalues(/\Aalways(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
 
     munge do |value|
       case value
@@ -57,6 +56,7 @@ Puppet::Type.newtype(:quagga_ospf) do
   newproperty(:redistribute, :array_matching => :all) do
     desc 'Redistribute information from another routing protocol'
 
+    defaultto([])
     newvalues(/\A(babel|bgp|connected|isis|kernel|rip|static)(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
 
     munge do |value|
@@ -78,8 +78,6 @@ Puppet::Type.newtype(:quagga_ospf) do
     def should_to_s(value)
       value.inspect
     end
-
-    defaultto([])
   end
 
   newproperty(:rfc1583, :boolean => true) do
@@ -95,8 +93,12 @@ Puppet::Type.newtype(:quagga_ospf) do
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
 
-    newvalues(:absent, re)
-    defaultto(:absent)
+    newvalues(re)
+
+    def insync?(is)
+      return false unless @should or is == :absent
+      super(is)
+    end
   end
 
   newproperty(:log_adjacency_changes) do
