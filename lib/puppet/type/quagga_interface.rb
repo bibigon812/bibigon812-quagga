@@ -47,15 +47,13 @@ Puppet::Type.newtype(:quagga_interface) do
       fail "Prefix length is not specified '#{value}'" unless value.include?('/')
     end
 
-    def insync?(current)
-      return false if current == :absent
-
-      current.each do |v|
-        return false unless @should.include?(v)
+    def insync?(is)
+      is.each do |value|
+        return false unless @should.include?(value)
       end
 
-      @should.each do |v|
-        return false unless current.include?(v)
+      @should.each do |value|
+        return false unless is.include?(value)
       end
 
       true
@@ -67,6 +65,10 @@ Puppet::Type.newtype(:quagga_interface) do
       else
         nil
       end
+    end
+
+    def change_to_s(is, should)
+      "removing #{(is - should).inspect}, adding #{(should - is).inspect}."
     end
 
     defaultto([])
@@ -85,7 +87,7 @@ Puppet::Type.newtype(:quagga_interface) do
     defaultto(:absent)
 
     validate do |value|
-      if value != :absent
+      unless value == :absent
         fail "Interface bandwidth '#{value}' is not an Integer" unless value.is_a?(Integer)
         fail "Interface bandwidth '#{value}' must be between 1-10000000" unless value >= 1 and value <= 10000000
       end

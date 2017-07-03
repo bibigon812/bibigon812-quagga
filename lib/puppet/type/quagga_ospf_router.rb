@@ -63,12 +63,12 @@ Puppet::Type.newtype(:quagga_ospf_router) do
       value.gsub(/\smetric-type\s2/, '')
     end
 
-    def insync?(current)
+    def insync?(is)
       @should.each do |value|
-        return false unless current.include?(value)
+        return false unless is.include?(value)
       end
 
-      current.each do |value|
+      is.each do |value|
         return false unless @should.include?(value)
       end
 
