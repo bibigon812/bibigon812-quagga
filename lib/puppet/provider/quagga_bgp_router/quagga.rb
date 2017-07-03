@@ -40,6 +40,21 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
     @property_flush = {}
   end
 
+  def self.default_router_id
+    default_router_id = :absent
+    begin
+      vtysh('-c', 'show ip bgp summary').split(/\n/).collect.each do |line|
+        if line =~ /\ABGP\srouter\sidentifier\s(\d+\.\d+\.\d+\.\d+),\slocal\sAS\snumber\s(\d+)\Z/
+          default_router_id = $1
+          break
+        end
+      end
+    rescue
+    end
+
+    default_router_id
+  end
+
   def self.instances
     debug '[instances]'
 
@@ -162,19 +177,6 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
     vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
 
     @property_hash[:ensure] = :present
-  end
-
-  def default_router_id
-    def_router_id = :absent
-
-    config = vtysh('-c', 'show running-config')
-    config.split(/\n/).collect do |line|
-      if line =~ /\A\sbgp\srouter-id\s(\S)\Z/
-        def_router_id = $1
-        break
-      end
-    end
-    def_router_id
   end
 
   def destroy
