@@ -44,14 +44,13 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
   newproperty(:allow_as_in) do
     desc 'Accept as-path with my AS present in it.'
-    newvalues(/\A(10|[1-9])\Z/)
+    defaultto(:absent)
 
-    munge do |value|
-      Integer(value)
-    end
-
-    def insync?(is)
-      is == should
+    validate do |value|
+      unless value == :absent
+        fail "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
+        fail "Invalid value \"#{value}\", valid values are 1-4294967295" unless value >= 1 and value <= 4294967295
+      end
     end
   end
 
@@ -69,31 +68,43 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
   newproperty(:prefix_list_in) do
     desc 'Filter updates from this neighbor.'
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:prefix_list_out) do
     desc 'Filter updates to this neighbor.'
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:route_map_export) do
     desc 'Apply map to routes coming from a Route-Server client.'
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:route_map_import) do
     desc 'Apply map to routes going into a Route-Server client\'s table.'
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:route_map_in) do
     desc 'Apply map to incoming routes.'
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
   newproperty(:route_map_out) do
     desc 'Apply map to outbound routes.'
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
