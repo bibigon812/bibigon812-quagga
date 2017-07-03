@@ -7,12 +7,11 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
   @resource_template = '<%= protocol %> prefix-list <%= name %> seq <%= seq %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
 
-  commands :vtysh => 'vtysh'
+  commands vtysh: 'vtysh'
 
   mk_resource_methods
 
   def self.instances
-    debug '[instances]'
     providers = []
     found_prefix_list = false
 
@@ -24,18 +23,17 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
       if line =~ /^(ip|ipv6)\sprefix-list\s([\w-]+)\sseq\s(\d+)\s(permit|deny)\s([\d\.\/:]+|any)(\s(ge|le)\s(\d+)(\s(ge|le)\s(\d+))?)?$/
 
         hash = {
-            :action => $4.to_sym,
-            :ensure => :present,
-            :name => "#{$2} #{$3}",
-            :prefix => $5,
-            :protocol => $1.to_sym,
-            :provider => self.name,
+            action: $4.to_sym,
+            ensure: :present,
+            ge: $7.nil? ? :absent : Integer($8),
+            le: $11.nil? ? :absent : Integer($11),
+            name: "#{$2} #{$3}",
+            prefix: $5,
+            protocol: $1.to_sym,
+            provider: self.name,
         }
 
-        hash[$7.to_sym] = $8.to_i unless $7.nil?
-        hash[$10.to_sym] = $11.to_i unless $10.nil?
-
-        debug "prefix_list: #{hash}"
+        debug 'Instantiated the prefix-list %{name}' % { name: hash[:name] }
 
         providers << new(hash)
 
@@ -59,7 +57,6 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     resources.keys.each do |name|
       if provider = providers.find{ |prefix_list| prefix_list.name == name }
         resources[name].provider = provider
-        provider.purge
 
         found_providers << provider
       end
@@ -84,7 +81,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     template = self.class.instance_variable_get('@resource_template')
     name, seq = @resource[:name].split(/:/)
 
-    debug 'Creating the prefix-list %{name}.' % { name: "#{name}:#{seq}" }
+    debug 'Creating the prefix-list %{name}.' % { name: "#{name} #{seq}" }
 
     cmds = []
     cmds << 'configure terminal'
@@ -135,20 +132,8 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
     name, sequence = @property_hash[:name].split(/:/)
 
-    debug 'Flushing the prefix-list %{name}.' % { name: "#{name}:#{sequence}" }
+    debug 'Flushing the prefix-list %{name}.' % { name: "#{name} #{sequence}" }
 
     create
-  end
-
-  def purge
-    debug '[purge]'
-
-    known_resources = self.class.instance_variable_get('@resource_properties')
-    known_resources.each do |property|
-      if @resource[property].nil? and not @property_hash[property].nil?
-        flush
-        break
-      end
-    end
   end
 end

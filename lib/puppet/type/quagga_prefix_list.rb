@@ -30,21 +30,21 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
   newproperty(:ge) do
     desc 'Minimum prefix length to be matched.'
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\A\d+\Z/)
 
     validate do |value|
       super(value)
+
+      return if value == :absent
+
       v = Integer(value)
       fail 'Invalid value. Minimum prefix length: 1-32' unless v >= 1 and v <= 32
     end
 
     munge do |value|
-      Integer(value)
-    end
-
-    def insync?(is)
-      return false unless @should or is == :absent
-      super(is)
+      Integer(value) unless value == :absent
     end
   end
 
@@ -54,17 +54,14 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
     validate do |value|
       super(value)
-      v = value.to_i
+
+      return if value == :absent
+      v = Integer(value)
       fail 'Invalid value. Maximum prefix length: 1-32' unless v >= 1 and v <= 32
     end
 
     munge do |value|
-      Integer(value)
-    end
-
-    def insync?(is)
-      return false unless @should or is == :absent
-      super(is)
+      Integer(value) unless value == :absent
     end
   end
 
