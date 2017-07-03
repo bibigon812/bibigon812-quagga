@@ -76,13 +76,10 @@ Puppet::Type.newtype(:quagga_route_map) do
   newproperty(:on_match) do
     desc 'Exit policy on matches.'
 
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\Agoto\s(\d+)\Z/)
     newvalues(/\Anext\Z/)
-
-    def insync?(is)
-      return false unless @should or is == :absent
-      super(is)
-    end
   end
 
   newproperty(:set, :array_matching => :all) do
