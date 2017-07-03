@@ -75,64 +75,65 @@ end'
 
     it 'should return the INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => 'INTERNAL',
-        :passive => :false,
-        :peer_group => :true,
-        :provider => :quagga,
-        :remote_as => 65000,
-        :shutdown => :false,
-        :update_source => '172.16.32.103',
+        ensure: :present,
+        name: 'INTERNAL',
+        passive: :false,
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
       })
     end
 
     it 'should return the RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => 'RR',
-        :passive => :false,
-        :peer_group => :true,
-        :provider => :quagga,
-        :remote_as => 65000,
-        :shutdown => :false,
-        :update_source => '172.16.32.103',
+        ensure: :present,
+        name: 'RR',
+        passive: :false,
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
       })
     end
 
     it 'should return the RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => 'RR_WEAK',
-        :passive => :false,
-        :peer_group => :true,
-        :provider => :quagga,
-        :remote_as => 65000,
-        :shutdown => :false,
-        :update_source => '172.16.32.103',
+        ensure: :present,
+        name: 'RR_WEAK',
+        passive: :false,
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
       })
     end
 
     it 'should return the 172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => '172.16.32.108',
-        :passive => :false,
-        :peer_group => 'INTERNAL',
-        :provider => :quagga,
-        :shutdown => :true,
+        ensure: :present,
+        name: '172.16.32.108',
+        passive: :false,
+        peer_group: 'INTERNAL',
+        provider: :quagga,
+        shutdown: :true,
+        update_source: :absent,
       })
     end
 
     it 'should return the 1a03:d000:20a0::91 resource' do
       expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => '1a03:d000:20a0::91',
-        :passive => :false,
-        :peer_group => :false,
-        :provider => :quagga,
-        :remote_as => 31113,
-        :shutdown => :false,
-        :update_source => '1a03:d000:20a0::92',
+        ensure: :present,
+        name: '1a03:d000:20a0::91',
+        passive: :false,
+        peer_group: :false,
+        provider: :quagga,
+        remote_as: 31113,
+        shutdown: :false,
+        update_source: '1a03:d000:20a0::92',
       })
     end
   end
@@ -200,70 +201,71 @@ end'
 
     it 'should return the INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => 'INTERNAL',
-        :passive => :false,
-        :peer_group => :true,
-        :provider => :quagga,
-        :remote_as => 65000,
-        :shutdown => :false,
-        :update_source => '172.16.32.103',
+        ensure: :present,
+        name: 'INTERNAL',
+        passive: :false,
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
       })
     end
 
     it 'should return the RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => 'RR',
-        :passive => :false,
-        :peer_group => :true,
-        :provider => :quagga,
-        :remote_as => 65000,
-        :shutdown => :false,
-        :update_source => '172.16.32.103',
+        ensure: :present,
+        name: 'RR',
+        passive: :false,
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
       })
     end
 
     it 'should return the RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => 'RR_WEAK',
-        :passive => :false,
-        :peer_group => :true,
-        :provider => :quagga,
-        :remote_as => 65000,
-        :shutdown => :false,
-        :update_source => '172.16.32.103',
+        ensure: :present,
+        name: 'RR_WEAK',
+        passive: :false,
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
       })
     end
 
     it 'should return the 172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => '172.16.32.108',
-        :passive => :false,
-        :peer_group => 'INTERNAL',
-        :provider => :quagga,
-        :shutdown => :true,
+        ensure: :present,
+        name: '172.16.32.108',
+        passive: :false,
+        peer_group: 'INTERNAL',
+        provider: :quagga,
+        shutdown: :true,
+        update_source: :absent,
       })
     end
 
     # it 'should return the 1a03:d000:20a0::91 resource' do
     #   expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-    #     :activate => :true,
-    #     :allow_as_in => 1,
-    #     :default_originate => :false,
-    #     :ensure => :present,
-    #     :name => '1a03:d000:20a0::91',
-    #     :next_hop_self => :false,
-    #     :passive => :false,
-    #     :peer_group => :false,
-    #     :provider => :quagga,
-    #     :remote_as => 31113,
-    #     :route_reflector_client => :false,
-    #     :route_server_client => :false,
-    #     :shutdown => :false,
-    #     :update_source => '1a03:d000:20a0::92',
+    #     activate: :true,
+    #     allow_as_in: 1,
+    #     default_originate: :false,
+    #     ensure: :present,
+    #     name: '1a03:d000:20a0::91',
+    #     next_hop_self: :false,
+    #     passive: :false,
+    #     peer_group: :false,
+    #     provider: :quagga,
+    #     remote_as: 31113,
+    #     route_reflector_client: :false,
+    #     route_server_client: :false,
+    #     shutdown: :false,
+    #     update_source: '1a03:d000:20a0::92',
     #   })
     # end
   end

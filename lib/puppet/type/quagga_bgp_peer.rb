@@ -99,13 +99,11 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
     interface = /[[:alpha:]]\w+(\.\d+(:\d+)?)?/
 
+    defaultto(:absent)
+    newvalues(:absent)
     newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\Z/)
     newvalues(/\A\h+:[\h:]+\Z/)
     newvalues(/\A#{interface}\Z/)
-
-    def insync?(is)
-      is == should
-    end
   end
 
   autorequire(:quagga_bgp_router) do

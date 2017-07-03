@@ -32,6 +32,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
       type: :boolean,
     },
     update_source: {
+      default: :absent,
       regexp: /\A\sneighbor\s\S+\supdate-source\s(\S+)\Z/,
       template: 'neighbor <%= name %> update-source<% unless value.nil? %> <%= value %><% end %>',
       type: :string,
@@ -167,7 +168,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
     debug 'Creating the bgp peer %{name}' % { name: name }
 
-    as_number = self.class.get_as_number
+    as_number = get_as_number
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
@@ -208,7 +209,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
     debug 'Destroying the bgp peer %{name}' % { name: name }
 
-    as_number = self.class.get_as_number
+    as_number = get_as_number
 
     cmds = []
     cmds << 'configure terminal'
@@ -233,7 +234,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
     debug 'Flushing the bgp peer %{name}' % { name: name }
 
-    as_number = self.class.get_as_number
+    as_number = get_as_number
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
