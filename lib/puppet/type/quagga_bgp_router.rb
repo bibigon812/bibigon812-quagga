@@ -5,7 +5,7 @@ Puppet::Type.newtype(:quagga_bgp_router) do
 
       Examples:
 
-        quagga_bgp { 'bgp':
+        quagga_bgp_router { 'bgp':
             ensure                   => present,
             as_number                => 65000,
             import_check             => true,
