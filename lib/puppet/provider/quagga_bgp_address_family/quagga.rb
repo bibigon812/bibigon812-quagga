@@ -124,7 +124,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     end
 
     unless hash.empty?
-      debug 'Instantiated bgp address family %{name}.' % { name: hash[:name]}
+      debug 'Instantiated the bgp address family %{name}.' % { name: hash[:name]}
       providers << new(hash)
     end
 
