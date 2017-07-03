@@ -4,7 +4,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
 
       Examples:
 
-        quagga_bgp_address_family { 'ipv4 unicast':
+        quagga_bgp_address_family { 'ipv4_unicast':
           aggregate_address => '192.168.0.0/24 summary-only',
           maximum_ebgp_paths => 2,
           maximum_ibgp_paths => 2,
@@ -17,8 +17,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
   newparam(:name, :namevar => true) do
     desc 'The address family: ipv4 unicast, ipv4 multicast or ipv6 unicast.'
 
-    newvalues(/\Aipv4\s(unicast|multicast)\Z/)
-    newvalues(/\Aipv6\s(unicast)\Z/)
+    newvalues(:ipv4_unicast, :ipv4_multicast, :ipv6_unicast)
   end
 
   newproperty(:aggregate_address, array_matching: :all) do
@@ -32,7 +31,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = value.split(/\s/).first
-      proto, _ = @resource[:name].split(/\s/)
+      proto, _ = @resource[:name].to_s.split(/_/)
 
       begin
         ip = IPAddr.new(v)
@@ -78,7 +77,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = Integer(value)
-      proto, type = @resource[:name].split(/\s/)
+      proto, type = @resource[:name].to_s.split(/_/)
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
@@ -106,7 +105,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
 
       v = Integer(value)
 
-      proto, type = @resource[:name].split(/\s/)
+      proto, type = @resource[:name].to_s.split(/_/)
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
@@ -127,7 +126,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     validate do |value|
       super(value)
 
-      proto, type = @resource[:name].split(/\s/)
+      proto, type = @resource[:name].to_s.split(/_/)
 
       begin
         ip = IPAddr.new(value)

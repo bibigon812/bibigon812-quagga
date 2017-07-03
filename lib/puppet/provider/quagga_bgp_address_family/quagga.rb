@@ -7,9 +7,10 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
 
   @resource_map = {
       aggregate_address: {
+          default: [],
           regexp: /\A\saggregate-address\s(.+)\Z/,
           template: 'aggregate-address<% unless value.nil? %> <%= value %><% end %>',
-          type: :string,
+          type: :array,
       },
       maximum_ebgp_paths: {
           default: 1,
@@ -35,7 +36,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     providers = []
     hash = {}
     found_router = false
-    address_family = 'ipv4 unicast'
+    address_family = :ipv4_unicast
     as = ''
 
     config = vtysh('-c', 'show running-config')
@@ -50,7 +51,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
 
         hash = {
             ensure: :present,
-            name: "#{as} #{address_family}",
+            name: address_family,
             provider: self.name,
         }
 
@@ -68,8 +69,8 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
       # Found the address family
       elsif found_router and line =~ /\A\saddress-family\s(ipv4|ipv6)(?:\s(multicast))?\Z/
         proto = $1
-        type = $2
-        address_family = type.nil? ? proto : "#{proto} #{type}"
+        type = $2 || 'unicast'
+        address_family = "#{proto}_#{type}".to_sym
 
         # Store a previous address family
         debug 'Instantiated bgp address family %{name}.' % { name: hash[:name] }
@@ -78,7 +79,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
         # Create new address family
         hash = {
             ensure: :present,
-            name: "#{as} #{address_family}",
+            name: address_family,
             provider: self.name,
         }
 

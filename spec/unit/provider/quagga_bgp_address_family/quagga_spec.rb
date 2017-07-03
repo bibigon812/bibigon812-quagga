@@ -62,25 +62,27 @@ end'
       expect(described_class.instances.size).to eq(2)
     end
 
-    it 'should return the \'197888 ipv4 unicast\' resource' do
+    it 'should return the :ipv4_unicast resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
+        aggregate_address: [],
         ensure: :present,
         maximum_ebgp_paths: 4,
         maximum_ibgp_paths: 4,
-        name: '197888 ipv4 unicast',
+        name: :ipv4_unicast,
         networks: ['172.16.32.0/24',],
         provider: :quagga,
       })
     end
 
-    it 'should return the \'197888 ipv6\' resource' do
+    it 'should return the :ipv6_unicast resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-         ensure: :present,
-         maximum_ebgp_paths: 1,
-         maximum_ibgp_paths: 1,
-         name: '197888 ipv6',
-         networks: ['1a04:6d40::/48',],
-         provider: :quagga,
+        aggregate_address: [],
+        ensure: :present,
+        maximum_ebgp_paths: 1,
+        maximum_ibgp_paths: 1,
+        name: :ipv6_unicast,
+        networks: ['1a04:6d40::/48',],
+        provider: :quagga,
       })
     end
   end
