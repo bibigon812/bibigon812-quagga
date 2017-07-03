@@ -4,15 +4,17 @@
 ### Added
 
 - the resource `quagga_bgp_address_family`
-- the property `as` to the resource `quagga_bgp_router`
+- the resource `quagga_bgp_peer_address_family`
+- the property `as_number` to the resource `quagga_bgp_router`
 
 ### Changed
 
+- changelog
 - the resource `quagga_bgp` to `quagga_bgp_router`
 
 ### Removed
 
-- the resource `quagga_redistribution` 
+- the resource `quagga_redistribution`
 
 ## [2.0.3] - 2017-06-27
 
