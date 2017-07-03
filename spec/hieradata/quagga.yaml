@@ -89,11 +89,31 @@ quagga::bgp::service_opts: -P 0
 
 quagga::bgp::router:
   as_number: 65000
-  router_id: 10.0.0.1
+  router_id: 10.255.255.1
 
-quagga::bgp::peers: {}
+quagga::bgp::peers:
+  10.0.0.2:
+    peer_group: INTERNAL
+  10.0.0.3:
+    peer_group: INTERNAL
+  172.16.0.2:
+    peer_group: CLIENTS
+    remote_as: 65001
+  CLIENTS:
+    peer_group: true
+    passive: true
+  INTERNAL:
+    peer_group: true
+    remote_as: 65000
+    update_source: 10.0.0.1
+
+
 quagga::bgp::as_paths: {}
+
+
 quagga::bgp::community_lists: {}
+
+
 quagga::bgp::address_families:
   ipv4_unicast:
     aggregate_address:
@@ -104,6 +124,18 @@ quagga::bgp::address_families:
     networks:
       - 1.1.1.0/23
       - 1.1.3.0/24
+  ipv4_multicast:
+    networks:
+      - 230.0.0.0/8
+      - 231.0.0.0/8
+  ipv6_unicast:
+    aggregate_address:
+      - 2001:db8:0:2::/64
+      - 2001:db8:0:3::/64
+    networks:
+      - 2001:db8::/64
+      - 2001:db8:0:1::/64
+      - 2001:db8:0:2::/63
 
 
 quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
