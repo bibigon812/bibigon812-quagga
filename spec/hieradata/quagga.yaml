@@ -90,10 +90,20 @@ quagga::bgp::service_opts: -P 0
 quagga::bgp::router:
   as_number: 65000
   router_id: 10.0.0.1
+
 quagga::bgp::peers: {}
 quagga::bgp::as_paths: {}
 quagga::bgp::community_lists: {}
-quagga::bgp::address_families: {}
+quagga::bgp::address_families:
+  ipv4_unicast:
+    aggregate_address:
+      - 1.1.1.0/24 summary-only
+      - 1.1.2.0/24 summary-only
+    maximum_ebgp_paths: 2
+    maximum_ibgp_paths: 10
+    networks:
+      - 1.1.1.0/23
+      - 1.1.3.0/24
 
 
 quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
