@@ -108,10 +108,22 @@ quagga::bgp::peers:
     update_source: 10.0.0.1
 
 
-quagga::bgp::as_paths: {}
+quagga::bgp::as_paths:
+  FROM_AS100:
+    rules:
+      - permit _100$
 
 
-quagga::bgp::community_lists: {}
+quagga::bgp::community_lists:
+  100:
+    rules:
+      - permit 65000:101
+      - permit 65000:102
+      - permit 65000:103
+  200:
+    rules:
+      - permit 65000:201
+      - permit 65000:202
 
 
 quagga::bgp::address_families:
