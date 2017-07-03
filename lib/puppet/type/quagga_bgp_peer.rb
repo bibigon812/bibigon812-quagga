@@ -42,7 +42,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     end
   end
 
-  newproperty(:passive, boolean: true) do
+  newproperty(:passive, :boolean => true) do
     desc 'Don\'t send open messages to this neighbor. Default to `false`.'
 
     defaultto(:false)
@@ -77,13 +77,13 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     end
   end
 
-  newproperty(:shutdown) do
+  newproperty(:shutdown, :boolean => true) do
     desc 'Administratively shut down this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
   end
 
-  newproperty :update_source do
+  newproperty(:update_source) do
     desc 'Source of routing updates.'
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
@@ -108,11 +108,11 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     end
   end
 
-  autorequire :package do
+  autorequire(:package) do
     %w{quagga}
   end
 
-  autorequire :service do
+  autorequire(:service) do
     %w{zebra bgpd}
   end
 
