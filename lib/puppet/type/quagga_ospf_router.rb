@@ -1,10 +1,10 @@
-Puppet::Type.newtype(:quagga_ospf) do
+Puppet::Type.newtype(:quagga_ospf_router) do
   @doc = %q{
     This type provides the capabilities to manage ospf router within puppet.
 
       Examples:
 
-        quagga_ospf { 'ospf':
+        quagga_ospf_router { 'ospf':
             ensure => present,
             redistribute => [
               'connected route-map QWER',

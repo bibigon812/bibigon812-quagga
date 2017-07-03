@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_ospf) do
+describe Puppet::Type.type(:quagga_ospf_router) do
   let :providerclass  do
     described_class.provide(:fake_quagga_provider) do
       attr_accessor :property_hash

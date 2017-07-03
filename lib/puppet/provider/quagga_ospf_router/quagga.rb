@@ -1,4 +1,4 @@
-Puppet::Type.type(:quagga_ospf).provide :quagga do
+Puppet::Type.type(:quagga_ospf_router).provide :quagga do
   @doc = 'Manages ospf parameters using quagga'
 
   @resource_map = {

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_ospf).provider(:quagga) do
+describe Puppet::Type.type(:quagga_ospf_router).provider(:quagga) do
   describe 'instances' do
     it 'should have an instance method' do
       expect(described_class).to respond_to :instances

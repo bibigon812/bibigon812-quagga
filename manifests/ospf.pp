@@ -7,12 +7,12 @@ class quagga::ospf (
   Boolean $service_manage,
   String $service_opts,
   Hash $router,
-  Hash $areas
+  Hash $areas,
 ) {
   include quagga::ospf::config
   include quagga::ospf::service
 
-  quagga_ospf {'ospf':
+  quagga_ospf_router {'ospf':
     * => $router
   }
 
