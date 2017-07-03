@@ -27,6 +27,15 @@ lookup_options:
   quagga::bgp::address_families:
     merge:
       strategy: deep
+  quagga::bgp::peer::address_families:
+    merge:
+      strategy: deep
+  quagga::ospf::router:
+    merge:
+      strategy: deep
+  quagga::ospf::areas:
+    merga:
+      strategy: deep
 quagga::global_opts: {}
 quagga::interfaces: {}
 quagga::prefix_lists: {}
