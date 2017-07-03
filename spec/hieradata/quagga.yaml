@@ -10,10 +10,55 @@ quagga::packages:
   quagga:
     ensure: present
 
-quagga::global_opts: {}
-quagga::interfaces: {}
-quagga::prefix_lists: {}
-quagga::route_maps: {}
+
+quagga::global_opts:
+  ip_forwarding: true
+  ip_multicast_routing: true
+  ipv6_forwarding: true
+
+
+quagga::interfaces:
+  eth0:
+    igmp: true
+    ip_address:
+      - 10.0.0.1/24
+    multicast: true
+    ospf_dead_interval: 8
+    ospf_hello_interval: 2
+    ospf_mtu_ignore: true
+    ospf_priority: 100
+    pim_ssm: true
+  lo:
+    ip_address:
+      - 10.255.255.1/32
+      - 172.16.255.1/32
+
+
+quagga::prefix_lists:
+  CONNECTED_PREFIXES:
+    rules:
+      500:
+        action: permit
+        le: 32
+        prefix: 10.255.255.0/24
+  OSPF_PREFIXES:
+    rules:
+      10:
+        action: permit
+        prefix: 172.16.255.0/24
+
+
+quagga::route_maps:
+  BGP_FROM_OSPF:
+    rules:
+      10:
+        action: permit
+        match: ip address prefix-list OSPF_PREFIXES
+  CONNECTED:
+    rules:
+      10:
+        action: permit
+        match: ip address prefix-list CONNECTED_PREFIXES
 
 
 quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
@@ -64,11 +109,16 @@ quagga::ospf::router:
   log_adjacency_changes: true
   opaque: false
   redistribute:
-    - connected
+    - connected route-map CONNECTED
   rfc1583: false
   router_id: 10.0.0.1
+
 quagga::ospf::areas:
   0.0.0.0:
     networks:
-      - 172.16.0.0/12
-      - 192.168.0.0/16
+      - 172.16.0.0/24
+      - 192.168.0.0/24
+  0.0.0.1:
+    networks:
+      - 172.16.1.0/24
+      - 192.168.1.0/24
