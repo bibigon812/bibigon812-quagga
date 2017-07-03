@@ -9,7 +9,7 @@ class quagga (
   String $default_content,
   String $service_file,
   Boolean $service_file_manage,
-  Hash $packages
+  Hash $packages,
 ) {
   $packages.each |String $package_name, Hash $package| {
     package {$package_name:
@@ -52,13 +52,47 @@ class quagga (
     }
   }
 
-  $prefix_lists.each |String $prefix_list_name, Hash $prefix_list| {
-    quagga_interface {$prefix_list_name:
+  $prefix_lists_ = $prefix_lists.reduce({}) |$prefix_lists, $prefix_list| {
+
+    $prefix_list_sequences = dig($prefix_list[1], 'rules')
+      .reduce({}) |$prefix_list_sequences, $prefix_list_sequence| {
+
+      merge($prefix_list_sequences,
+        { "${prefix_list[0]} ${$prefix_list_sequence[0]}" => $prefix_list_sequence[1] }
+      )
+    }
+
+    merge($prefix_lists, $prefix_list_sequences)
+  }
+
+  resources { 'quagga_prefix_list':
+    purge => true,
+  }
+
+  $prefix_lists_.each |String $prefix_list_name, Hash $prefix_list| {
+    quagga_prefix_list {$prefix_list_name:
       * => $prefix_list
     }
   }
 
-  $route_maps.each |String $route_map_name, Hash $route_map| {
+  $route_maps_ = $route_maps.reduce({}) |$route_maps, $route_map| {
+
+    $route_map_sequences = dig($route_map[1], 'rules')
+      .reduce({}) |$route_map_sequences, $route_map_sequence| {
+
+        merge($route_map_sequences,
+          { "${route_map[0]} ${route_map_sequence[0]}" => $route_map_sequence[1] }
+        )
+      }
+
+    merge($route_maps, $route_map_sequences)
+  }
+
+  resources { 'quagga_route_map':
+    purge => true,
+  }
+
+  $route_maps_.each |String $route_map_name, Hash $route_map| {
     quagga_route_map {$route_map_name:
       * => $route_map
     }
