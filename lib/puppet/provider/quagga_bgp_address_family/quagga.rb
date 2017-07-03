@@ -290,4 +290,21 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
       @property_flush[property] = value
     end
   end
+
+  private
+  def get_as_number
+    if @as_number.nil?
+      begin
+        vtysh('-c', 'show ip bgp summary').split(/\n/).collect.each do |line|
+          if line =~ /\ABGP\srouter\sidentifier\s(\d+\.\d+\.\d+\.\d+),\slocal\sAS\snumber\s(\d+)\Z/
+            @as_number = Integer($2)
+            break
+          end
+        end
+      rescue
+      end
+    end
+
+    @as_number
+  end
 end
