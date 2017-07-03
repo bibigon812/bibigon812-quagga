@@ -36,7 +36,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     newvalues(/\A\w+\sipv6\s(unicast)\Z/)
   end
 
-  newproperty(:activate, boolean: true) do
+  newproperty(:activate, :boolean => true) do
     desc 'Enable the Address Family for this Neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
@@ -54,13 +54,13 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     end
   end
 
-  newproperty(:default_originate, boolean: true) do
+  newproperty(:default_originate, :boolean => true) do
     desc 'Originate default route to this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
   end
 
-  newproperty(:next_hop_self, boolean: true) do
+  newproperty(:next_hop_self, :boolean => true) do
     desc 'Disable the next hop calculation for this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
@@ -108,13 +108,13 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
   end
 
-  newproperty(:route_reflector_client, boolean: true) do
+  newproperty(:route_reflector_client, :boolean => true) do
     desc 'Configure a neighbor as Route Reflector client.'
     defaultto(:false)
     newvalues(:false, :true)
   end
 
-  newproperty(:route_server_client, boolean: true) do
+  newproperty(:route_server_client, :boolean => true) do
     desc 'Configure a neighbor as Route Server client.'
     defaultto(:false)
     newvalues(:false, :true)
@@ -132,11 +132,11 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     end
   end
 
-  autorequire :package do
+  autorequire(:package) do
     %w{quagga}
   end
 
-  autorequire :service do
+  autorequire(:service) do
     %w{zebra bgpd}
   end
 
