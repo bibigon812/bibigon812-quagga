@@ -100,10 +100,8 @@ quagga::bgp::peers:
     peer_group: CLIENTS
     remote_as: 65001
   CLIENTS:
-    peer_group: true
     passive: true
   INTERNAL:
-    peer_group: true
     remote_as: 65000
     update_source: 10.0.0.1
 
@@ -148,6 +146,9 @@ quagga::bgp::address_families:
       - 2001:db8::/64
       - 2001:db8:0:1::/64
       - 2001:db8:0:2::/63
+
+
+quagga::bgp::peer::address_families: {}
 
 
 quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
