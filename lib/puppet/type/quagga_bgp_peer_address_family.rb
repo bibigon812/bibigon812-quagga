@@ -4,7 +4,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
       Examples:
 
-        quagga_bgp_peer_address_family { '192.168.0.2 ipv4 unicast':
+        quagga_bgp_peer_address_family { '192.168.0.2 ipv4_unicast':
             peer_group             => PEER_GROUP,
             activate               => true,
             allow_as_in            => 1,
@@ -30,10 +30,10 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   newparam(:name, :namevar => true) do
     desc 'Contains the neighbor IP address or the peer-group name, the address family.'
 
-    newvalues(/\A([\d\.]+)ipv4\s(unicast|multicast)\Z/)
-    newvalues(/\A([\h\.:]+)\sipv6\s(unicast)\Z/)
-    newvalues(/\A\w+\sipv4\s(unicast|multicast)\Z/)
-    newvalues(/\A\w+\sipv6\s(unicast)\Z/)
+    newvalues(/\A([\d\.]+)\sipv4_(unicast|multicast)\Z/)
+    newvalues(/\A([\h\.:]+)\sipv6_(unicast)\Z/)
+    newvalues(/\A\w+\sipv4_(unicast|multicast)\Z/)
+    newvalues(/\A\w+\sipv6_(unicast)\Z/)
   end
 
   newproperty(:activate, :boolean => true) do
@@ -64,6 +64,21 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'Disable the next hop calculation for this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
+  end
+
+  newproperty(:peer_group) do
+    desc 'Member of the peer-group.'
+
+    defaultto do
+       if @resource[:name] =~ /\.:/
+         :false
+       else
+         :true
+       end
+    end
+
+    newvalues(:false, :true)
+    newvalues(/\A[[:alpha:]]\w+\Z/)
   end
 
   newproperty(:prefix_list_in) do
