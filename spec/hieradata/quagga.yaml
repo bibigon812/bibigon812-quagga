@@ -91,39 +91,6 @@ quagga::bgp::router:
   as_number: 65000
   router_id: 10.255.255.1
 
-quagga::bgp::peers:
-  10.0.0.2:
-    peer_group: INTERNAL
-  10.0.0.3:
-    peer_group: INTERNAL
-  172.16.0.2:
-    peer_group: CLIENTS
-    remote_as: 65001
-  CLIENTS:
-    passive: true
-  INTERNAL:
-    remote_as: 65000
-    update_source: 10.0.0.1
-
-
-quagga::bgp::as_paths:
-  FROM_AS100:
-    rules:
-      - permit _100$
-
-
-quagga::bgp::community_lists:
-  100:
-    rules:
-      - permit 65000:101
-      - permit 65000:102
-      - permit 65000:103
-  200:
-    rules:
-      - permit 65000:201
-      - permit 65000:202
-
-
 quagga::bgp::address_families:
   ipv4_unicast:
     aggregate_address:
@@ -147,8 +114,58 @@ quagga::bgp::address_families:
       - 2001:db8:0:1::/64
       - 2001:db8:0:2::/63
 
+quagga::bgp::peers:
+  10.0.0.2:
+    peer_group: INTERNAL
+    address_families:
+      ipv4_unicast:
+        peer_group: INTERNAL
+  10.0.0.3:
+    peer_group: INTERNAL
+    address_families:
+      ipv4_unicast:
+        peer_group: INTERNAL
+  10.0.0.10:
+    peer_group: INTERNAL
+    address_families:
+      ipv4_multicast:
+        activate: true
+  172.16.0.2:
+    peer_group: CLIENTS
+    remote_as: 65001
+    address_families:
+      ipv4_unicast:
+        peer_group: CLIENTS
+  CLIENTS:
+    passive: true
+    address_families:
+      ipv4_unicast:
+        default_originate: true
+  INTERNAL:
+    remote_as: 65000
+    update_source: 10.0.0.1
+    address_families:
+      ipv4_unicast:
+        activate: true
+        next_hop_self: true
 
-quagga::bgp::peer::address_families: {}
+
+quagga::bgp::as_paths:
+  FROM_AS100:
+    rules:
+      - permit _100$
+
+
+quagga::bgp::community_lists:
+  100:
+    rules:
+      - permit 65000:101
+      - permit 65000:102
+      - permit 65000:103
+  200:
+    rules:
+      - permit 65000:201
+      - permit 65000:202
 
 
 quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
