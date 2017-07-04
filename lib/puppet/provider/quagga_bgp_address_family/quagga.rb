@@ -109,14 +109,14 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
 
             else
               case options[:type]
-                when :array
-                  hash[property] << value
-                when :fixnum
-                  hash[property] = value.to_i
-                when :symbol
-                  hash[property] = value.gsub(/-/, '_').to_sym
-                else
-                  hash[property] = value
+              when :array
+                hash[property] << value
+              when :fixnum
+                hash[property] = value.to_i
+              when :symbol
+                hash[property] = value.gsub(/-/, '_').to_sym
+              else
+                hash[property] = value
               end
             end
           end
