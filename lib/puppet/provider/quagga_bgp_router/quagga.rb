@@ -1,37 +1,37 @@
 Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   @doc = %q{ Manages as-path access-list using quagga }
 
-  commands vtysh: 'vtysh'
+  commands :vtysh => 'vtysh'
 
   @resource_map = {
-      import_check: {
-          default: :false,
-          regexp: /\A\sbgp\snetwork\simport-check\Z/,
-          template: 'bgp network import-check',
-          type: :boolean,
+      :import_check => {
+          :default  => :false,
+          :regexp   => /\A\sbgp\snetwork\simport-check\Z/,
+          :template => 'bgp network import-check',
+          :type     => :boolean,
       },
-      default_ipv4_unicast: {
-          default: :true,
-          regexp: /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
-          template: 'bgp default ipv4-unicast',
-          type: :boolean,
+      :default_ipv4_unicast => {
+          :default  => :true,
+          :regexp   => /\A\sno\sbgp\sdefault\sipv4-unicast\Z/,
+          :template => 'bgp default ipv4-unicast',
+          :type     => :boolean,
       },
-      default_local_preference: {
-          default: 100,
-          regexp: /\A\sbgp\sdefault\slocal-preference\s(\d+)\Z/,
-          template: 'bgp default local-preference<% unless value.nil? %> <%= value %><% end %>',
-          type: :fixnum,
+      :default_local_preference => {
+          :default  => 100,
+          :regexp   => /\A\sbgp\sdefault\slocal-preference\s(\d+)\Z/,
+          :template => 'bgp default local-preference<% unless value.nil? %> <%= value %><% end %>',
+          :type     => :fixnum,
       },
-      redistribute: {
-          regexp: /\A\sredistribute\s(.+)\Z/,
-          template: 'redistribute <%= value %>',
-          type: :array,
-          default: [],
+      :redistribute => {
+          :regexp   => /\A\sredistribute\s(.+)\Z/,
+          :template => 'redistribute <%= value %>',
+          :type     => :array,
+          :default  => [],
       },
-      router_id: {
-          regexp: /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/,
-          template: 'bgp router-id<% unless value.nil? %> <%= value %><% end %>',
-          type: :string,
+      :router_id => {
+          :regexp   => /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/,
+          :template => 'bgp router-id<% unless value.nil? %> <%= value %><% end %>',
+          :type     => :string,
       },
   }
 
@@ -70,10 +70,10 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
         found_bgp = true
 
         hash = {
-            as_number: as_number,
-            ensure: :present,
-            name: :bgp,
-            provider: self.name,
+            :as_number => as_number,
+            :ensure => :present,
+            :name => :bgp,
+            :provider => self.name,
         }
 
         # Added default values
@@ -122,7 +122,7 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
     end
 
     unless hash.empty?
-      debug "bgp: #{hash}"
+      debug ":bgp => #{hash}"
       providers << new(hash)
     end
 
@@ -141,13 +141,13 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   def create
     as_number = @resource[:as_number]
 
-    debug 'Creating the bgp router %{as_number}' % { as_number: as_number }
+    debug 'Creating the bgp router %{as_number}' % { :as_number => as_number }
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
 
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != options[:default]
@@ -161,7 +161,7 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
             if @resource[property]
               cmds << ERB.new(options[:template]).result(binding)
             else
-              cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
             end
 
           else
@@ -182,11 +182,11 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   def destroy
     as_number = @property_hash[:as_number]
 
-    debug 'Destroying the bgp router %{as_number}' % { as_number: as_number }
+    debug 'Destroying the bgp router %{as_number}' % { :as_number => as_number }
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'no router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'no router bgp %{as_number}' % { :as_number => as_number }
     cmds << 'end'
     cmds << 'write memory'
 
@@ -204,20 +204,20 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
 
     as_number = @property_hash[:as_number]
 
-    debug 'Flushing the bgp router %{as_number}' % { as_number: as_number }
+    debug 'Flushing the bgp router %{as_number}' % { :as_number => as_number }
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
 
     @property_flush.each do |property, v|
       if v == :absent or v == :false
-        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
 
       elsif [:true, 'true'].include?(v) and [:symbol, :string].include?(resource_map[property][:type])
-        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         cmds << ERB.new(resource_map[property][:template]).result(binding)
 
       elsif v == :true
@@ -225,7 +225,7 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
 
       elsif resource_map[property][:type] == :array
         (@property_hash[property] - v).each do |value|
-          cmds << 'no %{command}' % {command: ERB.new(resource_map[property][:template]).result(binding) }
+          cmds << 'no %{command}' % {:command => ERB.new(resource_map[property][:template]).result(binding) }
         end
 
         (v - @property_hash[property]).each do |value|

@@ -1,43 +1,43 @@
 Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   @doc = 'Manages bgp neighbors using quagga.'
 
-  commands vtysh: 'vtysh'
+  commands :vtysh => 'vtysh'
 
   @resource_map = {
-    peer_group: {
-      default: :false,
-      template: 'neighbor <%= name %> peer-group <%= value %>',
-      type: :string,
+    :peer_group => {
+      :default => :false,
+      :template => 'neighbor <%= name %> peer-group <%= value %>',
+      :type => :string,
     },
-    remote_as: {
-      default: :absent,
-      regexp: /\A\sneighbor\s\S+\sremote-as\s(\d+)\Z/,
-      template: 'neighbor <%= name %> remote-as <%= value %>',
-      type: :fixnum,
+    :remote_as => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s\S+\sremote-as\s(\d+)\Z/,
+      :template => 'neighbor <%= name %> remote-as <%= value %>',
+      :type => :fixnum,
     },
-    local_as: {
-      default: :absent,
-      regexp: /\A\sneighbor\s\S+\slocal-as\s(\d+)\Z/,
-      template: 'neighbor <%= name %> local-as<% unless value.nil? %> <%= value %><% end %>',
-      type: :fixnum,
+    :local_as => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s\S+\slocal-as\s(\d+)\Z/,
+      :template => 'neighbor <%= name %> local-as<% unless value.nil? %> <%= value %><% end %>',
+      :type => :fixnum,
     },
-    passive: {
-      default: :false,
-      regexp: /\A\sneighbor\s\S+\spassive\Z/,
-      template: 'neighbor <%= name %> passive',
-      type: :boolean,
+    :passive => {
+      :default => :false,
+      :regexp => /\A\sneighbor\s\S+\spassive\Z/,
+      :template => 'neighbor <%= name %> passive',
+      :type => :boolean,
     },
-    shutdown: {
-      default: :false,
-      regexp: /\A\sneighbor\s\S+\sshutdown\Z/,
-      template: 'neighbor <%= name %> shutdown',
-      type: :boolean,
+    :shutdown => {
+      :default => :false,
+      :regexp => /\A\sneighbor\s\S+\sshutdown\Z/,
+      :template => 'neighbor <%= name %> shutdown',
+      :type => :boolean,
     },
-    update_source: {
-      default: :absent,
-      regexp: /\A\sneighbor\s\S+\supdate-source\s(\S+)\Z/,
-      template: 'neighbor <%= name %> update-source<% unless value.nil? %> <%= value %><% end %>',
-      type: :string,
+    :update_source => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s\S+\supdate-source\s(\S+)\Z/,
+      :template => 'neighbor <%= name %> update-source<% unless value.nil? %> <%= value %><% end %>',
+      :type => :string,
     },
   }
 
@@ -83,14 +83,14 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
         # Found a new neighbour
         unless name == previous_name
           unless hash.empty?
-            debug 'Instantiated bgp peer %{name}' % { name: hash[:name] }
+            debug 'Instantiated bgp peer %{name}' % { :name => hash[:name] }
             providers << new(hash)
           end
 
           hash = {
-              ensure: :present,
-              name: name,
-              provider: self.name,
+              :ensure => :present,
+              :name => name,
+              :provider => self.name,
           }
 
           # Add default values
@@ -149,7 +149,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     end
 
     unless hash.empty?
-      debug 'Instantiated bgp peer %{name}' % { name: hash[:name] }
+      debug 'Instantiated bgp peer %{name}' % { :name => hash[:name] }
       providers << new(hash)
     end
 
@@ -168,14 +168,14 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   def create
     name = @resource[:name]
 
-    debug 'Creating the bgp peer %{name}' % { name: name }
+    debug 'Creating the bgp peer %{name}' % { :name => name }
 
     as_number = get_as_number
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number}
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number}
 
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != options[:default]
@@ -189,7 +189,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
             if @resource[property] == :true
               cmds << ERB.new(options[:template]).result(binding)
             else
-              cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
             end
 
           else
@@ -209,14 +209,14 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   def destroy
     name = @property_hash[:name]
 
-    debug 'Destroying the bgp peer %{name}' % { name: name }
+    debug 'Destroying the bgp peer %{name}' % { :name => name }
 
     as_number = get_as_number
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number}
-    cmds << 'no neighbor %{name}' % { name: name }
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number}
+    cmds << 'no neighbor %{name}' % { :name => name }
     cmds << 'end'
     cmds << 'write memory'
 
@@ -234,21 +234,21 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
     name = @property_hash[:name]
 
-    debug 'Flushing the bgp peer %{name}' % { name: name }
+    debug 'Flushing the bgp peer %{name}' % { :name => name }
 
     as_number = get_as_number
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
 
     @property_flush.each do |property, v|
       if v == :absent or v == :false
-        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
 
       elsif [:true, 'true'].inclulde?(v) and [:symbol, :string].include?(resource_map[property][:type])
-        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         cmds << ERB.new(resource_map[property][:template]).result(binding)
 
       elsif v == :true
@@ -256,7 +256,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
       elsif resource_map[property][:type] == :array
         (@property_hash[property] - v).each do |value|
-          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+          cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         end
 
         (v - @property_hash[property]).each do |value|
@@ -280,11 +280,11 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
   def clear
     name = @property_hash[:name]
-    debug 'Clearing the bgp peer %{name}' % { name: name }
+    debug 'Clearing the bgp peer %{name}' % { :name => name }
 
     cmds = []
     proto = name.include?('.') ? 'ip' : 'ipv6'
-    cmds << 'clear %{proto} bgp %{name} soft' % { proto: proto, name: name }
+    cmds << 'clear %{proto} bgp %{name} soft' % { :proto => proto, :name => name }
 
     vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
   end

@@ -3,32 +3,32 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
 
   confine :osfamily => :redhat
 
-  commands vtysh: 'vtysh'
+  commands :vtysh => 'vtysh'
 
   @resource_map = {
-      aggregate_address: {
-          default: [],
-          regexp: /\A\saggregate-address\s(.+)\Z/,
-          template: 'aggregate-address<% unless value.nil? %> <%= value %><% end %>',
-          type: :array,
+      :aggregate_address => {
+          :default  => [],
+          :regexp   => /\A\saggregate-address\s(.+)\Z/,
+          :template => 'aggregate-address<% unless value.nil? %> <%= value %><% end %>',
+          :type     => :array,
       },
-      maximum_ebgp_paths: {
-          default: 1,
-          regexp: /\A\smaximum-paths\s(\d+)\Z/,
-          template: 'maximum-paths<% unless value.nil? %> <%= value %><% end %>',
-          type: :fixnum,
+      :maximum_ebgp_paths => {
+          :default  => 1,
+          :regexp   => /\A\smaximum-paths\s(\d+)\Z/,
+          :template => 'maximum-paths<% unless value.nil? %> <%= value %><% end %>',
+          :type     => :fixnum,
       },
-      maximum_ibgp_paths: {
-          default: 1,
-          regexp: /\A\smaximum-paths\sibgp\s(\d+)\Z/,
-          template: 'maximum-paths ibgp<% unless value.nil? %> <%= value %><% end %>',
-          type: :fixnum,
+      :maximum_ibgp_paths => {
+          :default  => 1,
+          :regexp   => /\A\smaximum-paths\sibgp\s(\d+)\Z/,
+          :template => 'maximum-paths ibgp<% unless value.nil? %> <%= value %><% end %>',
+          :type     => :fixnum,
       },
-      networks: {
-          default: [],
-          regexp: /\A\snetwork\s(.+)\Z/,
-          template: 'network<% unless value.nil? %> <%= value %><% end %>',
-          type: :array,
+      :networks => {
+          :default  => [],
+          :regexp   => /\A\snetwork\s(.+)\Z/,
+          :template => 'network<% unless value.nil? %> <%= value %><% end %>',
+          :type     => :array,
       }
   }
 
@@ -51,10 +51,10 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
         found_router = true
 
         hash = {
-            ensure: :present,
-            proto: proto,
-            provider: self.name,
-            type: type
+            :ensure => :present,
+            :proto => proto,
+            :provider => self.name,
+            :type => type
         }
 
         # Add default values
@@ -74,15 +74,15 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
         type = $2.nil? ? :unicast : $2.to_sym
 
         # Store a previous address family
-        debug 'Instantiated bgp address family %{address_family}.' % { address_family: "#{proto} #{type}" }
+        debug 'Instantiated bgp address family %{address_family}.' % { :address_family => "#{proto} #{type}" }
         providers << new(hash)
 
         # Create new address family
         hash = {
-            ensure: :present,
-            proto: proto,
-            provider: self.name,
-            type: type,
+            :ensure => :present,
+            :proto => proto,
+            :provider => self.name,
+            :type => type,
         }
 
         # Add default values
@@ -127,7 +127,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     end
 
     unless hash.empty?
-      debug 'Instantiated bgp address family %{address_family}.' % { address_family: "#{proto} #{type}" }
+      debug 'Instantiated bgp address family %{address_family}.' % { :address_family => "#{proto} #{type}" }
       providers << new(hash)
     end
 
@@ -147,15 +147,15 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     proto = @resource[:proto]
     type = @resource[:type]
 
-    debug 'Creating the bgp address family %{name}' % { name: address_family(proto, type) }
+    debug 'Creating the bgp address family %{name}' % { :name => address_family(proto, type) }
 
     as_number = get_as_number
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
     cmds << 'address-family %{address_family}' % {
-      address_family: address_family(proto, type)
+      :address_family => address_family(proto, type)
     }
 
     resource_map = self.class.instance_variable_get('@resource_map')
@@ -172,7 +172,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
             if @resource[property] == :true
               cmds << ERB.new(options[:template]).result(binding)
             else
-              cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
             end
 
           else
@@ -194,15 +194,15 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     proto = @resource[:proto]
     type = @resource[:type]
 
-    debug 'Destroying the bgp address family %{address_family}' % { address_family: address_family(proto, type) }
+    debug 'Destroying the bgp address family %{address_family}' % { :address_family => address_family(proto, type) }
 
     as_number = get_as_number
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
     cmds << 'address-family %{address_family}' % {
-      address_family: address_family(proto, type)
+      :address_family => address_family(proto, type)
     }
 
     resource_map = self.class.instance_variable_get('@resource_map')
@@ -212,19 +212,19 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
         case options[:type]
           when :array
             @property_hash[property].each do |value|
-              cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
             end
 
           when :boolean
             if @property_hash[property] == :true
-              cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
             else
               cmds << ERB.new(options[:template]).result(binding)
             end
 
           else
             value = @property_hash[property]
-            cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+            cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
         end
       end
     end
@@ -247,24 +247,24 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     proto = @resource[:proto]
     type = @resource[:type]
 
-    debug 'Flushing the bgp address family %{address_family}' % { address_family: address_family(proto, type) }
+    debug 'Flushing the bgp address family %{address_family}' % { :address_family => address_family(proto, type) }
 
     as_number = get_as_number
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
     cmds << 'address-family %{address_family}' % {
-      address_family: address_family(proto, type)
+      :address_family => address_family(proto, type)
     }
 
     resource_map = self.class.instance_variable_get('@resource_map')
     @property_flush.each do |property, v|
       if v == :absent or v == :false
-        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
 
       elsif (v == :true or v == 'true') and [:symbol, :string].include?(resource_map[property][:type])
-        cmds << 'no %{command}' % { comand: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << 'no %{command}' % { :comand => ERB.new(resource_map[property][:template]).result(binding) }
         cmds << ERB.new(resource_map[property][:template]).result(binding)
 
       elsif v == :true
@@ -272,7 +272,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
 
       elsif resource_map[property][:type]  == :array
         (@property_hash[property] - v).each do |value|
-          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+          cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         end
 
         (v - @property_hash[property]).each do |value|

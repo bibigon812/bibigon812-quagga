@@ -7,7 +7,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
   @resource_template = '<%= protocol %> prefix-list <%= name %> seq <%= seq %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
 
-  commands vtysh: 'vtysh'
+  commands :vtysh => 'vtysh'
 
   mk_resource_methods
 
@@ -23,17 +23,17 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
       if line =~ /^(ip|ipv6)\sprefix-list\s([\w-]+)\sseq\s(\d+)\s(permit|deny)\s([\d\.\/:]+|any)(\s(ge|le)\s(\d+)(\s(ge|le)\s(\d+))?)?$/
 
         hash = {
-            action: $4.to_sym,
-            ensure: :present,
-            ge: $7.nil? ? :absent : Integer($8),
-            le: $11.nil? ? :absent : Integer($11),
-            name: "#{$2} #{$3}",
-            prefix: $5,
-            protocol: $1.to_sym,
-            provider: self.name,
+            :action => $4.to_sym,
+            :ensure => :present,
+            :ge => $7.nil? ? :absent : Integer($8),
+            :le => $11.nil? ? :absent : Integer($11),
+            :name => "#{$2} #{$3}",
+            :prefix => $5,
+            :protocol => $1.to_sym,
+            :provider => self.name,
         }
 
-        debug 'Instantiated the prefix-list %{name}' % { name: hash[:name] }
+        debug 'Instantiated the prefix-list %{name}' % { :name => hash[:name] }
 
         providers << new(hash)
 
@@ -81,7 +81,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     template = self.class.instance_variable_get('@resource_template')
     name, seq = @resource[:name].split(/:/)
 
-    debug 'Creating the prefix-list %{name}.' % { name: "#{name} #{seq}" }
+    debug 'Creating the prefix-list %{name}.' % { :name => "#{name} #{seq}" }
 
     cmds = []
     cmds << 'configure terminal'
@@ -103,7 +103,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     template = self.class.instance_variable_get('@resource_template')
     name, seq = @property_hash[:name].split(/:/)
 
-    debug 'Destroying the prefix-list %{name}.' % { name: "#{name}:#{seq}" }
+    debug 'Destroying the prefix-list %{name}.' % { :name => "#{name}:#{seq}" }
 
     cmds = []
     cmds << 'configure terminal'
@@ -114,7 +114,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     ge = @property_hash[:ge]
     le = @property_hash[:le]
 
-    cmds << 'no %{command}' % { command: ERB.new(template).result(binding) }
+    cmds << 'no %{command}' % { :command => ERB.new(template).result(binding) }
 
     cmds << 'end'
     cmds << 'write memory'
@@ -132,7 +132,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
     name, sequence = @property_hash[:name].split(/:/)
 
-    debug 'Flushing the prefix-list %{name}.' % { name: "#{name} #{sequence}" }
+    debug 'Flushing the prefix-list %{name}.' % { :name => "#{name} #{sequence}" }
 
     create
   end

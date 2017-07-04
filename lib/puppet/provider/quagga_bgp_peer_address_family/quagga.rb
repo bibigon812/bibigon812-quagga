@@ -1,87 +1,87 @@
 Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   @doc = 'Manages the address family of bgp peers using quagga.'
 
-  confine osfamily: :redhat
+  confine :osfamily => :redhat
 
-  commands vtysh: 'vtysh'
+  commands :vtysh => 'vtysh'
 
   @resource_map = {
-    peer_group: {
-      default: :false,
-      regexp: /\A\sneighbor\s(\S+)\speer-group(?:\s(\w+))?\Z/,
-      template: 'neighbor <%= name %> peer-group<% unless value.nil? %> <%= value %><% end %>',
-      type: :string,
+    :peer_group => {
+      :default => :false,
+      :regexp => /\A\sneighbor\s(\S+)\speer-group(?:\s(\w+))?\Z/,
+      :template => 'neighbor <%= name %> peer-group<% unless value.nil? %> <%= value %><% end %>',
+      :type => :string,
     },
-    activate: {
-      regexp: /\A\s(?:(no)\s)?neighbor\s(\S+)\sactivate\Z/,
-      template: 'neighbor <%= name %> activate',
-      type: :boolean,
+    :activate => {
+      :regexp => /\A\s(?:(no)\s)?neighbor\s(\S+)\sactivate\Z/,
+      :template => 'neighbor <%= name %> activate',
+      :type => :boolean,
     },
-    allow_as_in: {
-      default: :absent,
-      regexp: /\A\sneighbor\s(\S+)\sallowas-in\s(\d+)\Z/,
-      template: 'neighbor <%= name %> allowas-in<% unless value.nil? %> <%= value %><% end %>',
-      type: :fixnum,
+    :allow_as_in => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s(\S+)\sallowas-in\s(\d+)\Z/,
+      :template => 'neighbor <%= name %> allowas-in<% unless value.nil? %> <%= value %><% end %>',
+      :type => :fixnum,
     },
-    default_originate: {
-      default: :false,
-      regexp: /\A\sneighbor\s(\S+)\sdefault-originate\Z/,
-      template: 'neighbor <%= name %> default-originate',
-      type: :boolean,
+    :default_originate => {
+      :default => :false,
+      :regexp => /\A\sneighbor\s(\S+)\sdefault-originate\Z/,
+      :template => 'neighbor <%= name %> default-originate',
+      :type => :boolean,
     },
-    next_hop_self: {
-      default: :false,
-      regexp: /\A\sneighbor\s(\S+)\snext-hop-self\Z/,
-      template: 'neighbor <%= name %> next-hop-self',
-      type: :boolean,
+    :next_hop_self => {
+      :default => :false,
+      :regexp => /\A\sneighbor\s(\S+)\snext-hop-self\Z/,
+      :template => 'neighbor <%= name %> next-hop-self',
+      :type => :boolean,
     },
-    prefix_list_in: {
-      default: :absent,
-      regexp: /\A\sneighbor\s(\S+)\sprefix-list\s(\S+)\sin\Z/,
-      template: 'neighbor <%= name %> prefix-list <%= value %> in',
-      type: :string,
+    :prefix_list_in => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s(\S+)\sprefix-list\s(\S+)\sin\Z/,
+      :template => 'neighbor <%= name %> prefix-list <%= value %> in',
+      :type => :string,
     },
-    prefix_list_out: {
-      default: :absent,
-      regexp: /\A\sneighbor\s(\S+)\sprefix-list\s(\S+)\sout\Z/,
-      template: 'neighbor <%= name %> prefix-list <%= value %> out',
-      type: :string,
+    :prefix_list_out => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s(\S+)\sprefix-list\s(\S+)\sout\Z/,
+      :template => 'neighbor <%= name %> prefix-list <%= value %> out',
+      :type => :string,
     },
-    route_map_export: {
-      default: :absent,
-      regexp: /\A\sneighbor\s(\S+)\sroute-map\s(\S+)\sexport\Z/,
-      template: 'neighbor <%= name %> route-map <%= value %> export',
-      type: :string,
+    :route_map_export => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s(\S+)\sroute-map\s(\S+)\sexport\Z/,
+      :template => 'neighbor <%= name %> route-map <%= value %> export',
+      :type => :string,
     },
-    route_map_import: {
-      default: :absent,
-      regexp: /\A\sneighbor\s(\S+)\sroute-map\s(\S+)\simport\Z/,
-      template: 'neighbor <%= name %> route-map <%= value %> import',
-      type: :string,
+    :route_map_import => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s(\S+)\sroute-map\s(\S+)\simport\Z/,
+      :template => 'neighbor <%= name %> route-map <%= value %> import',
+      :type => :string,
     },
-    route_map_in: {
-      default: :absent,
-      regexp: /\A\sneighbor\s(\S+)\sroute-map\s(\S+)\sin\Z/,
-      template: 'neighbor <%= name %> route-map <%= value %> in',
-      type: :string,
+    :route_map_in => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s(\S+)\sroute-map\s(\S+)\sin\Z/,
+      :template => 'neighbor <%= name %> route-map <%= value %> in',
+      :type => :string,
     },
-    route_map_out: {
-      default: :absent,
-      regexp: /\A\sneighbor\s(\S+)\sroute-map\s(\S+)\sout\Z/,
-      template: 'neighbor <%= name %> route-map <%= value %> out',
-      type: :string,
+    :route_map_out => {
+      :default => :absent,
+      :regexp => /\A\sneighbor\s(\S+)\sroute-map\s(\S+)\sout\Z/,
+      :template => 'neighbor <%= name %> route-map <%= value %> out',
+      :type => :string,
     },
-    route_reflector_client: {
-      default: :false,
-      regexp: /\A\sneighbor\s(\S+)\sroute-reflector-client\Z/,
-      template: 'neighbor <%= name %> route-reflector-client',
-      type: :boolean,
+    :route_reflector_client => {
+      :default => :false,
+      :regexp => /\A\sneighbor\s(\S+)\sroute-reflector-client\Z/,
+      :template => 'neighbor <%= name %> route-reflector-client',
+      :type => :boolean,
     },
-    route_server_client: {
-      default: :false,
-      regexp: /\A\sneighbor\s(\S+)\sroute-server-client\Z/,
-      template: 'neighbor <%= name %> route-server-client',
-      type: :boolean,
+    :route_server_client => {
+      :default => :false,
+      :regexp => /\A\sneighbor\s(\S+)\sroute-server-client\Z/,
+      :template => 'neighbor <%= name %> route-server-client',
+      :type => :boolean,
     },
   }
 
@@ -147,19 +147,19 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
                 peer_group_af_activate[previous_peer] = hash[:activate] if hash[:peer_group] == :true
 
                 debug 'Instantiated the address family %{address_family} of the bgp peer %{peer}.' % {
-                  address_family: hash[:address_family],
-                  peer: hash[:peer],
+                  :address_family => hash[:address_family],
+                  :peer => hash[:peer],
                 }
 
                 providers << new(hash)
               end
 
               hash = {
-                address_family: address_family,
-                ensure: :present,
-                name: "#{peer} #{address_family}",
-                peer: peer,
-                provider: self.name,
+                :address_family => address_family,
+                :ensure => :present,
+                :name => "#{peer} #{address_family}",
+                :peer => peer,
+                :provider => self.name,
               }
 
               # Add default values
@@ -211,8 +211,8 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
       end
 
       debug 'Instantiated the address family %{address_family} of the bgp peer %{peer}.' % {
-        address_family: hash[:address_family],
-        peer: hash[:peer],
+        :address_family => hash[:address_family],
+        :peer => hash[:peer],
       }
 
       providers << new(hash)
@@ -234,8 +234,8 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     name, address_family = @resource[:name].split(/\s/)
 
     debug 'Creating the address family %{address_family} of the bgp peer %{peer}' % {
-      address_family: address_family,
-      peer: name,
+      :address_family => address_family,
+      :peer => name,
     }
 
     as_number = get_as_number
@@ -243,9 +243,9 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number}
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number}
     cmds << 'address-family %{address_family}' % {
-      address_family: address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+      :address_family => address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
     }
 
     resource_map.each do |property, options|
@@ -260,7 +260,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
             if @resource[property] == :true
               cmds << ERB.new(options[:template]).result(binding)
             else
-              cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
             end
 
           else
@@ -281,8 +281,8 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     name, address_family = @property_hash[:name].splt(/\s/)
 
     debug 'Destroying the address family %{address_family} of the bgp peer %{peer}' % {
-      address_family: address_family,
-      peer: name,
+      :address_family => address_family,
+      :peer => name,
     }
 
     as_number = get_as_number
@@ -290,9 +290,9 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number}
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number}
     cmds << 'address-family %{address_family}' % {
-      address_family: address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+      :address_family => address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
     }
 
     @property_hash.each do |property, v|
@@ -300,13 +300,13 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
         case resource_map[property][:type]
         when :array
           v.each do |value|
-            cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+            cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
           end
         when :string
           value = v
-          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+          cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         else
-          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+          cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         end
       end
     end
@@ -329,8 +329,8 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     name, address_family = @property_hash[:name].splt(/\s/)
 
     debug 'Flushing the address family %{address_family} of the bgp peer %{peer}' % {
-      address_family: address_family,
-      peer: name,
+      :address_family => address_family,
+      :peer => name,
     }
 
     as_number = get_as_number
@@ -338,17 +338,17 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
     cmds << 'address-family %{address_family}' % {
-      address_family: address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+      :address_family => address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
     }
 
     @property_flush.each do |property, v|
       if v == :absent or v == :false
-        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
 
       elsif [:true, 'true'].inclulde?(v) and [:symbol, :string].include?(resource_map[property][:type])
-        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         cmds << ERB.new(resource_map[property][:template]).result(binding)
 
       elsif v == :true
@@ -356,7 +356,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
 
       elsif resource_map[property][:type] == :array
         (@property_hash[property] - v).each do |value|
-          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+          cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         end
 
         (v - @property_hash[property]).each do |value|
