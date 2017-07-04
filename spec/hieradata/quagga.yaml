@@ -115,6 +115,18 @@ quagga::bgp::address_families:
       - 2001:db8:0:2::/63
 
 quagga::bgp::peers:
+  CLIENTS:
+    passive: true
+    address_families:
+      ipv4_unicast:
+        default_originate: true
+  INTERNAL:
+    remote_as: 65000
+    update_source: 10.0.0.1
+    address_families:
+      ipv4_unicast:
+        activate: true
+        next_hop_self: true
   10.0.0.2:
     peer_group: INTERNAL
     address_families:
@@ -136,18 +148,6 @@ quagga::bgp::peers:
     address_families:
       ipv4_unicast:
         peer_group: CLIENTS
-  CLIENTS:
-    passive: true
-    address_families:
-      ipv4_unicast:
-        default_originate: true
-  INTERNAL:
-    remote_as: 65000
-    update_source: 10.0.0.1
-    address_families:
-      ipv4_unicast:
-        activate: true
-        next_hop_self: true
 
 
 quagga::bgp::as_paths:
