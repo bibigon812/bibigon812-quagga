@@ -23,10 +23,9 @@ define quagga::bgp::peer (
   }
 
   $address_families.each |String $address_family_name, Hash $address_family| {
-    quagga_bgp_peer_address_family {$address_family_name:
-      peer_group => $name,
-      *          => $address_family,
-      require    => Quagga_bgp_peer[$name]
+    quagga_bgp_peer_address_family {"${name} ${address_family_name}":
+      *       => $address_family,
+      require => Quagga_bgp_peer[$name],
     }
   }
 }
