@@ -92,13 +92,14 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     found_router = false
     address_family = :ipv4_unicast
     as_number = ''
-    previous_peer_name = ''
+    previous_peer = ''
     default_ipv4_unicast = :true
-    peer_group_default_ipv4_unicast = {}
+    peer_group_af_activate = {}
+    found_activate = false
 
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
-      # Skip comments
+      # Skipping comments
       next if line =~ /\A!/
 
       # Found the router bgp
@@ -124,31 +125,40 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
         @resource_map.each do |property, options|
           if options[:regexp] =~ line
             if property == :activate
-              peer_name = $2
+              peer = $2
               value = $1
             else
-              peer_name = $1
+              peer = $1
               value = $2
             end
 
-            unless peer_name == previous_peer_name
+            unless peer == previous_peer
               unless hash.empty?
-                # TODO activate
-                if hash[:peer_group] == :true
-                  peer_group_default_ipv4_unicast[previous_peer_name] = hash[:activate]
-                elsif hash[:peer_group] == :false
-                  hash[:activate] = address_family == :ipv4_unicast ? default_ipv4_unicast : :false
-                else
-                  hash[:activate] = peer_group_default_ipv4_unicast[hash[:peer_group]]
+                # Adding the value of the property `activate` if it's not found.
+                unless found_activate
+                  if [:true, :false].include?(hash[:peer_group])
+                    hash[:activate] = address_family == :ipv4_unicast ? default_ipv4_unicast : :false
+                  else
+                    hash[:activate] = peer_group_af_activate[hash[:peer_group]]
+                  end
                 end
 
-                debug 'Instantiated bgp peer address family %{name}.' % { name: hash[:name] }
+                # Saving the value of the property `activate` if the resource is a peer group.
+                peer_group_af_activate[previous_peer] = hash[:activate] if hash[:peer_group] == :true
+
+                debug 'Instantiated the address family %{address_family} of the bgp peer %{peer}.' % {
+                  address_family: hash[:address_family],
+                  peer: hash[:peer],
+                }
+
                 providers << new(hash)
               end
 
               hash = {
+                address_family: address_family,
                 ensure: :present,
-                name: "#{peer_name} #{address_family}",
+                name: "#{peer} #{address_family}",
+                peer: peer,
                 provider: self.name,
               }
 
@@ -163,12 +173,15 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
                 end
               end
 
-              previous_peer_name = peer_name
+              previous_peer = peer
+              found_activate = false
             end
+
+            found_activate = true if property == :activate
 
             if value.nil?
               hash[property] = :true
-            elsif property == :activete
+            elsif property == :activate
               hash[property] = :false
             else
               case options[:type]
@@ -188,7 +201,20 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     end
 
     unless hash.empty?
-      debug 'Instantiated bgp peer address family %{name}.' % { name: hash[:name] }
+      # Adding the value of the property `activate` if it's not found.
+      unless found_activate
+        if [:true, :false].include?(hash[:peer_group])
+          hash[:activate] = address_family == :ipv4_unicast ? default_ipv4_unicast : :false
+        else
+          hash[:activate] = peer_group_af_activate[hash[:peer_group]]
+        end
+      end
+
+      debug 'Instantiated the address family %{address_family} of the bgp peer %{peer}.' % {
+        address_family: hash[:address_family],
+        peer: hash[:peer],
+      }
+
       providers << new(hash)
     end
 
@@ -204,5 +230,178 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     end
   end
 
-  # TODO
+  def create
+    name, address_family = @resource[:name].split(/\s/)
+
+    debug 'Creating the address family %{address_family} of the bgp peer %{peer}' % {
+      address_family: address_family,
+      peer: name,
+    }
+
+    as_number = get_as_number
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << 'router bgp %{as_number}' % { as_number: as_number}
+    cmds << 'address-family %{address_family}' % {
+      address_family: address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+    }
+
+    resource_map.each do |property, options|
+      if @resource[property] and @resource[property] != options[:default]
+        case options[:type]
+          when :array
+            @resource[property].each do |value|
+              cmds << ERB.new(options[:template]).result(binding)
+            end
+
+          when :boolean
+            if @resource[property] == :true
+              cmds << ERB.new(options[:template]).result(binding)
+            else
+              cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+            end
+
+          else
+            value = @resource[property]
+            cmds << ERB.new(options[:template]).result(binding)
+        end
+
+      end
+    end
+
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
+  end
+
+  def destroy
+    name, address_family = @property_hash[:name].splt(/\s/)
+
+    debug 'Destroying the address family %{address_family} of the bgp peer %{peer}' % {
+      address_family: address_family,
+      peer: name,
+    }
+
+    as_number = get_as_number
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << 'router bgp %{as_number}' % { as_number: as_number}
+    cmds << 'address-family %{address_family}' % {
+      address_family: address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+    }
+
+    @property_hash.each do |property, v|
+      unless value == resource_map[proeprty][:default]
+        case resource_map[property][:type]
+        when :array
+          v.each do |value|
+            cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+          end
+        when :string
+          value = v
+          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        else
+          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        end
+      end
+    end
+
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
+
+    @property_hash.clear
+  end
+
+  def exists?
+    @property_hash[:ensure] == :present
+  end
+
+  def flush
+    return if @property_flush.empty?
+
+    name, address_family = @property_hash[:name].splt(/\s/)
+
+    debug 'Flushing the address family %{address_family} of the bgp peer %{peer}' % {
+      address_family: address_family,
+      peer: name,
+    }
+
+    as_number = get_as_number
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    cmds = []
+    cmds << 'configure terminal'
+    cmds << 'router bgp %{as_number}' % { as_number: as_number }
+    cmds << 'address-family %{address_family}' % {
+      address_family: address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+    }
+
+    @property_flush.each do |property, v|
+      if v == :absent or v == :false
+        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+
+      elsif [:true, 'true'].inclulde?(v) and [:symbol, :string].include?(resource_map[property][:type])
+        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+
+      elsif v == :true
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+
+      elsif resource_map[property][:type] == :array
+        (@property_hash[property] - v).each do |value|
+          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
+        end
+
+        (v - @property_hash[property]).each do |value|
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
+        end
+
+      else
+        value = v
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      end
+    end
+
+    cmds << 'end'
+    cmds << 'write memory'
+
+    vtysh(cmds.reduce([]) { |commands, command| commands << '-c' << command })
+
+    @property_hash = @resource.to_hash
+    @property_flush.clear
+  end
+
+  @resource_map.each_key do |property|
+    define_method "#{property}" do
+      @property_hash[property] || :absent
+    end
+
+    define_method "#{property}=" do |value|
+      @property_flush[property] = value
+    end
+  end
+
+  private
+  def get_as_number
+    if @as_number.nil?
+      begin
+        vtysh('-c', 'show ip bgp summary').split(/\n/).collect.each do |line|
+          if line =~ /\ABGP\srouter\sidentifier\s(\d+\.\d+\.\d+\.\d+),\slocal\sAS\snumber\s(\d+)\Z/
+            @as_number = Integer($2)
+            break
+          end
+        end
+      rescue
+      end
+    end
+
+    @as_number
+  end
 end
