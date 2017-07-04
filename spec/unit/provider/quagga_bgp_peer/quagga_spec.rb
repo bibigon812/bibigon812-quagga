@@ -261,23 +261,18 @@ end'
       })
     end
 
-    # it 'should return the 1a03:d000:20a0::91 resource' do
-    #   expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-    #     activate: :true,
-    #     allow_as_in: 1,
-    #     default_originate: :false,
-    #     ensure: :present,
-    #     name: '1a03:d000:20a0::91',
-    #     next_hop_self: :false,
-    #     passive: :false,
-    #     peer_group: :false,
-    #     provider: :quagga,
-    #     remote_as: 31113,
-    #     route_reflector_client: :false,
-    #     route_server_client: :false,
-    #     shutdown: :false,
-    #     update_source: '1a03:d000:20a0::92',
-    #   })
-    # end
+    it 'should return the 1a03:d000:20a0::91 resource' do
+      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
+        ensure: :present,
+        local_as: :absent,
+        name: '1a03:d000:20a0::91',
+        passive: :false,
+        peer_group: :false,
+        provider: :quagga,
+        remote_as: 31113,
+        shutdown: :false,
+        update_source: '1a03:d000:20a0::92',
+      })
+    end
   end
 end
