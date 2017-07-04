@@ -10,7 +10,7 @@ class quagga::bgp (
   Hash $peers,
   Hash $as_paths,
   Hash $community_lists,
-  Hash $address_families
+  Hash $address_families,
 ) {
   include quagga::bgp::config
   include quagga::bgp::service
