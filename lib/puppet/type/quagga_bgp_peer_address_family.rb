@@ -36,8 +36,18 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     newvalues(/\A\w+\sipv6_(unicast)\Z/)
   end
 
+  newparam(:address_family) do
+    default { @resource[:name].split(/\s/).last }
+    newvalues(:ipv4_unicast, :ipv4_multicast, :ipv6_unicast)
+  end
+
+  newparam(:peer) do
+    default { @resource[:name].split(/\s/).first }
+  end
+
   newproperty(:activate, :boolean => true) do
     desc 'Enable the Address Family for this Neighbor.'
+
     defaultto(:false)
     newvalues(:false, :true)
   end
@@ -69,13 +79,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   newproperty(:peer_group) do
     desc 'Member of the peer-group.'
 
-    defaultto do
-       if @resource[:name] =~ /\.:/
-         :false
-       else
-         :true
-       end
-    end
+    defaultto { @resource[:name] =~ /\.:/ ? :false : :true }
 
     newvalues(:false, :true)
     newvalues(/\A[[:alpha:]]\w+\Z/)
