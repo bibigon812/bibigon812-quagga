@@ -46,7 +46,7 @@ Puppet::Type.newtype(:quagga_bgp_router) do
 
   newproperty(:default_ipv4_unicast, boolean: true) do
     desc 'Activate ipv4-unicast for a peer by default.'
-    defaultto(:true)
+    defaultto(:false)
     newvalues(:false, :true)
   end
 
