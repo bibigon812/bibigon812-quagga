@@ -31,7 +31,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
       end
     end
 
-    [:import_check, :default_ipv4_unicast, :default_local_preference,
+    [:as_number, :import_check, :default_ipv4_unicast, :default_local_preference,
      :router_id,].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
@@ -60,14 +60,26 @@ describe Puppet::Type.type(:quagga_bgp_router) do
       expect { described_class.new(:name => 'bgp') }.to_not raise_error
     end
 
-    it 'should not support AS197888 as a value' do
-      expect { described_class.new(:name => 'AS197888') }.to raise_error(Puppet::Error, /Invalid value/)
+    it 'should not support AS65000 as a value' do
+      expect { described_class.new(:name => 'AS65000') }.to raise_error(Puppet::Error, /Invalid value/)
     end
   end
 
   describe 'as_number' do
     it 'should support 65000 as a value' do
-      expect{described_class.new(name: 'bgp', as_number: 65000)}.to_not raise_error
+      expect{described_class.new(:name => 'bgp', :as_number => 65000)}.to_not raise_error
+    end
+
+    it 'should support \'65000\' as a value' do
+      expect{described_class.new(:name => 'bgp', :as_number => '65000')}.to_not raise_error
+    end
+
+    it 'should not support \'AS65000\' as a value' do
+      expect{described_class.new(:name => 'bgp', :as_number => 'AS65000')}.to raise_error Puppet::Error, /Invalid value/
+    end
+
+    it 'should support 65000 as a value' do
+      expect(described_class.new(:name => 'bgp', :as_number => '65000')[:as_number]).to eq(65000)
     end
   end
 

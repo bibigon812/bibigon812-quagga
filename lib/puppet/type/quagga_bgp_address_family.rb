@@ -16,20 +16,17 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
 
   def self.title_patterns
     [
-      [ /\A([^_]*)\Z/, [[ :proto ]] ],
-      [ /\A([^_]*)_([^_]*)\Z/, [[:proto], [:type]] ]
+      [ /\A([^_]+)_([^_]+)\Z/, [[:proto], [:type]] ]
     ]
   end
 
   newparam(:proto, :namevar => true) do
     desc 'The protocol is `ipv4` or `ipv6`.'
-    defaultto(:ipv4)
     newvalues(:ipv4, :ipv6)
   end
 
   newparam(:type, :namevar => true) do
     desc 'The protocl type is `unicast` or `multicast`.'
-    defaultto(:unicast)
     newvalues(:unicast, :multicast)
   end
 

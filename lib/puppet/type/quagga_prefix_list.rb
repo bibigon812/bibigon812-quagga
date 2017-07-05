@@ -16,10 +16,26 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
   ensurable
 
-  newparam(:name, namevar: true) do
-    desc 'The name of the prefix-list and the sequence number of rule.'
+  def self.title_patterns
+    [
+      [ /\A(\S+)\s(\S+)\Z/, [[:name], [:sequence]] ]
+    ]
+  end
 
-    newvalues(/\A[\w-]+\s\d+\Z/)
+  newparam(:name, :namevar => true) do
+    desc 'The name of the prefix-list.'
+
+    newvalues(/\A[\w-]+\Z/)
+  end
+
+  newparam(:sequence, :namevar => true) do
+    desc 'The sequence number of the rule.'
+
+    newvalues(/\A\d+\Z/)
+
+    munge do |value|
+      Integer(value)
+    end
   end
 
   newproperty(:action) do

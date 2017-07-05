@@ -51,10 +51,10 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
         found_router = true
 
         hash = {
-            :ensure => :present,
-            :proto => proto,
+            :ensure   => :present,
+            :proto    => proto,
             :provider => self.name,
-            :type => type
+            :type     => type,
         }
 
         # Add default values
@@ -73,16 +73,18 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
         proto = $1.to_sym
         type = $2.nil? ? :unicast : $2.to_sym
 
-        # Store a previous address family
-        debug 'Instantiated bgp address family %{address_family}.' % { :address_family => "#{proto} #{type}" }
+        debug 'Instantiated bgp address family %{address_family}.' % {
+          :address_family => "#{hash[:proto]} #{hash[:type]}",
+        }
+
         providers << new(hash)
 
         # Create new address family
         hash = {
-            :ensure => :present,
-            :proto => proto,
+            :ensure   => :present,
+            :proto    => proto,
             :provider => self.name,
-            :type => type,
+            :type     => type,
         }
 
         # Add default values
@@ -127,7 +129,10 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     end
 
     unless hash.empty?
-      debug 'Instantiated bgp address family %{address_family}.' % { :address_family => "#{proto} #{type}" }
+      debug 'Instantiated bgp address family %{address_family}.' % {
+        :address_family => "#{hash[:proto]} #{hash[:type]}"
+      }
+
       providers << new(hash)
     end
 
@@ -136,9 +141,9 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.keys.each do |name|
-      if provider = providers.find{ |pkg| pkg.name == name }
-        resources[name].provider = provider
+    resources.values.each do |resource|
+      if provider = providers.find{ |p| p.proto == resource[:proto] and p.type == resource[:type] }
+        resource.provider = provider
       end
     end
   end
@@ -298,6 +303,16 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     super(value)
 
     @property_flush = {}
+  end
+
+  [:proto, :type].each do |param|
+    define_method "#{param}" do
+      @property_hash[param]
+    end
+
+    define_method "#{param}=" do |value|
+      @property_hash[param] = value
+    end
   end
 
   @resource_map.each_key do |property|

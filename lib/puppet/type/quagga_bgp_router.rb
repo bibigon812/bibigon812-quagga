@@ -17,8 +17,9 @@ Puppet::Type.newtype(:quagga_bgp_router) do
 
   ensurable
 
-  newparam(:name) do
+  newparam(:name, :namevar => true) do
     desc 'BGP router instance. Must be set to \'bgp\'.'
+    defaultto(:bgp)
     newvalues(:bgp)
   end
 
@@ -38,13 +39,13 @@ Puppet::Type.newtype(:quagga_bgp_router) do
     end
   end
 
-  newproperty(:import_check, boolean: true) do
+  newproperty(:import_check, :boolean => true) do
     desc 'Check BGP network route exists in IGP.'
     defaultto(:false)
     newvalues(:false, :true)
   end
 
-  newproperty(:default_ipv4_unicast, boolean: true) do
+  newproperty(:default_ipv4_unicast, :boolean => true) do
     desc 'Activate ipv4-unicast for a peer by default.'
     defaultto(:false)
     newvalues(:false, :true)

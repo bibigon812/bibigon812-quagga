@@ -1,16 +1,20 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_global) do
-  let(:provider) do
-    @provider_class = describe_class.provide(:quagga_ospf) {
+  let :providerclass  do
+    described_class.provide(:fake_quagga_provider) do
+      attr_accessor :property_hash
+      def create; end
+      def destroy; end
+      def exists?
+        get(:ensure) == :present
+      end
       mk_resource_methods
-    }
-    @provider_class.stub(:suitable?).return true
-    @provider_class
+    end
   end
 
   before :each do
-    described_class.stubs(:defaultprovider).returns @provider_class
+    Puppet::Type.type(:quagga_bgp_router).stubs(:defaultprovider).returns providerclass
   end
 
   after :each do
@@ -18,17 +22,17 @@ describe Puppet::Type.type(:quagga_global) do
   end
 
   it 'should have :name be its namevar' do
-    expect(described_class.key_attributes).to eq([:name])
+    expect(described_class.key_attributes).to eq([:hostname])
   end
 
   describe "when validating attributes" do
-    [:name, :provider].each do |param|
+    [:hostname, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end
     end
 
-    [:hostname, :password, :enable_password, :line_vty, :service_password_encryption,
+    [:password, :enable_password, :line_vty, :service_password_encryption,
     :ip_forwarding, :ipv6_forwarding, :ip_multicast_routing].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
@@ -36,7 +40,7 @@ describe Puppet::Type.type(:quagga_global) do
     end
   end
 
-  describe 'name' do
+  describe 'title' do
     it 'should support ospf as a value' do
       expect { described_class.new(:name => 'foo') }.to_not raise_error
     end
@@ -113,7 +117,7 @@ describe Puppet::Type.type(:quagga_global) do
     end
 
     it 'should contain hostname.example.com' do
-      expect(described_class.new(:name => 'hostname.example.com', :hostname => '')[:hostname]).to eq('hostname.example.com')
+      expect(described_class.new(:name => 'hostname.example.com', :hostname => '')[:hostname]).to eq('')
     end
 
     it 'should contain host1.example.com' do

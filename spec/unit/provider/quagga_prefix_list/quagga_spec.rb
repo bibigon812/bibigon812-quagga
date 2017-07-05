@@ -37,27 +37,29 @@ ip as-path access-list THROUGH_AS300 permit _300_
 
     it 'should return the resource \'ABCD 5\'' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-          ensure: :present,
-          name: 'ABCD 5',
-          ge: :absent,
-          le: :absent,
-          provider: :quagga,
-          action: :permit,
-          prefix: 'any',
-          protocol: :ip,
+          :ensure   => :present,
+          :name     => 'ABCD',
+          :ge       => :absent,
+          :le       => :absent,
+          :provider => :quagga,
+          :action   => :permit,
+          :prefix   => 'any',
+          :protocol => :ip,
+          :sequence => 5,
       })
     end
 
     it 'should return the resource \'ADVERTISED_ROUTES 10\'' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-          ensure: :present,
-          name: 'ADVERTISED_ROUTES 10',
-          ge: :absent,
-          le: :absent,
-          provider: :quagga,
-          action: :permit,
-          prefix: '1.1.1.0/24',
-          protocol: :ip,
+          :ensure   => :present,
+          :name     => 'ADVERTISED_ROUTES',
+          :ge       => :absent,
+          :le       => :absent,
+          :provider => :quagga,
+          :action   => :permit,
+          :prefix   => '1.1.1.0/24',
+          :protocol => :ip,
+          :sequence => 10,
       })
     end
   end

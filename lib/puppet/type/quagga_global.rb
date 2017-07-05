@@ -1,21 +1,12 @@
 Puppet::Type.newtype(:quagga_global) do
   @doc = 'This type provides the capabilities to manage the router'
 
-  newparam(:name, :namevar => true) do
-    desc 'Router instance name'
-  end
+  # newparam(:name, :namevar => true) do
+  #   desc 'Router instance name'
+  # end
 
-  newproperty(:hostname) do
+  newparam(:hostname, :namevar => true) do
     desc 'Router hostname'
-    defaultto {@resource[:name]}
-
-    munge do |value|
-      if value.empty?
-        @resource[:name]
-      else
-        value
-      end
-    end
   end
 
   newproperty(:password) do

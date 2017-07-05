@@ -21,10 +21,25 @@ Puppet::Type.newtype(:quagga_route_map) do
 
   ensurable
 
-  newparam(:name) do
-    desc 'The name of the route-map and the action are separated by space.'
+  def self.title_patterns
+    [
+      [ /\A(\S+)\s(\S+)\Z/, [[:name], [:sequence]] ]
+    ]
+  end
 
-    newvalues(/\A\w[\w-]+\s\d+\Z/)
+  newparam(:name, :namevar => true) do
+    desc 'The name of the route-map.'
+
+    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+  end
+
+  newparam(:sequence, :namevar => true) do
+    desc 'The aequence number of the rule.'
+    newvalues(/\A\d+\Z/)
+
+    munge do |value|
+      Integer(value)
+    end
   end
 
   newproperty(:action) do

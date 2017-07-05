@@ -51,6 +51,10 @@ describe Puppet::Type.type(:quagga_bgp_address_family) do
     it 'should not support \'ipv6_foo\' as a value' do
       expect { described_class.new(:title => 'ipv6_foo') }.to raise_error(Puppet::Error, /Invalid value/)
     end
+
+    it 'should not support \'ipv6\' as a value' do
+      expect { described_class.new(:title => 'ipv6') }.to raise_error(Puppet::Error, /title patterns matched/)
+    end
   end
 
   describe 'aggregate_address' do

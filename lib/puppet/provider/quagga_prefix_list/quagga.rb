@@ -5,7 +5,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
       :action, :prefix, :ge, :le, :protocol,
   ]
 
-  @resource_template = '<%= protocol %> prefix-list <%= name %> seq <%= seq %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
+  @resource_template = '<%= protocol %> prefix-list <%= name %> seq <%= sequence %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
 
   commands :vtysh => 'vtysh'
 
@@ -27,13 +27,17 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
             :ensure => :present,
             :ge => $7.nil? ? :absent : Integer($8),
             :le => $11.nil? ? :absent : Integer($11),
-            :name => "#{$2} #{$3}",
+            :name => $2,
             :prefix => $5,
             :protocol => $1.to_sym,
             :provider => self.name,
+            :sequence => Integer($3),
         }
 
-        debug 'Instantiated the prefix-list %{name}' % { :name => hash[:name] }
+        debug 'Instantiated the prefix-list %{name} ${sequence}' % {
+          :name     => hash[:name],
+          :sequence => hash[:sequence],
+        }
 
         providers << new(hash)
 
@@ -48,40 +52,24 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   end
 
   def self.prefetch(resources)
-    debug 'Prefetch prefix-list resources.'
     providers = instances
-
-    found_providers = []
-    prefix_list_names = []
-
-    resources.keys.each do |name|
-      if provider = providers.find{ |prefix_list| prefix_list.name == name }
-        resources[name].provider = provider
-
-        found_providers << provider
-      end
-
-      # Store prefix-list names which that were found
-      prefix_list_name = name.split(/:/).first
-      prefix_list_names << prefix_list_name unless prefix_list_names.include?(prefix_list_name)
-    end
-
-    # Destroy providers that manage unused sequences of found prefix-lists
-    (providers - found_providers).each do |provider|
-      prefix_list_names.each do |prefix_list_name|
-        if provider.name.start_with?("#{prefix_list_name}:")
-          provider.destroy
-          break
-        end
+    resources.values.each do |resource|
+      if provider = providers.find{ |provider| provider.name == resource[:name] and provider.sequence == resoucre[:sequince] }
+        resource.provider = provider
       end
     end
   end
 
   def create
     template = self.class.instance_variable_get('@resource_template')
-    name, seq = @resource[:name].split(/:/)
 
-    debug 'Creating the prefix-list %{name}.' % { :name => "#{name} #{seq}" }
+    name = @resource[:name]
+    sequence = @resource[:sequence]
+
+    debug 'Creating the prefix-list %{name} %{sequence}.' % {
+      :name     => name,
+      :sequence => sequence,
+    }
 
     cmds = []
     cmds << 'configure terminal'
@@ -101,9 +89,13 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
   def destroy
     template = self.class.instance_variable_get('@resource_template')
-    name, seq = @property_hash[:name].split(/:/)
+    name = @property_hash[:name]
+    sequence = @property_hash[:sequence]
 
-    debug 'Destroying the prefix-list %{name}.' % { :name => "#{name}:#{seq}" }
+    debug 'Destroying the prefix-list %{name}.' % {
+      :name     => name,
+      :sequence => sequence,
+    }
 
     cmds = []
     cmds << 'configure terminal'

@@ -37,39 +37,42 @@ route-map AS8631_out permit 20
       expect(described_class.instances.size).to eq(3)
     end
 
-    it 'should return the resource CONNECTED:500' do
+    it 'should return the resource CONNECTED 500' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-          :ensure => :present,
-          :action => :permit,
-          :name => 'CONNECTED:500',
+          :ensure   => :present,
+          :action   => :permit,
+          :name     => 'CONNECTED',
           :provider => :quagga,
-          :match => ['ip address prefix-list CONNECTED_NETWORKS',],
+          :match    => ['ip address prefix-list CONNECTED_NETWORKS',],
           :on_match => :absent,
-          :set => [],
+          :set      => [],
+          :sequence => 500,
       })
     end
 
     it 'should return the resource AS8631_out:10' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-          :ensure => :present,
-          :action => :permit,
-          :name => 'AS8631_out:10',
+          :ensure   => :present,
+          :action   => :permit,
+          :name     => 'AS8631_out',
           :provider => :quagga,
-          :match => ['origin igp',],
+          :match    => ['origin igp',],
           :on_match => :absent,
-          :set => ['community 1:1 2:2 additive', 'extcommunity rt 100:1', 'metric +10',],
+          :set      => ['community 1:1 2:2 additive', 'extcommunity rt 100:1', 'metric +10',],
+          :sequence => 10,
       })
     end
 
     it 'should return the resource AS8631_out:20' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-          :ensure => :present,
-          :action => :permit,
-          :name => 'AS8631_out:20',
+          :ensure   => :present,
+          :action   => :permit,
+          :name     => 'AS8631_out',
           :provider => :quagga,
-          :match => ['origin igp',],
+          :match    => ['origin igp',],
           :on_match => :absent,
-          :set => ['community 0:6697 additive',],
+          :set      => ['community 0:6697 additive',],
+          :sequence => 20,
       })
     end
   end
