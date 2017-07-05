@@ -203,7 +203,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   def destroy
@@ -220,7 +220,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
 
     @property_hash.clear
   end
@@ -272,7 +272,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]) { |commands, command| commands << '-c' << command })
+    vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
 
     @property_hash = @resource.to_hash
     @property_flush.clear
@@ -286,7 +286,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     proto = name.include?('.') ? 'ip' : 'ipv6'
     cmds << 'clear %{proto} bgp %{name} soft' % { :proto => proto, :name => name }
 
-    vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   @resource_map.each_key do |property|

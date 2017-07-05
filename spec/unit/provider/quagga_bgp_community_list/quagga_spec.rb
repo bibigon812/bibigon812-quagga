@@ -129,7 +129,7 @@ end
 
   describe '#destroy' do
     before do
-      provider.stubs(:exists?).returns(false)
+      provider.stubs(:exists?).returns(true)
     end
 
     it 'should has all rules' do
