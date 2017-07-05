@@ -9,8 +9,6 @@ Puppet::Type.type(:quagga_bgp_as_path).provide :quagga do
   commands :vtysh => 'vtysh'
 
   def self.instances
-    debug '[instances]'
-
     providers = []
     hash = {}
     previous_name = ''
@@ -20,11 +18,14 @@ Puppet::Type.type(:quagga_bgp_as_path).provide :quagga do
       if line =~ /\Aip\sas-path\saccess-list\s([\w]+)\s(permit|deny)\s(.+)\Z/
         name = $1
         action = $2
-        regex = $3
+        regexp = $3
 
         unless name == previous_name
           unless hash.empty?
-            debug "as-path list: #{hash}"
+            debug 'Instantiated the bgp as-path %{name}.' % {
+              :name => hash[:name],
+            }
+
             providers << new(hash)
           end
 
@@ -36,16 +37,22 @@ Puppet::Type.type(:quagga_bgp_as_path).provide :quagga do
           }
         end
 
-        hash[:rules] <<  "#{action} #{regex}"
+        regexp.split(/\s/).each do |r|
+          hash[:rules] <<  "#{action} #{r}"
+        end
 
         previous_name = name
       end
     end
 
     unless hash.empty?
-      debug "as-path list: #{hash}"
+      debug 'Instantiated the bgp as-path %{name}.' % {
+        :name => hash[:name],
+      }
+
       providers << new(hash)
     end
+
     providers
   end
 
@@ -59,19 +66,42 @@ Puppet::Type.type(:quagga_bgp_as_path).provide :quagga do
   end
 
   def create
-    debug '[create]'
-    @property_hash[:ensure] = :present
-    @property_hash[:name] = @resource[:name]
+    debug 'Creating the bgp as-path %{name}.' % {
+      :name => @resource[:name]
+    }
 
-    self.rules = @resource[:rules]
+    cmds = []
+    cmds << 'configure terminal'
+
+    @resource[:rules].each do |rule|
+      cmds << 'ip as-path access-list %{name} %{rule}' % {
+        :name => @resource[:name],
+        :rule => rule,
+      }
+    end
+
+    cmds << 'end'
+    cmds << 'write memory'
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_hash[:ensure] = :present
   end
 
   def destroy
-    debug '[destroy]'
+    debug 'Destroying the bgp as-path %{name}.' % {
+      :name => @property_hash[:name],
+    }
 
-    @property_hash[:ensure] = :absent
+    cmds = []
+    cmds << 'configure terminal'
 
-    self.rules = []
+    cmds << 'no ip as-path access-list %{name}' % {
+      :name => @property_hash[:name],
+    }
+
+    cmds << 'end'
+    cmds << 'write memory'
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
 
     @property_hash.clear
   end
@@ -85,22 +115,8 @@ Puppet::Type.type(:quagga_bgp_as_path).provide :quagga do
   end
 
   def rules=(value)
-    debug '[rules=]'
-    name = @property_hash[:name]
-
-    cmds = []
-    cmds << 'configure terminal'
-
-    cmds << "no ip as-path access-list #{name}"
-
-    value.each do |rule|
-      cmds << "ip as-path access-list #{name} #{rule}"
-    end
-
-    cmds << 'end'
-    cmds << 'write memory'
-
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    destroy
+    create unless value.empty?
 
     @property_hash[:rules] = value
   end
