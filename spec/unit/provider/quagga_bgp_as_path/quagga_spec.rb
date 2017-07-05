@@ -85,7 +85,6 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
       }
     end
 
-
     before :each do
       described_class.stubs(:vtysh).with(
           '-c', 'show running-config'
@@ -99,7 +98,6 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
   end
 
   describe '#create' do
-
     before do
       provider.stubs(:exists?).returns(false)
     end
@@ -119,7 +117,6 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
   end
 
   describe '#destroy' do
-
     before do
       provider.stubs(:exists?).returns(true)
     end

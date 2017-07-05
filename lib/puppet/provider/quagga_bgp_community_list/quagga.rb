@@ -9,8 +9,6 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
   end
 
   def self.instances
-    debug '[instances]'
-
     providers = []
     hash = {}
     previous_name = ''
@@ -29,7 +27,10 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
 
         if name != previous_name
           unless hash.empty?
-            debug "community-list: #{hash}"
+            debug 'Instantiated the bgp community list %{name}.' % {
+              :name => hash[:name],
+            }
+
             providers << new(hash)
           end
           hash = {
@@ -51,7 +52,10 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
     end
 
     unless hash.empty?
-      debug "community-list: #{hash}"
+      debug 'Instantiated the bgp community list %{name}.' % {
+        :name => hash[:name],
+      }
+
       providers << new(hash)
     end
 
@@ -68,16 +72,42 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
   end
 
   def create
-    debug '[create]'
-    @property_hash[:name] = @resource[:name]
+    debug 'Creating the bgp community list %{name}.' % {
+      :name => @resource[:name],
+    }
+
+    cmds = []
+    cmds << 'configure terminal'
+
+    @resource[:rules].each do |rule|
+      cmds << 'ip community-list %{name} %{rule}' % {
+        :name => @resource[:name],
+        :rule => rule,
+      }
+    end
+
+    cmds << 'end'
+    cmds << 'write memory'
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
     @property_hash[:ensure] = :present
-    self.rules = @resource[:rules]
   end
 
   def destroy
-    debug '[destroy]'
-    @property_hash[:ensure] = :absent
-    self.rules = []
+    debug 'Destroying the bgp community list %{name}.' % {
+      :name => @property_hash[:name],
+    }
+
+    cmds = []
+    cmds << 'configure terminal'
+
+    cmds << 'no ip community-list %{name}' % { :name => @property_hash[:name], }
+
+    cmds << 'end'
+    cmds << 'write memory'
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_hash.clear
   end
 
   def exists?
@@ -89,22 +119,8 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
   end
 
   def rules=(value)
-    debug '[rules=]'
-    name = @property_hash[:name].nil? ? @resource[:name] : @property_hash[:name]
-
-    cmds = []
-    cmds << 'configure terminal'
-
-
-    cmds << "no ip community-list #{name}"
-
-    value.each do |rule|
-      cmds << "ip community-list #{name} #{rule}"
-    end
-
-    cmds << 'end'
-    cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    destroy
+    create unless value.empty?
 
     @property_hash[:rules] = value
   end
