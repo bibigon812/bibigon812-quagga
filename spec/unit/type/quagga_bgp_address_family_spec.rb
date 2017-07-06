@@ -14,7 +14,7 @@ describe Puppet::Type.type(:quagga_bgp_address_family) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_bgp_as_path).stubs(:defaultprovider).returns providerclass
+    Puppet::Type.type(:quagga_bgp_address_family).stubs(:defaultprovider).returns providerclass
   end
 
   it "should have :proto, :type be it's namevar" do

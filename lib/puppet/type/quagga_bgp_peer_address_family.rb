@@ -27,28 +27,50 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
   ensurable
 
+  def self.title_patterns
+    [
+      [ /\A(\S+)\Z/, [[:name]] ],
+      [ /\A(\S+)\s(\S+)\Z/, [[:name], [:address_family]] ]
+    ]
+  end
+
   newparam(:name, :namevar => true) do
     desc 'Contains the neighbor IP address or the peer-group name, the address family.'
 
-    newvalues(/\A([\d\.]+)\sipv4_(unicast|multicast)\Z/)
-    newvalues(/\A([\h\.:]+)\sipv6_(unicast)\Z/)
-    newvalues(/\A\w+\sipv4_(unicast|multicast)\Z/)
-    newvalues(/\A\w+\sipv6_(unicast)\Z/)
+    newvalues(/\A[\d\.]+\Z/)
+    newvalues(/\A[\h\.:]+\Z/)
+    newvalues(/\A\w+\Z/)
   end
 
-  newparam(:address_family) do
-    default { @resource[:name].split(/\s/).last }
+  newparam(:address_family, :namevar => true) do
+    defaultto(:ipv4_unicast)
     newvalues(:ipv4_unicast, :ipv4_multicast, :ipv6_unicast)
   end
 
-  newparam(:peer) do
-    default { @resource[:name].split(/\s/).first }
+  newproperty(:peer_group) do
+    desc 'Member of the peer-group.'
+
+    defaultto { @resource[:name] =~ /\.:/ ? :false : :true }
+
+    newvalues(:false, :true)
+    newvalues(/\A[[:alpha:]]\w+\Z/)
   end
 
   newproperty(:activate, :boolean => true) do
     desc 'Enable the Address Family for this Neighbor.'
 
-    defaultto(:false)
+    defaultto do
+      if @resource[:peer_group] == :false or @resource[:peer_group] == :true
+        if @resource[:address_family] == :ipv4_unicast
+          @resource.catalog.resources.find{ |resource| resource.type == :quagga_bgp_router }[:default_ipv4_unicast]
+        else
+          :false
+        end
+      else
+        @resource.catalog.resources.select{ |resource| resource.type == :quagga_bgp_peer_address_family }.find{ |resource| resource[:name] == @resource[:peer_group] }[:activate]
+      end
+    end
+
     newvalues(:false, :true)
   end
 
@@ -74,15 +96,6 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'Disable the next hop calculation for this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
-  end
-
-  newproperty(:peer_group) do
-    desc 'Member of the peer-group.'
-
-    defaultto { @resource[:name] =~ /\.:/ ? :false : :true }
-
-    newvalues(:false, :true)
-    newvalues(/\A[[:alpha:]]\w+\Z/)
   end
 
   newproperty(:prefix_list_in) do

@@ -14,7 +14,7 @@ describe Puppet::Type.type(:quagga_bgp_community_list) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_bgp_as_path).stubs(:defaultprovider).returns providerclass
+    Puppet::Type.type(:quagga_bgp_community_list).stubs(:defaultprovider).returns providerclass
   end
 
   after :each do

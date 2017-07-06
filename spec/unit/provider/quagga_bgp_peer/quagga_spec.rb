@@ -369,7 +369,7 @@ end
       provider.stubs(:get_as_number).returns(65000)
     end
 
-    it 'should has all values' do
+    it 'should update passive, shutdown and update_source' do
       resource[:ensure] = :present
       provider.passive = :true
       provider.shutdown = :true
@@ -386,7 +386,7 @@ end
       provider.flush
     end
 
-    it 'should has all values' do
+    it 'should remove passive and shutdown and change update_source' do
       resource[:ensure] = :present
       provider.passive = :false
       provider.shutdown = :false

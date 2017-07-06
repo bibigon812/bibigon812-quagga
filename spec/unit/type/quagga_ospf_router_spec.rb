@@ -17,7 +17,7 @@ describe Puppet::Type.type(:quagga_ospf_router) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_bgp_as_path).stubs(:defaultprovider).returns providerclass
+    Puppet::Type.type(:quagga_ospf_router).stubs(:defaultprovider).returns providerclass
   end
 
   after :each do

@@ -136,7 +136,6 @@ end'
   end
 
   describe '#create' do
-
     before do
       provider.stubs(:exists?).returns(false)
       provider.stubs(:get_as_number).returns(65000)
@@ -166,7 +165,6 @@ end'
   end
 
   describe '#destroy' do
-
     before do
       provider.stubs(:exists?).returns(true)
       provider.stubs(:get_as_number).returns(65000)
@@ -195,7 +193,6 @@ end'
   end
 
   describe '#flush' do
-
     before do
       provider.stubs(:exists?).returns(true)
       provider.stubs(:get_as_number).returns(65000)
