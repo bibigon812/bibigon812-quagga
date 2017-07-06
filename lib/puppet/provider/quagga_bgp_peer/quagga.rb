@@ -6,7 +6,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
   @resource_map = {
     :peer_group => {
       :default => :false,
-      :template => 'neighbor <%= name %> peer-group <%= value %>',
+      :template => 'neighbor <%= name %> peer-group<% unless value.nil? %> <%= value %><% end %>',
       :type => :string,
     },
     :remote_as => {
@@ -179,24 +179,21 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
 
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != options[:default]
-        case options[:type]
-          when :array
-            @resource[property].each do |value|
-              cmds << ERB.new(options[:template]).result(binding)
-            end
+        if [:true, 'true'].include?(@resource[property])
+          cmds << ERB.new(options[:template]).result(binding)
 
-          when :boolean
-            if @resource[property] == :true
-              cmds << ERB.new(options[:template]).result(binding)
-            else
-              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
-            end
+        elsif [:false, 'false'].include?(@resource[property])
+          cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
 
-          else
-            value = @resource[property]
+        elsif options[:type] == :array
+          @resource[property].each do |value|
             cmds << ERB.new(options[:template]).result(binding)
-        end
+          end
 
+        else
+          value = @resource[property]
+          cmds << ERB.new(options[:template]).result(binding)
+        end
       end
     end
 
@@ -204,6 +201,8 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     cmds << 'write memory'
 
     vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+
+    @property_hash[:ensure] = :present
   end
 
   def destroy
@@ -247,7 +246,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
       if v == :absent or v == :false
         cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
 
-      elsif [:true, 'true'].inclulde?(v) and [:symbol, :string].include?(resource_map[property][:type])
+      elsif [:true, 'true'].include?(v) and [:symbol, :string].include?(resource_map[property][:type])
         cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         cmds << ERB.new(resource_map[property][:template]).result(binding)
 

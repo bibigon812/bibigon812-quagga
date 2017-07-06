@@ -317,28 +317,90 @@ end
     end
   end
 
-  # TODO:
-  # describe '#create' do
-  #   before do
-  #     provider.stubs(:exists?).returns(false)
-  #     provider.stubs(:get_as_number).returns(65000)
-  #   end
-  #
-  #   it 'should has all values' do
-  #     resource[:ensure] = :present
-  #     resource[:name] = 'INTERNAL'
-  #     resource[:remote_as] = 65000
-  #     resource[:update_source] = '172.16.32.103'
-  #     provider.expects(:vtysh).with([
-  #       '-c', 'configure terminal',
-  #       '-c', 'router bgp 65000',
-  #       '-c', 'neighbor INTERNAL peer-group',
-  #       '-c', 'neighbor INTERNAL remote-as 65000',
-  #       '-c', 'neighbor INTERNAL update-source 172.16.32.103',
-  #       '-c', 'end',
-  #       '-c', 'write memory',
-  #     ])
-  #     provider.create
-  #   end
-  # end
+  describe '#create' do
+    before do
+      provider.stubs(:exists?).returns(false)
+      provider.stubs(:get_as_number).returns(65000)
+    end
+
+    it 'should has all values' do
+      resource[:ensure] = :present
+      resource[:name] = 'INTERNAL'
+      resource[:remote_as] = 65000
+      resource[:update_source] = '172.16.32.103'
+      provider.expects(:vtysh).with([
+        '-c', 'configure terminal',
+        '-c', 'router bgp 65000',
+        '-c', 'neighbor INTERNAL peer-group',
+        '-c', 'neighbor INTERNAL remote-as 65000',
+        '-c', 'neighbor INTERNAL update-source 172.16.32.103',
+        '-c', 'end',
+        '-c', 'write memory',
+      ])
+      provider.create
+    end
+  end
+
+  describe '#destroy' do
+    before do
+      provider.stubs(:exists?).returns(true)
+      provider.stubs(:get_as_number).returns(65000)
+    end
+
+    it 'should has all values' do
+      resource[:ensure] = :present
+      resource[:name] = 'INTERNAL'
+      resource[:remote_as] = 65000
+      resource[:update_source] = '172.16.32.103'
+      provider.expects(:vtysh).with([
+        '-c', 'configure terminal',
+        '-c', 'router bgp 65000',
+        '-c', 'no neighbor INTERNAL',
+        '-c', 'end',
+        '-c', 'write memory',
+      ])
+      provider.destroy
+    end
+  end
+
+  describe '#flush' do
+    before do
+      provider.stubs(:exists?).returns(true)
+      provider.stubs(:get_as_number).returns(65000)
+    end
+
+    it 'should has all values' do
+      resource[:ensure] = :present
+      provider.passive = :true
+      provider.shutdown = :true
+      provider.update_source = '172.16.32.104'
+      provider.expects(:vtysh).with([
+        '-c', 'configure terminal',
+        '-c', 'router bgp 65000',
+        '-c', 'neighbor INTERNAL passive',
+        '-c', 'neighbor INTERNAL shutdown',
+        '-c', 'neighbor INTERNAL update-source 172.16.32.104',
+        '-c', 'end',
+        '-c', 'write memory',
+      ])
+      provider.flush
+    end
+
+    it 'should has all values' do
+      resource[:ensure] = :present
+      provider.passive = :false
+      provider.shutdown = :false
+      provider.update_source = '172.16.32.105'
+      provider.expects(:vtysh).with([
+        '-c', 'configure terminal',
+        '-c', 'router bgp 65000',
+        '-c', 'no neighbor INTERNAL passive',
+        '-c', 'no neighbor INTERNAL shutdown',
+        '-c', 'neighbor INTERNAL update-source 172.16.32.105',
+        '-c', 'end',
+        '-c', 'write memory',
+      ])
+      provider.flush
+    end
+  end
 end
