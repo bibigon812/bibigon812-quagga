@@ -166,23 +166,20 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     resource_map = self.class.instance_variable_get('@resource_map')
     resource_map.each do |property, options|
       unless @resource[property] == options[:default]
+        if @resource[property] == :true
+          cmds << ERB.new(options[:template]).result(binding)
 
-        case options[:type]
-          when :array
-            @resource[property].each do |value|
-              cmds << ERB.new(options[:template]).result(binding)
-            end
+        elsif @resource == :false
+          cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
 
-          when :boolean
-            if @resource[property] == :true
-              cmds << ERB.new(options[:template]).result(binding)
-            else
-              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
-            end
-
-          else
-            value = @resource[property]
+        elsif options[:type] == :array
+          @resource[property].each do |value|
             cmds << ERB.new(options[:template]).result(binding)
+          end
+
+        else
+          value = @resource[property]
+          cmds << ERB.new(options[:template]).result(binding)
         end
       end
     end
