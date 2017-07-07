@@ -162,7 +162,6 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
               hash = {
                 :address_family => address_family,
                 :ensure => :present,
-                :name => "#{peer} #{address_family}",
                 :peer => peer,
                 :provider => self.name,
               }

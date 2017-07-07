@@ -54,11 +54,11 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
         end
 
         hash = {
-            :ensure   => :present,
-            :name     => "#{name} #{sequence}",
-            :sequence => sequence,
-            :provider => self.name,
             :action   => action.to_sym,
+            :ensure   => :present,
+            :name     => name,
+            :provider => self.name,
+            :sequence => sequence,
         }
 
         # Added default values

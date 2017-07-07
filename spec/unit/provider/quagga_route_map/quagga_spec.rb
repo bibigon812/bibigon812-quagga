@@ -41,7 +41,7 @@ route-map AS8631_out permit 20
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
           :ensure   => :present,
           :action   => :permit,
-          :name     => 'CONNECTED 500',
+          :name     => 'CONNECTED',
           :sequence => 500,
           :provider => :quagga,
           :match    => ['ip address prefix-list CONNECTED_NETWORKS',],
@@ -54,7 +54,7 @@ route-map AS8631_out permit 20
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
           :ensure   => :present,
           :action   => :permit,
-          :name     => 'AS8631_out 10',
+          :name     => 'AS8631_out',
           :sequence => 10,
           :provider => :quagga,
           :match    => ['origin igp',],
@@ -67,7 +67,7 @@ route-map AS8631_out permit 20
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
           :ensure   => :present,
           :action   => :permit,
-          :name     => 'AS8631_out 20',
+          :name     => 'AS8631_out',
           :sequence => 20,
           :provider => :quagga,
           :match    => ['origin igp',],
