@@ -29,13 +29,13 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
   def self.title_patterns
     [
-      [ /\A(\S+)\Z/, [[:name]] ],
-      [ /\A(\S+)\s(\S+)\Z/, [[:name], [:address_family]] ]
+      [ /\A(\S+)\Z/, [[:peer]] ],
+      [ /\A(\S+)\s(\S+)\Z/, [[:peer], [:address_family]] ]
     ]
   end
 
-  newparam(:name, :namevar => true) do
-    desc 'Contains the neighbor IP address or the peer-group name, the address family.'
+  newparam(:peer, :namevar => true) do
+    desc 'The bgp peer name.'
 
     newvalues(/\A[\d\.]+\Z/)
     newvalues(/\A[\h\.:]+\Z/)
@@ -67,7 +67,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
           :false
         end
       else
-        @resource.catalog.resources.select{ |resource| resource.type == :quagga_bgp_peer_address_family }.find{ |resource| resource[:name] == @resource[:peer_group] }[:activate]
+        @resource.catalog.resources.select{ |resource| resource.type == :quagga_bgp_peer_address_family }.find{ |resource| resource[:peer] == @resource[:peer_group] }[:activate]
       end
     end
 
@@ -157,10 +157,14 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   end
 
   autorequire(:quagga_bgp_peer) do
+    [ self[:peer] ]
+  end
+
+  autorequire(:quagga_bgp_peer_address_family) do
     if [:false, :true].include?(self[:peer_group])
       []
     else
-      [self[:peer_group]]
+      [ "#{self[:peer_group]} #{self[:address_family]}" ]
     end
   end
 
