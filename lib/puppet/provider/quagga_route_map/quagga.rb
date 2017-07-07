@@ -45,7 +45,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
         found_route_map = true
 
         unless hash.empty?
-          debug debug 'Instantiated the route-map %{name} %{sequence}' % {
+          debug 'Instantiated the route-map %{name} %{sequence}' % {
             :name     => hash[:name],
             :sequence => hash[:sequence],
           }
@@ -55,10 +55,9 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
         hash = {
             :ensure   => :present,
-            :name     => name,
+            :name     => "#{name} #{sequence}",
             :provider => self.name,
             :action   => action.to_sym,
-            :sequence => sequence,
         }
 
         # Added default values
@@ -97,7 +96,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     end
 
     unless hash.empty?
-      debug debug 'Instantiated the route-map %{name} %{sequence}' % {
+      debug 'Instantiated the route-map %{name} %{sequence}' % {
         :name     => hash[:name],
         :sequence => hash[:sequence],
       }
