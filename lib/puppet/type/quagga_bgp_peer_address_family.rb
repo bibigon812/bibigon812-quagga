@@ -38,11 +38,12 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'The bgp peer name.'
 
     newvalues(/\A[\d\.]+\Z/)
-    newvalues(/\A[\h\.:]+\Z/)
+    newvalues(/\A[\h:]+\Z/)
     newvalues(/\A\w+\Z/)
   end
 
   newparam(:address_family, :namevar => true) do
+    desc 'The address family: ipv4_unicast, ipv4_multicast, ipv6_unicast.'
     defaultto(:ipv4_unicast)
     newvalues(:ipv4_unicast, :ipv4_multicast, :ipv6_unicast)
   end
@@ -50,7 +51,9 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   newproperty(:peer_group) do
     desc 'Member of the peer-group.'
 
-    defaultto { @resource[:name] =~ /\.:/ ? :false : :true }
+    defaultto do
+      resource[:peer] =~ /\.|:/ ? :false : :true
+    end
 
     newvalues(:false, :true)
     newvalues(/\A[[:alpha:]]\w+\Z/)
@@ -60,14 +63,14 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'Enable the Address Family for this Neighbor.'
 
     defaultto do
-      if @resource[:peer_group] == :false or @resource[:peer_group] == :true
-        if @resource[:address_family] == :ipv4_unicast
-          @resource.catalog.resources.find{ |resource| resource.type == :quagga_bgp_router }[:default_ipv4_unicast]
+      if resource[:peer_group] == :false or resource[:peer_group] == :true
+        if resource[:address_family] == :ipv4_unicast
+          resource.catalog.resources.find{ |r| r.type == :quagga_bgp_router }[:default_ipv4_unicast]
         else
           :false
         end
       else
-        @resource.catalog.resources.select{ |resource| resource.type == :quagga_bgp_peer_address_family }.find{ |resource| resource[:peer] == @resource[:peer_group] }[:activate]
+        resource.catalog.resources.select{ |r| r.type == :quagga_bgp_peer_address_family }.find{ |r| r[:peer] == resource[:peer_group] }[:activate]
       end
     end
 
@@ -90,6 +93,13 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'Originate default route to this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
+
+    validate do |value|
+      super(value)
+      unless [:true, :false].include?(resource[:peer_group])
+        fail 'Invalid command for a peer-group member.' if value == :true
+      end
+    end
   end
 
   newproperty(:next_hop_self, :boolean => true) do
@@ -110,6 +120,13 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     defaultto(:absent)
     newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
+
+    validate do |value|
+      super(value)
+      unless [:true, :false].include?(resource[:peer_group])
+        fail 'Invalid command for a peer-group member.' unless value == :absent
+      end
+    end
   end
 
   newproperty(:route_map_export) do
@@ -124,6 +141,13 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     defaultto(:absent)
     newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
+
+    validate do |value|
+      super(value)
+      unless [:true, :false].include?(resource[:peer_group])
+        fail 'Invalid command for a peer-group member.' unless value == :absent
+      end
+    end
   end
 
   newproperty(:route_map_in) do
@@ -138,18 +162,39 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     defaultto(:absent)
     newvalues(:absent)
     newvalues(/\A[[:alpha:]][\w-]+\Z/)
+
+    validate do |value|
+      super(value)
+      unless [:true, :false].include?(resource[:peer_group])
+        fail 'Invalid command for a peer-group member.' unless value == :absent
+      end
+    end
   end
 
   newproperty(:route_reflector_client, :boolean => true) do
     desc 'Configure a neighbor as Route Reflector client.'
     defaultto(:false)
     newvalues(:false, :true)
+
+    validate do |value|
+      super(value)
+      unless [:true, :false].include?(resource[:peer_group])
+        fail 'Invalid command for a peer-group member.' if value == :true
+      end
+    end
   end
 
   newproperty(:route_server_client, :boolean => true) do
     desc 'Configure a neighbor as Route Server client.'
     defaultto(:false)
     newvalues(:false, :true)
+
+    validate do |value|
+      super(value)
+      unless [:true, :false].include?(resource[:peer_group])
+        fail 'Invalid command for a peer-group member.' if value == :true
+      end
+    end
   end
 
   autorequire(:quagga_bgp_router) do
