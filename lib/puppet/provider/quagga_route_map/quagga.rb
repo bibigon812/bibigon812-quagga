@@ -59,6 +59,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
             :provider => self.name,
             :action   => action.to_sym,
             :sequence => sequence,
+            :title    => "#{name} #{sequence}"
         }
 
         # Added default values
@@ -70,7 +71,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
           end
         end
 
-      elsif line =~ /\A\s(match|on-match|set)/ && found_route_map
+      elsif line =~ /\A\s(match|on-match|set)/ and found_route_map
         @resource_map.each do |property, options|
           if line =~ options[:regexp]
             value = $1
@@ -97,7 +98,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     end
 
     unless hash.empty?
-      debug debug 'Instantiated the route-map %{name} ${sequence}' % {
+      debug debug 'Instantiated the route-map %{name} %{sequence}' % {
         :name     => hash[:name],
         :sequence => hash[:sequence],
       }
@@ -112,7 +113,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     providers = instances
     resources.keys.each do |title|
       if provider = providers.find { |p| name == "#{p.name} #{p.sequence}" }
-        resource.provider = provider
+        resources[name].provider = provider
       end
     end
   end
