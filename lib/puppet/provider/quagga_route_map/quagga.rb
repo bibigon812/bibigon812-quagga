@@ -45,7 +45,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
         found_route_map = true
 
         unless hash.empty?
-          debug debug 'Instantiated the route-map %{name} ${sequence}' % {
+          debug debug 'Instantiated the route-map %{name} %{sequence}' % {
             :name     => hash[:name],
             :sequence => hash[:sequence],
           }
@@ -110,8 +110,8 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.values.each do |resource|
-      if provider = providers.find { |provider| provider.name == resource[:name] and provider.sequence = resource[:sequence] }
+    resources.keys.each do |title|
+      if provider = providers.find { |p| name == "#{p.name} #{p.sequence}" }
         resource.provider = provider
       end
     end
