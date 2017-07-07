@@ -90,6 +90,16 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     @property_flush = {}
   end
 
+  def name
+    if @property_hash[:peer] and @property_hash[:address_family]
+      "#{@property_hash[:peer]} #{@property_hash[:address_family]}"
+    elsif self.resource
+      resource.name
+    else
+      raise Puppet::DevError, "No resource and no name in property hash in #{self.class.name} instance"
+    end
+  end
+
   def self.instances
     # TODO
     providers = []
