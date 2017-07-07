@@ -21,12 +21,12 @@ describe Puppet::Type.type(:quagga_route_map) do
     described_class.unprovide(:quagga_route_map)
   end
 
-  it 'should have :name, :sequence be its namevar' do
-    expect(described_class.key_attributes).to eq([:name, :sequence])
+  it 'should have :route_map_name, :rule_number be its namevar' do
+    expect(described_class.key_attributes).to eq([:route_map_name, :rule_number])
   end
 
   describe "when validating attributes" do
-    [:name, :sequence, :provider].each do |param|
+    [:route_map_name, :rule_number, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end
