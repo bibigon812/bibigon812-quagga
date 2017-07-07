@@ -64,59 +64,59 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family) do
   ].each do |property|
     describe "boolean values of the property `#{property}`" do
       it 'should support \'true\' as a value' do
-        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', property => 'true') }.to_not raise_error
+        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => 'true') }.to_not raise_error
       end
 
       it 'should support :true as a value' do
-        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', property => :true) }.to_not raise_error
+        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => :true) }.to_not raise_error
       end
 
       it 'should support true as a value' do
-        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', property => true) }.to_not raise_error
+        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => true) }.to_not raise_error
       end
 
       it 'should support \'false\' as a value' do
-        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', property => 'false') }.to_not raise_error
+        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => 'false') }.to_not raise_error
       end
 
       it 'should support :false as a value' do
-        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', property => :false) }.to_not raise_error
+        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => :false) }.to_not raise_error
       end
 
       it 'should support false as a value' do
-        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', property => false) }.to_not raise_error
+        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => false) }.to_not raise_error
       end
 
       it 'should not support :enabled as a value' do
-        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', property => :enabled) }.to raise_error Puppet::Error
+        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => :enabled) }.to raise_error Puppet::Error
       end
 
       it 'should not support \'disabled\' as a value' do
-        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', property => 'disabled') }.to raise_error Puppet::Error
+        expect { described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => 'disabled') }.to raise_error Puppet::Error
       end
 
       it 'should contain \'true\' => true' do
-        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', property => 'true')[property]).to eq(:true)
+        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => 'true')[property]).to eq(:true)
       end
 
       it 'should contain true => true' do
-        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', property => true)[property]).to eq(:true)
+        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => true)[property]).to eq(:true)
       end
 
       it 'should contain :true => true' do
-        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', property => :true)[property]).to eq(:true)
+        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => :true)[property]).to eq(:true)
       end
 
       it 'should contain \'false\' => false' do
-        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', property => 'false')[property]).to eq(:false)
+        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => 'false')[property]).to eq(:false)
       end
 
       it 'should contain false => false' do
-        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', property => false)[property]).to eq(:false)
+        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => false)[property]).to eq(:false)
       end
 
       it 'should contain false => false' do
-        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', property => :false)[property]).to eq(:false)
+        expect(described_class.new(:title => '10.0.0.1 ipv4_multicast', :peer_group => :false, property => :false)[property]).to eq(:false)
       end
     end
   end
@@ -127,15 +127,15 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family) do
   ].each do |property|
     describe "string values of the property `#{property}`" do
       it "should support \"#{property.to_s.upcase}\" as a value" do
-        expect { described_class.new(:title => '2001:db8::1 ipv6_unicast', property => property.to_s.upcase) }.to_not raise_error
+        expect { described_class.new(:title => '2001:db8::1 ipv6_unicast', :peer_group => :false, property => property.to_s.upcase) }.to_not raise_error
       end
 
       it "should not support \"9#{property.to_s.upcase}\" as a value" do
-        expect { described_class.new(:title => '2001:db8::1 ipv6_unicast', property => "9#{property.to_s.upcase}") }.to raise_error(Puppet::Error, /Invalid value/)
+        expect { described_class.new(:title => '2001:db8::1 ipv6_unicast', :peer_group => :false, property => "9#{property.to_s.upcase}") }.to raise_error(Puppet::Error, /Invalid value/)
       end
 
       it "should contain \"#{property.to_s.upcase}\"" do
-        expect(described_class.new(:title => '2001:db8::1 ipv6_unicast', property => property.to_s.upcase)[property]).to eq(property.to_s.upcase)
+        expect(described_class.new(:title => '2001:db8::1 ipv6_unicast', :peer_group => :false, property => property.to_s.upcase)[property]).to eq(property.to_s.upcase)
       end
     end
   end
