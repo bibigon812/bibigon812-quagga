@@ -42,7 +42,7 @@ class quagga (
     }
   }
 
-  quagga_global {$facts['networking']['fqdn']:
+  quagga_global {"${facts['networking']['fqdn']}": # lint:ignore:only_variable_string
     * => $global_opts
   }
 
