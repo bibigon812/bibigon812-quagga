@@ -247,6 +247,14 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
     @property_flush.clear
   end
 
+  def as_number
+    @property_hash[:as_number]
+  end
+
+  def as_number=(value)
+    @property_hash[:as_number] = value
+  end
+
   @resource_map.keys.each do |property|
     define_method "#{property}" do
       @property_hash[property] || :absent
