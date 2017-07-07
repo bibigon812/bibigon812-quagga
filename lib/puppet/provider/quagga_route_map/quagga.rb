@@ -56,6 +56,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
         hash = {
             :ensure   => :present,
             :name     => "#{name} #{sequence}",
+            :sequence => sequence,
             :provider => self.name,
             :action   => action.to_sym,
         }
@@ -110,8 +111,8 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   def self.prefetch(resources)
     providers = instances
     resources.keys.each do |title|
-      if provider = providers.find { |p| name == "#{p.name} #{p.sequence}" }
-        resources[name].provider = provider
+      if provider = providers.find { |p| title == "#{p.title} #{p.sequence}" }
+        resources[title].provider = provider
       end
     end
   end
