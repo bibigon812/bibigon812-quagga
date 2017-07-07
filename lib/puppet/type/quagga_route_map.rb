@@ -23,6 +23,7 @@ Puppet::Type.newtype(:quagga_route_map) do
 
   def self.title_patterns
     [
+      [ /\A(\S+)\Z/, [[:name]] ],
       [ /\A(\S+)\s(\S+)\Z/, [[:name], [:sequence]] ]
     ]
   end
