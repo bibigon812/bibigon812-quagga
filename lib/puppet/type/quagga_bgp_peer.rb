@@ -43,22 +43,16 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   newproperty(:passive, :boolean => true) do
-    desc 'Don\'t send open messages to this neighbor. Default to `false`.'
+    desc 'Don\'t send open messages to this neighbor.'
 
     defaultto(:false)
     newvalues(:false, :true)
   end
 
   newproperty(:peer_group) do
-    desc 'Member of the peer-group. Default to `false`.'
+    desc 'Member of the peer-group.'
 
-    defaultto do
-       if @resource[:name] =~ /\.:/
-         :false
-       else
-         :true
-       end
-    end
+    defaultto { resource[:name] =~ /\.|:/ ? :false : :true }
 
     newvalues(:false, :true)
     newvalues(/\A[[:alpha:]]\w+\Z/)
