@@ -41,7 +41,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = value.split(/\s/).first
-      proto = @resource[:proto]
+      proto = resource[:proto]
 
       begin
         ip = IPAddr.new(v)
@@ -87,8 +87,8 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = Integer(value)
-      proto = @resource[:proto]
-      type = @resource[:type]
+      proto = resource[:proto]
+      type = resource[:type]
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == :ipv4 and type == :multicast and v > 1
@@ -115,8 +115,8 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = Integer(value)
-      proto = @resource[:proto]
-      type = @resource[:type]
+      proto = resource[:proto]
+      type = resource[:type]
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == :ipv4 and type == :multicast and v > 1
@@ -137,8 +137,8 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     validate do |value|
       super(value)
 
-      proto = @resource[:proto]
-      type = @resource[:type]
+      proto = resource[:proto]
+      type = resource[:type]
 
       begin
         ip = IPAddr.new(value)
