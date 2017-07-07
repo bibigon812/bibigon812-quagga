@@ -59,7 +59,6 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
             :provider => self.name,
             :action   => action.to_sym,
             :sequence => sequence,
-            :title    => "#{name} #{sequence}"
         }
 
         # Added default values
