@@ -85,6 +85,11 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     },
   }
 
+  def initialize(value)
+    super(value)
+    @property_flush = {}
+  end
+
   def self.instances
     # TODO
     providers = []
@@ -222,15 +227,16 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.keys.each do |name|
-      if provider = providers.find{ |pkg| pkg.name == name }
-        resources[name].provider = provider
+    resources.values.each do |resource|
+      if provider = providers.find{ |p| p.peer == resource[:peer] and p.address_family = resource[:address_family] }
+        resource.provider = provider
       end
     end
   end
 
   def create
-    name, address_family = @resource[:name].split(/\s/)
+    name = @resource[:peer]
+    address_family = @resource[:address_family]
 
     debug 'Creating the address family %{address_family} of the bgp peer %{peer}' % {
       :address_family => address_family,
@@ -244,7 +250,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     cmds << 'configure terminal'
     cmds << 'router bgp %{as_number}' % { :as_number => as_number}
     cmds << 'address-family %{address_family}' % {
-      :address_family => address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+      :address_family => address_family_to_s(address_family)
     }
 
     resource_map.each do |property, options|
@@ -274,7 +280,8 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   end
 
   def destroy
-    name, address_family = @property_hash[:name].splt(/\s/)
+    name = @property_hash[:peer]
+    address_family = @property_hash[:address_family]
 
     debug 'Destroying the address family %{address_family} of the bgp peer %{peer}' % {
       :address_family => address_family,
@@ -288,20 +295,21 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     cmds << 'configure terminal'
     cmds << 'router bgp %{as_number}' % { :as_number => as_number}
     cmds << 'address-family %{address_family}' % {
-      :address_family => address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+      :address_family => address_family_to_s(address_family)
     }
 
-    @property_hash.each do |property, v|
-      unless value == resource_map[proeprty][:default]
-        case resource_map[property][:type]
-        when :array
-          v.each do |value|
+    resource_map.each do |property, options|
+      unless @property_hash[property] == options[:default]
+        if @property_hash[property] == :true or property == :allow_as_in
+          cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
+
+        elsif options[:type] == :array
+          @property_hash[property].each do |value|
             cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
           end
-        when :string
-          value = v
-          cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
+
         else
+          value = @property_hash[property]
           cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         end
       end
@@ -322,7 +330,8 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   def flush
     return if @property_flush.empty?
 
-    name, address_family = @property_hash[:name].splt(/\s/)
+    name = @property_hash[:peer]
+    address_family = @property_hash[:address_family]
 
     debug 'Flushing the address family %{address_family} of the bgp peer %{peer}' % {
       :address_family => address_family,
@@ -336,14 +345,19 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     cmds << 'configure terminal'
     cmds << 'router bgp %{as_number}' % { :as_number => as_number }
     cmds << 'address-family %{address_family}' % {
-      :address_family => address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
+      :address_family => address_family_to_s(address_family)
     }
 
     @property_flush.each do |property, v|
       if v == :absent or v == :false
+        if [:prefix_list_in, :prefix_list_out, :route_map_export,
+          :route_map_import, :route_map_in, :route_map_out, :peer_group].include?(property)
+          value = @property_hash[property]
+        end
+
         cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
 
-      elsif [:true, 'true'].inclulde?(v) and [:symbol, :string].include?(resource_map[property][:type])
+      elsif v == :true and [:symbol, :string].include?(resource_map[property][:type])
         cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
         cmds << ERB.new(resource_map[property][:template]).result(binding)
 
@@ -374,6 +388,16 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     @property_flush.clear
   end
 
+  [:peer, :address_family].each do |param|
+    define_method "#{param}" do
+      @property_hash[param]
+    end
+
+    define_method "#{param}=" do |value|
+      @property_hash[param] = value
+    end
+  end
+
   @resource_map.each_key do |property|
     define_method "#{property}" do
       @property_hash[property] || :absent
@@ -399,5 +423,9 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     end
 
     @as_number
+  end
+
+  def address_family_to_s(address_family)
+    address_family == :ipv6_unicast ? 'ipv6' : address_family.to_s.gsub('_', ' ')
   end
 end
