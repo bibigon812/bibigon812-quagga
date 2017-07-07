@@ -157,7 +157,6 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
               hash = {
                 :address_family => address_family,
                 :ensure => :present,
-                :name => "#{peer} #{address_family}",
                 :peer => peer,
                 :provider => self.name,
               }
@@ -250,24 +249,21 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
 
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != options[:default]
-        case options[:type]
-          when :array
-            @resource[property].each do |value|
-              cmds << ERB.new(options[:template]).result(binding)
-            end
+        if @resource[property] == :true
+          cmds << ERB.new(options[:template]).result(binding)
 
-          when :boolean
-            if @resource[property] == :true
-              cmds << ERB.new(options[:template]).result(binding)
-            else
-              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
-            end
+        elsif @resource[property] == :false
+          cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
 
-          else
-            value = @resource[property]
+        elsif options[:type] == :array
+          @resource[property].each do |value|
             cmds << ERB.new(options[:template]).result(binding)
-        end
+          end
 
+        else
+          value = @resource[property]
+          cmds << ERB.new(options[:template]).result(binding)
+        end
       end
     end
 
