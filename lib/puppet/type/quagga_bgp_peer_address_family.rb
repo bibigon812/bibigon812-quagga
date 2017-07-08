@@ -27,32 +27,20 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
   ensurable
 
-  def self.title_patterns
-    [
-      [ /\A(\S+)\Z/, [[:peer]] ],
-      [ /\A(\S+)\s(\S+)\Z/, [[:peer], [:address_family]] ]
-    ]
-  end
+  newparam(:name, :namevar => true) do
+    desc 'Contains a bgp peer name and an address family.'
 
-  newparam(:peer, :namevar => true) do
-    desc 'The bgp peer name.'
-
-    newvalues(/\A[\d\.]+\Z/)
-    newvalues(/\A[\h:]+\Z/)
-    newvalues(/\A\w+\Z/)
-  end
-
-  newparam(:address_family, :namevar => true) do
-    desc 'The address family: ipv4_unicast, ipv4_multicast, ipv6_unicast.'
-    defaultto(:ipv4_unicast)
-    newvalues(:ipv4_unicast, :ipv4_multicast, :ipv6_unicast)
+    newvalues(/\A[\d\.]+\sipv4_(unicast|multicast)\Z/)
+    newvalues(/\A[\h:]+\sipv6_unicast\Z/)
+    newvalues(/\A\w+\sipv4_(unicast|multicast)\Z/)
+    newvalues(/\A\w+\sipv6_unicast\Z/)
   end
 
   newproperty(:peer_group) do
     desc 'Member of the peer-group.'
 
     defaultto do
-      resource[:peer] =~ /\.|:/ ? :false : :true
+      resource[:name] =~ /(\.|:)/ ? :false : :true
     end
 
     newvalues(:false, :true)
@@ -64,13 +52,17 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
     defaultto do
       if resource[:peer_group] == :false or resource[:peer_group] == :true
-        if resource[:address_family] == :ipv4_unicast
+        if resource[:name].split(/\s/).last == 'ipv4_unicast'
           resource.catalog.resources.find{ |r| r.type == :quagga_bgp_router }[:default_ipv4_unicast]
         else
           :false
         end
       else
-        resource.catalog.resources.select{ |r| r.type == :quagga_bgp_peer_address_family }.find{ |r| r[:peer] == resource[:peer_group] }[:activate]
+        resource.catalog.resources.select{
+          |r| r.type == :quagga_bgp_peer_address_family
+        }.find{
+          |r| r[:name] == "#{resource[:peer_group]} #{resource[:name].split(/\s/).last}"
+        }[:activate]
       end
     end
 
@@ -202,14 +194,14 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   end
 
   autorequire(:quagga_bgp_peer) do
-    [ self[:peer] ]
+    [ self[:name].split(/\s/).first ]
   end
 
   autorequire(:quagga_bgp_peer_address_family) do
     if [:false, :true].include?(self[:peer_group])
       []
     else
-      [ "#{self[:peer_group]} #{self[:address_family]}" ]
+      [ "#{self[:peer_group]} #{self[:name].split(/\s/).last}" ]
     end
   end
 

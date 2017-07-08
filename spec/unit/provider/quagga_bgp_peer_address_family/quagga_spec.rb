@@ -4,19 +4,18 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family).provider(:quagga) do
   let(:resource) do
     Puppet::Type.type(:quagga_bgp_peer_address_family).new(
       :provider => provider,
-      :title    => '2001:db8:: ipv6_unicast',
+      :name    => '2001:db8:: ipv6_unicast',
     )
   end
 
   let(:provider) do
     described_class.new(
     :activate               => :true,
-    :address_family         => :ipv6_unicast,
     :allow_as_in            => 1,
     :default_originate      => :true,
     :ensure                 => :present,
+    :name                   => '2001:db8:: ipv6_unicast',
     :next_hop_self          => :true,
-    :peer                   => '2001:db8::',
     :peer_group             => :false,
     :prefix_list_in         => 'PREFIX_LIST_IN',
     :prefix_list_out        => 'PREFIX_LIST_OUT',
@@ -33,13 +32,11 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family).provider(:quagga) do
   let(:provider1) do
     described_class.new(
     :activate               => :false,
-    :address_family         => :ipv6_unicast,
     :allow_as_in            => :absent,
     :default_originate      => :false,
     :ensure                 => :present,
     :name                   => '2001:db8:: ipv6_unicast',
     :next_hop_self          => :false,
-    :peer                   => '2001:db8::',
     :peer_group             => 'INTERNAL',
     :prefix_list_in         => :absent,
     :prefix_list_out        => :absent,
@@ -162,12 +159,11 @@ end'
     it 'should return the \'INTERNAL ipv4_unicast\' resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
         :activate               => :true,
-        :address_family         => :ipv4_unicast,
         :allow_as_in            => 1,
         :default_originate      => :false,
         :ensure                 => :present,
+        :name                   => 'INTERNAL ipv4_unicast',
         :next_hop_self          => :true,
-        :peer                   => 'INTERNAL',
         :peer_group             => :true,
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -184,12 +180,11 @@ end'
     it 'should return the \'RR ipv4_unicast\' resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
         :activate               => :false,
-        :address_family         => :ipv4_unicast,
         :allow_as_in            => :absent,
         :default_originate      => :false,
         :ensure                 => :present,
+        :name                   => 'RR ipv4_unicast',
         :next_hop_self          => :true,
-        :peer                   => 'RR',
         :peer_group             => :true,
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -206,12 +201,11 @@ end'
     it 'should return the \'RR_WEAK ipv4_unicast\' resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
         :activate               => :true,
-        :address_family         => :ipv4_unicast,
         :allow_as_in            => :absent,
         :default_originate      => :false,
         :ensure                 => :present,
+        :name                   => 'RR_WEAK ipv4_unicast',
         :next_hop_self          => :true,
-        :peer                   => 'RR_WEAK',
         :peer_group             => :true,
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -228,12 +222,11 @@ end'
     it 'should return the \'172.16.32.108 ipv4_unicast\' resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
         :activate               => :true,
-        :address_family         => :ipv4_unicast,
         :allow_as_in            => :absent,
         :default_originate      => :true,
         :ensure                 => :present,
+        :name                   => '172.16.32.108 ipv4_unicast',
         :next_hop_self          => :false,
-        :peer                   => '172.16.32.108',
         :peer_group             => 'INTERNAL',
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -250,12 +243,11 @@ end'
     it 'should return the \'2001:db8:: ipv6_unicast\' resource' do
       expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
         :activate               => :true,
-        :address_family         => :ipv6_unicast,
         :allow_as_in            => 1,
         :default_originate      => :false,
         :ensure                 => :present,
+        :name                   => '2001:db8:: ipv6_unicast',
         :next_hop_self          => :false,
-        :peer                   => '2001:db8::',
         :peer_group             => :false,
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -284,12 +276,11 @@ end'
     it 'should return the \'INTERNAL ipv4_unicast\' resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
         :activate               => :false,
-        :address_family         => :ipv4_unicast,
         :allow_as_in            => 1,
         :default_originate      => :false,
         :ensure                 => :present,
+        :name                   => 'INTERNAL ipv4_unicast',
         :next_hop_self          => :true,
-        :peer                   => 'INTERNAL',
         :peer_group             => :true,
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -306,12 +297,11 @@ end'
     it 'should return the \'RR ipv4_unicast\' resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
         :activate               => :true,
-        :address_family         => :ipv4_unicast,
         :allow_as_in            => :absent,
         :default_originate      => :false,
         :ensure                 => :present,
+        :name                   => 'RR ipv4_unicast',
         :next_hop_self          => :true,
-        :peer                   => 'RR',
         :peer_group             => :true,
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -328,12 +318,11 @@ end'
     it 'should return the \'RR_WEAK ipv4_unicast\' resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
         :activate               => :true,
-        :address_family         => :ipv4_unicast,
         :allow_as_in            => :absent,
         :default_originate      => :false,
         :ensure                 => :present,
+        :name                   => 'RR_WEAK ipv4_unicast',
         :next_hop_self          => :true,
-        :peer                   => 'RR_WEAK',
         :peer_group             => :true,
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -350,12 +339,11 @@ end'
     it 'should return the \'172.16.32.108 ipv4_unicast\' resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
         :activate               => :false,
-        :address_family         => :ipv4_unicast,
         :allow_as_in            => :absent,
         :default_originate      => :true,
         :ensure                 => :present,
+        :name                   => '172.16.32.108 ipv4_unicast',
         :next_hop_self          => :false,
-        :peer                   => '172.16.32.108',
         :peer_group             => 'INTERNAL',
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -372,12 +360,11 @@ end'
     it 'should return the \'2001:db8:: ipv6_unicast\' resource' do
       expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
         :activate               => :true,
-        :address_family         => :ipv6_unicast,
         :allow_as_in            => 1,
         :default_originate      => :false,
         :ensure                 => :present,
+        :name                   => '2001:db8:: ipv6_unicast',
         :next_hop_self          => :false,
-        :peer                   => '2001:db8::',
         :peer_group             => :false,
         :prefix_list_in         => :absent,
         :prefix_list_out        => :absent,
@@ -419,12 +406,11 @@ end'
 
     it 'should has all values' do
       resource[:activate]               = :true
-      resource[:address_family]         = :ipv6_unicast
       resource[:allow_as_in]            = 1
       resource[:default_originate]      = :true
       resource[:ensure]                 = :present
       resource[:next_hop_self]          = :true
-      resource[:peer]                   = '2001:db8::'
+      resource[:name]                   = '2001:db8:: ipv6_unicast'
       resource[:peer_group]             = :false
       resource[:prefix_list_in]         = 'PREFIX_LIST_IN'
       resource[:prefix_list_out]        = 'PREFIX_LIST_OUT'

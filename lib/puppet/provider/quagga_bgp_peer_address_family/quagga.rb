@@ -90,16 +90,6 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     @property_flush = {}
   end
 
-  def name
-    if @property_hash[:peer] and @property_hash[:address_family]
-      "#{@property_hash[:peer]} #{@property_hash[:address_family]}"
-    elsif self.resource
-      resource.name
-    else
-      raise Puppet::DevError, "No resource and no name in property hash in #{self.class.name} instance"
-    end
-  end
-
   def self.instances
     # TODO
     providers = []
@@ -161,18 +151,14 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
                 # Saving the value of the property `activate` if the resource is a peer group.
                 peer_group_af_activate[previous_peer] = hash[:activate] if hash[:peer_group] == :true
 
-                debug 'Instantiated the address family %{address_family} of the bgp peer %{peer}.' % {
-                  :address_family => hash[:address_family],
-                  :peer => hash[:peer],
-                }
+                debug 'Instantiated the bgp peer address family %{name}.' % { :name => hash[:name] }
 
                 providers << new(hash)
               end
 
               hash = {
-                :address_family => address_family,
                 :ensure => :present,
-                :peer => peer,
+                :name => "#{peer} #{address_family}",
                 :provider => self.name,
               }
 
@@ -224,10 +210,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
         end
       end
 
-      debug 'Instantiated the address family %{address_family} of the bgp peer %{peer}.' % {
-        :address_family => hash[:address_family],
-        :peer => hash[:peer],
-      }
+      debug 'Instantiated the bgp peer address family %{name}.' % { :name => hash[:name] }
 
       providers << new(hash)
     end
@@ -237,16 +220,15 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.values.each do |resource|
-      if provider = providers.find{ |p| p.peer == resource[:peer] and p.address_family = resource[:address_family] }
-        resource.provider = provider
+    resources.keys.each do |name|
+      if provider = providers.find{ |provider| provider.name == name }
+        resources[name].provider = provider
       end
     end
   end
 
   def create
-    name = @resource[:peer]
-    address_family = @resource[:address_family]
+    name, address_family = @resource[:name].split(/\s/)
 
     debug 'Creating the address family %{address_family} of the bgp peer %{peer}' % {
       :address_family => address_family,
@@ -290,8 +272,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   end
 
   def destroy
-    name = @property_hash[:peer]
-    address_family = @property_hash[:address_family]
+    name, address_family = @property_hash[:name].split(/\s/)
 
     debug 'Destroying the address family %{address_family} of the bgp peer %{peer}' % {
       :address_family => address_family,
@@ -340,8 +321,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   def flush
     return if @property_flush.empty?
 
-    name = @property_hash[:peer]
-    address_family = @property_hash[:address_family]
+    name, address_family = @property_hash[:name].split(/\s/)
 
     debug 'Flushing the address family %{address_family} of the bgp peer %{peer}' % {
       :address_family => address_family,
@@ -398,16 +378,6 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     @property_flush.clear
   end
 
-  [:peer, :address_family].each do |param|
-    define_method "#{param}" do
-      @property_hash[param]
-    end
-
-    define_method "#{param}=" do |value|
-      @property_hash[param] = value
-    end
-  end
-
   @resource_map.each_key do |property|
     define_method "#{property}" do
       @property_hash[property] || :absent
@@ -436,6 +406,6 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   end
 
   def address_family_to_s(address_family)
-    address_family == :ipv6_unicast ? 'ipv6' : address_family.to_s.gsub('_', ' ')
+    address_family == 'ipv6_unicast' ? 'ipv6' : address_family.gsub('_', ' ')
   end
 end
