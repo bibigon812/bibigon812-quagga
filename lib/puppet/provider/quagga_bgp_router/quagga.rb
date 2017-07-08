@@ -71,9 +71,9 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
 
         hash = {
             :as_number => as_number,
-            :ensure => :present,
-            :name => :bgp,
-            :provider => self.name,
+            :ensure    => :present,
+            :name      => 'bgp',
+            :provider  => self.name,
         }
 
         # Added default values
@@ -132,7 +132,7 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   def self.prefetch(resources)
     providers = instances
     resources.keys.each do |name|
-      if provider = providers.find { |p| p.name == name }
+      if provider = providers.find { |provider| provider.name == name }
         resources[name].provider = provider
       end
     end

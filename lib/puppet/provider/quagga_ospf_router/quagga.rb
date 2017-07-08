@@ -67,8 +67,10 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
       if line =~ /\Arouter ospf\Z/
         found_section = true
 
-        hash[:name] = :ospf
-        hash[:ensure] = :present
+        hash = {
+          :ensure => :present,
+          :name   => 'ospf',
+        }
 
         @resource_map.each do |property, options|
           if options[:type] == :array or options[:type] == :hash
