@@ -45,9 +45,8 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
         found_route_map = true
 
         unless hash.empty?
-          debug 'Instantiated the route-map %{name} %{sequence}' % {
+          debug 'Instantiated the route-map %{name}' % {
             :name     => hash[:name],
-            :sequence => hash[:sequence],
           }
 
           providers << new(hash)
@@ -56,9 +55,8 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
         hash = {
             :action   => action.to_sym,
             :ensure   => :present,
-            :name     => name,
+            :name     => "#{name} #{sequence}",
             :provider => self.name,
-            :sequence => sequence,
         }
 
         # Added default values
@@ -110,18 +108,18 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.keys.each do |title|
-      if provider = providers.find { |p| title == "#{p.title} #{p.sequence}" }
-        resources[title].provider = provider
+    resources.keys.each do |name|
+      if provider = providers.find { |provider| provider.name == name }
+        resources[name].provider = provider
       end
     end
   end
 
   def create
-    debug '[create]'
-
-    name, sequence = @resource[:name].split(/:/)
+    name, sequence = @resource[:name].split(/\s/)
     action = @resource[:action]
+
+    debug 'Creating the route-map %{name}' % { :name => @resource[:name] }
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
@@ -151,10 +149,10 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
   end
 
   def destroy
-    name, sequence = @property_hash[:name].split(/:/)
+    name, sequence = @property_hash[:name].split(/\s/)
     action = @property_hash[:action]
 
-    debug "[destroy][#{name}:#{action}:#{sequence}]"
+    debug 'Destroying the route-map #{name}' % { :name => @property_hash[:name] }
 
     cmds = []
     cmds << 'configure terminal'
@@ -178,7 +176,8 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     name, sequence = @property_hash[:name].split(/:/)
     action = @property_hash[:action]
 
-    debug "[flush][#{name}:#{action}:#{sequence}]"
+    debug 'Flushing the route-map %{name}' % { :name => @property_hash[:name] }
+
     resource_map = self.class.instance_variable_get('@resource_map')
 
     cmds = []
