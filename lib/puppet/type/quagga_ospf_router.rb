@@ -16,10 +16,10 @@ Puppet::Type.newtype(:quagga_ospf_router) do
 
   ensurable
 
-  newparam(:name) do
+  newparam(:name, :namevar => true) do
     desc 'OSPF router instance. Must be set to \'ospf\''
 
-    newvalues(:ospf)
+    newvalues('ospf')
   end
 
   newproperty(:abr_type) do
