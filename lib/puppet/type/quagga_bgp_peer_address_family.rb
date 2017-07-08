@@ -50,21 +50,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   newproperty(:activate, :boolean => true) do
     desc 'Enable the Address Family for this Neighbor.'
 
-    defaultto do
-      if resource[:peer_group] == :false or resource[:peer_group] == :true
-        if resource[:name].split(/\s/).last == 'ipv4_unicast'
-          @resource.catalog.resources.find{ |r| r.type == :quagga_bgp_router }[:default_ipv4_unicast]
-        else
-          :false
-        end
-      else
-        @resource.catalog.resources.select{
-          |r| r.type == :quagga_bgp_peer_address_family
-        }.find{
-          |r| r[:name] == "#{resource[:peer_group]} #{resource[:name].split(/\s/).last}"
-        }[:activate]
-      end
-    end
+    defaultto :false
 
     newvalues(:false, :true)
   end
