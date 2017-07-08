@@ -66,7 +66,7 @@ router bgp 65000
           default_local_preference: 100,
           ensure: :present,
           import_check: :true,
-          name: :bgp,
+          name: 'bgp',
           provider: :quagga,
           redistribute: [],
           router_id: '172.16.32.103',
