@@ -10,32 +10,16 @@ Puppet::Type.newtype(:quagga_prefix_list) do
           ge          => 8,
           le          => 24,
           prefix      => '224.0.0.0/4',
-          protocol    => 'ip',
+          proto       => 'ip',
         }
   }
 
   ensurable
 
-  def self.title_patterns
-    [
-      [ /\A(\S+)\s(\S+)\Z/, [[:name], [:sequence]] ]
-    ]
-  end
-
   newparam(:name, :namevar => true) do
     desc 'The name of the prefix-list.'
 
-    newvalues(/\A[\w-]+\Z/)
-  end
-
-  newparam(:sequence, :namevar => true) do
-    desc 'The sequence number of the rule.'
-
-    newvalues(/\A\d+\Z/)
-
-    munge do |value|
-      Integer(value)
-    end
+    newvalues(/\A[\w-]+\s\d+\Z/)
   end
 
   newproperty(:action) do
@@ -47,37 +31,22 @@ Puppet::Type.newtype(:quagga_prefix_list) do
   newproperty(:ge) do
     desc 'Minimum prefix length to be matched.'
     defaultto(:absent)
-    newvalues(:absent)
-    newvalues(/\A\d+\Z/)
 
     validate do |value|
-      super(value)
-
       return if value == :absent
-
-      v = Integer(value)
-      fail 'Invalid value. Minimum prefix length: 1-32' unless v >= 1 and v <= 32
-    end
-
-    munge do |value|
-      Integer(value) unless value == :absent
+      fail "Invalid value. '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail 'Invalid value. Maximum prefix length: 1-32' unless value >= 1 and value <= 32
     end
   end
 
   newproperty(:le) do
     desc 'Maximum prefix length to be matched.'
-    newvalues(/\A\d+\Z/)
+    defaultto(:absent)
 
     validate do |value|
-      super(value)
-
       return if value == :absent
-      v = Integer(value)
-      fail 'Invalid value. Maximum prefix length: 1-32' unless v >= 1 and v <= 32
-    end
-
-    munge do |value|
-      Integer(value) unless value == :absent
+      fail "Invalid value. '#{value}' is not an Integer" unless value.is_a?(Integer)
+      fail 'Invalid value. Maximum prefix length: 1-32' unless value >= 1 and value <= 32
     end
   end
 
@@ -86,7 +55,7 @@ Puppet::Type.newtype(:quagga_prefix_list) do
     newvalues(/\A([\d\.:\/]+|any)\Z/)
   end
 
-  newproperty(:protocol) do
+  newproperty(:proto) do
     desc 'The IP protocol version.'
 
     newvalues(:ip, :ipv6)
