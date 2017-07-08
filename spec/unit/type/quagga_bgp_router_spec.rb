@@ -71,7 +71,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
     end
 
     it 'should support \'65000\' as a value' do
-      expect{described_class.new(:name => 'bgp', :as_number => '65000')}.to_not raise_error
+      expect{described_class.new(:name => 'bgp', :as_number => '65000')}.to raise_error Puppet::Error, /Invalid value/
     end
 
     it 'should not support \'AS65000\' as a value' do
@@ -79,7 +79,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
     end
 
     it 'should support 65000 as a value' do
-      expect(described_class.new(:name => 'bgp', :as_number => '65000')[:as_number]).to eq(65000)
+      expect(described_class.new(:name => 'bgp', :as_number => 65000)[:as_number]).to eq(65000)
     end
   end
 
@@ -145,15 +145,11 @@ describe Puppet::Type.type(:quagga_bgp_router) do
 
   describe 'default_local_preference' do
     it 'should support \'100\' as a value' do
-      expect { described_class.new(:name => 'bgp', :default_local_preference => '100') }.to_not raise_error
+      expect { described_class.new(:name => 'bgp', :default_local_preference => '100') }.to raise_error Puppet::Error, /Invalid value/
     end
 
     it 'should support 200 as a value' do
       expect { described_class.new(:name => 'bgp', :default_local_preference => 200) }.to_not raise_error
-    end
-
-    it 'should not support \'0\' as a value' do
-      expect { described_class.new(:name => 'bgp', :default_local_preference => '0') }.to_not raise_error
     end
 
     it 'should not support 4294967296 as a value' do
@@ -165,7 +161,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
     end
 
     it 'should contain 500' do
-      expect(described_class.new(:name => 'bgp', :default_local_preference => '500')[:default_local_preference]).to eq(500)
+      expect(described_class.new(:name => 'bgp', :default_local_preference => 500)[:default_local_preference]).to eq(500)
     end
 
     it 'should contain 800' do

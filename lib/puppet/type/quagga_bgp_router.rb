@@ -24,17 +24,10 @@ Puppet::Type.newtype(:quagga_bgp_router) do
 
   newproperty(:as_number) do
     desc 'The AS number.'
-    newvalues(/\A\d+\Z/)
 
     validate do |value|
-      super(value)
-
-      v = Integer(value)
-      fail "Invalid value '#{value}'. Valid values are 1-4294967295" unless v >= 1 and v <= 4294967295
-    end
-
-    munge do |value|
-      Integer(value)
+      fail "Invalid value '#{value}'. It is not an Integer" unless value.is_a?(Integer)
+      fail "Invalid value '#{value}'. Valid values are 1-4294967295" unless value >= 1 and value <= 4294967295
     end
   end
 
@@ -52,19 +45,11 @@ Puppet::Type.newtype(:quagga_bgp_router) do
 
   newproperty(:default_local_preference) do
     desc 'Default local preference.'
-
     defaultto(100)
-    newvalues(/\A\d+\Z/)
 
     validate do |value|
-      super(value)
-
-      v = Integer(value)
-      fail "Invalid value #{value}. Valid values are 0-4294967295" unless v >= 0 and v <= 4294967295
-    end
-
-    munge do |value|
-      Integer(value)
+      fail "Invalid value '#{value}'. It is not an Integer" unless value.is_a?(Integer)
+      fail "Invalid value '#{value}'. Valid values are 0-4294967295" unless value >= 0 and value <= 4294967295
     end
   end
 
