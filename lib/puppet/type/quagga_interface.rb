@@ -222,7 +222,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   autorequire(:service) do
-    if value(:pim_ssm) == :true
+    if self[:pim_ssm] == :true
       %w{quagga ospfd pimd}
     else
       %w{quagga ospfd}
