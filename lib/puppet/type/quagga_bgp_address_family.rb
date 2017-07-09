@@ -16,7 +16,8 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
 
   newparam(:name, :namevar => true) do
     desc 'The Address family.'
-    newvalues(:ipv4_unicast, :ipv4_multicast, :ipv6_unicast)
+    newvalues(/\Aipv4_(unicast|multicast)\Z/)
+    newvalues(/\Aipv6_unicast\Z/)
   end
 
   newproperty(:aggregate_address, array_matching: :all) do
@@ -30,7 +31,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = value.split(/\s/).first
-      proto = resource[:name].to_s.split(/_/).first
+      proto, _ = resource[:name].split(/_/)
 
       begin
         ip = IPAddr.new(v)
@@ -76,7 +77,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = Integer(value)
-      proto, type = resource[:name].to_s.split(/_/)
+      proto, type = resource[:name].split(/_/)
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
@@ -103,7 +104,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = Integer(value)
-      proto, type = resource[:name].to_s.split(/_/)
+      proto, type = resource[:name].split(/_/)
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
@@ -124,7 +125,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     validate do |value|
       super(value)
 
-      proto, type = resource[:name].to_s.split(/_/)
+      proto, type = resource[:name].split(/_/)
 
       begin
         ip = IPAddr.new(value)
