@@ -69,8 +69,8 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     proto = @resource[:proto]
     action = @resource[:action]
     prefix = @resource[:prefix]
-    ge = @resource[:ge]
-    le = @resource[:le]
+    ge = @resource[:ge] unless @resource[:ge] == :absent
+    le = @resource[:le] unless @resource[:le] == :absent
 
     cmds << ERB.new(template).result(binding)
 
@@ -93,8 +93,8 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     proto = @property_hash[:proto]
     action = @property_hash[:action]
     prefix = @property_hash[:prefix]
-    ge = @property_hash[:ge]
-    le = @property_hash[:le]
+    ge = @property_hash[:ge] unless @property_hash[:ge] == :absent
+    le = @property_hash[:le] unless @property_hash[:le] == :absent
 
     cmds << 'no %{command}' % { :command => ERB.new(template).result(binding) }
 
