@@ -2,10 +2,10 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
   @doc = %q{ Manages prefix lists using quagga }
 
   @resource_properties = [
-      :action, :prefix, :ge, :le, :protocol,
+      :action, :prefix, :ge, :le, :proto,
   ]
 
-  @resource_template = '<%= protocol %> prefix-list <%= name %> seq <%= sequence %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
+  @resource_template = '<%= proto %> prefix-list <%= name %> seq <%= sequence %> <%= action %> <%= prefix %><% unless ge.nil? %> ge <%= ge %><% end %><% unless le.nil? %> le <%= le %><% end %>'
 
   commands :vtysh => 'vtysh'
 
@@ -23,13 +23,13 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
       if line =~ /^(ip|ipv6)\sprefix-list\s([\w-]+)\sseq\s(\d+)\s(permit|deny)\s([\d\.\/:]+|any)(\s(ge|le)\s(\d+)(\s(ge|le)\s(\d+))?)?$/
 
         hash = {
-            :action => $4.to_sym,
-            :ensure => :present,
-            :ge => $7.nil? ? :absent : Integer($8),
-            :le => $11.nil? ? :absent : Integer($11),
-            :name => "#{$2} #{$3}",
-            :prefix => $5,
-            :protocol => $1.to_sym,
+            :action   => $4.to_sym,
+            :ensure   => :present,
+            :ge       => $7.nil? ? :absent : Integer($8),
+            :le       => $11.nil? ? :absent : Integer($11),
+            :name     => "#{$2} #{$3}",
+            :prefix   => $5,
+            :proto    => $1.to_sym,
             :provider => self.name,
         }
 
@@ -66,7 +66,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     cmds = []
     cmds << 'configure terminal'
 
-    protocol = @resource[:protocol]
+    proto = @resource[:proto]
     action = @resource[:action]
     prefix = @resource[:prefix]
     ge = @resource[:ge]

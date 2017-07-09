@@ -44,7 +44,7 @@ ip as-path access-list THROUGH_AS300 permit _300_
           :provider => :quagga,
           :action   => :permit,
           :prefix   => 'any',
-          :protocol => :ip,
+          :proto    => :ip,
       })
     end
 
@@ -57,7 +57,7 @@ ip as-path access-list THROUGH_AS300 permit _300_
           :provider => :quagga,
           :action   => :permit,
           :prefix   => '1.1.1.0/24',
-          :protocol => :ip,
+          :proto    => :ip,
       })
     end
   end
