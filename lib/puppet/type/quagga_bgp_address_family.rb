@@ -14,20 +14,9 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
 
   ensurable
 
-  def self.title_patterns
-    [
-      [ /\A([^_]+)_([^_]+)\Z/, [[:proto], [:type]] ]
-    ]
-  end
-
-  newparam(:proto, :namevar => true) do
-    desc 'The protocol is `ipv4` or `ipv6`.'
-    newvalues(:ipv4, :ipv6)
-  end
-
-  newparam(:type, :namevar => true) do
-    desc 'The protocl type is `unicast` or `multicast`.'
-    newvalues(:unicast, :multicast)
+  newparam(:name, :namevar => true) do
+    desc 'The Address family.'
+    newvalues(:ipv4_unicast, :ipv4_multicast, :ipv6_unicast)
   end
 
   newproperty(:aggregate_address, array_matching: :all) do
@@ -41,12 +30,12 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = value.split(/\s/).first
-      proto = resource[:proto]
+      proto = resource[:name].to_s.split(/_/).first
 
       begin
         ip = IPAddr.new(v)
-        fail "Invalid value '#{value}'. The IP address must be a v4" if proto == :ipv4 and ip.ipv6?
-        fail "Invalid value '#{value}'. The IP address must be a v6" if proto == :ipv6 and ip.ipv4?
+        fail "Invalid value '#{value}'. The IP address must be a v4" if proto == 'ipv4' and ip.ipv6?
+        fail "Invalid value '#{value}'. The IP address must be a v6" if proto == 'ipv6' and ip.ipv4?
       rescue
         fail "Invalid value #{value}. The IP address '#{v}' is invalid."
       end
@@ -87,12 +76,11 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = Integer(value)
-      proto = resource[:proto]
-      type = resource[:type]
+      proto, type = resource[:name].to_s.split(/_/)
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
-      fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == :ipv4 and type == :multicast and v > 1
-      fail "Invalid value '#{value}'. The ipv6 does not support multipath." if proto == :ipv6 and v > 1
+      fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
+      fail "Invalid value '#{value}'. The ipv6 does not support multipath." if proto == 'ipv6' and v > 1
     end
 
     munge do |value|
@@ -115,12 +103,11 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       super(value)
 
       v = Integer(value)
-      proto = resource[:proto]
-      type = resource[:type]
+      proto, type = resource[:name].to_s.split(/_/)
 
       fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
-      fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == :ipv4 and type == :multicast and v > 1
-      fail "Invalid value '#{value}'. The ipv6 does not support multipath." if proto == :ipv6 and v > 1
+      fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
+      fail "Invalid value '#{value}'. The ipv6 does not support multipath." if proto == 'ipv6' and v > 1
     end
 
     munge do |value|
@@ -137,17 +124,16 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     validate do |value|
       super(value)
 
-      proto = resource[:proto]
-      type = resource[:type]
+      proto, type = resource[:name].to_s.split(/_/)
 
       begin
         ip = IPAddr.new(value)
 
-        fail "Invalid value '#{value}'. The IP address must be a v4." if proto == :ipv4 and not ip.ipv4?
-        fail "Invalid value '#{value}'. The IP address must be a v6." if proto == :ipv6 and not ip.ipv6?
+        fail "Invalid value '#{value}'. The IP address must be a v4." if proto == 'ipv4' and not ip.ipv4?
+        fail "Invalid value '#{value}'. The IP address must be a v6." if proto == 'ipv6' and not ip.ipv6?
 
-        fail "Invalid value '#{value}'. It is not an unicast IP address." if proto == :ipv4 and type == :unicast and IPAddr.new('224.0.0.0/4').include?(ip)
-        fail "Invalid value '#{value}'. It is not an multicast IP address." if proto == :ipv4 and type == :multicast and not IPAddr.new('224.0.0.0/4').include?(ip)
+        fail "Invalid value '#{value}'. It is not an unicast IP address." if proto == 'ipv4' and type == 'unicast' and IPAddr.new('224.0.0.0/4').include?(ip)
+        fail "Invalid value '#{value}'. It is not an multicast IP address." if proto == 'ipv4' and type == 'multicast' and not IPAddr.new('224.0.0.0/4').include?(ip)
       rescue
         fail "Invalid value '#{value}'. The IP address '#{value}' is invalid."
       end

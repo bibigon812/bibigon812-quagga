@@ -17,9 +17,8 @@ describe Puppet::Type.type(:quagga_bgp_address_family).provider(:quagga) do
       :aggregate_address  => ['192.168.0.0/24 summary-only', '10.0.0.0/24'],
       :maximum_ebgp_paths => 2,
       :maximum_ibgp_paths => 10,
+      :name               => 'ipv4_unicast',
       :networks           => ['10.0.0.0/8', '192.168.0.0/16'],
-      :proto              => :ipv4,
-      :type               => :unicast
     )
   end
 
@@ -94,10 +93,9 @@ end'
         :ensure             => :present,
         :maximum_ebgp_paths => 4,
         :maximum_ibgp_paths => 4,
+        :name               => 'ipv4_unicast',
         :networks           => ['172.16.32.0/24',],
-        :proto              => :ipv4,
         :provider           => :quagga,
-        :type               => :unicast,
       })
     end
 
@@ -107,10 +105,9 @@ end'
         :ensure             => :present,
         :maximum_ebgp_paths => 1,
         :maximum_ibgp_paths => 1,
+        :name               => 'ipv6_unicast',
         :networks           => ['1a04:6d40::/48',],
-        :proto              => :ipv6,
         :provider           => :quagga,
-        :type               => :unicast,
       })
     end
   end
