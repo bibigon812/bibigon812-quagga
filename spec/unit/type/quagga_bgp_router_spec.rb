@@ -60,7 +60,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
       expect { described_class.new(:name => 'bgp') }.to_not raise_error
     end
 
-    it 'should not support AS65000 as a value' do
+    it 'should contain bgp' do
       expect(described_class.new(:name => 'AS65000')[:name]).to eq('bgp')
     end
   end

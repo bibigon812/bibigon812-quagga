@@ -47,8 +47,8 @@ describe Puppet::Type.type(:quagga_ospf_router) do
       expect { described_class.new(:name => 'ospf') }.to_not raise_error
     end
 
-    it 'should not support foo as a value' do
-      expect { described_class.new(:name => 'foo') }.to raise_error(Puppet::Error, /Invalid value/)
+    it 'should contain ospf' do
+      expect(described_class.new(:name => 'foo')[:name]).to eq('ospf')
     end
   end
 
