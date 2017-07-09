@@ -61,7 +61,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
     end
 
     it 'should not support AS65000 as a value' do
-      expect { described_class.new(:name => 'AS65000') }.to raise_error(Puppet::Error, /Invalid value/)
+      expect(described_class.new(:name => 'AS65000')[:name]).to eq('bgp')
     end
   end
 

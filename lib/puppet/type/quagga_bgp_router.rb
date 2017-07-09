@@ -18,8 +18,11 @@ Puppet::Type.newtype(:quagga_bgp_router) do
   ensurable
 
   newparam(:name, :namevar => true) do
-    desc 'BGP router instance. Must be set to \'bgp\'.'
-    newvalues('bgp')
+    desc 'BGP router instance.'
+
+    munge do |value|
+      'bgp'
+    end
   end
 
   newproperty(:as_number) do
