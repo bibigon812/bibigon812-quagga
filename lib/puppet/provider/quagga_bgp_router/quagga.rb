@@ -133,7 +133,7 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
     debug '[prefetch]'
     providers = instances
     resources.keys.each do |name|
-      if provider = providers.find { |provider| provider.name == name }
+      if provider = providers.find { |provider| provider.name.to_s == name.to_s }
         resources[name].provider = provider
       end
     end
