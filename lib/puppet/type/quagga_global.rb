@@ -10,7 +10,7 @@ Puppet::Type.newtype(:quagga_global) do
   end
 
   newproperty(:password) do
-    desc 'Set password for vty interface. If there is no password, a vty won\’t accept connections.'
+    desc 'Set password for vty interface. If there is no password, a vty won\'t accept connections.'
 
     defaultto(:absent)
 
