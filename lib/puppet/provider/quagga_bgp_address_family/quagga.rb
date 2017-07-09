@@ -140,9 +140,9 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   def self.prefetch(resources)
     debug '[prefetch]'
     providers = instances
-    resources.keys.each do |resource|
+    resources.keys.each do |name|
       if provider = providers.find{ |provider| provider.name == name }
-        resource.provider = provider
+        resources[name].provider = provider
       end
     end
   end
