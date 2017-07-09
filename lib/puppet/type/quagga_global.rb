@@ -6,11 +6,11 @@ Puppet::Type.newtype(:quagga_global) do
   # end
 
   newparam(:hostname, :namevar => true) do
-    desc 'Router hostname'
+    desc 'Router hostname.'
   end
 
   newproperty(:password) do
-    desc 'Set password for vty interface. If there is no password, a vty won’t accept connections.'
+    desc 'Set password for vty interface. If there is no password, a vty won\’t accept connections.'
 
     defaultto(:absent)
 
@@ -74,7 +74,7 @@ Puppet::Type.newtype(:quagga_global) do
   end
 
   autorequire(:service) do
-    if value(:ip_multicast_routing) == :true
+    if self[:ip_multicast_routing] == :true
       %w{zebra pimd}
     else
       %w{zebra}
