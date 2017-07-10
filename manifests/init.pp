@@ -54,7 +54,7 @@ class quagga (
 
   $prefix_lists_ = $prefix_lists.reduce({}) |$prefix_lists, $prefix_list| {
 
-    $prefix_list_sequences = dig($prefix_list[1], 'rules')
+    $prefix_list_sequences = $prefix_list[1]['rules']
       .reduce({}) |$prefix_list_sequences, $prefix_list_sequence| {
 
       merge($prefix_list_sequences,
@@ -77,7 +77,7 @@ class quagga (
 
   $route_maps_ = $route_maps.reduce({}) |$route_maps, $route_map| {
 
-    $route_map_sequences = dig($route_map[1], 'rules')
+    $route_map_sequences = $route_map[1]['rules']
       .reduce({}) |$route_map_sequences, $route_map_sequence| {
 
         merge($route_map_sequences,
