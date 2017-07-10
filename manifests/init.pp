@@ -52,17 +52,12 @@ class quagga (
     }
   }
 
-  $prefix_lists_ = $prefix_lists.reduce({}) |$prefix_lists, $prefix_list| {
-
-    $prefix_list_sequences = $prefix_list[1]['rules']
-      .reduce({}) |$prefix_list_sequences, $prefix_list_sequence| {
-
-      merge($prefix_list_sequences,
-        { "${prefix_list[0]} ${$prefix_list_sequence[0]}" => $prefix_list_sequence[1] }
-      )
+  $prefix_lists_ = $prefix_lists.reduce({}) |Hash $pls, Tuple[String, Hash] $pl| {
+    $pl_seqs = $pl[1]['rules'].reduce({}) |Hash $pl_ss, Tuple[Integer, Hash] $pl_s| {
+      merge($pl_ss, { "${pl[0]} ${$pl_s[0]}" => $pl_s[1] })
     }
 
-    merge($prefix_lists, $prefix_list_sequences)
+    merge($pls, $pl_seqs)
   }
 
   resources { 'quagga_prefix_list':
@@ -75,17 +70,12 @@ class quagga (
     }
   }
 
-  $route_maps_ = $route_maps.reduce({}) |$route_maps, $route_map| {
-
-    $route_map_sequences = $route_map[1]['rules']
-      .reduce({}) |$route_map_sequences, $route_map_sequence| {
-
-        merge($route_map_sequences,
-          { "${route_map[0]} ${route_map_sequence[0]}" => $route_map_sequence[1] }
-        )
+  $route_maps_ = $route_maps.reduce({}) |Hash $rms, Tuple[String, Hash] $rm| {
+    $rm_seqs = $rm[1]['rules'].reduce({}) |Hash $rm_ss, Tuple[Integer, Hash] $rm_s| {
+        merge($rm_ss, { "${rm[0]} ${rm_s[0]}" => $rm_s[1] })
       }
 
-    merge($route_maps, $route_map_sequences)
+    merge($rms, $rm_seqs)
   }
 
   resources { 'quagga_route_map':
