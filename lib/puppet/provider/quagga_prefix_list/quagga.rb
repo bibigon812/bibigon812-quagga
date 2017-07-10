@@ -78,7 +78,7 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
     cmds << 'write memory'
     vtysh(cmds.reduce([]){ |commands, command| commands << '-c' << command })
 
-    @property_hash[:ensure] = :present
+    @property_hash = @resource.to_hash
   end
 
   def destroy
