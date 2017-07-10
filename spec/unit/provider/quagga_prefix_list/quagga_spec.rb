@@ -60,5 +60,18 @@ ip as-path access-list THROUGH_AS300 permit _300_
           :proto    => :ip,
       })
     end
+
+    it 'should return the resource \'ADVERTISED_ROUTES 1000\'' do
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
+          :ensure   => :present,
+          :name     => 'ADVERTISED_ROUTES 1000',
+          :ge       => :absent,
+          :le       => 32,
+          :provider => :quagga,
+          :action   => :deny,
+          :prefix   => '0.0.0.0/0',
+          :proto    => :ip,
+      })
+    end
   end
 end

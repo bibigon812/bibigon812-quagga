@@ -20,13 +20,13 @@ Puppet::Type.type(:quagga_prefix_list).provide :quagga do
 
       next if line =~ /\A!\Z/
 
-      if line =~ /^(ip|ipv6)\sprefix-list\s([\w-]+)\sseq\s(\d+)\s(permit|deny)\s([\d\.\/:]+|any)(\s(ge|le)\s(\d+)(\s(ge|le)\s(\d+))?)?$/
+      if line =~ /^(ip|ipv6)\sprefix-list\s([\w-]+)\sseq\s(\d+)\s(permit|deny)\s([\d\.\/:]+|any)(?:\sge\s(\d+))?(?:\sle\s(\d+))?$/
 
         hash = {
             :action   => $4.to_sym,
             :ensure   => :present,
-            :ge       => $7.nil? ? :absent : Integer($8),
-            :le       => $11.nil? ? :absent : Integer($11),
+            :ge       => $6.nil? ? :absent : Integer($6),
+            :le       => $7.nil? ? :absent : Integer($7),
             :name     => "#{$2} #{$3}",
             :prefix   => $5,
             :proto    => $1.to_sym,
