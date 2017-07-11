@@ -56,11 +56,23 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
       :type => :fixnum,
       :default => 100
     },
+    :ospf_auth => {
+      :regexp => /\A\sip\sospf\sauthentication\s(message-digest)\Z/,
+      :template => 'ip ospf authentication<% unless value.nil? %> <%= value %><% end %>',
+      :type => :string,
+      :default => :absent
+    },
+    :ospf_message_digest_key => {
+      :regexp => /\A\sip\sospf\smessage-digest-key\s(.*)\Z/,
+      :template => 'ip ospf message-digest-key<% unless value.nil? %> <%= value %><% end %>',
+      :type => :string,
+      :default => :absent
+    },
     :ospf_cost => {
       :regexp => /\A\sip\sospf\scost\s(\d+)\Z/,
       :template => 'ip ospf cost<% unless value.nil? %> <%= value %><% end %>',
       :type => :fixnum,
-      :default => 10
+      :default => :absent
     },
     :ospf_dead_interval => {
       :regexp => /\A\sip\sospf\sdead-interval\s(\d+)\Z/,

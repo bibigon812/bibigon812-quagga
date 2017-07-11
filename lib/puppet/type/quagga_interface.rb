@@ -137,15 +137,31 @@ Puppet::Type.newtype(:quagga_interface) do
     defaultto(100)
   end
 
+  newproperty(:ospf_auth) do
+    desc 'Interface OSPF authentication'
+
+    defaultto(:absent)
+    newvalues(:absent, 'message-digest')
+  end
+
+  newproperty(:ospf_message_digest_key) do
+    desc 'Set OSPF authentication key to a cryptographic password. The cryptographic algorithm is MD5.'
+
+    defaultto(:absent)
+    newvalues(:absent, /\d+\smd5\s\S{1,16}/)
+  end
+
   newproperty(:ospf_cost) do
     desc 'Interface OSPF cost'
 
     validate do |value|
-      fail "OSPF cost '#{value}' is not an Integer" unless value.is_a?(Integer)
-      fail "OSPF cost '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
+      if value != :absent
+        fail "OSPF cost '#{value}' is not an Integer" unless value.is_a?(Integer)
+        fail "OSPF cost '#{value}' must be between 1-65535" unless value >= 1 and value <= 65535
+      end
     end
 
-    defaultto(10)
+    defaultto(:absent)
   end
 
   newproperty(:ospf_dead_interval) do
