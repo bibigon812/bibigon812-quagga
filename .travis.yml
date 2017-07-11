@@ -8,7 +8,7 @@ script:
   - bundle exec rake syntax
   - bundle exec rake lint
   - bundle exec rake spec
-  - bunlde exec rake beaker
+  - bundle exec rake beaker
   - bundle exec rake build
 rvm:
   - 2.3.3
