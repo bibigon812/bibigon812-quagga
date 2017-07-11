@@ -82,5 +82,6 @@ quagga::ospf::service_enable: true
 quagga::ospf::service_manage: true
 quagga::ospf::service_ensure: "running"
 quagga::ospf::service_opts: "-P 0"
-quagga::ospf::router: {}
+quagga::ospf::router:
+  router_id: "%{::facts.networking.ip}"
 quagga::ospf::areas: {}
