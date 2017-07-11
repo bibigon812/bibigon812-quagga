@@ -1,8 +1,14 @@
 source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 
-gem 'puppet', '~> 4.10.0',          require: false
-gem 'puppet_facts',                 require: false
-gem 'beaker',                       require: false
-gem 'beaker-rspec',                 require: false
-gem 'beaker-puppet_install_helper', require: false
-gem 'puppetlabs_spec_helper',       require: false
+group :tests do
+  gem 'puppetlabs_spec_helper'
+end
+
+group :system_tests do
+  gem 'beaker'
+  gem 'beaker-rspec'
+  gem 'beaker-puppet_install_helper'
+end
+
+gem 'puppet', '~> 4.10.0'
+gem 'facter'

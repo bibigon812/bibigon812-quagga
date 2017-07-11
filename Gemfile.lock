@@ -265,7 +265,6 @@ GEM
     puppet-lint (2.2.1)
     puppet-syntax (2.4.1)
       rake
-    puppet_facts (0.2.1)
     puppetlabs_spec_helper (2.2.0)
       mocha (~> 1.0)
       puppet-lint (~> 2.0)
@@ -334,8 +333,8 @@ DEPENDENCIES
   beaker
   beaker-puppet_install_helper
   beaker-rspec
+  facter
   puppet (~> 4.10.0)
-  puppet_facts
   puppetlabs_spec_helper
 
 BUNDLED WITH
