@@ -187,15 +187,16 @@ quagga::ospf::router:
 ### OSPF Areas
 
 ```yaml
-0.0.0.0:
-  networks:
-    - 172.16.0.0/24
-    - 192.168.0.0/24
-0.0.0.1:
-  networks:
-    - 172.16.1.0/24
-    - 192.168.1.0/24
-  stub: true
+quagga::ospf::areas:
+  0.0.0.0:
+    networks:
+      - 172.16.0.0/24
+      - 192.168.0.0/24
+  0.0.0.1:
+    networks:
+      - 172.16.1.0/24
+      - 192.168.1.0/24
+    stub: true
 ```
 
 ### As-path Lists
