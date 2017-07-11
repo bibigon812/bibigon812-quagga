@@ -196,8 +196,8 @@ Puppet::Type.newtype(:quagga_interface) do
   newproperty(:ospf_network) do
     desc 'OSPF network type'
 
-    newvalues(/\A(broadcast|non-broadcast|point-to-multipoint|point-to-point|loopback)\Z/)
-    defaultto('broadcast')
+    newvalues(:absent, :broadcast, 'non-broadcast', 'point-to-multipoint', 'point-to-point', :loopback)
+    defaultto(:absent)
   end
 
   newproperty(:ospf_priority) do

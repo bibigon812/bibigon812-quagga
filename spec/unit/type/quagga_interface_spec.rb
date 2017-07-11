@@ -32,7 +32,7 @@ describe Puppet::Type.type(:quagga_interface) do
       end
     end
 
-    [:ospf_cost, :ospf_dead_interval, :ospf_hello_interval, :ospf_mtu_ignore, :ospf_network,
+    [:ospf_auth, :ospf_message_digest_key, :ospf_cost, :ospf_dead_interval, :ospf_hello_interval, :ospf_mtu_ignore, :ospf_network,
      :ospf_priority, :ospf_retransmit_interval, :ospf_transmit_delay,
      :igmp, :pim_ssm, :igmp_query_interval, :igmp_query_max_response_time_dsec,
      :bandwidth, :link_detect, :multicast,
@@ -240,6 +240,10 @@ describe Puppet::Type.type(:quagga_interface) do
 
       it 'should support point-to-point as value' do
         expect { described_class.new(:name => 'foo', :ospf_network => 'point-to-point') }.to_not raise_error
+      end
+
+      it 'should support :absent as value' do
+        expect { described_class.new(:name => 'foo', :ospf_network => :absent) }.to_not raise_error
       end
 
       it 'should contain point-to-point' do

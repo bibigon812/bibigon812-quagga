@@ -28,6 +28,7 @@ interface eth1
  ip ospf priority 50
  ip ospf retransmit-interval 4
  ip ospf mtu-ignore
+ ip ospf network broadcast
  ip pim ssm
  ip igmp
  ip igmp query-interval 150
@@ -67,7 +68,7 @@ interface tun0
         :ospf_dead_interval => 40,
         :ospf_hello_interval => 10,
         :ospf_mtu_ignore => :false,
-        :ospf_network => 'broadcast',
+        :ospf_network => :absent,
         :ospf_priority => 1,
         :ospf_retransmit_interval => 5,
         :ospf_transmit_delay => 1,
@@ -95,7 +96,7 @@ interface tun0
         :ospf_dead_interval => 8,
         :ospf_hello_interval => 2,
         :ospf_mtu_ignore => :true,
-        :ospf_network => 'broadcast',
+        :ospf_network => :broadcast,
         :ospf_priority => 50,
         :ospf_retransmit_interval => 4,
         :ospf_transmit_delay => 1,
