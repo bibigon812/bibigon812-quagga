@@ -61,6 +61,8 @@ interface tun0
         :ip_address => [],
         :link_detect => :false,
         :multicast => :false,
+        :ospf_auth => :absent,
+        :ospf_message_digest_key => :absent,
         :ospf_cost => :absent,
         :ospf_dead_interval => 40,
         :ospf_hello_interval => 10,
