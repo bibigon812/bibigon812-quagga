@@ -96,7 +96,7 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
       :regexp => /\A\sip\sospf\snetwork\s([\w-]+)\Z/,
       :template => 'ip ospf network<% unless value.nil? %> <%= value %><% end %>',
       :type => :string,
-      :default => 'broadcast'
+      :default => :absent
     },
     :ospf_priority => {
       :regexp => /\A\sip\sospf\spriority\s(\d+)\Z/,
@@ -182,8 +182,8 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
                 when :boolean
                   interface[property] = :true
 
-                when :symbol
-                  interface[property] = value.gsub(/-/, '_').to_sym
+                else
+                  interface[property] = value
 
               end
             end

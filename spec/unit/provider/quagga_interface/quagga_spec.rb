@@ -96,7 +96,7 @@ interface tun0
         :ospf_dead_interval => 8,
         :ospf_hello_interval => 2,
         :ospf_mtu_ignore => :true,
-        :ospf_network => :broadcast,
+        :ospf_network => 'broadcast',
         :ospf_priority => 50,
         :ospf_retransmit_interval => 4,
         :ospf_transmit_delay => 1,

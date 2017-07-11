@@ -247,7 +247,7 @@ describe Puppet::Type.type(:quagga_interface) do
       end
 
       it 'should contain point-to-point' do
-        expect(described_class.new(:name => 'foo', :ospf_network => 'point-to-point')[:ospf_network]).to eq('point-to-point')
+        expect(described_class.new(:name => 'foo', :ospf_network => 'point-to-point')[:ospf_network]).to eq(:"point-to-point")
       end
     end
 
