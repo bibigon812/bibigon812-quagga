@@ -1,4 +1,9 @@
 
+## [unreleased]
+
+### Fixed
+- the lint warning when creating the resource `quagga_global`
+
 ## [3.0.0] - 2017-07-11
 
 ### Added
