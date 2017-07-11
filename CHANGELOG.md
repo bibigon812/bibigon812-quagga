@@ -1,20 +1,29 @@
 
-## [Unreleased]
+## [3.0.0] - 2017-07-11
 
 ### Added
 
 - the resource `quagga_bgp_address_family`
 - the resource `quagga_bgp_peer_address_family`
 - the property `as_number` to the resource `quagga_bgp_router`
+- the true hiera support
+- many classes that are wrappers for resources `quagga_*`
 
 ### Changed
 
 - changelog
 - the resource `quagga_bgp` to `quagga_bgp_router`
+- names of resources `quagga_route_map`, `quagga_prefix_list`
+- the resource `quagga_bgp` to `quagga_bgp_router`
+- resources `quagga_bgp_router`, `quagga_bgp_peer`
 
 ### Removed
 
 - the resource `quagga_redistribution`
+
+### Updated
+
+- dependencies
 
 ## [2.0.3] - 2017-06-27
 
@@ -102,7 +111,7 @@
 
 ### Added
 
-- pim support by [@m4ce](https://github.com/m4ce) 
+- pim support by [@m4ce](https://github.com/m4ce)
 
 ### Fixed
 
@@ -153,7 +162,7 @@
 ### Fixed
 
 - NilClass in flush methods
-- errors on creating all resources 
+- errors on creating all resources
 
 ### Updated
 
