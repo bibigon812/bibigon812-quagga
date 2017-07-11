@@ -262,64 +262,64 @@ quagga::route_maps:
 
 #### quagga
 
-- `global_opts`. Quagga global options. See the type `quagga_global`.
-- `interfaces`. Quagga interfacec options. See the type `quagga_interface`.
-- `prefix_lists`. Quagga prefix-list options. See the type `quagga_prefix_list`.
-- `route_maps`. Quagga route-map options. See the type `quagga_rotue_map`.
-- `default_owner`. Overrides the default owner of Quagga configuration files in the file system.
-- `default_group`. Overrides the default group of Quagga configuration files in the file system.
-- `default_mode`. Overrides the default mode of Quagga configuration files in the system.
-- `default_content`. Overrides the initial content of quagga configuration files.
-- `service_file`. Overrides the default path of the Quagga system configuration file in the file system.
+- `global_opts`: Quagga global options. See the type `quagga_global`.
+- `interfaces`: Quagga interfacec options. See the type `quagga_interface`.
+- `prefix_lists`: Quagga prefix-list options. See the type `quagga_prefix_list`.
+- `route_maps`: Quagga route-map options. See the type `quagga_rotue_map`.
+- `default_owner`: overrides the default owner of Quagga configuration files in the file system.
+- `default_group`: overrides the default group of Quagga configuration files in the file system.
+- `default_mode`: overrides the default mode of Quagga configuration files in the system.
+- `default_content`: overrides the initial content of quagga configuration files.
+- `service_file`: overrides the default path of the Quagga system configuration file in the file system.
 - `service_file_manage`.
-- `packages`. Quagga package options.
+- `packages`: Quagga package options.
 
 #### quagga::bgp
 
-- `config_file`. Configuration file if the BGP service.
-- `config_file_manage`. Enable the management of the BGP service setting file.
-- `service_name`. The name of the BGP service.
-- `service_enable`. Enable the BGP service.
-- `service_manage`. Enable the management of the BGP service.
-- `service_ensure`. The state of the BGP Service.
-- `service_opts`. Service start options.
-- `router`. BGP router options. See the type `quagga_bgp_router`.
-- `peers`. BGP peer options. See the type `quagga_bgp_peer`.
-- `as_paths`. As-path options. See the type `quagga_bgp_as_path`.
-- `community_lists`. Community-list options. See the type `quagga_bgp_community_list`.
-- `address_families`. BGP address-family options. See the type `quagga_bgp_address_family`.
+- `config_file`: configuration file if the BGP service.
+- `config_file_manage`: enable the management of the BGP service setting file.
+- `service_name`: the name of the BGP service.
+- `service_enable`: enable the BGP service.
+- `service_manage`: enable the management of the BGP service.
+- `service_ensure`: the state of the BGP Service.
+- `service_opts`: service start options.
+- `router`: BGP router options. See the type `quagga_bgp_router`.
+- `peers`: BGP peer options. See the type `quagga_bgp_peer`.
+- `as_paths`: as-path options. See the type `quagga_bgp_as_path`.
+- `community_lists`: community-list options. See the type `quagga_bgp_community_list`.
+- `address_families`: BGP address-family options. See the type `quagga_bgp_address_family`.
 
 #### quagga::ospf
 
-- `config_file`. Configuration file if the OSPF service.
-- `config_file_manage`. Enable the management of the OSPF service setting file.
-- `service_name`. The name of the OSPF service.
-- `service_enable`. Enable the OSPF service.
-- `service_manage`. Enable the management of the OSPF service.
-- `service_ensure`. The state of the OSPF Service.
-- `service_opts`. Service start options.
-- `router`. OSPF router options. See the type `quagga_ospf_router`.
-- `areas`. OSPF area options. See the type `quagga_ospf_area`.
+- `config_file`: configuration file if the OSPF service.
+- `config_file_manage`: enable the management of the OSPF service setting file.
+- `service_name`: the name of the OSPF service.
+- `service_enable`: enable the OSPF service.
+- `service_manage`: enable the management of the OSPF service.
+- `service_ensure`: the state of the OSPF Service.
+- `service_opts`: service start options.
+- `router`: OSPF router options. See the type `quagga_ospf_router`.
+- `areas`: OSPF area options. See the type `quagga_ospf_area`.
 
 #### quagga::pim
 
-- `config_file`. Configuration file if the PIM service.
-- `config_file_manage`. Enable the management of the PIM service setting file.
-- `service_name`. The name of the PIM service.
-- `service_enable`. Enable the PIM service.
-- `service_manage`. Enable the management of the PIM service.
-- `service_ensure`. The state of the PIM Service.
-- `service_opts`. Service start options.
+- `config_file`: configuration file if the PIM service.
+- `config_file_manage`: enable the management of the PIM service setting file.
+- `service_name`: the name of the PIM service.
+- `service_enable`: enable the PIM service.
+- `service_manage`: enable the management of the PIM service.
+- `service_ensure`: the state of the PIM Service.
+- `service_opts`: service start options.
 
 #### quagga::zebra
 
-- `config_file`. Configuration file if the Zebra service.
-- `config_file_manage`. Enable the management of the Zebra service setting file.
-- `service_name`. The name of the Zebra service.
-- `service_enable`. Enable the Zebra service.
-- `service_manage`. Enable the management of the Zebra service.
-- `service_ensure`. The state of the Zebra Service.
-- `service_opts`. Service start options.
+- `config_file`: configuration file if the Zebra service.
+- `config_file_manage`: enable the management of the Zebra service setting file.
+- `service_name`: the name of the Zebra service.
+- `service_enable`: enable the Zebra service.
+- `service_manage`: enable the management of the Zebra service.
+- `service_ensure`: the state of the Zebra Service.
+- `service_opts`: service start options.
 
 
 ### Defines
@@ -343,9 +343,9 @@ quagga_as_path { 'TEST_AS_PATH':
 }
 ```
 
-- `name`: The name of the as-path access-list.
-- `ensure`: Manage the state of this as-path list: `absent`, `present`.
-- `rules`: List of rules.
+- `name`: the name of the as-path access-list.
+- `ensure`: manage the state of this as-path list: `absent`, `present`.
+- `rules`: the list of rules.
 
 #### quagga_bgp_router
 
@@ -386,7 +386,7 @@ quagga_bgp_address_family { 'ipv4_multicast':
 }
 ```
 
-- `name`: the Address family.
+- `name`: the address family.
 - `aggregate_address`: configure BGP aggregate entries.
 - `maximum_ebgp_paths`: forward packets over multiple ebgp paths.
 - `maximum_ibgp_paths`: forward packets over multiple ibgp paths.
@@ -409,7 +409,7 @@ quagga_bgp_peer { 'internal_peers':
 ```
 
 - `name`: a neighbor IP address or a peer-group name.
-- `ensure`: manage the state of this BGP neighbor: `absent`, `present`. Default value: `present`.
+- `ensure`: manage the state of this BGP neighbor: `absent`, `present`: Default value: `present`.
 - `local_as`: specify a local-as number.
 - `passive`: don't send open messages to this neighbor. Default value: `false`.
 - `peer_group`: member of the peer-group.
@@ -441,7 +441,7 @@ quagga_bgp_peer_address_family { '192.168.0.2 ipv4_unicast':
 ```
 
 - `name`: contains peer and address family names separated by space.
-- `ensure`: manage the state of this BGP neighbor: `absent`, `present`. Default value: `present`.
+- `ensure`: manage the state of this BGP neighbor: `absent`, `present`: Default value: `present`.
 - `activate`: enable the Address Family for this Neighbor. Default value: `true`.
 - `allow_as_in`: accept as-path with my AS present in it.
 - `default_originate`: originate default route to this neighbor. Default value: `false`.
@@ -469,7 +469,7 @@ quagga_community_list { '100':
 ```
 
 - `name`: community list number.
-- `ensure`: manage the state of this community list: `absent`, `present`. Default value: `present`.
+- `ensure`: manage the state of this community list: `absent`, `present`: Default value: `present`.
 - `rules`: the list of rules.
 
 #### quagga_global
@@ -523,7 +523,7 @@ quagga_interface { 'eth0':
 - `ospf_dead_interval`: interval after which a neighbor is declared dead. Default value: `40`.
 - `ospf_hello_interval`: time between HELLO packets. Default value: `10`.
 - `ospf_mtu_ignore`: disable mtu mismatch detection. Default value: `false`.
-- `ospf_network`: network type: `absent`, `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`. Default value: `absent`.
+- `ospf_network`: network type: `absent`, `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`: Default value: `absent`.
 - `ospf_priority`: router priority. Default value: `1`.
 - `ospf_retransmit_interval`: time between retransmitting lost link state advertisements. Default value: `5`.
 - `ospf_transmit_delay`: link state transmit delay. Default value: `1`.
@@ -543,7 +543,7 @@ quagga_ospf_router { 'ospf':
 ```
 
 - `name`: the name must be `ospf`.
-- `ensure`: manage the state of this OSPF router: `absent`, `present`. Default value: `present`.
+- `ensure`: manage the state of this OSPF router: `absent`, `present`: Default value: `present`.
 - `abr_type`: set OSPF ABR type. Default value: `cisco`.
 - `log_adjacency_changes`: log changes in adjacency. Default value: `false`.
 - `opaque`: enable the Opaque-LSA capability (rfc2370). Default value: `false`.
@@ -561,14 +561,14 @@ quagga_ospf_area { '0.0.0.0':
 ```
 
 - `name`: the OSPF area.
-- `ensure`: manage the state of this OSPF area: `absent`, `present`. Default value: `present`.
+- `ensure`: manage the state of this OSPF area: `absent`, `present`: Default value: `present`.
 - `access_list_expor`: set the filter for networks announced to other areas.
 - `access_list_import`: set the filter for networks from other areas announced to the specified one.
 - `prefix_list_export`: filter networks sent from this area.
 - `prefix_list_import`: filter networks sent to this area.
 - `networks`: enable routing on an IP network. Default value: `[]`.
-- `auth`: enable authentication on this area: `false`, `true`, `message-digest`. Default value: `false`.
-- `stub`: . configure the area to be a stub area: `false`, `true`, `no-summary`. Default value: `false`.
+- `auth`: enable authentication on this area: `false`, `true`, `message-digest`: Default value: `false`.
+- `stub`: . configure the area to be a stub area: `false`, `true`, `no-summary`: Default value: `false`.
 
 #### quagga_prefix_list
 
@@ -591,12 +591,12 @@ quagga_prefix_list {'ADVERTISED_PREFIXES 20':
 ```
 
 - `name`: name of the prefix-list and sequence number.
-- `ensure`: manage the state of this prefix list: `absent`, `present`. Default value: `present`.
+- `ensure`: manage the state of this prefix list: `absent`, `present`: Default value: `present`.
 - `action`: action can be `permit` or `deny`.
 - `ge`: minimum prefix length to be matched.
 - `le`: maximum prefix length to be matched.
 - `prefix`: IP prefix `<network>/<length>`.
-- `proto`: IP protocol version: `ip`, `ipv6`. Default value: `ip`.
+- `proto`: IP protocol version: `ip`, `ipv6`: Default value: `ip`.
 
 #### quagga_route_map
 
@@ -674,7 +674,7 @@ quagga_route_map { 'bgp_out 65000':
 
 - `name`: name of the route-map and sequence number of rule.
 - `action`: route map actions: `deny`,`permit`.
-- `ensure`: manage the state of this route map: `absent`, `present`. Default value: `present`.
+- `ensure`: manage the state of this route map: `absent`, `present`: Default value: `present`.
 - `match`: match values from routing table. Default value: `[]`.
 - `on_match`: exit policy on matches.
 - `set`: set values in destination routing protocol. Default value: `[]`.
