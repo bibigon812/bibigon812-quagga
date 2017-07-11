@@ -119,6 +119,7 @@ quagga::bgp::peers:
     passive: true
     address_families:
       ipv4_unicast:
+        activate: true
         default_originate: true
   INTERNAL:
     remote_as: 65000
