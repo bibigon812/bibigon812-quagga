@@ -16,13 +16,12 @@ Puppet::Type.newtype(:quagga_bgp_as_path) do
   ensurable
 
   newparam(:name) do
-    desc %q{ The name of the as-path access-list. }
-
+    desc 'The name of the as-path access-list.'
     newvalues(/\A\w+\Z/)
   end
 
   newproperty(:rules, :array_matching => :all) do
-    desc 'Array of rules `action regex`.'
+    desc 'Set actions of this ap-path list.'
 
     newvalues(/\A(permit|deny)\s\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
 

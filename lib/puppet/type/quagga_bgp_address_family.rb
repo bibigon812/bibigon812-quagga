@@ -35,8 +35,8 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
 
       begin
         ip = IPAddr.new(v)
-        fail "Invalid value '#{value}'. The IP address must be a v4" if proto == 'ipv4' and ip.ipv6?
-        fail "Invalid value '#{value}'. The IP address must be a v6" if proto == 'ipv6' and ip.ipv4?
+        fail "Invalid value '#{value}'. The IP address must be a v4." if proto == 'ipv4' and ip.ipv6?
+        fail "Invalid value '#{value}'. The IP address must be a v6." if proto == 'ipv6' and ip.ipv4?
       rescue
         fail "Invalid value #{value}. The IP address '#{v}' is invalid."
       end
@@ -79,7 +79,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       v = Integer(value)
       proto, type = resource[:name].split(/_/)
 
-      fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
+      fail "Invalid value '#{value}'. Valid values are 1-255." unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
       fail "Invalid value '#{value}'. The ipv6 does not support multipath." if proto == 'ipv6' and v > 1
     end
@@ -106,7 +106,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       v = Integer(value)
       proto, type = resource[:name].split(/_/)
 
-      fail "Invalid value '#{value}'. Valid values are 1-255" unless v >= 1 and v <= 255
+      fail "Invalid value '#{value}'. Valid values are 1-255." unless v >= 1 and v <= 255
       fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
       fail "Invalid value '#{value}'. The ipv6 does not support multipath." if proto == 'ipv6' and v > 1
     end

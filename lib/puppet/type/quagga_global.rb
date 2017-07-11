@@ -24,7 +24,7 @@ Puppet::Type.newtype(:quagga_global) do
   end
 
   newproperty(:enable_password) do
-    desc 'Set enable password'
+    desc 'Set enable password.'
 
     defaultto(:absent)
 
@@ -38,32 +38,32 @@ Puppet::Type.newtype(:quagga_global) do
   end
 
   newproperty(:ip_multicast_routing, :boolean => true) do
-    desc 'Enable IP multicast forwarding'
+    desc 'Enable IP multicast forwarding.'
     defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:ip_forwarding, :boolean => true) do
-    desc 'Enable IP forwarding'
+    desc 'Enable IP forwarding.'
     defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:ipv6_forwarding, :boolean => true) do
-    desc 'Enable IPv6 forwarding'
+    desc 'Enable IPv6 forwarding.'
     defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:line_vty, :boolean => true) do
-    desc 'Enter vty configuration mode'
+    desc 'Enter vty configuration mode.'
 
     defaultto(:true)
     newvalues(:true, :false)
   end
 
   newproperty(:service_password_encryption, :boolean => true) do
-    desc 'Encrypt passwords'
+    desc 'Encrypt passwords.'
 
     defaultto(:false)
     newvalues(:true, :false)

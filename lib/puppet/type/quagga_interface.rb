@@ -31,12 +31,12 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:description) do
-    desc 'Interface description'
+    desc 'Interface description.'
     defaultto(:absent)
   end
 
   newproperty(:ip_address, :array_matching => :all) do
-    desc 'IP address'
+    desc 'The IP address.'
 
     validate do |value|
       begin
@@ -75,14 +75,14 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:link_detect, :boolean => true) do
-    desc 'Enable link state detection'
+    desc 'Enable link state detection.'
 
     defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:bandwidth) do
-    desc 'Set bandwidth value of the interface in kilobits/sec'
+    desc 'Set bandwidth value of the interface in kilobits/sec.'
 
     defaultto(:absent)
 
@@ -95,28 +95,28 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:multicast, :boolean => true) do
-    desc 'Enable multicast flag for the interface'
+    desc 'Enable multicast flag for the interface.'
 
     defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:igmp, :boolean => true) do
-    desc 'Enable IGMP'
+    desc 'Enable IGMP.'
 
     defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:pim_ssm, :boolean => true) do
-    desc 'Enable PIM SSM operation'
+    desc 'Enable PIM SSM operation.'
 
     defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:igmp_query_interval) do
-    desc 'IGMP query interval'
+    desc 'IGMP query interval.'
 
     validate do |value|
       fail "IGMP query interval '#{value}' is not an Integer" unless value.is_a?(Integer)
@@ -127,7 +127,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:igmp_query_max_response_time_dsec) do
-    desc 'IGMP maximum query response time in deciseconds'
+    desc 'IGMP maximum query response time in deciseconds.'
 
     validate do |value|
       fail "IGMP max query response time '#{value}' is not an Integer" unless value.is_a?(Integer)
@@ -138,7 +138,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:ospf_auth) do
-    desc 'Interface OSPF authentication'
+    desc 'Interface OSPF authentication.'
 
     defaultto(:absent)
     newvalues(:absent, 'message-digest')
@@ -152,7 +152,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:ospf_cost) do
-    desc 'Interface OSPF cost'
+    desc 'Interface OSPF cost.'
 
     validate do |value|
       if value != :absent
@@ -165,7 +165,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:ospf_dead_interval) do
-    desc  'Interval after which an OSPF neighbor is declared dead'
+    desc  'Interval after which an OSPF neighbor is declared dead.'
 
     validate do |value|
       fail "OSPF dead interval '#{value}' is not an Integer" unless value.is_a?(Integer)
@@ -176,7 +176,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:ospf_hello_interval) do
-    desc 'HELLO packets interval between OSPF neighbours'
+    desc 'HELLO packets interval between OSPF neighbours.'
 
     validate do |value|
       fail "OSPF hello packets interval '#{value}' is not an Integer" unless value.is_a?(Integer)
@@ -187,7 +187,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:ospf_mtu_ignore, :boolean => true) do
-    desc 'Disable OSPF mtu mismatch detection'
+    desc 'Disable OSPF mtu mismatch detection.'
 
     defaultto(:false)
     newvalues(:true, :false)
@@ -201,7 +201,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:ospf_priority) do
-    desc 'Router OSPF priority'
+    desc 'Router OSPF priority.'
 
     validate do |value|
       fail "Router OSPF priority '#{value}' is not an Integer" unless value.is_a?(Integer)
@@ -212,7 +212,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:ospf_retransmit_interval) do
-    desc 'Time between retransmitting lost OSPF link state advertisements'
+    desc 'Time between retransmitting lost OSPF link state advertisements.'
 
     validate do |value|
       fail "OSPF retransmit interval '#{value}' is not an Integer" unless value.is_a?(Integer)
@@ -223,7 +223,7 @@ Puppet::Type.newtype(:quagga_interface) do
   end
 
   newproperty(:ospf_transmit_delay) do
-    desc 'Link state transmit delay'
+    desc 'Link state transmit delay.'
 
     validate do |value|
       fail "OSPF transmit delay '#{value}' is not an Integer" unless value.is_a?(Integer)

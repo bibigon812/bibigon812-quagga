@@ -27,14 +27,14 @@ Puppet::Type.newtype(:quagga_ospf_area) do
   end
 
   newproperty(:auth) do
-    desc %q{OSPF authentication}
+    desc 'OSPF authentication.'
 
     defaultto(:false)
     newvalues(:false, :true, 'message-digest')
   end
 
   newproperty(:stub) do
-    desc %q{Configure the OSPF area to be a stub area}
+    desc 'Configure the OSPF area to be a stub area.'
 
     defaultto(:false)
     newvalues(:false, :true, 'no-summary')
@@ -73,7 +73,7 @@ Puppet::Type.newtype(:quagga_ospf_area) do
   end
 
   newproperty(:networks, :array_matching => :all) do
-    desc 'Enable routing on an IP network. Default to `[]`.'
+    desc 'Enable routing on an IP network.'
 
     validate do |value|
       begin

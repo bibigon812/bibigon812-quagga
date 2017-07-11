@@ -25,7 +25,7 @@ Puppet::Type.newtype(:quagga_ospf_router) do
   end
 
   newproperty(:abr_type) do
-    desc 'Set OSPF ABR type. Default to `cisco`.'
+    desc 'Set OSPF ABR type.'
 
     defaultto(:cisco)
     newvalues(:cisco, :ibm, :shortcut, :standard)
@@ -49,14 +49,14 @@ Puppet::Type.newtype(:quagga_ospf_router) do
   end
 
   newproperty(:opaque, :boolean => true) do
-    desc 'Enable the Opaque-LSA capability (rfc2370). Default to `false`.'
+    desc 'Enable the Opaque-LSA capability (rfc2370).'
 
     defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:redistribute, :array_matching => :all) do
-    desc 'Redistribute information from another routing protocol'
+    desc 'Redistribute information from another routing protocol.'
 
     defaultto([])
     newvalues(/\A(babel|bgp|connected|isis|kernel|rip|static)(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
@@ -83,7 +83,7 @@ Puppet::Type.newtype(:quagga_ospf_router) do
   end
 
   newproperty(:rfc1583, :boolean => true) do
-    desc 'Enable the RFC1583Compatibility flag. Default to `false`.'
+    desc 'Enable the RFC1583Compatibility flag.'
 
     defaultto(:false)
     newvalues(:true, :false)
@@ -101,7 +101,7 @@ Puppet::Type.newtype(:quagga_ospf_router) do
   end
 
   newproperty(:log_adjacency_changes) do
-    desc 'Log changes in adjacency'
+    desc 'Log changes in adjacency.'
 
     defaultto(:false)
     newvalues(:true, :false, :detail)

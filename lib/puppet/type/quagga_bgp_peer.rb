@@ -59,7 +59,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   newproperty(:remote_as) do
-    desc 'Specify a BGP neighbor as.'
+    desc 'Specify a BGP neighbor AS.'
 
     defaultto(:absent)
 

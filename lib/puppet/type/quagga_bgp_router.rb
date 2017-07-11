@@ -57,7 +57,7 @@ Puppet::Type.newtype(:quagga_bgp_router) do
   end
 
   newproperty(:redistribute, :array_matching => :all) do
-    desc 'Redistribute information from another routing protocol'
+    desc 'Redistribute information from another routing protocol.'
 
     defaultto([])
     newvalues(/\A(babel|connected|isis|kernel|ospf|rip|static)(\smetric\s\d+)?(\sroute-map\s\w+)?\Z/)

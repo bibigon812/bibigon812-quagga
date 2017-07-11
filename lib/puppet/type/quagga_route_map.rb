@@ -22,7 +22,7 @@ Puppet::Type.newtype(:quagga_route_map) do
   ensurable
 
   newparam(:name, :namevar => true) do
-    desc 'Contains a name and a sequence of the route-map'
+    desc 'Contains a name and a sequence of the route-map.'
 
     newvalues(/\A[[:alpha:]][\w-]+\s\d+\Z/)
   end
