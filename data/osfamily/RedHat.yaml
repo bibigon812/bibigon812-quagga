@@ -1,2 +1,3 @@
 ---
 quagga::service_file: "/etc/sysconfig/quagga"
+quagga::pim::service_manage: false
