@@ -1,18 +1,16 @@
 require 'spec_helper_acceptance'
 
 describe 'quagga' do
-  describe 'running puppet code' do
-    it 'should work with no errors' do
-      pp = <<-EOS
-        class { 'quagga': }
-        quagga_ospf { 'ospf':
-          ensure => present,
-          router_id => '1.1.1.1',
-        }
-      EOS
+  let(:manifest) {
+    'include quagga'
+  }
 
-      apply_manifest(pp, :catch_failures => true)
-      apply_manifest(pp, :catch_changes => true)
-    end
+  it 'should apply without errors' do
+    apply_manifest(manifest, :catch_failures => true)
+  end
+
+  it 'should apply a second time without changes' do
+    @result = apply_manifest(manifest)
+    expect(@result.exit_code).to be_zero
   end
 end
