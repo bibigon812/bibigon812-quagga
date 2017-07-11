@@ -32,7 +32,7 @@ describe Puppet::Type.type(:quagga_interface) do
       end
     end
 
-    [:ospf_cost, :ospf_dead_interval, :ospf_hello_interval, :ospf_mtu_ignore, :ospf_network,
+    [:ospf_auth, :ospf_message_digest_key, :ospf_cost, :ospf_dead_interval, :ospf_hello_interval, :ospf_mtu_ignore, :ospf_network,
      :ospf_priority, :ospf_retransmit_interval, :ospf_transmit_delay,
      :igmp, :pim_ssm, :igmp_query_interval, :igmp_query_max_response_time_dsec,
      :bandwidth, :link_detect, :multicast,
@@ -62,7 +62,47 @@ describe Puppet::Type.type(:quagga_interface) do
       end
     end
 
+    describe 'ospf_auth' do
+      it 'should support :absent as a value' do
+        expect { described_class.new(:name => 'foo', :ospf_auth => :absent) }.to_not raise_error
+      end
+
+      it 'should support message-digest as a value' do
+        expect { described_class.new(:name => 'foo', :ospf_auth => "message-digest") }.to_not raise_error
+      end
+
+      it 'should contain :message-digest' do
+        expect(described_class.new(name: 'foo', :ospf_auth => 'message-digest')[:ospf_auth]).to eq(:"message-digest")
+      end
+
+      it 'should not support foo as a value' do
+        expect { described_class.new(:name => 'foo', :ospf_auth => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+      end
+    end
+
+    describe 'ospf_message_digest_key' do
+      it 'should support :absent as a value' do
+        expect { described_class.new(:name => 'foo', :ospf_message_digest_key => :absent) }.to_not raise_error
+      end
+
+      it 'should support "1 md5 hello123" as a value' do
+        expect { described_class.new(:name => 'foo', :ospf_message_digest_key => "1 md5 hello123") }.to_not raise_error
+      end
+
+      it 'should contain "1 md5 hello123"' do
+        expect(described_class.new(name: 'foo', :ospf_message_digest_key => '1 md5 hello123')[:ospf_message_digest_key]).to eq('1 md5 hello123')
+      end
+
+      it 'should not support foo as a value' do
+        expect { described_class.new(:name => 'foo', :ospf_message_digest_key => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+      end
+    end
+
     describe 'ospf_cost' do
+      it 'should support :absent as a value' do
+        expect { described_class.new(:name => 'foo', :ospf_cost => :absent) }.to_not raise_error
+      end
+
       it 'should support 100 as a value' do
         expect { described_class.new(:name => 'foo', :ospf_cost => 100) }.to_not raise_error
       end
@@ -202,8 +242,12 @@ describe Puppet::Type.type(:quagga_interface) do
         expect { described_class.new(:name => 'foo', :ospf_network => 'point-to-point') }.to_not raise_error
       end
 
+      it 'should support :absent as value' do
+        expect { described_class.new(:name => 'foo', :ospf_network => :absent) }.to_not raise_error
+      end
+
       it 'should contain point-to-point' do
-        expect(described_class.new(:name => 'foo', :ospf_network => 'point-to-point')[:ospf_network]).to eq('point-to-point')
+        expect(described_class.new(:name => 'foo', :ospf_network => 'point-to-point')[:ospf_network]).to eq(:"point-to-point")
       end
     end
 

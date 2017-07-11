@@ -4,6 +4,18 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
   @doc = %q{ Manages OSPF areas using quagga }
 
   @resource_map = {
+    :auth => {
+        :type => :string,
+        :regexp => /\A\sarea\s(\S+)\sauthentication(?:\s(message-digest))\Z/,
+        :template => 'area <%= area %> authentication<% unless value.nil? %> <%= value %><% end %>',
+        :default => :false,
+    },
+    :stub => {
+        :type => :string,
+        :regexp => /\A\sarea\s(\S+)\sstub(?:\s(no-summary))\Z/,
+        :template => 'area <%= area %> stub<% unless value.nil? %> <%= value %><% end %>',
+        :default => :false,
+    },
     :access_list_export => {
         :type => :string,
         :regexp => /\A\sarea\s(\S+)\sexport-list\s(\S+)\Z/,
@@ -41,7 +53,6 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
   def initialize(value={})
     super(value)
     @property_flush = {}
-    @property_remove = {}
   end
 
   def self.instances
@@ -187,8 +198,6 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
   end
 
   def flush
-    return unless @property_flush.empty?
-
     resource_map = self.class.instance_variable_get('@resource_map')
     area = @property_hash[:name]
 
@@ -199,19 +208,25 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
     cmds << 'router ospf'
 
     @property_flush.each do |property, v|
-      case resource_map[property][:type]
-        when :array
-          (@property_hash[property] - v).each do |value|
-            cmds << "no  #{ERB.new(resource_map[property][:template]).result(binding)}"
-          end
-
-          (v - @property_hash[property]).each do |value|
-            cmds << ERB.new(resource_map[property][:template]).result(binding)
-          end
-
-        else
+      if v == :false or v == :absent
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+      elsif v == :true and [:symbol, :string].include?(resource_map[property][:type])
+        cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      elsif v == :true
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      elsif resource_map[property][:type] == :array
+        (@property_hash[property] - v).each do |v|
           value = v
+          cmds << "no  #{ERB.new(resource_map[property][:template]).result(binding)}"
+        end
+
+        (v - @property_hash[property]).each do |value|
           cmds << ERB.new(resource_map[property][:template]).result(binding)
+        end
+      else
+        value = v
+        cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
 
       @property_hash[property] = v

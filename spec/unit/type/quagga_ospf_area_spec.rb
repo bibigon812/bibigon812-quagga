@@ -56,6 +56,67 @@ describe Puppet::Type.type(:quagga_ospf_area) do
     end
   end
 
+  describe 'auth' do
+    it 'should support true as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :auth => true) }.to_not raise_error
+    end
+
+    it 'should support false as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :auth => false) }.to_not raise_error
+    end
+
+    it 'should support message-digest as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :auth => "message-digest") }.to_not raise_error
+    end
+
+    it 'should contain :true' do
+      expect(described_class.new(name: '0.0.0.0', :auth => true)[:auth]).to eq(:true)
+    end
+
+    it 'should contain :false' do
+      expect(described_class.new(name: '0.0.0.0', :auth => false)[:auth]).to eq(:false)
+    end
+
+    it 'should contain :message-digest' do
+      expect(described_class.new(name: '0.0.0.0', :auth => 'message-digest')[:auth]).to eq(:"message-digest")
+    end
+
+    it 'should not support foo as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :auth => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+  end
+
+  describe "stub" do
+    it 'should support true as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => true) }.to_not raise_error
+    end
+
+    it 'should support false as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => false) }.to_not raise_error
+    end
+
+    it 'should support no-summary as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => "no-summary") }.to_not raise_error
+    end
+
+    it 'should contain :true' do
+      expect(described_class.new(name: '0.0.0.0', :stub => true)[:stub]).to eq(:true)
+    end
+
+    it 'should contain :false' do
+      expect(described_class.new(name: '0.0.0.0', :stub => false)[:stub]).to eq(:false)
+    end
+
+    it 'should contain :no-summary' do
+      expect(described_class.new(name: '0.0.0.0', :stub => 'no-summary')[:stub]).to eq(:"no-summary")
+    end
+
+
+    it 'should not support foo as a value' do
+      expect { described_class.new(:name => '0.0.0.0', :stub => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+    end
+  end
+
   [:access_list_export, :access_list_import, :prefix_list_export, :prefix_list_import].each do |property|
     describe "#{property}" do
       it 'should support LIST-import as a value' do

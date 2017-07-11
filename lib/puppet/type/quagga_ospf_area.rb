@@ -5,6 +5,8 @@ Puppet::Type.newtype(:quagga_ospf_area) do
       Examples:
 
         ospf_area { '0.0.0.0':
+            auth               => true,
+            stub               => true,
             access_list_export => 'ACCESS_LIST_EXPORT',
             access_list_import => 'ACCESS_LIST_IPMORT',
             prefix_list_export => 'PREFIX_LIST_EXPORT',
@@ -22,6 +24,20 @@ Puppet::Type.newtype(:quagga_ospf_area) do
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
 
     newvalues(re)
+  end
+
+  newproperty(:auth) do
+    desc %q{OSPF authentication}
+
+    defaultto(:false)
+    newvalues(:false, :true, 'message-digest')
+  end
+
+  newproperty(:stub) do
+    desc %q{Configure the OSPF area to be a stub area}
+
+    defaultto(:false)
+    newvalues(:false, :true, 'no-summary')
   end
 
   newproperty(:access_list_export) do

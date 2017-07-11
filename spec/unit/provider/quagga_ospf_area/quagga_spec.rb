@@ -53,7 +53,8 @@ router ospf
  area 0.10.10.10 import-list ACCESS_LIST_IPMORT
  area 0.10.10.10 filter-list prefix PREFIX_LIST_IMPORT in
  area 0.10.10.10 filter-list prefix PREFIX_LIST_EXPORT out
- area 0.10.10.10 stub
+ area 0.10.10.10 stub no-summary
+ area 0.10.10.10 authentication message-digest
  default-information originate always metric 100 metric-type 1 route-map ABCD
  ospf router-id 10.255.78.4
  redistribute kernel route-map KERNEL
@@ -85,6 +86,8 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
         :networks => %w{10.255.1.0/24 10.255.2.0/24 10.255.3.0/24},
         :prefix_list_export => :absent,
         :prefix_list_import => :absent,
+        :auth => :false,
+        :stub => :false,
         :provider => :quagga,
       })
     end
@@ -98,6 +101,8 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
         :networks => %w{192.168.1.0/24 192.168.2.0/24},
         :prefix_list_export => 'PREFIX_LIST_EXPORT',
         :prefix_list_import => 'PREFIX_LIST_IMPORT',
+        :auth => 'message-digest',
+        :stub => 'no-summary',
         :provider => :quagga,
       })
     end

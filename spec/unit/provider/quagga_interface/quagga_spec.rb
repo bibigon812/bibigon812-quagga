@@ -20,11 +20,15 @@ describe Puppet::Type.type(:quagga_interface).provider(:quagga) do
       ).returns 'interface eth0
 !
 interface eth1
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 hello123
+ ip ospf cost 10
  ip ospf hello-interval 2
  ip ospf dead-interval 8
  ip ospf priority 50
  ip ospf retransmit-interval 4
  ip ospf mtu-ignore
+ ip ospf network broadcast
  ip pim ssm
  ip igmp
  ip igmp query-interval 150
@@ -58,11 +62,13 @@ interface tun0
         :ip_address => [],
         :link_detect => :false,
         :multicast => :false,
-        :ospf_cost => 10,
+        :ospf_auth => :absent,
+        :ospf_message_digest_key => :absent,
+        :ospf_cost => :absent,
         :ospf_dead_interval => 40,
         :ospf_hello_interval => 10,
         :ospf_mtu_ignore => :false,
-        :ospf_network => 'broadcast',
+        :ospf_network => :absent,
         :ospf_priority => 1,
         :ospf_retransmit_interval => 5,
         :ospf_transmit_delay => 1,
@@ -84,6 +90,8 @@ interface tun0
         :ip_address => [],
         :link_detect => :false,
         :multicast => :false,
+        :ospf_auth => 'message-digest',
+        :ospf_message_digest_key => '1 md5 hello123',
         :ospf_cost => 10,
         :ospf_dead_interval => 8,
         :ospf_hello_interval => 2,

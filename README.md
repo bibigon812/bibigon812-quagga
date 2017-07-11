@@ -481,11 +481,13 @@ quagga_interface { 'eth0':
 - `igmp_query_max_response_time_dsec`: IGMP maximum query response time in deciseconds. Default value: `100`.
 - `ipaddress`: IP addresses. Default value: `[]`.
 - `multicast`: Enable multicast flag for the interface. Default value: `false`.
-- `ospf_cost`: Interface cos. Default value: `10`.
+- `ospf_auth`: Interface authentication type: `absent`, `message-digest` . Default value: `absent`.
+- `ospf_message_digest_key`: Set OSPF authentication key to a cryptographic password: `absent`, `KEYID md5 KEY` . Default value: `absent`.
+- `ospf_cost`: Interface cost. Default value: `absent`.
 - `ospf_dead_interval`: Interval after which a neighbor is declared dead. Default value: `40`.
 - `ospf_hello_interval`: Time between HELLO packets. Default value: `10`.
 - `ospf_mtu_ignore`: Disable mtu mismatch detection. Default value: `false`.
-- `ospf_network`: Network type: `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`. Default value: `broadcast`.
+- `ospf_network`: Network type: `absent`, `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`. Default value: `absent`.
 - `ospf_priority`: Router priority. Default value: `1`.
 - `ospf_retransmit_interval`: Time between retransmitting lost link state advertisements. Default value: `5`.
 - `ospf_transmit_delay`: Link state transmit delay. Default value: `1`.
@@ -527,6 +529,8 @@ quagga_ospf_area { '0.0.0.0':
 - `prefix_list_export`: Filter networks sent from this area.
 - `prefix_list_import`: Filter networks sent to this area.
 - `networks`: Enable routing on an IP network. Default value: `[]`.
+- `auth`: Enable authentication on this area: `false`, `true`, `message-digest`. Default value: `false`.
+- `stub`: . Configure the area to be a stub area: `false`, `true`, `no-summary`. Default value: `false`.
 
 #### quagga_prefix_list
 
