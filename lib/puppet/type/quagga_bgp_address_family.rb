@@ -5,10 +5,10 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       Examples:
 
         quagga_bgp_address_family { 'ipv4_unicast':
-          aggregate_address => '192.168.0.0/24 summary-only',
+          aggregate_address  => '192.168.0.0/24 summary-only',
           maximum_ebgp_paths => 2,
           maximum_ibgp_paths => 2,
-          network => ['192.168.0.0/24', '172.16.0.0/24',],
+          networks           => ['192.168.0.0/24', '172.16.0.0/24',],
         }
   }
 

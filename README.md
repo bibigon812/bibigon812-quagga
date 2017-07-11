@@ -6,336 +6,330 @@ This module provides management of network protocols without restarting
 services. All resources make changes to the configuration of services using
 commands, as if you are doing this through the CLI.
 
-Currently it supports:
+## Quick start
 
-- BGP
-- OSPF
-- PIM
-- Route maps
-- Prefix lists
-- Community lists
-- AS-path lists
-
-## Usage
+Include with default parameters:
 
 ```puppet
-class { '::quagga':
-    as_paths => {
-        FROM_AS100 => {
-            rules => [
-                'permit _100$',
-            ],
-        },
-    },
-    bgp => {
-        65000 => {
-            import_check       => true,
-            ipv4_unicast       => false,
-            maximum_paths_ebgp => 2,
-            maximum_paths_ibgp => 2,
-            networks => [
-                '1.1.1.0/24',
-                '1.1.2.0/24',
-            ],
-            peers=> {
-                '192.168.0.2' => {
-                    peer_group => 'INTERNAL',
-                },
-                '192.168.0.3' => {
-                    peer_group => 'INTERNAL',
-                },
-                INTERNAL => {
-                    activate      => true,
-                    next_hop_self => true,
-                    peer_group    => true,
-                    remote_as     => 65000,
-                    update_source => '192.168.0.1',
-                },
-            },
-            redistribute => [
-                'ospf route-map BGP_FROM_OSPF',
-            ],
-            router_id => '10.255.255.1',
-        },
-    },
-    community_lists => {
-        100 => {
-            rules => [
-                'permit 65000:101',
-                'permit 65000:102',
-                'permit 65000:103',
-            ],
-        },
-        200 => {
-            rules => [
-                'permit 65000:201',
-                'permit 65000:202',
-            ],
-        },
-    },
-    global => {
-        ip_forwarding               => true,
-        ip_multicast_routing        => true,
-        ipv6_forwarding             => true,
-        service_password_encryption => true,
-    },
-    interfaces => {
-        lo => {
-            ip_address => [ 
-                '10.255.255.1/32',
-                '172.16.255.1/32',
-            ],
-        },
-        eth0 => {
-            igmp => true,
-            ip_address => '172.16.0.1/24',
-            ospf_dead_interval => 8,
-            ospf_hello_interval => 2,
-            ospf_mtu_ignore => true,
-            pim_ssm => true,
-        },
-    },
-    ospf => {
-        areas => {
-            '0.0.0.0' => {
-                networks => [
-                    '172.16.0.0/12',
-                ],
-            }
-        },
-        redistribute => [
-            'connected route-map CONNECTED',
-        ],
-    },
-    prefix_lists => {
-        CONNECTED_NETWORKS => {
-            rules => {
-                500 => {
-                    action => 'permit',
-                    le     => 32,
-                    prefix => '10.255.255.0/24',
-                },
-            },
-        },
-        OSPF_NETWORKS => {
-            rules => {
-                10 => {
-                    action => 'permit',
-                    prefix => '172.31.255.0/24',
-                },
-            },
-        },
-    },
-    route_maps => {
-        BGP_FROM_OSPF => {
-            rules => {
-                10 => {
-                    action => 'permit',
-                    match  => 'ip address prefix-list OSPF_NETWORKS',
-                },
-            },
-        },
-        CONNECTED => {
-            rules => {
-                10 => {
-                    action => 'permit',
-                    match  => 'ip address prefix-list CONNECTED_NETWORKS',
-                },
-            },
-        },
-    },
-}
+include quagga
 ```
+## Setup Quagga
 
-A full description of parameters can be found in the appropriate types.
-
-- as_paths: [quagga_as_path](#quagga_as_path)
-- bgp: [quagga_bgp](#quagga_bgp)
-- bgp peers: [quagga_bgp_peer](#quagga_bgp_peer)
-- community_lists: [quagga_community_list](#quagga_community_list)
-- global: [quagga_global](#quagga_global)
-- interfaces: [quagga_interface](#quagga_interface)
-- ospf: [quagga_ospf](#quagga_ospf)
-- prefix_lists: [quagga_prefix_list](#quagga_prefix_list)
-- route_maps: [quagga_route_map](#quagga_route_map)
-
-## Hiera
+### System Settings
 
 ```yaml
-quagga::global:
-    ip_forwarding: true
-    ip_multicast_routing: true
-    ipv6_forwarding: true
-    service_password_encryption: true
+quagga::default_owner: quagga
+quagga::default_group: quagga
+quagga::default_mode: '0600'
+quagga::default_content: "hostname %{::facts.networking.fqdn}\n"
+quagga::config_dir: /etc/quagga
+quagga::service_file_manage: true
+quagga::packages:
+  quagga:
+    ensure: present
+```
 
+### Service Settings
+
+```yaml
+quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
+quagga::bgp::config_file_manage: true
+quagga::bgp::service_name: bgpd
+quagga::bgp::service_enable: true
+quagga::bgp::service_manage: true
+quagga::bgp::service_ensure: running
+quagga::bgp::service_opts: -P 0
+
+quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
+quagga::ospf::config_file_manage: true
+quagga::ospf::service_name: ospfd
+quagga::ospf::service_enable: true
+quagga::ospf::service_manage: true
+quagga::ospf::service_ensure: running
+quagga::ospf::service_opts: -P 0
+
+quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
+quagga::zebra::config_file_manage: true
+quagga::zebra::service_name: zebra
+quagga::zebra::service_enable: true
+quagga::zebra::service_manage: true
+quagga::zebra::service_ensure: running
+quagga::zebra::service_opts: -P 0
+
+quagga::pim::config_file: "%{lookup('quagga::config_dir')}/pimd.conf"
+quagga::pim::config_file_manage: true
+quagga::pim::service_name: pimd
+quagga::pim::service_enable: true
+quagga::pim::service_manage: true
+quagga::pim::service_ensure: running
+quagga::pim::service_opts: -P 0
+```
+
+### Global Options
+
+```yaml
+quagga::global_opts:
+  ip_forwarding: true
+  ip_multicast_routing: true
+  ipv6_forwarding: true
+```
+
+### Interfaces
+
+```yaml
 quagga::interfaces:
-    lo:
-        ip_address: 
-            - 10.255.255.1/32
-            - 172.16.255.1/32
-    eth0:
-        igmp: true
-        ip_address: 172.16.0.1/24
-        ospf_dead_interval: 8
-        ospf_hello_interval: 2
-        ospf_mtu_ignore: true
-        pim_ssm: true
+  eth0:
+    igmp: true
+    ip_address:
+      - 10.0.0.1/24
+    multicast: true
+    ospf_dead_interval: 8
+    ospf_hello_interval: 2
+    ospf_mtu_ignore: true
+    ospf_priority: 100
+    pim_ssm: true
+  lo:
+    ip_address:
+      - 10.255.255.1/32
+      - 172.16.255.1/32
+```
 
+### BGP
 
-# bgp router parameters
+```yaml
 quagga::bgp::router:
-    65000:
-        import_check: true
-        default_ipv4_unicast: false
-        router_id: 10.255.255.1
-        redistribute:
-            - ospf route-map BGP_FROM_OSPF
+  as_number: 65000
+  default_ipv4_unicast: false
+  import_check: true
+  router_id: 10.0.0.1
+```
 
-quagga::bgp::peers:
-    CLIENTS:
-        passive: true
-        peer_group: true
-    INTERNAL:
-        local_as: 65000
-        peer_group: true
-        remote_as: 65000
-        shutdown: false
-        update_source: 192.168.0.1
-    172.16.0.2:
-        remote_as: 65001
-    192.168.0.2:
-        peer_group: INTERNAL
+### BGP Address Families
 
+```yaml
 quagga::bgp::address_families:
-    ipv4_unicast:
-        maximum_ebgp_paths: 2
-        maximum_ibgp_paths: 10
-        networks:
-            - 1.1.1.0/24
-            - 1.1.2.0/24
-    ipv4_multicast:
-        networks:
-            - 230.0.0.0/24
-            - 230.0.255.0/24
-    ipv6_unicast:
-        networks:
-            - 1::/64
-            - 2::/64
+  ipv4_unicast:
+    aggregate_address:
+      - 1.1.1.0/24 summary-only
+      - 1.1.2.0/24 summary-only
+    maximum_ebgp_paths: 2
+    maximum_ibgp_paths: 10
+    networks:
+      - 1.1.1.0/23
+      - 1.1.3.0/24
+  ipv4_multicast:
+    networks:
+      - 230.0.0.0/8
+      - 231.0.0.0/8
+  ipv6_unicast:
+    aggregate_address:
+      - 2001:db8:0:2::/64
+      - 2001:db8:0:3::/64
+    networks:
+      - 2001:db8::/64
+      - 2001:db8:0:1::/64
+      - 2001:db8:0:2::/63
+```
 
-# bgp peer parameters
+### BGP Peers
+
+```yaml
 quagga::bgp::peers:
-    CLIENTS:
-        passive: true
-        peer_group: true
-        address_family:
-            ipv4_unicast:
-                activate: true
-    INTERNAL:
-        local_as: 65000
-        peer_group: true
-        remote_as: 65000
-        shutdown: false
-        update_source: 192.168.0.1
-        address_family:
-            ipv4_unicast:
-                activate: true
-                alliw_as_in: 1
-                next_hop_self: true
-    172.16.0.2:
-        remote_as: 65001
-        address_family:
-            ipv4_unicast:
-                activate: true
-    192.168.0.2:
+  CLIENTS:
+    passive: true
+    address_families:
+      ipv4_unicast:
+        activate: true
+        default_originate: true
+  INTERNAL:
+    remote_as: 65000
+    update_source: 10.0.0.1
+    address_families:
+      ipv4_unicast:
+        activate: true
+        next_hop_self: true
+  10.0.0.2:
+    peer_group: INTERNAL
+    address_families:
+      ipv4_unicast:
         peer_group: INTERNAL
-        address_family:
-            ipv4_unicast:
-                activate: true
-            ipv4_multicast:
-                activate: true
-            ipv6_unicast:
-                activate: true
+  10.0.0.3:
+    peer_group: INTERNAL
+    address_families:
+      ipv4_unicast:
+        peer_group: INTERNAL
+  10.0.0.10:
+    peer_group: INTERNAL
+    address_families:
+      ipv4_multicast:
+        activate: true
+  172.16.0.2:
+    peer_group: CLIENTS
+    remote_as: 65001
+    address_families:
+      ipv4_unicast:
+        peer_group: CLIENTS
 
+```
 
-# OSPF
+### OSPF
+
+```yaml
 quagga::ospf::router:
-    default_originate: true
-    redistribute:
-        - connected route-map CONNECTED
-    router_id: 10.255.255.1
+  log_adjacency_changes: true
+  opaque: false
+  redistribute:
+    - connected route-map CONNECTED
+  rfc1583: false
+  router_id: 10.0.0.1
+```
 
-quagga::ospf::areas:
-    0.0.0.0:
-        networks:
-            - 172.16.0.0/12
+### OSPF Areas
 
+```yaml
+0.0.0.0:
+  networks:
+    - 172.16.0.0/24
+    - 192.168.0.0/24
+0.0.0.1:
+  networks:
+    - 172.16.1.0/24
+    - 192.168.1.0/24
+  stub: true
+```
 
-quagga::as_paths:
-    FROM_AS100:
-        rules:
-            - permit _100$
+### As-path Lists
 
-quagga::community_lists:
-    100:
-        rules:
-            - permit 65000:101
-            - permit 65000:102
-            - permit 65000:103
-    200:
-        rules:
-            - permit 65000:201
-            - permit 65000:202
+```yaml
+quagga::bgp::as_paths:
+  FROM_AS100:
+    rules:
+      - permit _100$
+```
 
+### Community Lists
+
+```yaml
+quagga::bgp::community_lists:
+  100:
+    rules:
+      - permit 65000:101
+      - permit 65000:102
+      - permit 65000:103
+  200:
+    rules:
+      - permit 65000:201
+      - permit 65000:202
+```
+
+### Prefix Lists
+
+```yaml
 quagga::prefix_lists:
-    CONNECTED_NETWORKS:
-        rules:
-            500:
-                action: permit
-                le: 32
-                prefix: 10.255.255.0/24
-    OSPF_NETWORKS:
-        rules:
-            10:
-                action: permit
-                prefix: 172.31.255.0/24
+  CONNECTED_PREFIXES:
+    rules:
+      500:
+        action: permit
+        le: 32
+        prefix: 10.255.255.0/24
+  OSPF_PREFIXES:
+    rules:
+      10:
+        action: permit
+        prefix: 172.16.255.0/24
+```
 
+## Route Maps
+
+```yaml
 quagga::route_maps:
-    BGP_FROM_OSPF:
-        rules:
-            10:
-                action: permit
-                match: ip address prefix-list OSPF_NETWORKS
-    CONNECTED:
-        rules:
-            10:
-                action: permit
-                match: ip address prefix-list CONNECTED_NETWORKS
+  BGP_FROM_OSPF:
+    rules:
+      10:
+        action: permit
+        match: ip address prefix-list OSPF_PREFIXES
+  CONNECTED:
+    rules:
+      10:
+        action: permit
+        match: ip address prefix-list CONNECTED_PREFIXES
 ```
 
 ## Reference
+
 ### Classes
+
 #### quagga
 
-```puppet
-class { '::quagga': }
-```
+- `global_opts`. Quagga global options. See the type `quagga_global`.
+- `interfaces`. Quagga interfacec options. See the type `quagga_interface`.
+- `prefix_lists`. Quagga prefix-list options. See the type `quagga_prefix_list`.
+- `route_maps`. Quagga route-map options. See the type `quagga_rotue_map`.
+- `default_owner`. Overrides the default owner of Quagga configuration files in the file system.
+- `default_group`. Overrides the default group of Quagga configuration files in the file system.
+- `default_mode`. Overrides the default mode of Quagga configuration files in the system.
+- `default_content`. Overrides the initial content of quagga configuration files.
+- `service_file`. Overrides the default path of the Quagga system configuration file in the file system.
+- `service_file_manage`.
+- `packages`. Quagga package options.
 
-- `owner`. Overrides the default owner of quagga configuration files in the file system. Default value: `quagga`.
-- `group`. Overrides the default group of quagga configuration files in the file system. Default value: `quagga`.
-- `mode`. Overrides the default mode of quagga configuration files in the system. Default value: `600`.
-- `package_name`. Overrides the default package name for the distribution you are installing to. Default value: `quagga`.
-- `package_ensure`. Overrides the 'ensure' parameter during package installation. Default value: `present`.
-- `content`. Overrides the initial content of quagga configuration files. Default value: `hostname ${::fqdn}\n`.
-- `as_paths`. Contains as-path list settings. Default value: `{}`.
-- `bgp`. Contains the setting of the bgp router. Default value: `{}`.
-- `community_lists`: Contains community list settings. Default value: `{}`.
-- `interfaces`: Contains network interface settings. Default value: `{}`.
-- `global`: Contain global settings. Default value: `{}`.
-- `ospf`. Contains the settings of the ospf router. Default value: `{}`.
-- `prefix_lists`. Contains prefix list settings. Default value: `{}`.
-- `route_maps`. Contains route-map settings. Default value: `{}`.
+#### quagga::bgp
+
+- `config_file`. Configuration file if the BGP service.
+- `config_file_manage`. Enable the management of the BGP service setting file.
+- `service_name`. The name of the BGP service.
+- `service_enable`. Enable the BGP service.
+- `service_manage`. Enable the management of the BGP service.
+- `service_ensure`. The state of the BGP Service.
+- `service_opts`. Service start options.
+- `router`. BGP router options. See the type `quagga_bgp_router`.
+- `peers`. BGP peer options. See the type `quagga_bgp_peer`.
+- `as_paths`. As-path options. See the type `quagga_bgp_as_path`.
+- `community_lists`. Community-list options. See the type `quagga_bgp_community_list`.
+- `address_families`. BGP address-family options. See the type `quagga_bgp_address_family`.
+
+#### quagga::ospf
+
+- `config_file`. Configuration file if the OSPF service.
+- `config_file_manage`. Enable the management of the OSPF service setting file.
+- `service_name`. The name of the OSPF service.
+- `service_enable`. Enable the OSPF service.
+- `service_manage`. Enable the management of the OSPF service.
+- `service_ensure`. The state of the OSPF Service.
+- `service_opts`. Service start options.
+- `router`. OSPF router options. See the type `quagga_ospf_router`.
+- `areas`. OSPF area options. See the type `quagga_ospf_area`.
+
+#### quagga::pim
+
+- `config_file`. Configuration file if the PIM service.
+- `config_file_manage`. Enable the management of the PIM service setting file.
+- `service_name`. The name of the PIM service.
+- `service_enable`. Enable the PIM service.
+- `service_manage`. Enable the management of the PIM service.
+- `service_ensure`. The state of the PIM Service.
+- `service_opts`. Service start options.
+
+#### quagga::zebra
+
+- `config_file`. Configuration file if the Zebra service.
+- `config_file_manage`. Enable the management of the Zebra service setting file.
+- `service_name`. The name of the Zebra service.
+- `service_enable`. Enable the Zebra service.
+- `service_manage`. Enable the management of the Zebra service.
+- `service_ensure`. The state of the Zebra Service.
+- `service_opts`. Service start options.
+
+
+### Defines
+
+
+#### quagga::bgp::peer
+
+See the type `quagga_bgp_peer`
 
 ### Types
+
 #### quagga_as_path
 
 ```puppet
@@ -349,76 +343,117 @@ quagga_as_path { 'TEST_AS_PATH':
 ```
 
 - `name`: The name of the as-path access-list.
-- `ensure`: Manage the state of this as-path list: `absent`, `present`. Default value: `present`.
-- `rules`: Array of rules `action regex`.
+- `ensure`: Manage the state of this as-path list: `absent`, `present`.
+- `rules`: List of rules.
 
-#### quagga_bgp
+#### quagga_bgp_router
 
 ```puppet
-quagga_bgp { '65000':
-    ensure             => present,
-    import_check       => true,
-    ipv4_unicast       => true,
-    maximum_paths_ebgp => 10,
-    maximum_paths_ibgp => 10,
-    networks           => ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16',],
-    router_id          => '10.0.0.1',
+quagga_bgp_router { 'bgp':
+    ensure                   => present,
+    as_number                => 65000,
+    import_check             => true,
+    default_ipv4_unicast     => false,
+    default_local_preference => 100,
+    redistribute             => [ ospf route-map BGP_FROM_OSPF, ],
+    router_id                => '192.168.1.1',
 }
 ```
 
-- `name`: AS number
-- `ensure`: Manage the state of this BGP router: `absent`, `present`. Default value: `present`.
-- `import_check`: Check BGP network route exists in IGP.
-- `ipv4_unicast`: Activate ipv4-unicast for a peer by default. Default value: `true`.
-- `maximum_paths_ebgp`: Forward packets over multiple paths ebgp. Default value: `1`.
-- `maximum_paths_ibgp`: Forward packets over multiple paths ibgp. Default value: `1`.
-- `networks`: Specify a networks to announce via BGP. Default value: `[]`.
-- `router_id`: Override configured router identifier.
+- `name`: the instance name.
+- `ensure`: manage the state of this BGP router: `absent`, `present`.
+- `as_number`: the number of the AS.
+- `import_check`: check BGP network route exists in IGP. Default value: `false`.
+- `default_ipv4_unicast`: activate ipv4-unicast for a peer by default. Default value: `false`.
+- `default_local_preference`: default local preference. Default value: `100`.
+- `redistribute`: redistribute information from another routing protocol.
+- `router_id`: override configured router identifier.
 
+#### quagga_bgp_address_family
+
+```puppet
+quagga_bgp_address_family { 'ipv4_unicast':
+  aggregate_address  => '192.168.0.0/24 summary-only',
+  maximum_ebgp_paths => 2,
+  maximum_ibgp_paths => 2,
+  networks           => ['192.168.0.0/24', '172.16.0.0/24',],
+}
+
+quagga_bgp_address_family { 'ipv4_multicast':
+  aggregate_address => '230.0.0.0/8 summary-only',
+  networks          => [ '230.0.0.0/8', '231.0.0.0/8', ],
+}
+```
+
+- `name`: the Address family.
+- `aggregate_address`: configure BGP aggregate entries.
+- `maximum_ebgp_paths`: forward packets over multiple ebgp paths.
+- `maximum_ibgp_paths`: forward packets over multiple ibgp paths.
+- `networks`: specify a network to announce via BGP.
 
 #### quagga_bgp_peer
 
 ```puppet
-quagga_bgp_peer { '65000 internal':
-    ensure        => present,
-    activate      => true,
-    next_hop_self => true,
-    peer_group    => true,
-    remote_as     => 65000,
-    update_source => '10.0.0.1',
+quagga_bgp_peer { '192.168.1.1':
+    ensure     => present,
+    peer_group => 'internal_peers',
 }
 
-quagga_bgp_peer { '65000 10.0.0.2':
+quagga_bgp_peer { 'internal_peers':
     ensure     => present,
-    peer_group => 'internal',
-}
-
-quagga_bgp_peer { '65000 10.0.0.3':
-    ensure     => present,
-    peer_group => 'internal',
+    local_as   => 65000,
+    peer_group => true,
+    remote_as  => 65000,
 }
 ```
 
-- `name`: It's consists of a AS number and a neighbor IP address or a peer-group name.
-- `ensure`: Manage the state of this BGP neighbor: `absent`, `present`. Default value: `present`.
-- `activate`: Enable the Address Family for this Neighbor. Default value: `true`.
-- `allow_as_in`: Accept as-path with my AS present in it.
-- `default_originate`: Originate default route to this neighbor. Default value: `false`.
-- `local_as`: Specify a local-as number.
-- `next_hop_self`: Disable the next hop calculation for this neighbor. Default value: `false`.
-- `passive`: Don't send open messages to this neighbor. Default value: `false`.
-- `peer_group`: Member of the peer-group. Default value: `false`.
-- `prefix_list_in`: Filter updates from this neighbor.
-- `prefix_list_out`: Filter updates to this neighbor.
-- `remote_as`: Specify a BGP neighbor as.
-- `route_map_export`: Apply map to routes coming from a Route-Server client.
-- `route_map_import`: Apply map to routes going into a Route-Server client's table.
-- `route_map_in`: Apply map to incoming routes.
-- `route_map_out`: Apply map to outbound routes.
-- `route_reflector_client`: Configure a neighbor as Route Reflector client. Default value: `false`.
-- `route_server_client`: Configure a neighbor as Route Server client. Default value: `false`.
-- `shutdown`: Administratively shut down this neighbor. Default value: `false`.
-- `update_source`: Source of routing updates. It can be the interface name or IP address.
+- `name`: a neighbor IP address or a peer-group name.
+- `ensure`: manage the state of this BGP neighbor: `absent`, `present`. Default value: `present`.
+- `local_as`: specify a local-as number.
+- `passive`: don't send open messages to this neighbor. Default value: `false`.
+- `peer_group`: member of the peer-group.
+- `remote_as`: specify a BGP neighbor AS.
+- `shutdown`: administratively shut down this neighbor. Default value: `false`.
+- `update_source`: source of routing updates.
+
+#### quagga_bgp_peer_address_family
+
+```puppet
+quagga_bgp_peer_address_family { '192.168.0.2 ipv4_unicast':
+    peer_group             => PEER_GROUP,
+    activate               => true,
+    allow_as_in            => 1,
+    default_originate      => true,
+    maximum_prefix         => 500000,
+    next_hop_self          => true,
+    prefix_list_in         => PREFIX_LIST,
+    prefix_list_out        => PREFIX_LIST,
+    remove_private_as      => true,
+    route_map_export       => ROUTE_MAP,
+    route_map_import       => ROUTE_MAP,
+    route_map_in           => ROUTE_MAP,
+    route_map_out          => ROUTE_MAP,
+    route_reflector_client => false,
+    route_server_client    => false,
+    send_community         => 'both',
+}
+```
+
+- `name`: contains peer and address family names separated by space.
+- `ensure`: manage the state of this BGP neighbor: `absent`, `present`. Default value: `present`.
+- `activate`: enable the Address Family for this Neighbor. Default value: `true`.
+- `allow_as_in`: accept as-path with my AS present in it.
+- `default_originate`: originate default route to this neighbor. Default value: `false`.
+- `next_hop_self`: disable the next hop calculation for this neighbor. Default value: `false`.
+- `peer_group`: member of the peer-group.
+- `prefix_list_in`: filter updates from this neighbor.
+- `prefix_list_out`: filter updates to this neighbor.
+- `route_map_export`: apply map to routes coming from a Route-Server client.
+- `route_map_import`: apply map to routes going into a Route-Server client's table.
+- `route_map_in`: apply map to incoming routes.
+- `route_map_out`: apply map to outbound routes.
+- `route_reflector_client`: configure a neighbor as Route Reflector client. Default value: `false`.
+- `route_server_client`: configure a neighbor as Route Server client. Default value: `false`.
 
 #### quagga_community_list
 
@@ -432,9 +467,9 @@ quagga_community_list { '100':
 }
 ```
 
-- `name`: Community list number.
-- `ensure`: Manage the state of this community list: `absent`, `present`. Default value: `present`.
-- `rules`: Array of rules `action community`.
+- `name`: community list number.
+- `ensure`: manage the state of this community list: `absent`, `present`. Default value: `present`.
+- `rules`: the list of rules.
 
 #### quagga_global
 
@@ -450,15 +485,15 @@ quagga_global { 'router-1.sandbox.local':
 }
 ```
 
-- `name`: Router instance name.
-- `hostname`: Router hostname. Default value: `name`.
-- `password`: Set password for vty interface. If there is no password, a vty won’t accept connections.
-- `enable_password`: Set enable password.
-- `ip_forwarding`: Enable IP forwarding. Default value: `false`.
-- `ip_multicast_routing`: Enable IP multicast forwarding. Default value: `false`.
-- `ipv6_forwarding`: Enable IPv6 forwarding. Default value: `false`.
-- `line_vty`: Enter vty configuration mode. Default value: `true`.
-- `service_password_encryption`: Encrypt passwords. Default value: `false`.
+- `name`: router instance name.
+- `hostname`: router hostname. Default value: `name`.
+- `password`: set password for vty interface. If there is no password, a vty won’t accept connections.
+- `enable_password`: set enable password.
+- `ip_forwarding`: enable IP forwarding. Default value: `false`.
+- `ip_multicast_routing`: enable IP multicast forwarding. Default value: `false`.
+- `ipv6_forwarding`: enable IPv6 forwarding. Default value: `false`.
+- `line_vty`: enter vty configuration mode. Default value: `true`.
+- `service_password_encryption`: encrypt passwords. Default value: `false`.
 
 #### quagga_interface
 
@@ -474,45 +509,47 @@ quagga_interface { 'eth0':
 }
 ```
 
-- `name`: The friendly name of the network interface.
-- `description`: Interface description.
-- `igmp`: Enable IGMP. Default value: `false`.
+- `name`: the friendly name of the network interface.
+- `description`: interface description.
+- `igmp`: enable IGMP. Default value: `false`.
 - `igmp_query_interval`: IGMP query interval. Default value: `125`.
 - `igmp_query_max_response_time_dsec`: IGMP maximum query response time in deciseconds. Default value: `100`.
 - `ipaddress`: IP addresses. Default value: `[]`.
-- `multicast`: Enable multicast flag for the interface. Default value: `false`.
-- `ospf_auth`: Interface authentication type: `absent`, `message-digest` . Default value: `absent`.
-- `ospf_message_digest_key`: Set OSPF authentication key to a cryptographic password: `absent`, `KEYID md5 KEY` . Default value: `absent`.
-- `ospf_cost`: Interface cost. Default value: `absent`.
-- `ospf_dead_interval`: Interval after which a neighbor is declared dead. Default value: `40`.
-- `ospf_hello_interval`: Time between HELLO packets. Default value: `10`.
-- `ospf_mtu_ignore`: Disable mtu mismatch detection. Default value: `false`.
-- `ospf_network`: Network type: `absent`, `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`. Default value: `absent`.
-- `ospf_priority`: Router priority. Default value: `1`.
-- `ospf_retransmit_interval`: Time between retransmitting lost link state advertisements. Default value: `5`.
-- `ospf_transmit_delay`: Link state transmit delay. Default value: `1`.
-- `pim_ssm`: Enable PIM SSM operation. Default value: `false`.
+- `multicast`: enable multicast flag for the interface. Default value: `false`.
+- `ospf_auth`: interface authentication type: `absent`, `message-digest` . Default value: `absent`.
+- `ospf_message_digest_key`: set OSPF authentication key to a cryptographic password: `absent`, `KEYID md5 KEY` . Default value: `absent`.
+- `ospf_cost`: interface cost. Default value: `absent`.
+- `ospf_dead_interval`: interval after which a neighbor is declared dead. Default value: `40`.
+- `ospf_hello_interval`: time between HELLO packets. Default value: `10`.
+- `ospf_mtu_ignore`: disable mtu mismatch detection. Default value: `false`.
+- `ospf_network`: network type: `absent`, `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`. Default value: `absent`.
+- `ospf_priority`: router priority. Default value: `1`.
+- `ospf_retransmit_interval`: time between retransmitting lost link state advertisements. Default value: `5`.
+- `ospf_transmit_delay`: link state transmit delay. Default value: `1`.
+- `pim_ssm`: enable PIM SSM operation. Default value: `false`.
 
-#### quagga_ospf
+#### quagga_ospf_router
 
 ```puppet
-quagga_ospf { 'ospf':
-    ensure    => present,
-    abr_type  => 'cisco',
-    opaque    => true,
-    rfc1583   => true,
-    router_id => '10.0.0.1',
+quagga_ospf_router { 'ospf':
+    ensure       => present,
+    abr_type     => 'cisco',
+    opaque       => true,
+    redistribute => [ 'connected', 'static route-map STATIC', ],
+    rfc1583      => true,
+    router_id    => '10.0.0.1',
 }
 ```
 
-- `name`: Name must be `ospf`.
-- `ensure`: Manage the state of this OSPF router: `absent`, `present`. Default value: `present`.
-- `abr_type`: Set OSPF ABR type. Default value: `cisco`.
-- `log_adjacency_changes`: Log changes in adjacency. Default value: `false`.
-- `opaque`: Enable the Opaque-LSA capability (rfc2370). Default value: `false`.
-- `rfc1583`: Enable the RFC1583Compatibility flag. Default value: `false`.
+- `name`: the name must be `ospf`.
+- `ensure`: manage the state of this OSPF router: `absent`, `present`. Default value: `present`.
+- `abr_type`: set OSPF ABR type. Default value: `cisco`.
+- `log_adjacency_changes`: log changes in adjacency. Default value: `false`.
+- `opaque`: enable the Opaque-LSA capability (rfc2370). Default value: `false`.
+- `redistribute`: redistribute information from another routing protocol.
+- `rfc1583`: enable the RFC1583Compatibility flag. Default value: `false`.
 - `router_id`: Router-id for the OSPF process.
-  
+
 #### quagga_ospf_area
 
 ```puppet
@@ -522,29 +559,29 @@ quagga_ospf_area { '0.0.0.0':
 }
 ```
 
-- `name`: OSPF area.
-- `ensure`: Manage the state of this OSPF area: `absent`, `present`. Default value: `present`.
-- `access_list_expor`: Set the filter for networks announced to other areas.
-- `access_list_import`: Set the filter for networks from other areas announced to the specified one.
-- `prefix_list_export`: Filter networks sent from this area.
-- `prefix_list_import`: Filter networks sent to this area.
-- `networks`: Enable routing on an IP network. Default value: `[]`.
-- `auth`: Enable authentication on this area: `false`, `true`, `message-digest`. Default value: `false`.
-- `stub`: . Configure the area to be a stub area: `false`, `true`, `no-summary`. Default value: `false`.
+- `name`: the OSPF area.
+- `ensure`: manage the state of this OSPF area: `absent`, `present`. Default value: `present`.
+- `access_list_expor`: set the filter for networks announced to other areas.
+- `access_list_import`: set the filter for networks from other areas announced to the specified one.
+- `prefix_list_export`: filter networks sent from this area.
+- `prefix_list_import`: filter networks sent to this area.
+- `networks`: enable routing on an IP network. Default value: `[]`.
+- `auth`: enable authentication on this area: `false`, `true`, `message-digest`. Default value: `false`.
+- `stub`: . configure the area to be a stub area: `false`, `true`, `no-summary`. Default value: `false`.
 
 #### quagga_prefix_list
 
 The prefix_list resource is a single sequence. You can use a chain of resources
-to describe compex prefix lists, for example:
+to describe comlpex prefix lists, for example:
 
 ```puppet
-quagga_prefix_list {'ADVERTISED_PREFIXES:10':
+quagga_prefix_list {'ADVERTISED_PREFIXES 10':
     ensure => present,
     action => 'permit',
     prefix => '192.168.0.0/16',
     le     => 24,
 }
-quagga_prefix_list {'ADVERTISED_PREFIXES:20':
+quagga_prefix_list {'ADVERTISED_PREFIXES 20':
     ensure => present,
     action => 'permit',
     prefix => '172.16.0.0/12',
@@ -552,36 +589,13 @@ quagga_prefix_list {'ADVERTISED_PREFIXES:20':
 }
 ```
 
-- `name`: Name of the prefix-list and sequence number of rule: `name:sequence`.
-- `ensure`: Manage the state of this prefix list: `absent`, `present`. Default value: `present`.
-- `action`: Action can be `permit` or `deny`.
-- `ge`: Minimum prefix length to be matched.
-- `le`: Maximum prefix length to be matched.
+- `name`: name of the prefix-list and sequence number.
+- `ensure`: manage the state of this prefix list: `absent`, `present`. Default value: `present`.
+- `action`: action can be `permit` or `deny`.
+- `ge`: minimum prefix length to be matched.
+- `le`: maximum prefix length to be matched.
 - `prefix`: IP prefix `<network>/<length>`.
 - `proto`: IP protocol version: `ip`, `ipv6`. Default value: `ip`.
-
-#### quagga_redistribution
-
-```puppet
-quagga_redistribution { 'ospf::connected':
-    ensure      => present,
-    metric      => 100,
-    metric_type => 2,
-    route_map   => 'CONNECTED',
-}
-
-quagga_redistribution { 'bgp:65000:ospf':
-    ensure    => present,
-    metric    => 100,
-    route_map => 'WORD',
-}
-```
-
-- `name`: The name contains the main protocol, the id and the protocol for redistribution.
-- `ensure`: Manage the state of this redistribution: `absent`, `present`. Default value: `present`.
-- `metric`: Metric for redistributed routes.
-- `metric_type`: OSPF exterior metric type for redistributed routes.
-- `route_map`: Route map reference.
 
 #### quagga_route_map
 
@@ -589,19 +603,19 @@ The route_map resource is a single sequence. You can use a chain of resources
 to describe complex route maps, for example:
 
 ```puppet
-quagga_route_map { 'bgp_out:10':
+quagga_route_map { 'bgp_out 10':
     ensure   => present,
     action   => 'permit',
     match    => 'ip address prefix-list ADVERTISED-PREFIXES'
     on_match => 'goto 65000',
 }
 
-quagga_route_map { 'bgp_out:99':
+quagga_route_map { 'bgp_out 99':
     ensure => present,
     action => 'deny',
 }
 
-quagga_route_map { 'bgp_out:65000':
+quagga_route_map { 'bgp_out 65000':
     ensure   => present,
     action   => 'permit',
     match    => [
@@ -657,11 +671,9 @@ quagga_route_map { 'bgp_out:65000':
 }
 ```
 
-- `name`: Name of the route-map, action and sequence number of rule.
-- `action`: Route map actions: `deny`,`permit`.
-- `ensure`: Manage the state of this route map: `absent`, `present`. Default value: `present`.
-- `match`: Match values from routing table. Default value: `[]`.
-- `on_match`: Exit policy on matches.
-- `set`: Set values in destination routing protocol. Default value: `[]`.
-    
-    
+- `name`: name of the route-map and sequence number of rule.
+- `action`: route map actions: `deny`,`permit`.
+- `ensure`: manage the state of this route map: `absent`, `present`. Default value: `present`.
+- `match`: match values from routing table. Default value: `[]`.
+- `on_match`: exit policy on matches.
+- `set`: set values in destination routing protocol. Default value: `[]`.
