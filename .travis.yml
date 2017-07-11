@@ -5,10 +5,6 @@ cache: bundler
 services:
   - docker
 script:
-  - bundle exec rake syntax
-  - bundle exec rake lint
-  - bundle exec rake spec
-  - bundle exec rake beaker:centos7-docker
-  - bundle exec rake build
+  - bundle exec rake release_checks
 rvm:
   - 2.3.3
