@@ -527,6 +527,8 @@ quagga_ospf_area { '0.0.0.0':
 - `prefix_list_export`: Filter networks sent from this area.
 - `prefix_list_import`: Filter networks sent to this area.
 - `networks`: Enable routing on an IP network. Default value: `[]`.
+- `auth`: Enable authentication on this area: `false`, `true`, `message-digest`. Default value: `false`.
+- `stub`: . Configure the area to be a stub area: `false`, `true`, `no-summary`. Default value: `false`.
 
 #### quagga_prefix_list
 
