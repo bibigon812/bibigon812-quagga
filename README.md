@@ -356,7 +356,7 @@ quagga_bgp_router { 'bgp':
     import_check             => true,
     default_ipv4_unicast     => false,
     default_local_preference => 100,
-    redistribute             => [ ospf route-map BGP_FROM_OSPF, ],
+    redistribute             => [ 'ospf route-map BGP_FROM_OSPF', ],
     router_id                => '192.168.1.1',
 }
 ```
