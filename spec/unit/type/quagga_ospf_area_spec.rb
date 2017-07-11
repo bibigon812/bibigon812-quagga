@@ -77,8 +77,8 @@ describe Puppet::Type.type(:quagga_ospf_area) do
       expect(described_class.new(name: '0.0.0.0', :auth => false)[:auth]).to eq(:false)
     end
 
-    it 'should contain message-digest' do
-      expect(described_class.new(name: '0.0.0.0', :auth => 'message-digest')[:auth]).to eq('message-digest')
+    it 'should contain :message-digest' do
+      expect(described_class.new(name: '0.0.0.0', :auth => 'message-digest')[:auth]).to eq(:"message-digest")
     end
 
     it 'should not support foo as a value' do
@@ -107,8 +107,8 @@ describe Puppet::Type.type(:quagga_ospf_area) do
       expect(described_class.new(name: '0.0.0.0', :stub => false)[:stub]).to eq(:false)
     end
 
-    it 'should contain message-digest' do
-      expect(described_class.new(name: '0.0.0.0', :stub => 'no-summary')[:stub]).to eq('no-summary')
+    it 'should contain :no-summary' do
+      expect(described_class.new(name: '0.0.0.0', :stub => 'no-summary')[:stub]).to eq(:"no-summary")
     end
 
 
