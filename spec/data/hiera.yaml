@@ -4,4 +4,4 @@
 :hierarchy:
   - quagga
 :yaml:
-  :datadir: 'spec/hieradata'
+  :datadir: 'spec/data'

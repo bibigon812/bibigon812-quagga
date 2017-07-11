@@ -1,7 +1,7 @@
 require 'spec_helper_acceptance'
 
 describe 'quagga' do
-  let(:hiera_config) { 'spec/hieradata/hiera.yaml' }
+  let(:hiera_config) { 'spec/data/hiera.yaml' }
   let(:manifest) {
     'include quagga'
   }
