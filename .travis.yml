@@ -1,14 +1,14 @@
 ---
 language: ruby
-sudo: false
+sudo: required
 cache: bundler
-before_script:
-  - bundle
+services:
+  - docker
 script:
   - bundle exec rake syntax
   - bundle exec rake lint
   - bundle exec rake spec
-  - bundle exec rake beaker
+  - bundle exec rake beaker:centos7-docker
   - bundle exec rake build
 rvm:
   - 2.3.3
