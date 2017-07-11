@@ -39,19 +39,19 @@ Puppet::Type.newtype(:quagga_global) do
 
   newproperty(:ip_multicast_routing, :boolean => true) do
     desc 'Enable IP multicast forwarding'
-    defaultto(:true)
+    defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:ip_forwarding, :boolean => true) do
     desc 'Enable IP forwarding'
-    defaultto(:true)
+    defaultto(:false)
     newvalues(:true, :false)
   end
 
   newproperty(:ipv6_forwarding, :boolean => true) do
     desc 'Enable IPv6 forwarding'
-    defaultto(:true)
+    defaultto(:false)
     newvalues(:true, :false)
   end
 
