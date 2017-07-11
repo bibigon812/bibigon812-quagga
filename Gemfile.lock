@@ -300,8 +300,6 @@ GEM
     rspec-puppet (2.6.4)
       rspec
     rspec-support (3.6.0)
-    rspec_junit_formatter (0.3.0)
-      rspec-core (>= 2, < 4, != 2.12.0)
     rsync (1.0.9)
     serverspec (2.39.1)
       multi_json
@@ -339,7 +337,6 @@ DEPENDENCIES
   puppet (~> 4.10.0)
   puppet_facts
   puppetlabs_spec_helper
-  rspec_junit_formatter
 
 BUNDLED WITH
    1.13.6
