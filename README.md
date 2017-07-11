@@ -500,13 +500,15 @@ quagga_global { 'router-1.sandbox.local':
 
 ```puppet
 quagga_interface { 'eth0':
-    igmp                => true,
-    ipaddress           => [ '10.0.0.1/24', '172.16.0.1/24', ],
-    multicast           => true,
-    ospf_mtu_ignore     => true,
-    ospf_hello_interval => 2,
-    ospf_dead_interval  => 8,
-    pim_ssm             => true,
+    igmp                    => true,
+    ipaddress               => [ '10.0.0.1/24', '172.16.0.1/24', ],
+    multicast               => true,
+    ospf_auth               => 'message-digest',
+    ospf_message_digest_key => '1 md5 MESSAGEDIGEST',
+    ospf_mtu_ignore         => true,
+    ospf_hello_interval     => 2,
+    ospf_dead_interval      => 8,
+    pim_ssm                 => true,
 }
 ```
 
