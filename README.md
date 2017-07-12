@@ -85,19 +85,25 @@ quagga::global_opts:
 ```yaml
 quagga::interfaces:
   eth0:
-    igmp: true
     ip_address:
       - 10.0.0.1/24
-    multicast: true
-    ospf_dead_interval: 8
-    ospf_hello_interval: 2
-    ospf_mtu_ignore: true
-    ospf_priority: 100
-    pim_ssm: true
   lo:
     ip_address:
       - 10.255.255.1/32
       - 172.16.255.1/32
+
+quagga::ospf::interfaces:
+  eth0:
+    dead_interval: 8
+    hello_interval: 2
+    mtu_ignore: true
+    priority: 100
+
+  quagga::pim::interfaces:
+    eth0:
+      igmp: true
+      multicast: true
+      pim_ssm: true
 ```
 
 ### BGP
@@ -306,6 +312,7 @@ quagga::route_maps:
 - `service_opts`: service start options.
 - `router`: OSPF router options. See the type `quagga_ospf_router`.
 - `areas`: OSPF area options. See the type `quagga_ospf_area`.
+- `interfaces`: OSPF parameters of interfaces. See the type `quagga_ospf_interface`.
 
 #### quagga::pim
 
@@ -316,6 +323,7 @@ quagga::route_maps:
 - `service_manage`: enable management of the PIM service.
 - `service_ensure`: the state of the PIM Service.
 - `service_opts`: service start options.
+- `interfaces`: OSPF parameters of interfaces. See the type `quagga_pim_interface`.
 
 #### quagga::zebra
 
@@ -504,36 +512,59 @@ quagga_global { 'router-1.sandbox.local':
 
 ```puppet
 quagga_interface { 'eth0':
-    igmp                    => true,
-    ipaddress               => [ '10.0.0.1/24', '172.16.0.1/24', ],
-    multicast               => true,
-    ospf_auth               => 'message-digest',
-    ospf_message_digest_key => '1 md5 MESSAGEDIGEST',
-    ospf_mtu_ignore         => true,
-    ospf_hello_interval     => 2,
-    ospf_dead_interval      => 8,
-    pim_ssm                 => true,
+    igmp       => true,
+    ip_address => [ '10.0.0.1/24', '172.16.0.1/24', ],
 }
 ```
 
 - `name`: the friendly name of the network interface.
+- `bandwidth`: set bandwidth value of the interface in kilobits/sec.
 - `description`: interface description.
+- `enable`: whether the interface should be enabled or not
+- `ip_address`: IP addresses. Default value: `[]`.
+- `link_detect`: enable link state detection. Default value: `false`.
+
+#### quagga_ospf_interface
+
+```puppet
+quagga_ospf_interface { 'eth0':
+    auth               => 'message-digest',
+    message_digest_key => '1 md5 MESSAGEDIGEST',
+    mtu_ignore         => true,
+    hello_interval     => 2,
+    dead_interval      => 8,
+}
+```
+
+- `name`: the friendly name of the network interface.
+- `auth`: interface authentication type: `absent`, `message-digest` . Default value: `absent`.
+- `message_digest_key`: set OSPF authentication key to a cryptographic password: `absent`, `KEYID md5 KEY` . Default value: `absent`.
+- `cost`: interface cost. Default value: `absent`.
+- `dead_interval`: interval after which a neighbor is declared dead. Default value: `40`.
+- `hello_interval`: time between HELLO packets. Default value: `10`.
+- `mtu_ignore`: disable mtu mismatch detection. Default value: `false`.
+- `network`: network type: `absent`, `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`: Default value: `absent`.
+- `priority`: router priority. Default value: `1`.
+- `retransmit_interval`: time between retransmitting lost link state advertisements. Default value: `5`.
+- `transmit_delay`: link state transmit delay. Default value: `1`.
+
+#### quagga_pim_interface
+
+```puppet
+quagga_interface { 'eth0':
+    igmp      => true,
+    multicast => true,
+    pim_ssm   => true,
+}
+```
+
+- `name`: the friendly name of the network interface.
 - `igmp`: enable IGMP. Default value: `false`.
 - `igmp_query_interval`: IGMP query interval. Default value: `125`.
 - `igmp_query_max_response_time_dsec`: IGMP maximum query response time in deciseconds. Default value: `100`.
-- `ipaddress`: IP addresses. Default value: `[]`.
 - `multicast`: enable multicast flag for the interface. Default value: `false`.
-- `ospf_auth`: interface authentication type: `absent`, `message-digest` . Default value: `absent`.
-- `ospf_message_digest_key`: set OSPF authentication key to a cryptographic password: `absent`, `KEYID md5 KEY` . Default value: `absent`.
-- `ospf_cost`: interface cost. Default value: `absent`.
-- `ospf_dead_interval`: interval after which a neighbor is declared dead. Default value: `40`.
-- `ospf_hello_interval`: time between HELLO packets. Default value: `10`.
-- `ospf_mtu_ignore`: disable mtu mismatch detection. Default value: `false`.
-- `ospf_network`: network type: `absent`, `broadcast`, `non-broadcast`, `point-to-multipoint`,`point-to-point` or `loopback`: Default value: `absent`.
-- `ospf_priority`: router priority. Default value: `1`.
-- `ospf_retransmit_interval`: time between retransmitting lost link state advertisements. Default value: `5`.
-- `ospf_transmit_delay`: link state transmit delay. Default value: `1`.
 - `pim_ssm`: enable PIM SSM operation. Default value: `false`.
+
 
 #### quagga_ospf_router
 
