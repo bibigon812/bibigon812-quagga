@@ -19,20 +19,12 @@ quagga::global_opts:
 
 quagga::interfaces:
   eth0:
-    igmp: true
     ip_address:
       - 10.0.0.1/24
-    multicast: true
-    ospf_dead_interval: 8
-    ospf_hello_interval: 2
-    ospf_mtu_ignore: true
-    ospf_priority: 100
-    pim_ssm: true
   lo:
     ip_address:
       - 10.255.255.1/32
       - 172.16.255.1/32
-
 
 quagga::prefix_lists:
   CONNECTED_PREFIXES:
@@ -77,6 +69,12 @@ quagga::pim::service_enable: true
 quagga::pim::service_manage: true
 quagga::pim::service_ensure: running
 quagga::pim::service_opts: -P 0
+
+quagga::pim::interfaces:
+  eth0:
+    igmp: true
+    multicast: true
+    pim_ssm: true
 
 
 quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
@@ -176,6 +174,13 @@ quagga::ospf::service_enable: true
 quagga::ospf::service_manage: true
 quagga::ospf::service_ensure: running
 quagga::ospf::service_opts: -P 0
+
+quagga::ospf::interfaces:
+  eth0:
+    dead_interval: 8
+    hello_interval: 2
+    mtu_ignore: true
+    priority: 100
 
 quagga::ospf::router:
   abr_type: cisco

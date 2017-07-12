@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_interface).provider(:quagga) do
+describe Puppet::Type.type(:quagga_ospf_interface).provider(:quagga) do
   describe 'instances' do
     it 'should have an instance method' do
       expect(described_class).to respond_to :instances
@@ -53,27 +53,35 @@ interface tun0
 
     it 'should return the resource eth0' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :bandwidth => :absent,
-        :ensure => :present,
         :name => 'eth0',
         :provider => :quagga,
-        :description => :absent,
-        :enable => :true,
-        :ip_address => [],
-        :link_detect => :false,
+        :auth => :absent,
+        :message_digest_key => :absent,
+        :cost => :absent,
+        :dead_interval => 40,
+        :hello_interval => 10,
+        :mtu_ignore => :false,
+        :network => :absent,
+        :priority => 1,
+        :retransmit_interval => 5,
+        :transmit_delay => 1,
       })
     end
 
     it 'should return the resource eth1' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :bandwidth => :absent,
-        :ensure => :present,
         :name => 'eth1',
         :provider => :quagga,
-        :description => :absent,
-        :enable => :true,
-        :ip_address => [],
-        :link_detect => :false,
+        :auth => 'message-digest',
+        :message_digest_key => '1 md5 hello123',
+        :cost => 10,
+        :dead_interval => 8,
+        :hello_interval => 2,
+        :mtu_ignore => :true,
+        :network => 'broadcast',
+        :priority => 50,
+        :retransmit_interval => 4,
+        :transmit_delay => 1,
       })
     end
   end

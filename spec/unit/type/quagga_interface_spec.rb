@@ -13,6 +13,9 @@ describe Puppet::Type.type(:quagga_interface) do
     end
   end
 
+  let(:zebra) { Puppet::Type.type(:service).new(:name => 'zebra') }
+  let(:catalog) { Puppet::Resource::Catalog.new }
+
   before :each do
     Puppet::Type.type(:quagga_interface).stubs(:defaultprovider).returns providerclass
   end
@@ -32,11 +35,7 @@ describe Puppet::Type.type(:quagga_interface) do
       end
     end
 
-    [:ospf_auth, :ospf_message_digest_key, :ospf_cost, :ospf_dead_interval, :ospf_hello_interval, :ospf_mtu_ignore, :ospf_network,
-     :ospf_priority, :ospf_retransmit_interval, :ospf_transmit_delay,
-     :igmp, :pim_ssm, :igmp_query_interval, :igmp_query_max_response_time_dsec,
-     :bandwidth, :link_detect, :multicast,
-    ].each do |property|
+    [ :bandwidth, :link_detect, ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -62,113 +61,7 @@ describe Puppet::Type.type(:quagga_interface) do
       end
     end
 
-    describe 'ospf_auth' do
-      it 'should support :absent as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_auth => :absent) }.to_not raise_error
-      end
-
-      it 'should support message-digest as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_auth => "message-digest") }.to_not raise_error
-      end
-
-      it 'should contain :message-digest' do
-        expect(described_class.new(name: 'foo', :ospf_auth => 'message-digest')[:ospf_auth]).to eq(:"message-digest")
-      end
-
-      it 'should not support foo as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_auth => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
-      end
-    end
-
-    describe 'ospf_message_digest_key' do
-      it 'should support :absent as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_message_digest_key => :absent) }.to_not raise_error
-      end
-
-      it 'should support "1 md5 hello123" as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_message_digest_key => "1 md5 hello123") }.to_not raise_error
-      end
-
-      it 'should contain "1 md5 hello123"' do
-        expect(described_class.new(name: 'foo', :ospf_message_digest_key => '1 md5 hello123')[:ospf_message_digest_key]).to eq('1 md5 hello123')
-      end
-
-      it 'should not support foo as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_message_digest_key => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
-      end
-    end
-
-    describe 'ospf_cost' do
-      it 'should support :absent as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_cost => :absent) }.to_not raise_error
-      end
-
-      it 'should support 100 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_cost => 100) }.to_not raise_error
-      end
-
-      it 'should not support 0 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_cost => 0) }.to raise_error(Puppet::Error, /OSPF cost/)
-      end
-
-      it 'should not support 65536 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_cost => 65536) }.to raise_error(Puppet::Error, /OSPF cost/)
-      end
-
-      it 'should contain 50' do
-        expect(described_class.new(:name => 'foo', :ospf_cost => 50)[:ospf_cost]).to eq(50)
-      end
-
-      it 'should contain 51' do
-        expect { described_class.new(:name => 'foo', :ospf_cost => '51') }.to raise_error Puppet::Error, /OSPF cost/
-      end
-    end
-
-    describe 'ospf_dead_interval' do
-      it 'should support 100 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_dead_interval => 100) }.to_not raise_error
-      end
-
-      it 'should not support 0 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_dead_interval => 0) }.to raise_error Puppet::Error, /OSPF dead interval/
-      end
-
-      it 'should not support 65536 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_dead_interval => 65536) }.to raise_error Puppet::Error, /OSPF dead interval/
-      end
-
-      it 'should contain 50' do
-        expect(described_class.new(:name => 'foo', :ospf_dead_interval => 50)[:ospf_dead_interval]).to eq(50)
-      end
-
-      it 'should contain 51' do
-        expect { described_class.new(:name => 'foo', :ospf_dead_interval => '51') }.to raise_error Puppet::Error, /OSPF dead interval/
-      end
-    end
-
-    describe 'ospf_hello_interval' do
-      it 'should support 100 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_hello_interval => 100) }.to_not raise_error
-      end
-
-      it 'should not support 0 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_hello_interval => 0) }.to raise_error Puppet::Error, /OSPF hello packets interval/
-      end
-
-      it 'should not support 65536 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_hello_interval => 65536) }.to raise_error Puppet::Error, /OSPF hello packets interval/
-      end
-
-      it 'should contain 50' do
-        expect(described_class.new(:name => 'foo', :ospf_hello_interval => 50)[:ospf_hello_interval]).to eq(50)
-      end
-
-      it 'should contain 51' do
-        expect { described_class.new(:name => 'foo', :ospf_hello_interval => '51') }.to raise_error Puppet::Error, /OSPF hello packets interval/
-      end
-    end
-
-    [:ospf_mtu_ignore, :igmp, :pim_ssm, :link_detect, :multicast].each do |property|
+    [ :link_detect ].each do |property|
       describe "#{property}" do
         it 'should support true as a value' do
           expect { described_class.new(:name => 'foo', property => true) }.to_not raise_error
@@ -223,142 +116,18 @@ describe Puppet::Type.type(:quagga_interface) do
         end
       end
     end
+  end
 
+  describe 'when autorequiring' do
+    it 'should require zebra service' do
+      interface = described_class.new(:name => 'eth0')
+      catalog.add_resource zebra
+      catalog.add_resource interface
+      reqs = interface.autorequire
 
-    describe 'ospf_network' do
-      it 'should support :broadcast as value' do
-        expect { described_class.new(:name => 'foo', :ospf_network => 'broadcast') }.to_not raise_error
-      end
-
-      it 'should support non-broadcast as value' do
-        expect { described_class.new(:name => 'foo', :ospf_network => 'non-broadcast') }.to_not raise_error
-      end
-
-      it 'should support point-to-multipoint as value' do
-        expect { described_class.new(:name => 'foo', :ospf_network => 'point-to-multipoint') }.to_not raise_error
-      end
-
-      it 'should support point-to-point as value' do
-        expect { described_class.new(:name => 'foo', :ospf_network => 'point-to-point') }.to_not raise_error
-      end
-
-      it 'should support :absent as value' do
-        expect { described_class.new(:name => 'foo', :ospf_network => :absent) }.to_not raise_error
-      end
-
-      it 'should contain point-to-point' do
-        expect(described_class.new(:name => 'foo', :ospf_network => 'point-to-point')[:ospf_network]).to eq(:"point-to-point")
-      end
-    end
-
-    describe 'ospf_priority' do
-      it 'should support 100 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_priority => 100) }.to_not raise_error
-      end
-
-      it 'should not support -1 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_priority => -1) }.to raise_error(Puppet::Error, /Router OSPF priority/)
-      end
-
-      it 'should not support 256 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_priority => 256) }.to raise_error Puppet::Error, /Router OSPF priority/
-      end
-
-      it 'should contain 50' do
-        expect(described_class.new(:name => 'foo', :ospf_priority => 50)[:ospf_priority]).to eq(50)
-      end
-
-      it 'should contain 51' do
-        expect { described_class.new(:name => 'foo', :ospf_priority => '51') }.to raise_error Puppet::Error, /is not an Integer/
-      end
-    end
-
-    describe 'ospf_ospf_retransmit_interval' do
-      it 'should support 100 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_retransmit_interval => 100) }.to_not raise_error
-      end
-
-      it 'should not support 0 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_retransmit_interval => 0) }.to raise_error Puppet::Error, /OSPF retransmit interval/
-      end
-
-      it 'should not support 65536 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_retransmit_interval => 65536) }.to raise_error Puppet::Error, /OSPF retransmit interval/
-      end
-
-      it 'should contain 50' do
-        expect(described_class.new(:name => 'foo', :ospf_retransmit_interval => 50)[:ospf_retransmit_interval]).to eq(50)
-      end
-
-      it 'should not support \'51\'' do
-        expect { described_class.new(:name => 'foo', :ospf_retransmit_interval => '51') }.to raise_error Puppet::Error, /is not an Integer/
-      end
-    end
-
-    describe 'ospf_transmit_delay' do
-      it 'should support 100 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_transmit_delay => 100) }.to_not raise_error
-      end
-
-      it 'should not support 0 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_transmit_delay => 0) }.to raise_error Puppet::Error, /OSPF transmit delay/
-      end
-
-      it 'should not support 65536 as a value' do
-        expect { described_class.new(:name => 'foo', :ospf_transmit_delay => 65536) }.to raise_error Puppet::Error, /OSPF transmit delay/
-      end
-
-      it 'should contain 50' do
-        expect(described_class.new(:name => 'foo', :ospf_transmit_delay => 50)[:ospf_transmit_delay]).to eq(50)
-      end
-
-      it 'should not support \'51\'' do
-        expect { described_class.new(:name => 'foo', :ospf_transmit_delay => '51') }.to raise_error Puppet::Error, /is not an Integer/
-      end
-    end
-
-    describe 'igmp_query_interval' do
-      it 'should support 100 as a value' do
-        expect { described_class.new(:name => 'foo', :igmp_query_interval => 100) }.to_not raise_error
-      end
-
-      it 'should not support 0 as a value' do
-        expect { described_class.new(:name => 'foo', :igmp_query_interval => 0) }.to raise_error(Puppet::Error, /between 1-1800/)
-      end
-
-      it 'should not support 1801 as a value' do
-        expect { described_class.new(:name => 'foo', :igmp_query_interval => 1801) }.to raise_error(Puppet::Error, /between 1-1800/)
-      end
-
-      it 'should not support \'50\' as a value' do
-        expect { described_class.new(:name => 'foo', :igmp_query_interval => '50') }.to raise_error(Puppet::Error, /is not an Integer/)
-      end
-
-      it 'should contain 50' do
-        expect(described_class.new(:name => 'foo', :igmp_query_interval => 50)[:igmp_query_interval]).to eq(50)
-      end
-    end
-
-    describe 'igmp_query_max_response_time_dsec' do
-      it 'should support 100 as a value' do
-        expect { described_class.new(:name => 'foo', :igmp_query_max_response_time_dsec => 100) }.to_not raise_error
-      end
-
-      it 'should not support 0 as a value' do
-        expect { described_class.new(:name => 'foo', :igmp_query_max_response_time_dsec => 0) }.to raise_error(Puppet::Error, /between 10-250/)
-      end
-
-      it 'should not support 251 as a value' do
-        expect { described_class.new(:name => 'foo', :igmp_query_max_response_time_dsec => 251) }.to raise_error(Puppet::Error, /between 10-250/)
-      end
-
-      it 'should not support \'50\' as a value' do
-        expect { described_class.new(:name => 'foo', :igmp_query_max_response_time_dsec => '50') }.to raise_error(Puppet::Error, /is not an Integer/)
-      end
-
-      it 'should contain 50' do
-        expect(described_class.new(:name => 'foo', :igmp_query_max_response_time_dsec => 50)[:igmp_query_max_response_time_dsec]).to eq(50)
-      end
+      expect(reqs.size).to eq(1)
+      expect(reqs[0].source).to eq(zebra)
+      expect(reqs[0].target).to eq(interface)
     end
   end
 end

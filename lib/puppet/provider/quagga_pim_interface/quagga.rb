@@ -1,30 +1,36 @@
-Puppet::Type.type(:quagga_interface).provide :quagga do
+Puppet::Type.type(:quagga_pim_interface).provide :quagga do
   @doc = 'Manages quagga interface parameters'
 
   @resource_map = {
-    :description => {
-      :regexp => /\A\sdescription\s(.*)\Z/,
-      :template => 'description<% unless value.nil? %> <%= value %><% end %>',
-      :type => :string,
-      :default => :absent
-    },
-    :ip_address => {
-      :regexp => /\A\sip\saddress\s(.*)\Z/,
-      :template => 'ip address <%= value %>',
-      :type => :array,
-      :default => [],
-    },
-    :bandwidth => {
-      :regexp => /\A\sbandwidth\s(\d+)\Z/,
-      :template => 'bandwidth<% unless value.nil? %> <%= value %><% end %>',
-      :type => :fixnum,
-      :default => :absent
-    },
-    :link_detect => {
-      :regexp => /\A\slink-detect\Z/,
-      :template => 'link-detect',
+    :multicast => {
+      :regexp => /\A\smulticast\Z/,
+      :template => 'multicast',
       :type => :boolean,
       :default => :false
+    },
+    :igmp => {
+      :regexp => /\A\sip\sigmp\Z/,
+      :template => 'ip igmp',
+      :type => :boolean,
+      :default => :false
+    },
+    :pim_ssm => {
+      :regexp => /\A\sip\spim\sssm\Z/,
+      :template => 'ip pim ssm',
+      :type => :boolean,
+      :default => :false
+    },
+    :igmp_query_interval => {
+      :regexp => /\A\sip\sigmp\squery-interval\s(\d+)\Z/,
+      :template => 'ip igmp query-interval<% unless value.nil? %> <%= value %><% end %>',
+      :type => :fixnum,
+      :default => 125
+    },
+    :igmp_query_max_response_time_dsec => {
+      :regexp => /\A\sip\sigmp\squery-max-response-time-dsec\s(\d+)\Z/,
+      :template => 'ip igmp query-max-response-time-dsec<% unless value.nil? %> <%= value %><% end %>',
+      :type => :fixnum,
+      :default => 100
     },
   }
 
@@ -58,8 +64,6 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
 
         interface = {
           :name => name,
-          :ensure => :present,
-          :enable => :true,
           :provider => self.name,
         }
 
@@ -122,76 +126,13 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
   end
 
   def create
-    debug '[create]'
-
-    resource_map = self.class.instance_variable_get('@resource_map')
-
-    cmds = []
-    cmds << "configure terminal"
-    cmds << "interface #{@resource[:name]}"
-
-    resource_map.each do |property, options|
-      if @resource[property] and ((resource[property].is_a?(Array) and !resource[property].empty?) or (@resource[property] != :absent))
-        value = @resource[property]
-        cmds << ERB.new(resource_map[property][:template]).result(binding)
-      end
-    end
-
-    cmds << "end"
-    cmds << "write memory"
-
-    vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
   end
 
   def exists?
-    @property_hash[:ensure] == :present
+    true
   end
 
   def destroy
-    debug '[destroy]'
-
-    cmds = []
-    cmds << "configure terminal"
-    cmds << "interface #{@resource[:name]}"
-    cmds << "shutdown"
-    cmds << "exit"
-    cmds << "no interface #{@resource[:name]}"
-    cmds << "end"
-    cmds << "write memory"
-
-    vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
-  end
-
-  def enable
-    debug '[enable]'
-
-    cmds = []
-    cmds << "configure terminal"
-    cmds << "interface #{@resource[:name]}"
-    cmds << "no shutdown"
-    cmds << "end"
-    cmds << "write memory"
-
-    vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
-    @property_hash[:enable] = :true
-  end
-
-  def disable
-    debug '[disable]'
-
-    cmds = []
-    cmds << "configure terminal"
-    cmds << "interface #{@resource[:name]}"
-    cmds << "shutdown"
-    cmds << "end"
-    cmds << "write memory"
-
-    vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
-    @property_hash[:enable] = :false
-  end
-
-  def enabled?
-    @property_hash[:enable]
   end
 
   def flush

@@ -5,8 +5,17 @@ class quagga::pim (
   Boolean $service_enable,
   Boolean $service_manage,
   Enum['running', 'stopped'] $service_ensure,
-  String $service_opts
+  String $service_opts,
+  Hash $interfaces,
 ) {
   include quagga::pim::config
   include quagga::pim::service
+
+  if $service_enable and $service_ensure == 'running' {
+    $interfaces.each |String $interface_name, Hash $interface| {
+      quagga_pim_interface {$interface_name:
+        * => $interface
+      }
+    }
+  }
 }

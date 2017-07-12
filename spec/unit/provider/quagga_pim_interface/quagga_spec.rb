@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:quagga_interface).provider(:quagga) do
+describe Puppet::Type.type(:quagga_pim_interface).provider(:quagga) do
   describe 'instances' do
     it 'should have an instance method' do
       expect(described_class).to respond_to :instances
@@ -53,27 +53,25 @@ interface tun0
 
     it 'should return the resource eth0' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :bandwidth => :absent,
-        :ensure => :present,
         :name => 'eth0',
         :provider => :quagga,
-        :description => :absent,
-        :enable => :true,
-        :ip_address => [],
-        :link_detect => :false,
+        :multicast => :false,
+        :pim_ssm => :false,
+        :igmp => :false,
+        :igmp_query_interval => 125,
+        :igmp_query_max_response_time_dsec => 100
       })
     end
 
     it 'should return the resource eth1' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :bandwidth => :absent,
-        :ensure => :present,
         :name => 'eth1',
         :provider => :quagga,
-        :description => :absent,
-        :enable => :true,
-        :ip_address => [],
-        :link_detect => :false,
+        :multicast => :false,
+        :pim_ssm => :true,
+        :igmp => :true,
+        :igmp_query_interval => 150,
+        :igmp_query_max_response_time_dsec => 200
       })
     end
   end

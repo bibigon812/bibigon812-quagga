@@ -13,7 +13,6 @@ describe Puppet::Type.type(:quagga_ospf_area) do
     end
   end
 
-
   let(:router) { Puppet::Type.type(:quagga_ospf_router).new(:name => 'ospf') }
   let(:catalog) { Puppet::Resource::Catalog.new }
 
