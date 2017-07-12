@@ -1,4 +1,20 @@
 
+## [unreleased]
+
+## Added
+
+- the `quagga_ospf_interface` resource
+- the `quagga_pim_interface` resource
+
+## Updated
+
+- the `quagga::ospf` class
+- the `quagga::pim` class
+
+## Removed
+
+- ospf and multicast settings from `quagga_interface` resource
+
 ## [3.0.2] - 2017-07-12
 
 ### Fixed
