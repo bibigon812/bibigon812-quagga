@@ -12,13 +12,15 @@ class quagga::ospf (
   include quagga::ospf::config
   include quagga::ospf::service
 
-  quagga_ospf_router {'ospf':
-    * => $router
-  }
+  if $service_enable and $service_ensure == 'running' {
+    quagga_ospf_router {'ospf':
+      * => $router
+    }
 
-  $areas.each |String $area_name, Hash $area| {
-    quagga_ospf_area {$area_name:
-      * => $area
+    $areas.each |String $area_name, Hash $area| {
+      quagga_ospf_area {$area_name:
+        * => $area
+      }
     }
   }
 }
