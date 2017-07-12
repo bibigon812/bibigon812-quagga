@@ -268,13 +268,13 @@ quagga::route_maps:
 
 #### quagga
 
-- `global_opts`: Quagga global options. See the type `quagga_global`. Default value: `{}`.
-- `interfaces`: Quagga interfacec options. See the type `quagga_interface`. Default value: `{}`.
-- `prefix_lists`: Quagga prefix-list options. See the type `quagga_prefix_list`. Default value: `{}`.
-- `route_maps`: Quagga route-map options. See the type `quagga_rotue_map`. Default value: `{}`.
-- `default_owner`: overrides the default owner of Quagga configuration files in the file system.
-- `default_group`: overrides the default group of Quagga configuration files in the file system.
-- `default_mode`: overrides the default mode of Quagga configuration files in the system.
+- `global_opts`: Quagga global options. See the type `quagga_global`.
+- `interfaces`: Quagga interfacec options. See the type `quagga_interface`.
+- `prefix_lists`: Quagga prefix-list options. See the type `quagga_prefix_list`.
+- `route_maps`: Quagga route-map options. See the type `quagga_rotue_map`.
+- `default_owner`: overrides the default owner of Quagga configuration files in the file system.  Default value: `quagga`.
+- `default_group`: overrides the default group of Quagga configuration files in the file system. Default value: `quagga`.
+- `default_mode`: overrides the default mode of Quagga configuration files in the system. Default value: `0600`.
 - `default_content`: overrides the initial content of quagga configuration files.
 - `service_file`: overrides the default path of the Quagga system configuration file in the file system.
 - `service_file_manage`: enable management of the service file. Default value: `true`.

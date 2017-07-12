@@ -3,7 +3,12 @@
 
 ### Fixed
 
-- applying the ospf configuration 
+- applying the OSPF configuration
+
+### Updated
+
+- changelog
+- docs
 
 ## [3.0.1] - 2017-07-12
 
