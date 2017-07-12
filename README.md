@@ -17,6 +17,8 @@ include quagga
 
 ### System Settings
 
+These settings are used by default:
+
 ```yaml
 quagga::default_owner: quagga
 quagga::default_group: quagga
@@ -30,6 +32,8 @@ quagga::packages:
 ```
 
 ### Service Settings
+
+These settings are used by default:
 
 ```yaml
 quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
@@ -64,6 +68,8 @@ quagga::pim::service_manage: true
 quagga::pim::service_ensure: running
 quagga::pim::service_opts: -P 0
 ```
+
+## Configure Services
 
 ### Global Options
 
@@ -262,25 +268,25 @@ quagga::route_maps:
 
 #### quagga
 
-- `global_opts`: Quagga global options. See the type `quagga_global`.
-- `interfaces`: Quagga interfacec options. See the type `quagga_interface`.
-- `prefix_lists`: Quagga prefix-list options. See the type `quagga_prefix_list`.
-- `route_maps`: Quagga route-map options. See the type `quagga_rotue_map`.
+- `global_opts`: Quagga global options. See the type `quagga_global`. Default value: `{}`.
+- `interfaces`: Quagga interfacec options. See the type `quagga_interface`. Default value: `{}`.
+- `prefix_lists`: Quagga prefix-list options. See the type `quagga_prefix_list`. Default value: `{}`.
+- `route_maps`: Quagga route-map options. See the type `quagga_rotue_map`. Default value: `{}`.
 - `default_owner`: overrides the default owner of Quagga configuration files in the file system.
 - `default_group`: overrides the default group of Quagga configuration files in the file system.
 - `default_mode`: overrides the default mode of Quagga configuration files in the system.
 - `default_content`: overrides the initial content of quagga configuration files.
 - `service_file`: overrides the default path of the Quagga system configuration file in the file system.
-- `service_file_manage`.
+- `service_file_manage`: enable management of the service file. Default value: `true`.
 - `packages`: Quagga package options.
 
 #### quagga::bgp
 
 - `config_file`: configuration file if the BGP service.
-- `config_file_manage`: enable the management of the BGP service setting file.
+- `config_file_manage`: enable management of the BGP service setting file.
 - `service_name`: the name of the BGP service.
 - `service_enable`: enable the BGP service.
-- `service_manage`: enable the management of the BGP service.
+- `service_manage`: enable management of the BGP service.
 - `service_ensure`: the state of the BGP Service.
 - `service_opts`: service start options.
 - `router`: BGP router options. See the type `quagga_bgp_router`.
@@ -292,10 +298,10 @@ quagga::route_maps:
 #### quagga::ospf
 
 - `config_file`: configuration file if the OSPF service.
-- `config_file_manage`: enable the management of the OSPF service setting file.
+- `config_file_manage`: enable management of the OSPF service setting file.
 - `service_name`: the name of the OSPF service.
 - `service_enable`: enable the OSPF service.
-- `service_manage`: enable the management of the OSPF service.
+- `service_manage`: enable management of the OSPF service.
 - `service_ensure`: the state of the OSPF Service.
 - `service_opts`: service start options.
 - `router`: OSPF router options. See the type `quagga_ospf_router`.
@@ -304,26 +310,24 @@ quagga::route_maps:
 #### quagga::pim
 
 - `config_file`: configuration file if the PIM service.
-- `config_file_manage`: enable the management of the PIM service setting file.
+- `config_file_manage`: enable management of the PIM service setting file.
 - `service_name`: the name of the PIM service.
 - `service_enable`: enable the PIM service.
-- `service_manage`: enable the management of the PIM service.
+- `service_manage`: enable management of the PIM service.
 - `service_ensure`: the state of the PIM Service.
 - `service_opts`: service start options.
 
 #### quagga::zebra
 
 - `config_file`: configuration file if the Zebra service.
-- `config_file_manage`: enable the management of the Zebra service setting file.
+- `config_file_manage`: enable management of the Zebra service setting file.
 - `service_name`: the name of the Zebra service.
 - `service_enable`: enable the Zebra service.
-- `service_manage`: enable the management of the Zebra service.
+- `service_manage`: enable management of the Zebra service.
 - `service_ensure`: the state of the Zebra Service.
 - `service_opts`: service start options.
 
-
 ### Defines
-
 
 #### quagga::bgp::peer
 
