@@ -1,10 +1,11 @@
 
-## [unreleased]
+## [3.0.2] - 2017-07-12
 
 ### Fixed
 
 - applying the OSPF configuration
 - the lint warning about only_variable_string
+- autorequire `quagga_ospf_router` in the `quagga_ospf_area` resource
 
 ### Updated
 
