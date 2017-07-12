@@ -33,7 +33,7 @@ class quagga::bgp (
     }
 
     $community_lists.each |Integer $community_list_name, Hash $community_list| {
-      quagga_bgp_community_list {"${community_list_name}": # lint:ignore:only_variable_string
+      quagga_bgp_community_list {sprintf('%d', $community_list_name):
         * => $community_list
       }
     }
