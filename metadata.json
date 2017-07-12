@@ -26,5 +26,5 @@
     "project_page": "https://github.com/bibigon812/bibigon812-quagga",
     "source": "https://github.com/bibigon812/bibigon812-quagga.git",
     "summary": "Puppet module to manage Quagga",
-    "version": "3.0.2"
+    "version": "3.1.0"
 }

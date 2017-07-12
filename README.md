@@ -99,11 +99,11 @@ quagga::ospf::interfaces:
     mtu_ignore: true
     priority: 100
 
-  quagga::pim::interfaces:
-    eth0:
-      igmp: true
-      multicast: true
-      pim_ssm: true
+quagga::pim::interfaces:
+  eth0:
+    igmp: true
+    multicast: true
+    pim_ssm: true
 ```
 
 ### BGP
