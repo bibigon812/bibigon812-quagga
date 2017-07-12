@@ -4,6 +4,7 @@
 ### Fixed
 
 - applying the OSPF configuration
+- the lint warning about only_variable_string
 
 ### Updated
 
