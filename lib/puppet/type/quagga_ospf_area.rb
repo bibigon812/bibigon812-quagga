@@ -107,7 +107,7 @@ Puppet::Type.newtype(:quagga_ospf_area) do
     defaultto([])
   end
 
-  autorequire(:quagga_ospf) do
+  autorequire(:quagga_ospf_router) do
     %w{ospf}
   end
 
