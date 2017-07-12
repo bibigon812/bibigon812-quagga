@@ -13,6 +13,10 @@ describe Puppet::Type.type(:quagga_ospf_area) do
     end
   end
 
+
+  let(:router) { Puppet::Type.type(:quagga_ospf_router).new(:name => 'ospf') }
+  let(:catalog) { Puppet::Resource::Catalog.new }
+
   before :each do
     Puppet::Type.type(:quagga_ospf_area).stubs(:defaultprovider).returns providerclass
   end
@@ -168,6 +172,19 @@ describe Puppet::Type.type(:quagga_ospf_area) do
 
     it 'should contain [ \'10.255.255.0/24\', \'192.168.0.0/16\' ]' do
       expect(described_class.new(:name => '0.0.0.0', :networks => %w{10.255.255.0/24 192.168.0.0/16})[:networks]).to eq(%w{10.255.255.0/24 192.168.0.0/16})
+    end
+  end
+
+  describe 'when autorequiring' do
+    it 'should require quagga_ospf_reoute resource' do
+      area = described_class.new(:name => '0.0.0.0', :stub => true)
+      catalog.add_resource router
+      catalog.add_resource area
+      reqs = area.autorequire
+
+      expect(reqs.size).to eq(1)
+      expect(reqs[0].source).to eq(router)
+      expect(reqs[0].target).to eq(area)
     end
   end
 end
