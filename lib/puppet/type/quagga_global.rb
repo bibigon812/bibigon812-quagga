@@ -37,12 +37,6 @@ Puppet::Type.newtype(:quagga_global) do
     end
   end
 
-  newproperty(:ip_multicast_routing, :boolean => true) do
-    desc 'Enable IP multicast forwarding.'
-    defaultto(:false)
-    newvalues(:true, :false)
-  end
-
   newproperty(:ip_forwarding, :boolean => true) do
     desc 'Enable IP forwarding.'
     defaultto(:false)
@@ -74,10 +68,6 @@ Puppet::Type.newtype(:quagga_global) do
   end
 
   autorequire(:service) do
-    if self[:ip_multicast_routing] == :true
-      %w{zebra pimd}
-    else
-      %w{zebra}
-    end
+    %w{zebra}
   end
 end

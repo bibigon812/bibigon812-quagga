@@ -39,6 +39,9 @@ lookup_options:
   quagga::ospf::areas:
     merge:
       strategy: deep
+  quagga::pim::router:
+    merge:
+      strategy: deep
   quagga::pim::interfaces:
     merge:
       strategy: deep
@@ -69,6 +72,7 @@ quagga::pim::service_enable: true
 quagga::pim::service_manage: true
 quagga::pim::service_ensure: "running"
 quagga::pim::service_opts: "-P 0"
+quagga::pim::router: {}
 quagga::pim::interfaces: {}
 quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
 quagga::bgp::config_file_manage: true
