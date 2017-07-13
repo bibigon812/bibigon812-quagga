@@ -23,7 +23,7 @@ include quagga
 ```
 ## Setup Quagga
 
-### Default settings
+### Default Settings
 
 ```yaml
 quagga::default_owner: quagga
@@ -85,9 +85,9 @@ quagga::zebra::service_ensure: running
 quagga::zebra::service_opts: -P 0
 ```
 
-## Configure Services
+### Configure Services
 
-### Global Options
+#### Global Options
 
 ```yaml
 quagga::global_opts:
@@ -95,7 +95,7 @@ quagga::global_opts:
   ipv6_forwarding: true
 ```
 
-### Interfaces
+#### Interfaces
 
 ```yaml
 quagga::interfaces:
@@ -106,22 +106,9 @@ quagga::interfaces:
     ip_address:
       - 10.255.255.1/32
       - 172.16.255.1/32
-
-quagga::ospf::interfaces:
-  eth0:
-    dead_interval: 8
-    hello_interval: 2
-    mtu_ignore: true
-    priority: 100
-
-quagga::pim::interfaces:
-  eth0:
-    igmp: true
-    multicast: true
-    pim_ssm: true
 ```
 
-### BGP
+#### BGP
 
 ```yaml
 quagga::bgp::router:
@@ -131,7 +118,7 @@ quagga::bgp::router:
   router_id: 10.0.0.1
 ```
 
-### BGP Address Families
+#### BGP Address Families
 
 ```yaml
 quagga::bgp::address_families:
@@ -158,7 +145,7 @@ quagga::bgp::address_families:
       - 2001:db8:0:2::/63
 ```
 
-### BGP Peers
+#### BGP Peers
 
 ```yaml
 quagga::bgp::peers:
@@ -199,7 +186,7 @@ quagga::bgp::peers:
 
 ```
 
-### OSPF
+#### OSPF
 
 ```yaml
 quagga::ospf::router:
@@ -211,7 +198,7 @@ quagga::ospf::router:
   router_id: 10.0.0.1
 ```
 
-### OSPF Areas
+#### OSPF Areas
 
 ```yaml
 quagga::ospf::areas:
@@ -226,14 +213,35 @@ quagga::ospf::areas:
     stub: true
 ```
 
-### PIM
+#### OSPF Interfaces
+
+```yaml
+quagga::ospf::interfaces:
+  eth0:
+    dead_interval: 8
+    hello_interval: 2
+    mtu_ignore: true
+    priority: 100
+```
+
+#### PIM
 
 ```yaml
 quagga::pim::router:
   ip_multicast_routing: true
 ```
 
-### As-path Lists
+#### PIM Interfaces
+
+```yaml
+quagga::pim::interfaces:
+  eth0:
+    igmp: true
+    multicast: true
+    pim_ssm: true
+```
+
+#### AS-path Lists
 
 ```yaml
 quagga::bgp::as_paths:
@@ -242,7 +250,7 @@ quagga::bgp::as_paths:
       - permit _100$
 ```
 
-### Community Lists
+#### Community Lists
 
 ```yaml
 quagga::bgp::community_lists:
@@ -257,7 +265,7 @@ quagga::bgp::community_lists:
       - permit 65000:202
 ```
 
-### Prefix Lists
+#### Prefix Lists
 
 ```yaml
 quagga::prefix_lists:
@@ -274,7 +282,7 @@ quagga::prefix_lists:
         prefix: 172.16.255.0/24
 ```
 
-## Route Maps
+#### Route Maps
 
 ```yaml
 quagga::route_maps:
