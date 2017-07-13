@@ -13,7 +13,6 @@ quagga::packages:
 
 quagga::global_opts:
   ip_forwarding: true
-  ip_multicast_routing: true
   ipv6_forwarding: true
 
 
@@ -70,6 +69,8 @@ quagga::pim::service_manage: true
 quagga::pim::service_ensure: running
 quagga::pim::service_opts: -P 0
 
+quagga::pim::router:
+  ip_multicast_routing: true
 quagga::pim::interfaces:
   eth0:
     igmp: true
