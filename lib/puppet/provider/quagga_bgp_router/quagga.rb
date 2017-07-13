@@ -43,9 +43,9 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
   def self.default_router_id
     default_router_id = :absent
     begin
-      vtysh('-c', 'show ip bgp summary').split(/\n/).collect.each do |line|
-        if line =~ /\ABGP\srouter\sidentifier\s(\d+\.\d+\.\d+\.\d+),\slocal\sAS\snumber\s(\d+)\Z/
-          default_router_id = $1
+      vtysh('-c', 'show running-config').split(/\n/).collect.each do |line|
+        if line =~ /\A\sbgp\srouter-id\s(\d+\.\d+\.\d+\.\d+)\Z/
+          default_router_id = Integer($1)
           break
         end
       end
