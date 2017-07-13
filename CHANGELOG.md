@@ -1,4 +1,10 @@
 
+## [unreleased]
+
+## Changed
+
+- split PIM router settings
+
 ## [3.1.0] - 2017-07-12
 
 ## Added

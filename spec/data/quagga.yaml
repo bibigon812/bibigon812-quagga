@@ -15,7 +15,6 @@ quagga::global_opts:
   ip_forwarding: true
   ipv6_forwarding: true
 
-
 quagga::interfaces:
   eth0:
     ip_address:
@@ -37,7 +36,6 @@ quagga::prefix_lists:
       10:
         action: permit
         prefix: 172.16.255.0/24
-
 
 quagga::route_maps:
   BGP_FROM_OSPF:

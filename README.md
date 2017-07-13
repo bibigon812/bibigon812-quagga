@@ -6,6 +6,14 @@ This module provides management of network protocols without restarting
 services. All resources make changes to the configuration of services using
 commands, as if you are doing this through the CLI.
 
+## Notice
+
+If you are using SELinux don't forget this:
+
+```
+setsebool zebra_write_config on
+```
+
 ## Quick start
 
 Include with default parameters:
@@ -36,6 +44,11 @@ quagga::packages:
 These settings are used by default:
 
 ```yaml
+quagga::global_opts: {}
+quagga::interfaces: {}
+quagga::prefix_lists: {}
+quagga::route_maps: {}
+
 quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
 quagga::bgp::config_file_manage: true
 quagga::bgp::service_name: bgpd
@@ -43,6 +56,11 @@ quagga::bgp::service_enable: true
 quagga::bgp::service_manage: true
 quagga::bgp::service_ensure: running
 quagga::bgp::service_opts: -P 0
+quagga::bgp::router: {}
+quagga::bgp::peers: {}
+quagga::bgp::as_paths: {}
+quagga::bgp::community_lists: {}
+quagga::bgp::address_families: {}
 
 quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
 quagga::ospf::config_file_manage: true
@@ -51,6 +69,10 @@ quagga::ospf::service_enable: true
 quagga::ospf::service_manage: true
 quagga::ospf::service_ensure: running
 quagga::ospf::service_opts: -P 0
+quagga::ospf::interfaces: {}
+quagga::ospf::router:
+  router_id: "%{::facts.networking.ip}"
+quagga::ospf::areas: {}
 
 quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
 quagga::zebra::config_file_manage: true
@@ -67,6 +89,8 @@ quagga::pim::service_enable: true
 quagga::pim::service_manage: true
 quagga::pim::service_ensure: running
 quagga::pim::service_opts: -P 0
+quagga::pim::router: {}
+quagga::pim::interfaces: {}
 ```
 
 ## Configure Services
@@ -208,6 +232,13 @@ quagga::ospf::areas:
       - 172.16.1.0/24
       - 192.168.1.0/24
     stub: true
+```
+
+### PIM
+
+```yaml
+quagga::pim::router:
+  ip_multicast_routing: true
 ```
 
 ### As-path Lists
@@ -550,7 +581,7 @@ quagga_ospf_interface { 'eth0':
 
 ```puppet
 quagga_pim_router { 'pim':
-    ip_multicast_routing        => true
+    ip_multicast_routing => true
 }
 ```
 
