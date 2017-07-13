@@ -1,3 +1,13 @@
+## [3.2.2] - 2017-07-13
+
+### Fixed
+
+- getting an AS number in resources `quagga_bgp_peer` and `quagga_bgp_peer_address_family`
+- getting a BGP router-id in the resource `quagga_bgp_router`
+
+### Removed
+
+- retrieving the `activate` value in the provider of the resource `quagga_bgp_peer_address_family`
 
 ## [3.2.1] - 2017-07-13
 

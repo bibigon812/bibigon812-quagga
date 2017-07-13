@@ -8,11 +8,13 @@ commands, as if you are doing this through the CLI.
 
 ## Notice
 
-If you are using SELinux don't forget this:
+- If you use SELinux set the sebool for Quagga:
 
 ```bash
 setsebool zebra_write_config on
 ```
+
+- Use the default value for the `default_ipv4_unicast` property of the `quagga_bgp_router` resource.
 
 ## Quick start
 
@@ -21,6 +23,7 @@ Include with default parameters:
 ```puppet
 include quagga
 ```
+
 ## Setup Quagga
 
 ### Default Settings
