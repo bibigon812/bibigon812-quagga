@@ -10,7 +10,7 @@ commands, as if you are doing this through the CLI.
 
 If you are using SELinux don't forget this:
 
-```
+```sh
 setsebool zebra_write_config on
 ```
 
@@ -23,9 +23,7 @@ include quagga
 ```
 ## Setup Quagga
 
-### System Settings
-
-These settings are used by default:
+### Default settings
 
 ```yaml
 quagga::default_owner: quagga
@@ -37,13 +35,7 @@ quagga::service_file_manage: true
 quagga::packages:
   quagga:
     ensure: present
-```
 
-### Service Settings
-
-These settings are used by default:
-
-```yaml
 quagga::global_opts: {}
 quagga::interfaces: {}
 quagga::prefix_lists: {}
@@ -56,11 +48,11 @@ quagga::bgp::service_enable: true
 quagga::bgp::service_manage: true
 quagga::bgp::service_ensure: running
 quagga::bgp::service_opts: -P 0
-quagga::bgp::router: {}
-quagga::bgp::peers: {}
+quagga::bgp::address_families: {}
 quagga::bgp::as_paths: {}
 quagga::bgp::community_lists: {}
-quagga::bgp::address_families: {}
+quagga::bgp::peers: {}
+quagga::bgp::router: {}
 
 quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
 quagga::ospf::config_file_manage: true
@@ -69,18 +61,10 @@ quagga::ospf::service_enable: true
 quagga::ospf::service_manage: true
 quagga::ospf::service_ensure: running
 quagga::ospf::service_opts: -P 0
+quagga::ospf::areas: {}
 quagga::ospf::interfaces: {}
 quagga::ospf::router:
   router_id: "%{::facts.networking.ip}"
-quagga::ospf::areas: {}
-
-quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
-quagga::zebra::config_file_manage: true
-quagga::zebra::service_name: zebra
-quagga::zebra::service_enable: true
-quagga::zebra::service_manage: true
-quagga::zebra::service_ensure: running
-quagga::zebra::service_opts: -P 0
 
 quagga::pim::config_file: "%{lookup('quagga::config_dir')}/pimd.conf"
 quagga::pim::config_file_manage: true
@@ -89,8 +73,16 @@ quagga::pim::service_enable: true
 quagga::pim::service_manage: true
 quagga::pim::service_ensure: running
 quagga::pim::service_opts: -P 0
-quagga::pim::router: {}
 quagga::pim::interfaces: {}
+quagga::pim::router: {}
+
+quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
+quagga::zebra::config_file_manage: true
+quagga::zebra::service_name: zebra
+quagga::zebra::service_enable: true
+quagga::zebra::service_manage: true
+quagga::zebra::service_ensure: running
+quagga::zebra::service_opts: -P 0
 ```
 
 ## Configure Services
