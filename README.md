@@ -353,7 +353,7 @@ quagga::route_maps:
 - `service_manage`: enable management of the PIM service.
 - `service_ensure`: the state of the PIM Service.
 - `service_opts`: service start options.
-- `router`: PIM router options. See the type `quagga_ospf_pim`.
+- `router`: PIM router options. See the type `quagga_pim_router`.
 - `interfaces`: OSPF parameters of interfaces. See the type `quagga_pim_interface`.
 
 #### quagga::zebra
