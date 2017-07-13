@@ -173,7 +173,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
     # Exit if nothing to do
     return if @property_flush.empty?
 
-    name, sequence = @property_hash[:name].split(/:/)
+    name, sequence = @property_hash[:name].split(/\s/)
     action = @property_hash[:action]
 
     debug 'Flushing the route-map %{name}' % { :name => @property_hash[:name] }
