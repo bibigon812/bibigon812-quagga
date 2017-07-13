@@ -61,8 +61,6 @@ Puppet::Type.type(:quagga_pim_router).provide :quagga do
       end
     end
 
-    hash[:name] = hash[:hostname]
-
     [new(hash)]
   end
 
