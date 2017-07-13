@@ -33,7 +33,7 @@ describe Puppet::Type.type(:quagga_global) do
     end
 
     [:password, :enable_password, :line_vty, :service_password_encryption,
-    :ip_forwarding, :ipv6_forwarding, :ip_multicast_routing].each do |property|
+    :ip_forwarding, :ipv6_forwarding].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -50,8 +50,7 @@ describe Puppet::Type.type(:quagga_global) do
     end
   end
 
-  [:line_vty, :service_password_encryption, :ip_forwarding, :ipv6_forwarding, :ip_multicast_routing,
-  ].each do |property|
+  [:line_vty, :service_password_encryption, :ip_forwarding, :ipv6_forwarding].each do |property|
     describe "boolean values of the property `#{property}`" do
       it 'should support \'true\' as a value' do
         expect { described_class.new(:name => 'hostname.example.com', property => 'true') }.to_not raise_error
