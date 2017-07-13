@@ -76,7 +76,6 @@ quagga::pim::service_opts: -P 0
 ```yaml
 quagga::global_opts:
   ip_forwarding: true
-  ip_multicast_routing: true
   ipv6_forwarding: true
 ```
 
@@ -323,6 +322,7 @@ quagga::route_maps:
 - `service_manage`: enable management of the PIM service.
 - `service_ensure`: the state of the PIM Service.
 - `service_opts`: service start options.
+- `router`: PIM router options. See the type `quagga_ospf_pim`.
 - `interfaces`: OSPF parameters of interfaces. See the type `quagga_pim_interface`.
 
 #### quagga::zebra
@@ -492,7 +492,6 @@ quagga_global { 'router-1.sandbox.local':
     enable_password             => 'enable_password',
     ip_forwarding               => true,
     ipv6_forwarding             => true,
-    ip_multicast_routing        => true,
     line_vty                    => true,
     service_password_encryption => true,
 }
@@ -503,7 +502,6 @@ quagga_global { 'router-1.sandbox.local':
 - `password`: set password for vty interface. If there is no password, a vty won’t accept connections.
 - `enable_password`: set enable password.
 - `ip_forwarding`: enable IP forwarding. Default value: `false`.
-- `ip_multicast_routing`: enable IP multicast forwarding. Default value: `false`.
 - `ipv6_forwarding`: enable IPv6 forwarding. Default value: `false`.
 - `line_vty`: enter vty configuration mode. Default value: `true`.
 - `service_password_encryption`: encrypt passwords. Default value: `false`.
@@ -547,6 +545,17 @@ quagga_ospf_interface { 'eth0':
 - `priority`: router priority. Default value: `1`.
 - `retransmit_interval`: time between retransmitting lost link state advertisements. Default value: `5`.
 - `transmit_delay`: link state transmit delay. Default value: `1`.
+
+#### quagga_pim_router
+
+```puppet
+quagga_pim_router { 'pim':
+    ip_multicast_routing        => true
+}
+```
+
+- `name`: the name must be `pim`.
+- `ip_multicast_routing`: enable IP multicast forwarding. Default value: `false`.
 
 #### quagga_pim_interface
 
