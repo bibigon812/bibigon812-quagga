@@ -1,4 +1,10 @@
 
+## [3.2.1] - 2017-07-13
+
+### Fixed
+
+- changing the resource `quagga_route_map`
+
 ## [3.2.0] - 2017-07-13
 
 ## Added
