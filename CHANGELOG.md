@@ -1,9 +1,17 @@
 
-## [unreleased]
+## [3.2.0] - 2017-07-13
+
+## Added
+
+- the new resource type `quagga_pim_router`
 
 ## Changed
 
 - split PIM router settings
+
+## Removed
+
+- the property `ip_multicast_routing` from the resource `quagga_global`
 
 ## [3.1.0] - 2017-07-12
 

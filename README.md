@@ -10,7 +10,7 @@ commands, as if you are doing this through the CLI.
 
 If you are using SELinux don't forget this:
 
-```sh
+```bash
 setsebool zebra_write_config on
 ```
 
