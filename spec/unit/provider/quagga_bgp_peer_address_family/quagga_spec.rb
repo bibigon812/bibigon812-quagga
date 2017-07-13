@@ -221,7 +221,7 @@ end'
 
     it 'should return the \'172.16.32.108 ipv4_unicast\' resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-        :activate               => :true,
+        :activate               => :false,
         :allow_as_in            => :absent,
         :default_originate      => :true,
         :ensure                 => :present,
@@ -296,7 +296,7 @@ end'
 
     it 'should return the \'RR ipv4_unicast\' resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :activate               => :true,
+        :activate               => :false,
         :allow_as_in            => :absent,
         :default_originate      => :false,
         :ensure                 => :present,
@@ -317,7 +317,7 @@ end'
 
     it 'should return the \'RR_WEAK ipv4_unicast\' resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :activate               => :true,
+        :activate               => :false,
         :allow_as_in            => :absent,
         :default_originate      => :false,
         :ensure                 => :present,

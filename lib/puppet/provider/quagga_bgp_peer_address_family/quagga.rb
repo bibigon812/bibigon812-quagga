@@ -112,15 +112,11 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
         as_number = $1
         found_router = true
 
-      # Found defult_ipv4_unicast
-      elsif found_router and line =~ /\A\sno\sbgp\sdefault\sipv4-unicast\Z/
-        default_ipv4_unicast = :false
-
       # Found the address family
       elsif found_router and line =~ /\A\saddress-family\s(ipv4|ipv6)(?:\s(multicast))?\Z/
         proto = $1
         type = $2
-        address_family = type.nil? ? "#{proto}_unicast".to_sym : "#{proto}_#{type}".to_sym
+        address_family = type.nil? ? "#{proto}_unicast" : "#{proto}_#{type}"
 
       # Exit
       elsif found_router and line =~ /\A\w/
@@ -139,24 +135,12 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
 
             unless peer == previous_peer
               unless hash.empty?
-                # Adding the value of the property `activate` if it's not found.
-                unless found_activate
-                  if [:true, :false].include?(hash[:peer_group])
-                    hash[:activate] = address_family == :ipv4_unicast ? default_ipv4_unicast : :false
-                  else
-                    hash[:activate] = peer_group_af_activate[hash[:peer_group]]
-                  end
-                end
-
-                # Saving the value of the property `activate` if the resource is a peer group.
-                peer_group_af_activate[previous_peer] = hash[:activate] if hash[:peer_group] == :true
-
                 debug 'Instantiated the bgp peer address family %{name}.' % { :name => hash[:name] }
-
                 providers << new(hash)
               end
 
               hash = {
+                :activate => :false,
                 :ensure => :present,
                 :name => "#{peer} #{address_family}",
                 :provider => self.name,
@@ -201,17 +185,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     end
 
     unless hash.empty?
-      # Adding the value of the property `activate` if it's not found.
-      unless found_activate
-        if [:true, :false].include?(hash[:peer_group])
-          hash[:activate] = address_family == :ipv4_unicast ? default_ipv4_unicast : :false
-        else
-          hash[:activate] = peer_group_af_activate[hash[:peer_group]]
-        end
-      end
-
       debug 'Instantiated the bgp peer address family %{name}.' % { :name => hash[:name] }
-
       providers << new(hash)
     end
 

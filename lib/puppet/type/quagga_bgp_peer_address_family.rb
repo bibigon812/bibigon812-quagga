@@ -51,7 +51,6 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'Enable the Address Family for this Neighbor.'
 
     defaultto :false
-
     newvalues(:false, :true)
   end
 
