@@ -137,6 +137,10 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family) do
       it "should contain \"#{property.to_s.upcase}\"" do
         expect(described_class.new(:name => '2001:db8::1 ipv6_unicast', :peer_group => :false, property => property.to_s.upcase)[property]).to eq(property.to_s.upcase)
       end
+
+      it "should contain \"#{property.to_s.upcase}\"" do
+        expect(described_class.new(:name => 'INTERNAL ipv4_unicast', property => property.to_s.upcase)[property]).to eq(property.to_s.upcase)
+      end
     end
   end
 

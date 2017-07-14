@@ -73,7 +73,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
     validate do |value|
       super(value)
-      unless [:true, :false].include?(resource[:peer_group])
+      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
         fail 'Invalid command for a peer-group member.' if value == :true
       end
     end
@@ -100,7 +100,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
     validate do |value|
       super(value)
-      unless [:true, :false].include?(resource[:peer_group])
+      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
         fail 'Invalid command for a peer-group member.' unless value == :absent
       end
     end
@@ -121,7 +121,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
     validate do |value|
       super(value)
-      unless [:true, :false].include?(resource[:peer_group])
+      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
         fail 'Invalid command for a peer-group member.' unless value == :absent
       end
     end
@@ -142,7 +142,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
     validate do |value|
       super(value)
-      unless [:true, :false].include?(resource[:peer_group])
+      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
         fail 'Invalid command for a peer-group member.' unless value == :absent
       end
     end
@@ -155,7 +155,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
     validate do |value|
       super(value)
-      unless [:true, :false].include?(resource[:peer_group])
+      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
         fail 'Invalid command for a peer-group member.' if value == :true
       end
     end
@@ -168,7 +168,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
     validate do |value|
       super(value)
-      unless [:true, :false].include?(resource[:peer_group])
+      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
         fail 'Invalid command for a peer-group member.' if value == :true
       end
     end
@@ -233,7 +233,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   # end
   #
   # autosubscribe(:quagga_route_map) do
-  #   as = self[:name].split(/\s/).first
+  #   peer = self[:name].split(/\s/).first
   #   peer_route_maps = {}
   #   peer_group_route_maps = {}
   #   reqs = []
