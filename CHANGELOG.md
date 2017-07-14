@@ -1,3 +1,9 @@
+## [3.2.3] - 2017-07-14
+
+### Fixed
+
+- property validations of the `quagga_bgp_peer_address_family` resource type.
+
 ## [3.2.2] - 2017-07-13
 
 ### Fixed
