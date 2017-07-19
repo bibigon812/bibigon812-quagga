@@ -25,6 +25,8 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
         }
   }
 
+  feature :refreshable, 'The provider can clean a bgp session.', :methods => [:clear]
+
   ensurable
 
   newparam(:name, :namevar => true) do
@@ -198,70 +200,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     %w{zebra bgpd}
   end
 
-# TODO:
-  # autosubscribe(:quagga_prefix_list) do
-  #   as = self[:name].split(/\s/).first
-  #   peer_prefix_lists = {}
-  #   peer_group_prefix_lists = {}
-  #   reqs = []
-  #
-  #   unless self[:peer_group] == :true
-  #     # Collect peer's prefix-lists unless it's a peer-group
-  #     [:prefix_list_in, :prefix_list_out].each do |property|
-  #       peer_prefix_lists[property] = self[property] unless self[property].nil?
-  #     end
-  #
-  #     unless self[:peer_group] == :false
-  #       # Collect peer-group's prefix-lists if peer has parent peer-group
-  #       peer_group = self[:peer_group]
-  #
-  #       catalog.resources.select { |resource| resource.type == :quagga_bgp_peer }
-  #           .select { |resource| resource[:name] == "#{as} #{peer_group}" }.each do |resource|
-  #         [:prefix_list_in, :prefix_list_out].each do |property|
-  #           peer_group_prefix_lists[property] = resource[property] unless resource[property].nil?
-  #         end
-  #       end
-  #     end
-  #   end
-  #
-  #   prefix_lists = catalog.resources.select { |resource| resource.type == :quagga_prefix_list }
-  #   peer_group_prefix_lists.merge(peer_prefix_lists).values.uniq.each do |name|
-  #     reqs += prefix_lists.select { |resource| resource[:name].start_with? "#{name}:" }
-  #   end
-  #
-  #   reqs
-  # end
-  #
-  # autosubscribe(:quagga_route_map) do
-  #   peer = self[:name].split(/\s/).first
-  #   peer_route_maps = {}
-  #   peer_group_route_maps = {}
-  #   reqs = []
-  #
-  #   unless self[:peer_group] == :true
-  #     # Collect peer's route-maps unless it's a peer-group
-  #     [:route_map_export, :route_map_import, :route_map_in, :route_map_out].each do |property|
-  #       peer_route_maps[property] = self[property] unless self[property].nil?
-  #     end
-  #
-  #     unless self[:peer_group] == :false
-  #       # Collect peer-group's route-maps if peer has parent peer-group
-  #       peer_group = self[:peer_group]
-  #
-  #       catalog.resources.select { |resource| resource.type == :quagga_bgp_peer }
-  #           .select { |resource| resource[:name] == "#{as} #{peer_group}" }.each do |resource|
-  #         [:route_map_export, :route_map_import, :route_map_in, :route_map_out].each do |property|
-  #           peer_group_route_maps[property] = resource[property] unless resource[property] == :absent
-  #         end
-  #       end
-  #     end
-  #   end
-  #
-  #   route_maps = catalog.resources.select { |resource| resource.type == :quagga_route_map }
-  #   peer_group_route_maps.merge(peer_route_maps).values.uniq.each do |name|
-  #     reqs += route_maps.select { |resource| resource[:name].start_with? "#{name}:" }
-  #   end
-  #
-  #   reqs
-  # end
+  def refresh
+    provider.clear
+  end
 end
