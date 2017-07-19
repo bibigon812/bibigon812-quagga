@@ -1,8 +1,6 @@
 Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   @doc = 'Manages the address family of bgp peers using quagga.'
 
-  confine :osfamily => :redhat
-
   commands :vtysh => 'vtysh'
 
   @resource_map = {
@@ -199,6 +197,25 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
         resources[name].provider = provider
       end
     end
+  end
+
+  def clear
+    peer_name, address_family = @property_hash[:name]
+
+    debug 'Clearing the address family %{address_family_name} of the bgp peer %{peer_name}' % {
+      :address_family_name => address_family,
+      :peer_name => peer_name,
+    }
+
+    cmds = []
+
+    if @property_hash[:peer_group] == :true
+      cmds << 'clear bgp peer-group %{name} soft' % { :name => peer_name }
+    else
+      cmds << 'clear bgp %{name} soft' % { :name => peer_name }
+    end
+
+    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
   end
 
   def create
