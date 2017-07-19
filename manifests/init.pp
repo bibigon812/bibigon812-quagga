@@ -56,13 +56,9 @@ class quagga (
     purge => true,
   }
 
-  $prefix_lists.reduce({}) |Hash $pls, Tuple[String, Hash] $pl| {
-    merge($pls, $pl[1]['rules'].reduce({}) |Hash $pl_seqs, Tuple[Integer, Hash] $pl_seq| {
-      merge($pl_seqs, { "${pl[0]} ${$pl_seq[0]}" => $pl_seq[1] })
-    })
-  }.each |String $prefix_list_name, Hash $prefix_list| {
-    quagga_prefix_list {$prefix_list_name:
-      * => $prefix_list
+  $prefix_lists.each |String $prefix_list_name, Hash $prefix_list| {
+    quagga::prefix_list {$prefix_list_name:
+      * => $prefix_list,
     }
   }
 
@@ -70,13 +66,9 @@ class quagga (
     purge => true,
   }
 
-  $route_maps.reduce({}) |Hash $rms, Tuple[String, Hash] $rm| {
-    merge($rms, $rm[1]['rules'].reduce({}) |Hash $rm_seqs, Tuple[Integer, Hash] $rm_seq| {
-      merge($rm_seqs, { "${rm[0]} ${rm_seq[0]}" => $rm_seq[1] })
-    })
-  }.each |String $route_map_name, Hash $route_map| {
-    quagga_route_map {$route_map_name:
-      * => $route_map
+  $route_maps.each |String $route_map_name, $route_map| {
+    quagga::route_map {$route_map_name:
+      * => $route_map,
     }
   }
 }
