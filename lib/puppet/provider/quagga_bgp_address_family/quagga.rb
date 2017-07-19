@@ -1,8 +1,6 @@
 Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   @doc = 'Manages bgp address family using quagga.'
 
-  confine :osfamily => :redhat
-
   commands :vtysh => 'vtysh'
 
   @resource_map = {
