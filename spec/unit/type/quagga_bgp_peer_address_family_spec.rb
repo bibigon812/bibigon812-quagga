@@ -13,6 +13,10 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family) do
     end
   end
 
+  let(:route_map_10) { Puppet::Type.type(:quagga_route_map).new(:name => 'ROUTE_MAP 10') }
+  let(:route_map_20) { Puppet::Type.type(:quagga_route_map).new(:name => 'ROUTE_MAP 20') }
+  let(:catalog) { Puppet::Resource::Catalog.new }
+
   before :each do
     Puppet::Type.type(:quagga_bgp_peer_address_family).stubs(:defaultprovider).returns providerclass
   end
@@ -169,13 +173,13 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family) do
       expect { described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => false) }.to_not raise_error
     end
 
-    # it 'should support peer_group as a value' do
-    #   expect { described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => 'peer_group') }.to_not raise_error
-    # end
-    #
-    # it 'should support peer_group_1 as a value' do
-    #   expect { described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => :peer_group_1) }.to_not raise_error
-    # end
+    it 'should support peer_group as a value' do
+      expect { described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => 'peer_group') }.to_not raise_error
+    end
+
+    it 'should support peer_group_1 as a value' do
+      expect { described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => :peer_group_1) }.to_not raise_error
+    end
 
     it 'should not support 9-allow as a value' do
       expect { described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => '9-allow') }.to raise_error(Puppet::Error, /Invalid value/)
@@ -197,12 +201,28 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family) do
       expect(described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => false)[:peer_group]).to eq(:false)
     end
 
-    # it 'should contain peer_group' do
-    #   expect(described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => 'peer_group')[:peer_group]).to eq('peer_group')
-    # end
-    #
-    # it 'should contain peer_group_1' do
-    #   expect(described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => 'peer_group_1')[:peer_group]).to eq('peer_group_1')
-    # end
+    it 'should contain peer_group' do
+      expect(described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => 'peer_group')[:peer_group]).to eq('peer_group')
+    end
+
+    it 'should contain peer_group_1' do
+      expect(described_class.new(:name => '2001:db8:: ipv6_unicast', :peer_group => 'peer_group_1')[:peer_group]).to eq('peer_group_1')
+    end
+  end
+
+  describe 'when autosubscribe' do
+    it 'should subscribe on route_map ROUTE_MAP' do
+      peer_address_family = described_class.new(:name => 'INTERNAL ipv4_unicast', :route_map_in => 'ROUTE_MAP')
+      catalog.add_resource route_map_10
+      catalog.add_resource route_map_20
+      catalog.add_resource peer_address_family
+      reqs = peer_address_family.autosubscribe
+
+      expect(reqs.size).to eq(2)
+      expect(reqs[0].source).to eq(route_map_10)
+      expect(reqs[0].target).to eq(peer_address_family)
+      expect(reqs[1].source).to eq(route_map_20)
+      expect(reqs[1].target).to eq(peer_address_family)
+    end
   end
 end

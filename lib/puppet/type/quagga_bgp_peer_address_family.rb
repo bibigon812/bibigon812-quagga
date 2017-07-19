@@ -200,16 +200,17 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     %w{zebra bgpd}
   end
 
-  autosubscribe(:quagga_route_map) do
+  autosubscribe(:quagga_prefix_list) do
     reqs = []
 
     [:prefix_list_in, :prefix_list_out].each do |prefix_list|
       next if self[prefix_list] == :absent
       reqs << catalog.resources.select { |resource| resource.type == :quagga_prefix_list }
         .select { |resource| resource[:name].start_with? "#{self[prefix_list]} " }
+        .map { |resource| resource[:name] }
     end
 
-    reqs
+    reqs.fletten
   end
 
   autosubscribe(:quagga_route_map) do
@@ -219,9 +220,10 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
       next if self[route_map] == :absent
       reqs << catalog.resources.select { |resource| resource.type == :quagga_route_map }
         .select { |resource| resource[:name].start_with? "#{self[route_map]} " }
+        .map { |resource| resource[:name] }
     end
 
-    reqs
+    reqs.flatten
   end
 
   def refresh
