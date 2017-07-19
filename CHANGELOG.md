@@ -1,8 +1,12 @@
-## [unreleased]
+## [3.3.0] - 2017-07-19
 
 ### Added
 
 - autosubscribe methods in the quagga_bgp_peer_address_family resource type
+
+### Updated
+
+- docs
 
 ## [3.2.3] - 2017-07-14
 
