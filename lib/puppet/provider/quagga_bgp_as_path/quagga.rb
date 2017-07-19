@@ -3,9 +3,6 @@ Puppet::Type.type(:quagga_bgp_as_path).provide :quagga do
     Manages as-path access-list using quagga.
   }
 
-  confine :operatingsystem => :centos
-  defaultfor :operatingsystem => :centos
-
   commands :vtysh => 'vtysh'
 
   def self.instances
