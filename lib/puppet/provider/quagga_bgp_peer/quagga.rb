@@ -277,17 +277,6 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     @property_flush.clear
   end
 
-  def clear
-    name = @property_hash[:name]
-    debug 'Clearing the bgp peer %{name}' % { :name => name }
-
-    cmds = []
-    proto = name.include?('.') ? 'ip' : 'ipv6'
-    cmds << 'clear %{proto} bgp %{name} soft' % { :proto => proto, :name => name }
-
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-  end
-
   @resource_map.each_key do |property|
     define_method "#{property}" do
       @property_hash[property] || :absent
