@@ -23,23 +23,9 @@ define quagga::bgp::peer (
   }
 
   $address_families.each |String $address_family_name, Hash $address_family| {
-    $route_maps = [
-      $address_family['route_map_export'],
-      $address_family['route_map_import'],
-      $address_family['route_map_in'],
-      $address_family['route_map_out'],
-    ]
-    $prefix_lists = [
-      $address_family['prefix_list_in'],
-      $address_family['prefix_list_out'],
-    ]
     quagga_bgp_peer_address_family {"${name} ${address_family_name}":
-      *         => $address_family,
-      require   => Quagga_bgp_peer[$name],
-      subscribe => [
-        Quagga::Prefix_list[$prefix_lists],
-        Quagga::Route_map[$route_maps],
-      ],
+      *       => $address_family,
+      require => Quagga_bgp_peer[$name],
     }
   }
 }
