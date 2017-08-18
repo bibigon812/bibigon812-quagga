@@ -43,6 +43,12 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
         :template => 'default-information originate<% unless value.nil? %> <%= value %><% end %>',
         :type => :string,
         :default => :false,
+    },
+    :passive_interfaces => {
+      :regexp => /\A\spassive-interface\s(.+)\Z/,
+      :template => 'passive-interface <%= value %>',
+      :type => :array,
+      :default => [],
     }
   }
 

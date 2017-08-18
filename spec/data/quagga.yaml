@@ -185,6 +185,9 @@ quagga::ospf::router:
   abr_type: cisco
   log_adjacency_changes: true
   opaque: false
+  passive_interfaces:
+    - eth0
+    - eth1 1.1.1.1
   redistribute:
     - connected route-map CONNECTED
   rfc1583: false
