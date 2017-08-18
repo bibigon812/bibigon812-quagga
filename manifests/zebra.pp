@@ -9,4 +9,5 @@ class quagga::zebra (
 ) {
   include quagga::zebra::config
   include quagga::zebra::service
+  include quagga::zebra::static_route
 }
