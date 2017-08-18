@@ -17,7 +17,7 @@ Puppet::Type.newtype(:quagga_static_route) do
   newparam(:name, :namevar => true) do
     desc 'The name of the destination address.'
 
-    newvalues(/\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,3}\Z/)
+    newvalues(/\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(\/\d{1,3}|\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\Z/)
   end
 
   newproperty(:gateway) do
@@ -33,10 +33,11 @@ Puppet::Type.newtype(:quagga_static_route) do
 
     defaultto(:absent)
     newvalues(:absent)
+    newvalues('null0')
     newvalues(/\A\w+\Z/)
 
     validate do |value|
-      unless value == :absent
+      unless value == :absent or value == 'null0'
         fail "Not a valid interface '#{value}'" unless %x[ip addr | awk ' /^[1-9]/ {$IF = substr($2, 0, length($2)-1); print $IF}'].include?(value)
       end
     end
