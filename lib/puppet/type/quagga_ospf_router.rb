@@ -82,6 +82,28 @@ Puppet::Type.newtype(:quagga_ospf_router) do
     end
   end
 
+  newproperty(:passive_interface, :array_matching => :all) do
+    desc 'OSPF passive interface'
+
+    defaultto([])
+
+    def insync?(is)
+      @should.each do |value|
+        return false unless is.include?(value)
+      end
+
+      is.each do |value|
+        return false unless @should.include?(value)
+      end
+
+      true
+    end
+
+    def should_to_s(value)
+      value.inspect
+    end
+  end
+
   newproperty(:rfc1583, :boolean => true) do
     desc 'Enable the RFC1583Compatibility flag.'
 
