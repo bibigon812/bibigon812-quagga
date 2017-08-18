@@ -107,6 +107,29 @@ Puppet::Type.newtype(:quagga_ospf_router) do
     newvalues(:true, :false, :detail)
   end
 
+  newproperty(:passive_interfaces, :array_matching => :all) do
+    desc 'Suppress routing updates on interfaces.'
+
+    defaultto([])
+    newvalues(/\A(default|[[:alpha:]]+\w+(?:\s\d+\.\d+\.\d+\.\d+)?)\Z/)
+
+    def insync?(is)
+      @should.each do |value|
+        return false unless is.include?(value)
+      end
+
+      is.each do |value|
+        return false unless @should.include?(value)
+      end
+
+      true
+    end
+
+    def should_to_s(value)
+      value.inspect
+    end
+  end
+
   autorequire(:package) do
     %w{quagga}
   end
