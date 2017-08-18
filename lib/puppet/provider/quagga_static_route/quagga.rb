@@ -2,10 +2,10 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
   @doc = %q{ Manages static routes using zebra }
 
   @resource_properties = [
-      :gateway, :interface, :distance,
+      :gateway, :interface, :option, :distance,
   ]
 
-  @resource_template = 'ip route <%= name %> <% if not gateway.nil? %><%= gateway %><% elsif not interface.nil? %><%= interface %><% end %><% unless distance.nil? %> <%= distance %><% end %>'
+  @resource_template = 'ip route <%= name %> <% if not gateway.nil? %><%= gateway %><% elsif not interface.nil? %><%= interface %><% end %><% unless option.nil? %> <%= option %><% end %><% unless distance.nil? %> <%= distance %><% end %>'
 
   commands :vtysh => 'vtysh'
 
@@ -18,24 +18,40 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
     config = vtysh('-c', 'show running-config')
     config.split(/\n/).collect do |line|
 
-      if line =~ /\Aip\sroute\s(\d+{1,3}\.\d+{1,3}\.\d+{1,3}\.\d{1,3}\/\d{1,2})\s(\d+{1,3}\.\d+{1,3}\.\d+{1,3}\.\d{1,3}|\w+)\s?(\d{1,3})?\Z/
+      if line =~ /\Aip\sroute\s(\d+{1,3}\.\d+{1,3}\.\d+{1,3}\.\d{1,3}(\/\d{1,2}|\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))\s(.*)\Z/
 
         name = $1
-        if $2 =~ /\d+{1,3}\.\d+{1,3}\.\d+{1,3}\.\d{1,3}/
-          gateway_address = $2
-          interface_name  = :absent
-        else
-          gateway_address = :absent
-          interface_name  = $2
-        end
+        gateway_address = :absent
+        interface_name  = :absent
+        option          = :absent
+        distance        = :absent
 
-        distance = $3.nil? ? :absent : Integer($3)
+        case $2
+        when /\A(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s(reject|blackhole)\s?(\d{1,3})?\Z/
+          gateway_address = $1
+          option          = $2
+          distance        = $3.nil? ? :absent : Integer($3)
+        when /\A(\w+)\s(reject|blackhole)\s?(\d{1,3})?\Z/
+          interface_name = $1
+          option         = $2
+          distance       = $3.nil? ? :absent : Integer($3)
+        when /\A(reject|blackhole)\s?(\d{1,3})?\Z/
+          option         = $1
+          distance       = $2.nil? ? :absent : Integer($2)
+        when /\A(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s?(\d{1,3})?\Z/
+          gateway_address = $1
+          distance        = $2.nil? ? :absent : Integer($2)
+        when /\A(\w+)\s?(\d{1,3})?\Z/
+          interface_name = $1
+          distance       = $2.nil? ? :absent : Integer($2)
+        end
 
         hash = {
             :name      => name,
             :ensure    => :present,
             :gateway   => gateway_address,
             :interface => interface_name,
+            :option    => option,
             :distance  => distance,
         }
 
@@ -71,6 +87,7 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
 
     gateway = @resource[:gateway] unless @resource[:gateway] == :absent
     interface = @resource[:interface] unless @resource[:interface] == :absent
+    option = @resource[:option] unless @resource[:option] == :absent
     distance = @resource[:distance] unless @resource[:distance] == :absent
 
     cmds << ERB.new(template).result(binding)
@@ -93,6 +110,7 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
 
     gateway = @property_hash[:gateway] unless @property_hash[:gateway] == :absent
     interface = @property_hash[:interface] unless @property_hash[:interface] == :absent
+    option = @property_hash[:option] unless @property_hash[:option] == :absent
     distance = @property_hash[:distance] unless @property_hash[:distance] == :absent
 
     cmds << 'no %{command}' % { :command => ERB.new(template).result(binding) }

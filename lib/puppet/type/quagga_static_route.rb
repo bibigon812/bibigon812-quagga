@@ -33,11 +33,10 @@ Puppet::Type.newtype(:quagga_static_route) do
 
     defaultto(:absent)
     newvalues(:absent)
-    newvalues('null0')
     newvalues(/\A\w+\Z/)
 
     validate do |value|
-      unless value == :absent or value == 'null0'
+      unless value == :absent || value == 'null0'
         fail "Not a valid interface '#{value}'" unless %x[ip addr | awk ' /^[1-9]/ {$IF = substr($2, 0, length($2)-1); print $IF}'].include?(value)
       end
     end
@@ -56,6 +55,14 @@ Puppet::Type.newtype(:quagga_static_route) do
     end
   end
 
+  newproperty(:option) do
+    desc 'Set reject or blackhole for route'
+  
+    defaultto(:absent)
+    newvalues(:absent)
+    newvalues('reject')
+    newvalues('blackhole')
+  end
 
   autorequire(:package) do
     %w{quagga}
