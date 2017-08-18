@@ -14,6 +14,14 @@ commands, as if you are doing this through the CLI.
 setsebool zebra_write_config on
 ```
 
+- If you have over 500k routes on CentOS set `UseDNS no` in `/etc/ssh/sshd_config`
+- If you have the FullView on CentOS turn off `NetworkManager`.
+
+```bash
+systemctl stop NetworkManager
+systemctl mask NetworkManager
+```
+
 - Use the default value for the `default_ipv4_unicast` property of the `quagga_bgp_router` resource type.
 - The correct way to delete route-map or prefix-list rules is to use the `ensure: absent`.
 

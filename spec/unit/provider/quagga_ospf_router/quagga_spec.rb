@@ -25,6 +25,9 @@ describe Puppet::Type.type(:quagga_ospf_router).provider(:quagga) do
 router ospf
  default-information originate always metric 100 metric-type 1 route-map ABCD
  ospf router-id 10.255.78.4
+ passive-interface eth0
+ passive-interface eth1 1.1.1.1
+ passive-interface default
  redistribute kernel route-map KERNEL
  redistribute connected route-map CONNECTED
  redistribute static route-map STATIC
@@ -48,6 +51,11 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
         :ensure => :present,
         :name => 'ospf',
         :opaque => :false,
+        :passive_interfaces => [
+          'eth0',
+          'eth1 1.1.1.1',
+          'default',
+        ],
         :redistribute => [
             'kernel route-map KERNEL',
             'connected route-map CONNECTED',

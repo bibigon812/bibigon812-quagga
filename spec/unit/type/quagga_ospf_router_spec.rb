@@ -35,7 +35,10 @@ describe Puppet::Type.type(:quagga_ospf_router) do
       end
     end
 
-    [:abr_type, :opaque, :rfc1583, :router_id, :log_adjacency_changes, :redistribute].each do |property|
+    [
+      :abr_type, :opaque, :rfc1583, :router_id, :log_adjacency_changes,
+      :redistribute, :passive_interfaces,
+    ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -235,6 +238,12 @@ describe Puppet::Type.type(:quagga_ospf_router) do
 
     it 'should contain \'false\'' do
       expect(described_class.new(:name => 'ospf')[:default_originate]).to eq(:false)
+    end
+  end
+
+  describe 'passive_interfaces' do
+    it 'should support default as a value' do
+      expect{described_class.new(:name => 'ospf', :passive_interfaces => 'default')}.to_not raise_error
     end
   end
 end
