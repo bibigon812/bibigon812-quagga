@@ -65,6 +65,7 @@ quagga::zebra::service_enable: true
 quagga::zebra::service_manage: true
 quagga::zebra::service_ensure: "running"
 quagga::zebra::service_opts: "-P 0"
+quagga::zebra::routes: {}
 quagga::pim::config_file: "%{lookup('quagga::config_dir')}/pimd.conf"
 quagga::pim::config_file_manage: true
 quagga::pim::service_name: "pimd"
