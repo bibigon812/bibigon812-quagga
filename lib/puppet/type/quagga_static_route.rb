@@ -99,7 +99,7 @@ Puppet::Type.newtype(:quagga_static_route) do
   end
 
   newproperty(:option) do
-    desc 'Set reject or blackhole for route.'
+    desc 'Sets reject or blackhole for this route.'
 
     defaultto :absent
     newvalues(:absent, :blackhole, :reject)
