@@ -46,7 +46,7 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
   def self.prefetch(resources)
     instances.each do |provider|
       if resource = resources[provider.name]
-        debug 'Prefetched the resource %{resource}' % { resource: resource.inspect }
+        debug 'Prefetched the resource %{resource}' % { resource: resource.to_hash.inspect }
         resource.provider = provider
       end
     end
