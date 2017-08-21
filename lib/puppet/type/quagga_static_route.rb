@@ -65,19 +65,24 @@ Puppet::Type.newtype(:quagga_static_route) do
     defaultto 'null0'
 
     validate do |value|
-      if value != 'null0'
+      v = value.downcase
+      if v != 'null0'
         if value.include?('/')
-          fail 'Do not specify the prefix length \'%{value}\'' % { value: value }
+          fail 'Do not specify the prefix length \'%{prefix}\'.' % { prefix: value }
         else
           begin
             IPAddr.new(value)
           rescue
-            unless Facter.value(:interfaces).split(',').include?(value)
-              fail 'The network interface \'%{value}\' was not found'
+            unless Facter.value(:interfaces).split(',').include?(v)
+              fail 'The network interface \'%{name}\' was not found' % { name: v }
             end
           end
         end
       end
+    end
+
+    munge do |value|
+      value.downcase
     end
   end
 
