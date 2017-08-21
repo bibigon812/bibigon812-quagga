@@ -8,6 +8,7 @@
 1. [Zebra Options](#zebra-options)
     * [Forwarding](#forwarding)
     * [Interfaces](#interfaces)
+    * [Routes](#routes)
 1. [BGP](#bgp)
     * [BGP Router](#bgp-router)
     * [BGP Address Families](#bgp-address-families)
@@ -115,7 +116,7 @@ quagga::zebra::routes:
 
 ## BGP
 
-### Router
+### BGP Router
 
 ```yaml
 quagga::bgp::router:
@@ -125,7 +126,7 @@ quagga::bgp::router:
   router_id: 10.0.0.1
 ```
 
-### Address Families
+### BGP Address Families
 
 ```yaml
 quagga::bgp::address_families:
@@ -152,7 +153,7 @@ quagga::bgp::address_families:
       - 2001:db8:0:2::/63
 ```
 
-### Peers
+### BGP Peers
 
 ```yaml
 quagga::bgp::peers:
@@ -193,7 +194,7 @@ quagga::bgp::peers:
 
 ```
 
-### AS-Paths
+### BGP AS-Paths
 
 ```yaml
 quagga::bgp::as_paths:
@@ -202,7 +203,7 @@ quagga::bgp::as_paths:
       - permit _100$
 ```
 
-### Community Lists
+### BGP Community Lists
 
 ```yaml
 quagga::bgp::community_lists:
@@ -219,7 +220,7 @@ quagga::bgp::community_lists:
 
 ## OSPF
 
-### Router
+### OSPF Router
 
 ```yaml
 quagga::ospf::router:
@@ -231,7 +232,7 @@ quagga::ospf::router:
   router_id: 10.0.0.1
 ```
 
-### Areas
+### OSPF Areas
 
 ```yaml
 quagga::ospf::areas:
@@ -246,7 +247,7 @@ quagga::ospf::areas:
     stub: true
 ```
 
-### Interfaces
+### OSPF Interfaces
 
 ```yaml
 quagga::ospf::interfaces:
@@ -259,14 +260,14 @@ quagga::ospf::interfaces:
 
 ## PIM
 
-### Router
+### PIM Router
 
 ```yaml
 quagga::pim::router:
   ip_multicast_routing: true
 ```
 
-### Interfaces
+### PIM Interfaces
 
 ```yaml
 quagga::pim::interfaces:
