@@ -22,15 +22,15 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
         distance = $4.nil? ? :absent : Integer($4)
 
         hash = {
-            :prefix   => prefix,
-            :ensure   => :present,
-            :nexthop  => nexthop,
-            :distance => distance,
-            :option   => option,
-            :provider => self.name,
+            prefix:   prefix,
+            ensure:   :present,
+            nexthop:  nexthop,
+            distance: distance,
+            option:   option,
+            provider: self.name,
         }
 
-        debug 'Instantiated the static route %{hash}' % { hash: hash.inspect }
+        debug 'Instantiated the resource %{hash}' % { hash: hash.inspect }
         providers << new(hash)
 
         found_route = true
@@ -44,10 +44,10 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
   end
 
   def self.prefetch(resources)
-    providers = instances
-    resources.keys.each do |name|
-      if provider = providers.find{ |provider| provider.prefix == resources[name][:prefix] and provider.nexthop == resources[name][:nexthop] }
-        resources[name].provider = provider
+    instances.each do |provider|
+      if resource = resources[provider.name]
+        debug 'Prefetched the resource %{resource}' % { resource: resource.inspect }
+        resource.provider = provider
       end
     end
   end
@@ -56,7 +56,7 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
     template = self.class.instance_variable_get('@template')
     prefix = @resource[:prefix]
 
-    debug 'Creating the route to %{prefix}.' % { :prefix => prefix }
+    debug 'Creating the resource %{resource}.' % { resource: @resource.to_hash.inspect }
 
     cmds = []
     cmds << 'configure terminal'
@@ -78,7 +78,7 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
     template = self.class.instance_variable_get('@template')
     prefix = @property_hash[:prefix]
 
-    debug 'Destroying the route to %{prefix}.' % { :prefix => prefix }
+    debug 'Destroying the resource %{resource}.' % { resource: @property_hash.inspect }
 
     cmds = []
     cmds << 'configure terminal'
@@ -87,7 +87,7 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
     nexthop = @property_hash[:nexthop] unless @property_hash[:nexthop] == :absent
     option = @property_hash[:option] unless @property_hash[:option] == :absent
 
-    cmds << 'no %{command}' % { :command => ERB.new(template).result(binding) }
+    cmds << 'no %{command}' % { command: ERB.new(template).result(binding) }
 
     cmds << 'end'
     cmds << 'write memory'
