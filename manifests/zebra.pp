@@ -11,9 +11,11 @@ class quagga::zebra (
   include quagga::zebra::config
   include quagga::zebra::service
 
-  $routes.each | $destination, $options | {
-    quagga_static_route { $destination:
-      * => $options
+  if $service_enable and $service_ensure == 'running' {
+    $routes.each | $destination, $options | {
+      quagga_static_route { $destination:
+        * => $options
+      }
     }
   }
 }
