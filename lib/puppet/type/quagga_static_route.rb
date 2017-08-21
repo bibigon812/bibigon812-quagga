@@ -35,6 +35,10 @@ Puppet::Type.newtype(:quagga_static_route) do
     ]
   end
 
+  def name
+    "#{self[:prefix]} #{self[:nexthop]}"
+  end
+
   ensurable do
     defaultvalues
     defaultto :present
