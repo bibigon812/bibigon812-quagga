@@ -62,7 +62,7 @@ Puppet::Type.newtype(:quagga_static_route) do
   newparam(:nexthop, namevar: true) do
     desc 'Specifies IP or the interface name of the nexthop router.'
 
-    defaultto 'null0'
+    defaultto 'Null0'
 
     validate do |value|
       if value != 'Null0'
