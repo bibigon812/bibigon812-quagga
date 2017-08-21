@@ -1,6 +1,56 @@
 [![Build Status](https://travis-ci.org/bibigon812/bibigon812-quagga.svg?branch=master)](https://travis-ci.org/bibigon812/bibigon812-quagga)
 
-## Overview
+## Table of Contents
+
+* [Module Description](#module-description)
+* [Notice](#notice)
+* [Quick Start](#quick-start)
+* [Zebra Options](#zebra-options)
+    * [Forwarding](#forwarding)
+    * [Interfaces](#interfaces)
+* [BGP](#bgp)
+    * [Router](#router)
+    * [Address Families](#address-families)
+    * [Peers](#peers)
+    * [AS-Paths](#as-paths)
+    * [Community Lists](#community-lists)
+* [OSPF](#ospf)
+    * [Router](#router)
+    * [Areas](#areas)
+    * [Interfaces](#interfaces)
+* [PIM](#pim)
+    * [Router](#router)
+    * [Interfaces](#interfaces)
+* [Prefix Lists](#prefix-lists)
+* [Route Maps](#route-maps)
+* [Reference](#reference)
+    * [Classes](#classes)
+        * [quagga](#quagga)
+        * [quagga::bgp](#quagga::bgp)
+        * [quagga::ospf](#quagga::ospf)
+        * [quagga::pim](#quagga::pim)
+        * [quagga::zebra](#quagga::zebra)
+    * [Defines](#defines)
+        * [quagga::bgp::peer](#quagga::bgp::peer)
+    * [Types](#types)
+        * [quagga_as_path](#quagga_as_path)
+        * [quagga_bgp_router](#quagga_bgp_router)
+        * [quagga_bgp_address_family](#quagga_bgp_address_family)
+        * [quagga_bgp_peer](#quagga_bgp_peer)
+        * [quagga_bgp_peer_address_family](#quagga_bgp_peer_address_family)
+        * [quagga_community_list](#quagga_community_list)
+        * [quagga_global](#quagga_global)
+        * [quagga_interface](#quagga_interface)
+        * [quagga_ospf_interface](#quagga_ospf_interface)
+        * [quagga_pim_router](#quagga_pim_router)
+        * [quagga_pim_interface](#quagga_pim_interface)
+        * [quagga_ospf_router](#quagga_ospf_router)
+        * [quagga_ospf_area](#quagga_ospf_area)
+        * [quagga_prefix_list](#quagga_prefix_list)
+        * [quagga_route_map](#quagga_route_map)
+        * [quagga_static_route](#quagga_static_route)
+
+## Module Description
 
 This module provides management of network protocols without restarting
 services. All resources make changes to the configuration of services using
@@ -35,7 +85,7 @@ quagga::route_maps:
         match: ip address prefix-list ADVERTISED_PREFIXES
 ```
 
-## Quick start
+## Quick Start
 
 Include with default parameters:
 
@@ -43,73 +93,9 @@ Include with default parameters:
 include quagga
 ```
 
-## Setup Quagga
+## Zebra Options
 
-### Default Settings
-
-```yaml
-quagga::default_owner: quagga
-quagga::default_group: quagga
-quagga::default_mode: '0600'
-quagga::default_content: "hostname %{::facts.networking.fqdn}\n"
-quagga::config_dir: /etc/quagga
-quagga::service_file_manage: true
-quagga::packages:
-  quagga:
-    ensure: present
-
-quagga::global_opts: {}
-quagga::interfaces: {}
-quagga::prefix_lists: {}
-quagga::route_maps: {}
-
-quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
-quagga::bgp::config_file_manage: true
-quagga::bgp::service_name: bgpd
-quagga::bgp::service_enable: true
-quagga::bgp::service_manage: true
-quagga::bgp::service_ensure: running
-quagga::bgp::service_opts: -P 0
-quagga::bgp::address_families: {}
-quagga::bgp::as_paths: {}
-quagga::bgp::community_lists: {}
-quagga::bgp::peers: {}
-quagga::bgp::router: {}
-
-quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
-quagga::ospf::config_file_manage: true
-quagga::ospf::service_name: ospfd
-quagga::ospf::service_enable: true
-quagga::ospf::service_manage: true
-quagga::ospf::service_ensure: running
-quagga::ospf::service_opts: -P 0
-quagga::ospf::areas: {}
-quagga::ospf::interfaces: {}
-quagga::ospf::router:
-  router_id: "%{::facts.networking.ip}"
-
-quagga::pim::config_file: "%{lookup('quagga::config_dir')}/pimd.conf"
-quagga::pim::config_file_manage: true
-quagga::pim::service_name: pimd
-quagga::pim::service_enable: true
-quagga::pim::service_manage: true
-quagga::pim::service_ensure: running
-quagga::pim::service_opts: -P 0
-quagga::pim::interfaces: {}
-quagga::pim::router: {}
-
-quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
-quagga::zebra::config_file_manage: true
-quagga::zebra::service_name: zebra
-quagga::zebra::service_enable: true
-quagga::zebra::service_manage: true
-quagga::zebra::service_ensure: running
-quagga::zebra::service_opts: -P 0
-```
-
-### Configure Services
-
-#### Global Options
+### Forwarding
 
 ```yaml
 quagga::global_opts:
@@ -117,7 +103,7 @@ quagga::global_opts:
   ipv6_forwarding: true
 ```
 
-#### Interfaces
+### Interfaces
 
 ```yaml
 quagga::interfaces:
@@ -130,7 +116,28 @@ quagga::interfaces:
       - 172.16.255.1/32
 ```
 
-#### BGP
+### Routes
+
+The prefix and the nexthop are namevars.
+
+```yaml
+quagga::zebra::routes:
+  192.168.0.0/24:
+    ensure: present
+    nexthop: 10.0.0.100
+    distance: 250
+  192.168.1.0/24 Null0:
+    ensure: present
+    distance: 250
+  192.168.1.0/24 10.0.0.100:
+    ensure: present
+    option: reject
+    distance: 200
+```
+
+## BGP
+
+### Router
 
 ```yaml
 quagga::bgp::router:
@@ -140,7 +147,7 @@ quagga::bgp::router:
   router_id: 10.0.0.1
 ```
 
-#### BGP Address Families
+### Address Families
 
 ```yaml
 quagga::bgp::address_families:
@@ -167,7 +174,7 @@ quagga::bgp::address_families:
       - 2001:db8:0:2::/63
 ```
 
-#### BGP Peers
+### Peers
 
 ```yaml
 quagga::bgp::peers:
@@ -208,62 +215,7 @@ quagga::bgp::peers:
 
 ```
 
-#### OSPF
-
-```yaml
-quagga::ospf::router:
-  log_adjacency_changes: true
-  opaque: false
-  redistribute:
-    - connected route-map CONNECTED
-  rfc1583: false
-  router_id: 10.0.0.1
-```
-
-#### OSPF Areas
-
-```yaml
-quagga::ospf::areas:
-  0.0.0.0:
-    networks:
-      - 172.16.0.0/24
-      - 192.168.0.0/24
-  0.0.0.1:
-    networks:
-      - 172.16.1.0/24
-      - 192.168.1.0/24
-    stub: true
-```
-
-#### OSPF Interfaces
-
-```yaml
-quagga::ospf::interfaces:
-  eth0:
-    dead_interval: 8
-    hello_interval: 2
-    mtu_ignore: true
-    priority: 100
-```
-
-#### PIM
-
-```yaml
-quagga::pim::router:
-  ip_multicast_routing: true
-```
-
-#### PIM Interfaces
-
-```yaml
-quagga::pim::interfaces:
-  eth0:
-    igmp: true
-    multicast: true
-    pim_ssm: true
-```
-
-#### AS-path Lists
+### AS-Paths
 
 ```yaml
 quagga::bgp::as_paths:
@@ -272,7 +224,7 @@ quagga::bgp::as_paths:
       - permit _100$
 ```
 
-#### Community Lists
+### Community Lists
 
 ```yaml
 quagga::bgp::community_lists:
@@ -287,7 +239,66 @@ quagga::bgp::community_lists:
       - permit 65000:202
 ```
 
-#### Prefix Lists
+## OSPF
+
+### Router
+
+```yaml
+quagga::ospf::router:
+  log_adjacency_changes: true
+  opaque: false
+  redistribute:
+    - connected route-map CONNECTED
+  rfc1583: false
+  router_id: 10.0.0.1
+```
+
+### Areas
+
+```yaml
+quagga::ospf::areas:
+  0.0.0.0:
+    networks:
+      - 172.16.0.0/24
+      - 192.168.0.0/24
+  0.0.0.1:
+    networks:
+      - 172.16.1.0/24
+      - 192.168.1.0/24
+    stub: true
+```
+
+### Interfaces
+
+```yaml
+quagga::ospf::interfaces:
+  eth0:
+    dead_interval: 8
+    hello_interval: 2
+    mtu_ignore: true
+    priority: 100
+```
+
+## PIM
+
+### Router
+
+```yaml
+quagga::pim::router:
+  ip_multicast_routing: true
+```
+
+### Interfaces
+
+```yaml
+quagga::pim::interfaces:
+  eth0:
+    igmp: true
+    multicast: true
+    pim_ssm: true
+```
+
+## Prefix Lists
 
 ```yaml
 quagga::prefix_lists:
@@ -304,7 +315,7 @@ quagga::prefix_lists:
         prefix: 172.16.255.0/24
 ```
 
-#### Route Maps
+## Route Maps
 
 ```yaml
 quagga::route_maps:
@@ -387,6 +398,7 @@ quagga::route_maps:
 - `service_manage`: enable management of the Zebra service.
 - `service_ensure`: the state of the Zebra Service.
 - `service_opts`: service start options.
+- `routes`: parameters of the static routes. See the type `quagga_static_route`.
 
 ### Defines
 
@@ -777,3 +789,24 @@ quagga_route_map { 'bgp_out 65000':
 - `match`: match values from routing table. Default value: `[]`.
 - `on_match`: exit policy on matches.
 - `set`: set values in destination routing protocol. Default value: `[]`.
+
+#### quagga_static_route
+
+```puppet
+quagga_static_route { '10.0.0.0/24':
+  ensure   => present,
+  nexthop  => '1.1.1.1',
+  option   => 'reject',
+  distance => 250,
+}
+
+quagga_static_route { '192.168.0.0/24 1.1.1.1':
+  ensure => present,
+  distance => 250,
+}
+```
+
+- `prefix`: namevar. IP destination prefix.
+- `nexthop`: namevar. Specifies IP or the interface name of the nexthop router. Defaults to `Null0`.
+- `distance`: Specifies the distance value for this route. Values are `1-255`.
+- `option`: Sets reject or blackhole for this route. Values are `reject` and `blackhole`.
