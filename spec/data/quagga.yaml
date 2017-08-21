@@ -207,5 +207,5 @@ quagga::zebra::routes:
   192.168.0.0/24:
     nexthop: 10.0.0.1
   10.255.255.0/24:
-    nexthop: null0
+    nexthop: Null0
     distance: 250
