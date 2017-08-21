@@ -5,8 +5,15 @@ class quagga::zebra (
   Boolean $service_enable,
   Boolean $service_manage,
   Enum['running', 'stopped'] $service_ensure,
-  String $service_opts
+  String $service_opts,
+  Hash $routes,
 ) {
   include quagga::zebra::config
   include quagga::zebra::service
+
+  $routes.each | $destination, $options | {
+    quagga_static_route { $destination:
+      * => $options
+    }
+  }
 }
