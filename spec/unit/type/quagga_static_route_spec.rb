@@ -56,8 +56,8 @@ describe Puppet::Type.type(:quagga_static_route) do
   end
 
   describe 'nexthop' do
-    it 'should support null0 as a value' do
-      expect { described_class.new(:title => '192.168.0.0/16', :nexthop => 'null0') }.to_not raise_error
+    it 'should support Null0 as a value' do
+      expect { described_class.new(:title => '192.168.0.0/16', :nexthop => 'Null0') }.to_not raise_error
     end
 
     it 'should support 192.168.1.1 as a value' do
@@ -68,13 +68,13 @@ describe Puppet::Type.type(:quagga_static_route) do
       expect { described_class.new(:title => '192.168.0.0/16', :nexthop => '192.168.1.1') }.to_not raise_error
     end
 
-    it 'should contain null0' do
-      expect(described_class.new(:title => '192.168.0.0/16', :nexthop => 'null0')[:nexthop]).to eq('null0')
+    it 'should contain Null0' do
+      expect(described_class.new(:title => '192.168.0.0/16', :nexthop => 'Null0')[:nexthop]).to eq('Null0')
     end
   end
 
   describe 'distance' do
-    it 'should support null0 as a value' do
+    it 'should support Null0 as a value' do
       expect { described_class.new(:title => '192.168.0.0/16', :distance => 100) }.to_not raise_error
     end
 

@@ -27,7 +27,7 @@ ip multicast-routing
 !
 ip route 10.0.0.0/8 10.1.2.1 blackhole
 ip route 10.0.0.0/8 10.1.1.1
-ip route 10.0.0.0/8 null0 250
+ip route 10.0.0.0/8 Null0 250
 !
 line vty
 !
@@ -64,7 +64,7 @@ end'
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
         distance: 250,
         ensure: :present,
-        nexthop: 'null0',
+        nexthop: 'Null0',
         option: :absent,
         prefix: '10.0.0.0/8',
         provider: :quagga,
@@ -85,7 +85,7 @@ end'
     before :each do
       described_class.stubs(:vtysh).with('-c', 'show running-config').
           returns <<-EOS
-ip route 172.16.3.0/24 null0
+ip route 172.16.3.0/24 Null0
 ip route 172.16.3.0/24 172.16.0.4
 ip route 172.16.3.0/24 172.16.0.5 blackhole
 ip route 172.16.3.0/24 172.16.0.6 250
@@ -95,7 +95,7 @@ EOS
     context 'network_route \'172.16.3.0/24\'' do
       let(:resources) do
         hash = {}
-          %w{null0 172.16.0.4 172.16.0.5 172.16.0.6}.each do |nexthop|
+          %w{Null0 172.16.0.4 172.16.0.5 172.16.0.6}.each do |nexthop|
             hash["172.16.3.0/24 #{nexthop}"] = Puppet::Type.type(:quagga_static_route).new(title: "172.16.3.0/24 #{nexthop}")
           end
         hash
@@ -103,10 +103,10 @@ EOS
 
       it 'with nexthop ' do
         described_class.prefetch(resources)
-        expect(resources['172.16.3.0/24 null0'].provider.prefix).to eq('172.16.3.0/24')
-        expect(resources['172.16.3.0/24 null0'].provider.nexthop).to eq('null0')
-        expect(resources['172.16.3.0/24 null0'].provider.distance).to eq(:absent)
-        expect(resources['172.16.3.0/24 null0'].provider.option).to eq(:absent)
+        expect(resources['172.16.3.0/24 Null0'].provider.prefix).to eq('172.16.3.0/24')
+        expect(resources['172.16.3.0/24 Null0'].provider.nexthop).to eq('Null0')
+        expect(resources['172.16.3.0/24 Null0'].provider.distance).to eq(:absent)
+        expect(resources['172.16.3.0/24 Null0'].provider.option).to eq(:absent)
 
         expect(resources['172.16.3.0/24 172.16.0.4'].provider.prefix).to eq('172.16.3.0/24')
         expect(resources['172.16.3.0/24 172.16.0.4'].provider.nexthop).to eq('172.16.0.4')
