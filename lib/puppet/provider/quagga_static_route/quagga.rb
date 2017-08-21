@@ -22,7 +22,7 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
       if line =~ /\Aip\sroute\s(\S+)\s(\S+)(?:\s(blackhole|reject))?(?:\s(\d+))?\Z/
 
         prefix = $1
-        nexthop = $2.downcase
+        nexthop = $2
         option = $3.nil? ? :absent : $3.to_sym
         distance = $4.nil? ? :absent : Integer($4)
 
