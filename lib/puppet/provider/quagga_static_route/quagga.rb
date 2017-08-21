@@ -1,11 +1,6 @@
 Puppet::Type.type(:quagga_static_route).provide :quagga do
   @doc = %q{ Manages static routes using zebra }
 
-  @resource_properties = [
-      :nexthop,
-      :distance,
-  ]
-
   @template = 'ip route <%= prefix %> <%= nexthop %><% unless option.nil? %> <%= option %><% end %><% unless distance.nil? %> <%= distance %><% end %>'
 
   commands :vtysh => 'vtysh'
@@ -35,6 +30,7 @@ Puppet::Type.type(:quagga_static_route).provide :quagga do
             :provider => self.name,
         }
 
+        debug 'Instantiated the static route %{hash}' % { hash: hash.inspect }
         providers << new(hash)
 
         found_route = true
