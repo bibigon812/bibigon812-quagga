@@ -2,53 +2,31 @@
 
 ## Table of Contents
 
-* [Module Description](#module-description)
-* [Notice](#notice)
-* [Quick Start](#quick-start)
-* [Zebra Options](#zebra-options)
+1. [Module Description](#module-description)
+1. [Notice](#notice)
+1. [Quick Start](#quick-start)
+1. [Zebra Options](#zebra-options)
     * [Forwarding](#forwarding)
     * [Interfaces](#interfaces)
-* [BGP](#bgp)
-    * [Router](#router)
-    * [Address Families](#address-families)
-    * [Peers](#peers)
-    * [AS-Paths](#as-paths)
-    * [Community Lists](#community-lists)
-* [OSPF](#ospf)
-    * [Router](#router)
-    * [Areas](#areas)
-    * [Interfaces](#interfaces)
-* [PIM](#pim)
-    * [Router](#router)
-    * [Interfaces](#interfaces)
-* [Prefix Lists](#prefix-lists)
-* [Route Maps](#route-maps)
-* [Reference](#reference)
+1. [BGP](#bgp)
+    * [BGP Router](#bgp-router)
+    * [BGP Address Families](#bgp-address-families)
+    * [BGP Peers](#bgp-peers)
+    * [BGP AS-Paths](#bgp-as-paths)
+    * [BGP Community Lists](#bgp-community-lists)
+1. [OSPF](#ospf)
+    * [OSPF Router](#ospf-router)
+    * [OSPF Areas](#ospf-areas)
+    * [OSPF Interfaces](#ospf-interfaces)
+1. [PIM](#pim)
+    * [PIM Router](#pim-router)
+    * [PIM Interfaces](#pim-interfaces)
+1. [Prefix Lists](#prefix-lists)
+1. [Route Maps](#route-maps)
+1. [Reference](#reference)
     * [Classes](#classes)
-        * [quagga](#quagga)
-        * [quagga::bgp](#quagga::bgp)
-        * [quagga::ospf](#quagga::ospf)
-        * [quagga::pim](#quagga::pim)
-        * [quagga::zebra](#quagga::zebra)
     * [Defines](#defines)
-        * [quagga::bgp::peer](#quagga::bgp::peer)
     * [Types](#types)
-        * [quagga_as_path](#quagga_as_path)
-        * [quagga_bgp_router](#quagga_bgp_router)
-        * [quagga_bgp_address_family](#quagga_bgp_address_family)
-        * [quagga_bgp_peer](#quagga_bgp_peer)
-        * [quagga_bgp_peer_address_family](#quagga_bgp_peer_address_family)
-        * [quagga_community_list](#quagga_community_list)
-        * [quagga_global](#quagga_global)
-        * [quagga_interface](#quagga_interface)
-        * [quagga_ospf_interface](#quagga_ospf_interface)
-        * [quagga_pim_router](#quagga_pim_router)
-        * [quagga_pim_interface](#quagga_pim_interface)
-        * [quagga_ospf_router](#quagga_ospf_router)
-        * [quagga_ospf_area](#quagga_ospf_area)
-        * [quagga_prefix_list](#quagga_prefix_list)
-        * [quagga_route_map](#quagga_route_map)
-        * [quagga_static_route](#quagga_static_route)
 
 ## Module Description
 
@@ -337,10 +315,10 @@ quagga::route_maps:
 
 #### quagga
 
-- `global_opts`: Quagga global options. See the type `quagga_global`.
-- `interfaces`: Quagga interfacec options. See the type `quagga_interface`.
-- `prefix_lists`: Quagga prefix-list options. See the type `quagga_prefix_list`.
-- `route_maps`: Quagga route-map options. See the type `quagga_rotue_map`.
+- `global_opts`: Quagga global options. See the type [`quagga_global`](#quagga_global).
+- `interfaces`: Quagga interfacec options. See the type [`quagga_interface`](#quagga_interface).
+- `prefix_lists`: Quagga prefix-list options. See the type [`quagga_prefix_list`](#quagga_prefix_list).
+- `route_maps`: Quagga route-map options. See the type [`quagga_rotue_map`](#quagga_route_map).
 - `default_owner`: overrides the default owner of Quagga configuration files in the file system.  Default value: `quagga`.
 - `default_group`: overrides the default group of Quagga configuration files in the file system. Default value: `quagga`.
 - `default_mode`: overrides the default mode of Quagga configuration files in the system. Default value: `0600`.
@@ -358,11 +336,11 @@ quagga::route_maps:
 - `service_manage`: enable management of the BGP service.
 - `service_ensure`: the state of the BGP Service.
 - `service_opts`: service start options.
-- `router`: BGP router options. See the type `quagga_bgp_router`.
-- `peers`: BGP peer options. See the type `quagga_bgp_peer`.
-- `as_paths`: as-path options. See the type `quagga_bgp_as_path`.
-- `community_lists`: community-list options. See the type `quagga_bgp_community_list`.
-- `address_families`: BGP address-family options. See the type `quagga_bgp_address_family`.
+- `router`: BGP router options. See the type [`quagga_bgp_router`](#quagga_bgp_router).
+- `peers`: BGP peer options. See the type [`quagga_bgp_peer`](#quagga_bgp_peer).
+- `as_paths`: as-path options. See the type [`quagga_bgp_as_path`](#quagga_bgp_as_path).
+- `community_lists`: community-list options. See the type [`quagga_bgp_community_list`](#quagga_bgp_community_list).
+- `address_families`: BGP address-family options. See the type [`quagga_bgp_address_family`](#quagga_bgp_address_family).
 
 #### quagga::ospf
 
@@ -373,9 +351,9 @@ quagga::route_maps:
 - `service_manage`: enable management of the OSPF service.
 - `service_ensure`: the state of the OSPF Service.
 - `service_opts`: service start options.
-- `router`: OSPF router options. See the type `quagga_ospf_router`.
-- `areas`: OSPF area options. See the type `quagga_ospf_area`.
-- `interfaces`: OSPF parameters of interfaces. See the type `quagga_ospf_interface`.
+- `router`: OSPF router options. See the type [`quagga_ospf_router`](#quagga_ospf_router).
+- `areas`: OSPF area options. See the type [`quagga_ospf_area`](#quagga_ospf_area).
+- `interfaces`: OSPF parameters of interfaces. See the type [`quagga_ospf_interface`](#quagga_ospf_interface).
 
 #### quagga::pim
 
@@ -386,8 +364,8 @@ quagga::route_maps:
 - `service_manage`: enable management of the PIM service.
 - `service_ensure`: the state of the PIM Service.
 - `service_opts`: service start options.
-- `router`: PIM router options. See the type `quagga_pim_router`.
-- `interfaces`: OSPF parameters of interfaces. See the type `quagga_pim_interface`.
+- `router`: PIM router options. See the type [`quagga_pim_router`](#quagga_pim_router).
+- `interfaces`: OSPF parameters of interfaces. See the type [`quagga_pim_interface`](#quagga_pim_interface).
 
 #### quagga::zebra
 
@@ -398,13 +376,13 @@ quagga::route_maps:
 - `service_manage`: enable management of the Zebra service.
 - `service_ensure`: the state of the Zebra Service.
 - `service_opts`: service start options.
-- `routes`: parameters of the static routes. See the type `quagga_static_route`.
+- `routes`: parameters of the static routes. See the type [`quagga_static_route`](#quagga_static_route).
 
 ### Defines
 
 #### quagga::bgp::peer
 
-See the type `quagga_bgp_peer`
+See types [`quagga_bgp_peer`](#quagga_bgp_peer) and [`quagga_bgp_peer_address_family`](#quagga_bgp_peer_address_family).
 
 ### Types
 
