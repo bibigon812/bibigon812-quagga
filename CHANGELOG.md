@@ -1,3 +1,10 @@
+## [3.4.0] - 2017-08-21
+
+### Added
+
+- the resource type `quagga_static_route`
+- the property `passive_interfaces` to the resource type `quagga_ospf_router`
+
 ## [3.3.0] - 2017-07-19
 
 ### Added
