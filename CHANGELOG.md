@@ -1,3 +1,9 @@
+## [3.5.0] - 2017-08-22
+
+### Added
+
+- the resource type `quagga_access_list`
+
 ## [3.4.0] - 2017-08-21
 
 ### Added
