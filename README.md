@@ -9,6 +9,7 @@
     * [Forwarding](#forwarding)
     * [Interfaces](#interfaces)
     * [Routes](#routes)
+    * [Access-Lists](#access-lists)
 1. [BGP](#bgp)
     * [BGP Router](#bgp-router)
     * [BGP Address Families](#bgp-address-families)
@@ -112,6 +113,32 @@ quagga::zebra::routes:
     ensure: present
     option: reject
     distance: 200
+```
+
+### Access-Lists
+
+- standard: 1-99, 1300-1999
+- extended: 100-199, 2000-2699
+- zebra: [[:alpha:]]+
+
+```yaml
+quagga::zebra::access_lists:
+  1:
+    remark: Standard access-list
+    rules:
+      - permit 127.0.0.1
+      - deny any
+  100:
+    remark: Extended access-list
+    rules:
+      - permit ip 10.0.0.0 0.0.0.255 any
+      - permit ip any 10.0.0.0 0.0.0.255
+      - deny ip any any
+  zebra_list:
+    remark: Zebra access-list
+    rules:
+      - permit 10.0.0.0/24
+      - deny any
 ```
 
 ## BGP
@@ -381,6 +408,7 @@ quagga::route_maps:
 - `service_ensure`: the state of the Zebra Service.
 - `service_opts`: service start options.
 - `routes`: parameters of the static routes. See the type [`quagga_static_route`](#quagga_static_route).
+- `access_lists`: parameters of the access-lists. See the type [`quagga_access_list`](#quagga_access_list).
 
 ### Defines
 
@@ -794,3 +822,42 @@ quagga_static_route { '192.168.0.0/24 1.1.1.1':
 - `nexthop`: namevar. Specifies IP or the interface name of the nexthop router. Defaults to `Null0`.
 - `distance`: Specifies the distance value for this route. Values are `1-255`.
 - `option`: Sets reject or blackhole for this route. Values are `reject` and `blackhole`.
+
+#### quagga_access_list
+
+```puppet
+quagga_access_list {'1':
+  ensure => present,
+  remark => 'IP standard access list',
+  rules  => [
+    'deny 10.0.0.128 0.0.0.127',
+    'deny 10.0.101.193',
+    'permit 10.0.0.0 0.0.255.255',
+    'permit 192.168.10.1'.
+    'deny any'
+  ]
+}
+
+quagga_access_list {'100':
+  ensure   => present,
+  remark   => 'IP extended access-list',
+  rules    => [
+    'deny ip host 10.0.1.100 any',
+    'permit ip 10.0.1.0 0.0.0.255 any',
+    'deny ip any any'
+  ]
+}
+
+quagga_access_list {'a_word':
+  ensure => present,
+  remark => 'IP zebra access-list',
+  rules  => [
+    'deny 192.168.0.0/23',,
+    'permit 192.168.0.0/16',
+    'deny any',
+  ]
+}
+```
+- `name`: The number of this access list.
+- `remark`: Specifies the remark for this access-list.
+- `rules`: Permits and denies for this rule. Defaults to [].
