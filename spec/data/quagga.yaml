@@ -209,3 +209,21 @@ quagga::zebra::routes:
   10.255.255.0/24:
     nexthop: Null0
     distance: 250
+
+quagga::zebra::access_lists:
+  1:
+    remark: Standard access-list
+    rules:
+      - permit 127.0.0.1
+      - deny any
+  100:
+    remark: Extended access-list
+    rules:
+      - permit ip 10.0.0.0 0.0.0.255 any
+      - permit ip any 10.0.0.0 0.0.0.255
+      - deny ip any any
+  zebra_list:
+    remark: Zebra access-list
+    rules:
+      - permit 10.0.0.0/24
+      - deny any
