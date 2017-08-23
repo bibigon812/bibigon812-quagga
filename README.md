@@ -251,6 +251,9 @@ quagga::bgp::community_lists:
 
 ```yaml
 quagga::ospf::router:
+  distribute_list:
+    - ACCESS_LIST out kernel
+    - ACCESS_LIST out isis
   log_adjacency_changes: true
   opaque: false
   passive_interfaces:
