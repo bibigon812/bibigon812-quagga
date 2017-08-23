@@ -183,6 +183,9 @@ quagga::ospf::interfaces:
 
 quagga::ospf::router:
   abr_type: cisco
+  distribute_list:
+    - ACCESS_LIST out isis
+    - ACCESS_LIST out connected
   log_adjacency_changes: true
   opaque: false
   passive_interfaces:

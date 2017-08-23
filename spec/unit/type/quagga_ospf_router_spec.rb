@@ -37,7 +37,7 @@ describe Puppet::Type.type(:quagga_ospf_router) do
 
     [
       :abr_type, :opaque, :rfc1583, :router_id, :log_adjacency_changes,
-      :redistribute, :passive_interfaces,
+      :redistribute, :passive_interfaces, :distribute_list,
     ].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
@@ -244,6 +244,28 @@ describe Puppet::Type.type(:quagga_ospf_router) do
   describe 'passive_interfaces' do
     it 'should support default as a value' do
       expect{described_class.new(:name => 'ospf', :passive_interfaces => 'default')}.to_not raise_error
+    end
+  end
+
+  describe 'distribute_list' do
+    it 'should support \'LIST out bgp\' as a value' do
+      expect { described_class.new(:name => 'ospf', :distribute_list => 'LIST out bgp') }.to_not raise_error
+    end
+
+    it 'should support \'LIST out kernel\' as a value' do
+      expect { described_class.new(:name => 'ospf', :distribute_list => 'LIST out kernel') }.to_not raise_error
+    end
+
+    it 'should not support \'LIST out ospf\' as a value' do
+      expect { described_class.new(:name => 'ospf', :distribute_list => 'LIST out ospf') }.to raise_error Puppet::Error, /Invalid value/
+    end
+
+    it 'should not support \'LIST in kernel\' as a value' do
+      expect { described_class.new(:name => 'ospf', :distribute_list => 'LIST in kernel') }.to raise_error Puppet::Error, /Invalid value/
+    end
+
+    it 'should contain \'LIST out connected\'' do
+      expect(described_class.new(:name => 'ospf', :distribute_list => 'LIST out connected')[:distribute_list]).to eq(['LIST out connected'])
     end
   end
 end

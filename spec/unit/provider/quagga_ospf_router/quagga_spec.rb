@@ -33,6 +33,8 @@ router ospf
  redistribute static route-map STATIC
  redistribute rip route-map RIP
  network 10.255.1.0/24 area 0.0.15.211
+ distribute-list QEWR out static
+ distribute-list QWER out isis
 !
 ip route 0.0.0.0/0 10.255.1.2 254
 !
@@ -64,7 +66,11 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
         ],
         :rfc1583 => :false,
         :router_id => '10.255.78.4',
-        :log_adjacency_changes => :false
+        :log_adjacency_changes => :false,
+        distribute_list: [
+          'QEWR out static',
+          'QWER out isis',
+        ]
       })
     end
   end
