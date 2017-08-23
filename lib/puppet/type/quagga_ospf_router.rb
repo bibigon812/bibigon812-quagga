@@ -130,11 +130,44 @@ Puppet::Type.newtype(:quagga_ospf_router) do
     end
   end
 
+  newproperty(:distribute_list, array_matching: :all) do
+    desc 'Filter networks in routing updates.'
+
+    defaultto []
+    newvalues(/\A\w+\sout\s(babel|bgp|connected|isis|kernel|rip|static)\Z/)
+
+    def insync?(is)
+      @should.each do |value|
+        return false unless is.include?(value)
+      end
+
+      is.each do |value|
+        return false unless @should.include?(value)
+      end
+
+      true
+    end
+
+    def should_to_s(value)
+      value.inspect
+    end
+  end
+
   autorequire(:package) do
     %w{quagga}
   end
 
   autorequire(:service) do
     %w{zebra ospfd}
+  end
+
+  autorequire(:quagga_access_list) do
+    reqs = []
+
+    self[:distribute_list].each do |list|
+      reqs << list.split(/\s/).first
+    end
+
+    reqs
   end
 end

@@ -49,7 +49,13 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
       :template => 'passive-interface <%= value %>',
       :type => :array,
       :default => [],
-    }
+    },
+    distribute_list: {
+      regexp: /\A\sdistribute-list\s(.+)\Z/,
+      template: 'distribute-list <%= value %>',
+      type: :array,
+      default: [],
+    },
   }
 
   commands :vtysh => 'vtysh'
