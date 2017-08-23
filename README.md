@@ -656,6 +656,7 @@ quagga_interface { 'eth0':
 quagga_ospf_router { 'ospf':
     ensure             => present,
     abr_type           => 'cisco',
+    distribute_list    => [ 'ACCESS_LIST out bgp', 'ACCESS_LIST out static', ],
     opaque             => true,
     passive_interfaces => [ 'eth0', 'eth1', ],
     redistribute       => [ 'connected', 'static route-map STATIC', ],
@@ -667,6 +668,7 @@ quagga_ospf_router { 'ospf':
 - `name`: the name must be `ospf`.
 - `ensure`: manage the state of this OSPF router: `absent`, `present`. Defaults to `present`.
 - `abr_type`: set OSPF ABR type. Defaults to `cisco`.
+- `distribute_list`: Filter networks in routing updates. Defaults to `[]`.
 - `log_adjacency_changes`: log changes in adjacency. Defaults to `false`.
 - `opaque`: enable the Opaque-LSA capability (rfc2370). Defaults to `false`.
 - `passive_interfaces`: Suppress routing updates on interfaces. Defaults to `[]`.

@@ -131,7 +131,7 @@ Puppet::Type.newtype(:quagga_ospf_router) do
   end
 
   newproperty(:distribute_list, array_matching: :all) do
-    desc 'Redistribute information from another routing protocol.'
+    desc 'Filter networks in routing updates.'
 
     defaultto []
     newvalues(/\A\w+\sout\s(babel|bgp|connected|isis|kernel|rip|static)\Z/)
