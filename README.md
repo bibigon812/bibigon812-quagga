@@ -144,7 +144,7 @@ quagga::zebra::access_lists:
 ## Prefix Lists
 
 ```yaml
-quagga::prefix_lists:
+quagga::zebra::prefix_lists:
   CONNECTED_PREFIXES:
     rules:
       500:
@@ -161,7 +161,7 @@ quagga::prefix_lists:
 ## Route Maps
 
 ```yaml
-quagga::route_maps:
+quagga::zebra::route_maps:
   BGP_FROM_OSPF:
     rules:
       10:
