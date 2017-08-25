@@ -60,7 +60,7 @@ quagga::service_file_manage: true
 quagga::packages:
   quagga:
     ensure: "present"
-quagga::hostname: "%{::facts.networking.fqdn}"
+quagga::zebra::hostname: "%{::facts.networking.fqdn}"
 quagga::zebra::global_opts: {}
 quagga::zebra::interfaces: {}
 quagga::zebra::prefix_lists: {}
