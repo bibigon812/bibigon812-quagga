@@ -1,8 +1,4 @@
 class quagga (
-  Hash $global_opts,
-  Hash $interfaces,
-  Hash $prefix_lists,
-  Hash $route_maps,
   String $default_owner,
   String $default_group,
   String $default_mode,
@@ -39,36 +35,6 @@ class quagga (
       mode    => '0644',
       replace => true,
       content => epp('quagga/quagga.sysconfig.epp')
-    }
-  }
-
-  quagga_global {$facts['networking']['fqdn']:
-    * => $global_opts
-  }
-
-  $interfaces.each |String $interface_name, Hash $interface| {
-    quagga_interface {$interface_name:
-      * => $interface
-    }
-  }
-
-  resources { 'quagga_prefix_list':
-    purge => true,
-  }
-
-  $prefix_lists.each |String $prefix_list_name, Hash $prefix_list| {
-    quagga::prefix_list {$prefix_list_name:
-      * => $prefix_list,
-    }
-  }
-
-  resources { 'quagga_route_map':
-    purge => true,
-  }
-
-  $route_maps.each |String $route_map_name, $route_map| {
-    quagga::route_map {$route_map_name:
-      * => $route_map,
     }
   }
 }

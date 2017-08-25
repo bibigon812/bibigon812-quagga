@@ -1,15 +1,21 @@
 ---
 lookup_options:
-  quagga::global_opts:
+  quagga::zebra::global_opts:
     merge:
       strategy: hash
-  quagga::interfaces:
+  quagga::zebra::interfaces:
     merge:
       strategy: deep
-  quagga::prefix_lists:
+  quagga::zebra::prefix_lists:
     merge:
       strategy: deep
-  quagga::route_maps:
+  quagga::zebra::route_maps:
+    merge:
+      strategy: deep
+  quagga::zebra::routes:
+    merge:
+      strategy: deep
+  quagga::zebra::access_lists:
     merge:
       strategy: deep
   quagga::bgp::router:
@@ -45,10 +51,6 @@ lookup_options:
   quagga::pim::interfaces:
     merge:
       strategy: deep
-quagga::global_opts: {}
-quagga::interfaces: {}
-quagga::prefix_lists: {}
-quagga::route_maps: {}
 quagga::default_owner: "quagga"
 quagga::default_group: "quagga"
 quagga::default_mode: "0600"
@@ -58,6 +60,13 @@ quagga::service_file_manage: true
 quagga::packages:
   quagga:
     ensure: "present"
+quagga::hostname: "%{::facts.networking.fqdn}"
+quagga::global_opts: {}
+quagga::interfaces: {}
+quagga::prefix_lists: {}
+quagga::route_maps: {}
+quagga::zebra::routes: {}
+quagga::zebra::access_lists: {}
 quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
 quagga::zebra::config_file_manage: true
 quagga::zebra::service_name: "zebra"
@@ -65,8 +74,6 @@ quagga::zebra::service_enable: true
 quagga::zebra::service_manage: true
 quagga::zebra::service_ensure: "running"
 quagga::zebra::service_opts: "-P 0"
-quagga::zebra::routes: {}
-quagga::zebra::access_lists: {}
 quagga::pim::config_file: "%{lookup('quagga::config_dir')}/pimd.conf"
 quagga::pim::config_file_manage: true
 quagga::pim::service_name: "pimd"
