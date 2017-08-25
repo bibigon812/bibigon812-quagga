@@ -61,10 +61,10 @@ quagga::packages:
   quagga:
     ensure: "present"
 quagga::hostname: "%{::facts.networking.fqdn}"
-quagga::global_opts: {}
-quagga::interfaces: {}
-quagga::prefix_lists: {}
-quagga::route_maps: {}
+quagga::zebra::global_opts: {}
+quagga::zebra::interfaces: {}
+quagga::zebra::prefix_lists: {}
+quagga::zebra::route_maps: {}
 quagga::zebra::routes: {}
 quagga::zebra::access_lists: {}
 quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
