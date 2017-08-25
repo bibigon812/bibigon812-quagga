@@ -11,11 +11,12 @@ quagga::packages:
     ensure: present
 
 
-quagga::global_opts:
+quagga::zebra::hostname: "localhost"
+quagga::zebra::global_opts:
   ip_forwarding: true
   ipv6_forwarding: true
 
-quagga::interfaces:
+quagga::zebra::interfaces:
   eth0:
     ip_address:
       - 10.0.0.1/24
@@ -24,7 +25,7 @@ quagga::interfaces:
       - 10.255.255.1/32
       - 172.16.255.1/32
 
-quagga::prefix_lists:
+quagga::zebra::prefix_lists:
   CONNECTED_PREFIXES:
     rules:
       500:
@@ -37,7 +38,7 @@ quagga::prefix_lists:
         action: permit
         prefix: 172.16.255.0/24
 
-quagga::route_maps:
+quagga::zebra::route_maps:
   BGP_FROM_OSPF:
     rules:
       10:

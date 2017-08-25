@@ -10,6 +10,8 @@
     * [Interfaces](#interfaces)
     * [Routes](#routes)
     * [Access-Lists](#access-lists)
+    * [Prefix Lists](#prefix-lists)
+    * [Route Maps](#route-maps)
 1. [BGP](#bgp)
     * [BGP Router](#bgp-router)
     * [BGP Address Families](#bgp-address-families)
@@ -23,8 +25,6 @@
 1. [PIM](#pim)
     * [PIM Router](#pim-router)
     * [PIM Interfaces](#pim-interfaces)
-1. [Prefix Lists](#prefix-lists)
-1. [Route Maps](#route-maps)
 1. [Reference](#reference)
     * [Classes](#classes)
     * [Defines](#defines)
@@ -56,7 +56,7 @@ systemctl mask NetworkManager
 - The correct way to delete route-map or prefix-list rules is to use the `ensure: absent`.
 
 ```
-quagga::route_maps:
+quagga::zebra::route_maps:
   ROUTE_MAP_IN:
     rules:
       1:
@@ -78,7 +78,7 @@ include quagga
 ### Forwarding
 
 ```yaml
-quagga::global_opts:
+quagga::zebra::global_opts:
   ip_forwarding: true
   ipv6_forwarding: true
 ```
@@ -86,7 +86,7 @@ quagga::global_opts:
 ### Interfaces
 
 ```yaml
-quagga::interfaces:
+quagga::zebra::interfaces:
   eth0:
     ip_address:
       - 10.0.0.1/24
@@ -140,6 +140,40 @@ quagga::zebra::access_lists:
       - permit 10.0.0.0/24
       - deny any
 ```
+
+## Prefix Lists
+
+```yaml
+quagga::prefix_lists:
+  CONNECTED_PREFIXES:
+    rules:
+      500:
+        action: permit
+        le: 32
+        prefix: 10.255.255.0/24
+  OSPF_PREFIXES:
+    rules:
+      10:
+        action: permit
+        prefix: 172.16.255.0/24
+```
+
+## Route Maps
+
+```yaml
+quagga::route_maps:
+  BGP_FROM_OSPF:
+    rules:
+      10:
+        action: permit
+        match: ip address prefix-list OSPF_PREFIXES
+  CONNECTED:
+    rules:
+      10:
+        action: permit
+        match: ip address prefix-list CONNECTED_PREFIXES
+```
+
 
 ## BGP
 
@@ -310,49 +344,12 @@ quagga::pim::interfaces:
     pim_ssm: true
 ```
 
-## Prefix Lists
-
-```yaml
-quagga::prefix_lists:
-  CONNECTED_PREFIXES:
-    rules:
-      500:
-        action: permit
-        le: 32
-        prefix: 10.255.255.0/24
-  OSPF_PREFIXES:
-    rules:
-      10:
-        action: permit
-        prefix: 172.16.255.0/24
-```
-
-## Route Maps
-
-```yaml
-quagga::route_maps:
-  BGP_FROM_OSPF:
-    rules:
-      10:
-        action: permit
-        match: ip address prefix-list OSPF_PREFIXES
-  CONNECTED:
-    rules:
-      10:
-        action: permit
-        match: ip address prefix-list CONNECTED_PREFIXES
-```
-
 ## Reference
 
 ### Classes
 
 #### quagga
 
-- `global_opts`: Quagga global options. See the type [`quagga_global`](#quagga_global).
-- `interfaces`: Quagga interfacec options. See the type [`quagga_interface`](#quagga_interface).
-- `prefix_lists`: Quagga prefix-list options. See the type [`quagga_prefix_list`](#quagga_prefix_list).
-- `route_maps`: Quagga route-map options. See the type [`quagga_rotue_map`](#quagga_route_map).
 - `default_owner`: overrides the default owner of Quagga configuration files in the file system.  Defaults to `quagga`.
 - `default_group`: overrides the default group of Quagga configuration files in the file system. Defaults to `quagga`.
 - `default_mode`: overrides the default mode of Quagga configuration files in the system. Defaults to `0600`.
@@ -403,6 +400,13 @@ quagga::route_maps:
 
 #### quagga::zebra
 
+- `hostname`: Quagga router hostname. Defaults to FQDN.
+- `global_opts`: Quagga global options. See the type [`quagga_global`](#quagga_global).
+- `interfaces`: Quagga interfacec options. See the type [`quagga_interface`](#quagga_interface).
+- `prefix_lists`: Quagga prefix-list options. See the type [`quagga_prefix_list`](#quagga_prefix_list).
+- `route_maps`: Quagga route-map options. See the type [`quagga_rotue_map`](#quagga_route_map).
+- `routes`: parameters of the static routes. See the type [`quagga_static_route`](#quagga_static_route).
+- `access_lists`: parameters of the access-lists. See the type [`quagga_access_list`](#quagga_access_list).
 - `config_file`: configuration file if the Zebra service.
 - `config_file_manage`: enable management of the Zebra service setting file.
 - `service_name`: the name of the Zebra service.
@@ -410,8 +414,6 @@ quagga::route_maps:
 - `service_manage`: enable management of the Zebra service.
 - `service_ensure`: the state of the Zebra Service.
 - `service_opts`: service start options.
-- `routes`: parameters of the static routes. See the type [`quagga_static_route`](#quagga_static_route).
-- `access_lists`: parameters of the access-lists. See the type [`quagga_access_list`](#quagga_access_list).
 
 ### Defines
 
