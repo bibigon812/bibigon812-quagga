@@ -1,3 +1,14 @@
+## [4.0.0] - 2017-08-26
+
+### Added
+
+- the `quagga::zebra::hostname`
+
+### Changed
+
+- the `quagga::prefix_lists` to the `quagga::zebra::prefix_lists`
+- the `quagga::route_maps` to the `quagga::zebra::route_maps`
+
 ## [3.5.1] - 2017-08-23
 
 ### Added
