@@ -1,3 +1,9 @@
+## [4.0.1] - 2017-09-04
+
+### Added
+
+- tags in the file `metadata.json`
+
 ## [4.0.0] - 2017-08-26
 
 ### Added
