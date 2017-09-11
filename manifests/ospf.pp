@@ -1,4 +1,5 @@
 class quagga::ospf (
+  Boolean $agentx,
   String $config_file,
   Boolean $config_file_manage,
   String $service_name,
@@ -14,6 +15,23 @@ class quagga::ospf (
   include quagga::ospf::service
 
   if $service_enable and $service_ensure == 'running' {
+    $agentx_ensure = $agentx ? {
+      true  => 'present',
+      false => 'absent'
+    }
+
+    file_line {'ospf_agentx':
+      ensure => $agentx_ensure,
+      path   => $config_file,
+      line   => 'agentx'
+    }
+
+    if $service_manage {
+      File_line['ospf_agentx'] {
+        notify => Service[$service_name]
+      }
+    }
+
     quagga_ospf_router {'ospf':
       * => $router
     }

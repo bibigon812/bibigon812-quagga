@@ -1,4 +1,5 @@
 class quagga::zebra (
+  Boolean $agentx,
   String $hostname,
   Hash $global_opts,
   Hash $interfaces,
@@ -18,6 +19,23 @@ class quagga::zebra (
   include quagga::zebra::service
 
   if $service_enable and $service_ensure == 'running' {
+    $agentx_ensure = $agentx ? {
+      true  => 'present',
+      false => 'absent'
+    }
+
+    file_line {'zebra_agentx':
+      ensure => $agentx_ensure,
+      path   => $config_file,
+      line   => 'agentx'
+    }
+
+    if $service_manage {
+      File_line['zebra_agentx'] {
+        notify => Service[$service_name]
+      }
+    }
+
     quagga_global {$hostname:
       * => $global_opts
     }

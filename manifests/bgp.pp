@@ -1,4 +1,5 @@
 class quagga::bgp (
+  Boolean $agentx,
   String $config_file,
   Boolean $config_file_manage,
   String $service_name,
@@ -16,6 +17,23 @@ class quagga::bgp (
   include quagga::bgp::service
 
   if $service_enable and $service_ensure == 'running' {
+    $agentx_ensure = $agentx ? {
+      true  => 'present',
+      false => 'absent'
+    }
+
+    file_line {'bgp_agentx':
+      ensure => $agentx_ensure,
+      path   => $config_file,
+      line   => 'agentx'
+    }
+
+    if $service_manage {
+      File_line['bgp_agentx'] {
+        notify => Service[$service_name]
+      }
+    }
+
     quagga_bgp_router {'bgp':
       * => $router
     }
