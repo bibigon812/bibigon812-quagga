@@ -1,4 +1,5 @@
 class quagga::pim (
+  Boolean $agentx,
   String $config_file,
   Boolean $config_file_manage,
   String $service_name,
@@ -13,6 +14,23 @@ class quagga::pim (
   include quagga::pim::service
 
   if $service_enable and $service_ensure == 'running' {
+    $agentx_ensure = $agentx ? {
+      true  => 'present',
+      false => 'absent'
+    }
+
+    file_line {'pim_agentx':
+      ensure => $agentx_ensure,
+      path   => $config_file,
+      line   => 'agentx'
+    }
+
+    if $service_manage {
+      File_line['pim_agentx'] {
+        notify => Service[$service_name]
+      }
+    }
+
     quagga_pim_router {'pim':
       * => $router
     }

@@ -11,6 +11,7 @@ quagga::packages:
     ensure: present
 
 
+quagga::zebra::agentx: false
 quagga::zebra::hostname: "localhost"
 quagga::zebra::global_opts:
   ip_forwarding: true
@@ -68,6 +69,7 @@ quagga::pim::service_manage: true
 quagga::pim::service_ensure: running
 quagga::pim::service_opts: -P 0
 
+quagga::pim::agentx: false
 quagga::pim::router:
   ip_multicast_routing: true
 quagga::pim::interfaces:
@@ -85,6 +87,7 @@ quagga::bgp::service_manage: true
 quagga::bgp::service_ensure: running
 quagga::bgp::service_opts: -P 0
 
+quagga::bgp::agentx: false
 quagga::bgp::router:
   as_number: 65000
   router_id: 10.255.255.1
@@ -175,6 +178,7 @@ quagga::ospf::service_manage: true
 quagga::ospf::service_ensure: running
 quagga::ospf::service_opts: -P 0
 
+quagga::ospf::agentx: false
 quagga::ospf::interfaces:
   eth0:
     dead_interval: 8

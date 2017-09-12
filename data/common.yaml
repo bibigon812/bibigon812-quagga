@@ -60,6 +60,7 @@ quagga::service_file_manage: true
 quagga::packages:
   quagga:
     ensure: "present"
+quagga::zebra::agentx: false
 quagga::zebra::hostname: "%{::facts.networking.fqdn}"
 quagga::zebra::global_opts: {}
 quagga::zebra::interfaces: {}
@@ -81,8 +82,10 @@ quagga::pim::service_enable: true
 quagga::pim::service_manage: true
 quagga::pim::service_ensure: "running"
 quagga::pim::service_opts: "-P 0"
+quagga::pim::agentx: false
 quagga::pim::router: {}
 quagga::pim::interfaces: {}
+quagga::bgp::agentx: false
 quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
 quagga::bgp::config_file_manage: true
 quagga::bgp::service_name: "bgpd"
@@ -95,6 +98,7 @@ quagga::bgp::peers: {}
 quagga::bgp::as_paths: {}
 quagga::bgp::community_lists: {}
 quagga::bgp::address_families: {}
+quagga::ospf::agentx: false
 quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
 quagga::ospf::config_file_manage: true
 quagga::ospf::service_name: "ospfd"
