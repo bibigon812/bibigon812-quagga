@@ -6,6 +6,7 @@
 1. [Notice](#notice)
 1. [Quick Start](#quick-start)
 1. [Zebra Options](#zebra-options)
+    * [SNMP](#snmp)
     * [Forwarding](#forwarding)
     * [Interfaces](#interfaces)
     * [Routes](#routes)
@@ -13,16 +14,19 @@
     * [Prefix Lists](#prefix-lists)
     * [Route Maps](#route-maps)
 1. [BGP](#bgp)
+    * [BGP SNMP](#bgp-snmp)
     * [BGP Router](#bgp-router)
     * [BGP Address Families](#bgp-address-families)
     * [BGP Peers](#bgp-peers)
     * [BGP AS-Paths](#bgp-as-paths)
     * [BGP Community Lists](#bgp-community-lists)
 1. [OSPF](#ospf)
+    * [OSPF SNMP](#ospf-snmp)
     * [OSPF Router](#ospf-router)
     * [OSPF Areas](#ospf-areas)
     * [OSPF Interfaces](#ospf-interfaces)
 1. [PIM](#pim)
+    * [PIM SNMP](#pim-snmp)
     * [PIM Router](#pim-router)
     * [PIM Interfaces](#pim-interfaces)
 1. [Reference](#reference)
@@ -74,6 +78,12 @@ include quagga
 ```
 
 ## Zebra Options
+
+### SNMP
+
+```yaml
+quagga::zebra::agentx: false
+```
 
 ### Forwarding
 
@@ -176,6 +186,12 @@ quagga::zebra::route_maps:
 
 
 ## BGP
+
+### BGP SNMP
+
+```yaml
+quagga::bgp::agentx: false
+```
 
 ### BGP Router
 
@@ -281,6 +297,12 @@ quagga::bgp::community_lists:
 
 ## OSPF
 
+### OSPF SNMP
+
+```yaml
+quagga::ospf::agentx: false
+```
+
 ### OSPF Router
 
 ```yaml
@@ -327,6 +349,12 @@ quagga::ospf::interfaces:
 
 ## PIM
 
+### PIM SNMP
+
+```yaml
+quagga::pim::agentx: false
+```
+
 ### PIM Router
 
 ```yaml
@@ -360,6 +388,7 @@ quagga::pim::interfaces:
 
 #### quagga::bgp
 
+- `agentx`: enable agentx. Defaults to `false`.
 - `config_file`: configuration file if the BGP service.
 - `config_file_manage`: enable management of the BGP service setting file.
 - `service_name`: the name of the BGP service.
@@ -375,6 +404,7 @@ quagga::pim::interfaces:
 
 #### quagga::ospf
 
+- `agentx`: enable agentx. Defaults to `false`.
 - `config_file`: configuration file if the OSPF service.
 - `config_file_manage`: enable management of the OSPF service setting file.
 - `service_name`: the name of the OSPF service.
@@ -388,6 +418,7 @@ quagga::pim::interfaces:
 
 #### quagga::pim
 
+- `agentx`: enable agentx. Defaults to `false`.
 - `config_file`: configuration file if the PIM service.
 - `config_file_manage`: enable management of the PIM service setting file.
 - `service_name`: the name of the PIM service.
@@ -400,6 +431,7 @@ quagga::pim::interfaces:
 
 #### quagga::zebra
 
+- `agentx`: enable agentx. Defaults to `false`.
 - `hostname`: Quagga router hostname. Defaults to FQDN.
 - `global_opts`: Quagga global options. See the type [`quagga_global`](#quagga_global).
 - `interfaces`: Quagga interfacec options. See the type [`quagga_interface`](#quagga_interface).
