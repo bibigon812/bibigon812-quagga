@@ -26,6 +26,6 @@
     "project_page": "https://github.com/bibigon812/bibigon812-quagga",
     "source": "https://github.com/bibigon812/bibigon812-quagga.git",
     "summary": "Puppet module to manage Quagga",
-    "version": "4.0.1",
+    "version": "4.1.0",
     "tags": [ "quagga", "bgp", "ospf", "pim", "zebra" ]
 }
