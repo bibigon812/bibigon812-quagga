@@ -1,3 +1,9 @@
+## [4.1.1] - 2017-09-30
+
+### Updated
+
+- the regexp of the as-path list rule
+
 ## [4.1.0] - 2017-09-13
 
 ### Added
