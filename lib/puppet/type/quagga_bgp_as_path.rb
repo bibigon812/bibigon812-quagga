@@ -23,7 +23,7 @@ Puppet::Type.newtype(:quagga_bgp_as_path) do
   newproperty(:rules, :array_matching => :all) do
     desc 'Set actions of this ap-path list.'
 
-    newvalues(/\A(permit|deny)\s\^?[_\d\.\\\*\+\[\]\|\?]+\$?\Z/)
+    newvalues(/\A(permit|deny)\s\^?[_,\d\.\\\*\+\-\[\]\(\)\{\}\|\?]+\$?\Z/)
 
     def should_to_s(newvalue = @should)
       if newvalue

@@ -70,6 +70,10 @@ describe Puppet::Type.type(:quagga_bgp_as_path) do
       expect { described_class.new(:name => 'as100', :rules => 'permit _100$') }.to_not raise_error
     end
 
+    it 'should support \'permit ^([{},0-9]+_){50}\' as a value' do
+      expect { described_class.new(:name => 'as100', :rules => 'permit ^([{},0-9]+_){50}') }.to_not raise_error
+    end
+
     it 'should support [\'permit _100$\', \'permit _100_\'] as a value' do
       expect { described_class.new(:name => 'as100', :rules => ['permit _100$', 'permit _100_']) }.to_not raise_error
     end
