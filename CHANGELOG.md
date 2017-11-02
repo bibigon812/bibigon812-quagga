@@ -1,3 +1,9 @@
+## [Unreleased]
+
+### Fixed
+
+- clearing the empty resource `quagga_bgp_peer_address_family`
+
 ## [4.1.1] - 2017-09-30
 
 ### Updated
