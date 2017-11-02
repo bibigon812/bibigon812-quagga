@@ -1,5 +1,7 @@
-.bundle
-.git
-.vagrant
-log
-vendor
+.bundle/
+.git/
+.vagrant/
+junit/
+log/
+pkg/
+vendor/
