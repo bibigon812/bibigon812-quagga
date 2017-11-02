@@ -200,6 +200,8 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   end
 
   def clear
+    return unless exists?
+
     peer_name, address_family = @property_hash[:name].split(/\s/)
 
     debug 'Clearing the address family %{address_family_name} of the bgp peer %{peer_name}' % {
