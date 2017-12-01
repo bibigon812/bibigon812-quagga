@@ -1,3 +1,9 @@
+## [4.1.4] - 2017-12-01
+
+### Fixed
+
+- the community-list instantiation
+
 ## [4.1.3] - 2017-12-01
 
 ### Changed
