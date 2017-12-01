@@ -32,6 +32,7 @@ ip community-list 300 permit 65000:31500
 ip community-list 300 permit 65000:6939
 ip community-list 500 permit 65000:8359
 ip community-list 500 permit 65000:12695
+ip community-list 501 permit 64513:2_.*_64515:1
 !
 end
 !'
@@ -57,7 +58,7 @@ end
     end
 
     it 'should return a resource' do
-      expect(described_class.instances.size).to eq(3)
+      expect(described_class.instances.size).to eq(4)
     end
 
     it 'should return the resource community-list' do
@@ -84,6 +85,15 @@ end
         :name => '500',
         :provider => :quagga,
         :rules => ['permit 65000:8359', 'permit 65000:12695',],
+      })
+    end
+
+    it 'should return the resource community-list' do
+      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
+        ensure: :present,
+        name: '501',
+        provider: :quagga,
+        rules: ['permit 64513:2_.*_64515:1',],
       })
     end
   end

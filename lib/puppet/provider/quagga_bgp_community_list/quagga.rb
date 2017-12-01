@@ -1,7 +1,7 @@
 Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
   @doc = 'Manages a community-list using quagga.'
 
-  commands :vtysh => 'vtysh'
+  commands vtysh: 'vtysh'
 
   def initialize(value)
     super(value)
@@ -19,31 +19,29 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
 
       next if line =~ /\A!\Z/
 
-      if line =~ /\Aip\scommunity-list\s(\d+)\s(deny|permit)((\s(\d+:\d+))+)\Z/
+      if line =~ /\Aip\scommunity-list\s(\d+)\s(deny|permit)\s(.+)\Z/
         name = $1
         action = $2
-        communities = $3.strip.split(/\s/)
+        rule = $3.strip
         found_community_list = true
 
         if name != previous_name
           unless hash.empty?
             debug 'Instantiated the bgp community list %{name}.' % {
-              :name => hash[:name],
+              name: hash[:name],
             }
 
             providers << new(hash)
           end
           hash = {
-              :ensure => :present,
-              :name => name,
-              :provider => self.name,
-              :rules => [],
+            ensure: :present,
+              name: name,
+              provider: self.name,
+              rules: [],
           }
         end
 
-        communities.each do |community|
-          hash[:rules] << "#{action} #{community}"
-        end
+        hash[:rules] << "#{action} #{rule}"
 
         previous_name = name
       elsif line =~ /\A\w/ and found_community_list
@@ -53,7 +51,7 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
 
     unless hash.empty?
       debug 'Instantiated the bgp community list %{name}.' % {
-        :name => hash[:name],
+        name: hash[:name],
       }
 
       providers << new(hash)
@@ -81,8 +79,8 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
 
     @resource[:rules].each do |rule|
       cmds << 'ip community-list %{name} %{rule}' % {
-        :name => @resource[:name],
-        :rule => rule,
+        name: @resource[:name],
+        rule: rule,
       }
     end
 
@@ -95,7 +93,7 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
 
   def destroy
     debug 'Destroying the bgp community list %{name}.' % {
-      :name => @property_hash[:name],
+      name: @property_hash[:name],
     }
 
     cmds = []
