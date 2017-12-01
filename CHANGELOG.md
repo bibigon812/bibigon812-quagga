@@ -1,4 +1,8 @@
-## [Unreleased]
+## [4.1.3] - 2017-12-01
+
+### Changed
+
+- a rule pattern of a community-list
 
 ### Fixed
 
