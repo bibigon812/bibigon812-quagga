@@ -31,7 +31,7 @@ Puppet::Type.newtype(:quagga_bgp_community_list) do
   newproperty(:rules, :array_matching => :all) do
     desc 'Set actions of this community list.'
 
-    newvalues(/\A(deny|permit)\s\d+:\d+\Z/)
+    newvalues(/\A(deny|permit)\s\^?[_,\d\.\\\*\+\-\[\]\(\)\{\}\|\?:]+\$?\Z/)
 
     def should_to_s(value = @should)
       if value
