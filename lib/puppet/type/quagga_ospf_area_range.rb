@@ -11,29 +11,14 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
         }
   }
 
-  def self.title_patterns
-    [
-      [ /\A(\S+)\Z/, [ [:name] ] ],
-      [ /\A(\S+)\s+(\S+)\Z/, [ [:area], [:name] ] ],
-    ]
-  end
-
   ensurable
 
-  newparam(:area, namevar: true) do
-    desc "Contains an OSPF area id, ex. '0.0.0.1'"
-
-    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
-
-    newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\Z/)
-  end
-
   newparam(:name, namevar: true) do
-    desc "Contains a CIDR, ex. '10.0.0.0/24'"
+    desc "Contains an OSPF area id and CIDR, ex. '0.0.0.0 10.0.0.0/24'"
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
 
-    newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\/(?:[1-2]?[0-9]|3[0-2])\Z/)
+    newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\s#{block}\.#{block}\.#{block}\.#{block}\/(?:[1-2]?[0-9]|3[0-2])\Z/)
   end
 
   newparam(:advertise) do
@@ -62,6 +47,6 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   end
 
   autorequire(:quagga_ospf_area) do
-    [ self[:area] ]
+    [ self[:name].split(/\s+/)[0] ]
   end
 end

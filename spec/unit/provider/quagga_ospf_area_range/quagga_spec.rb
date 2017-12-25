@@ -16,11 +16,10 @@ router ospf
   let(:provider) do
     described_class.new(
       advertise: :false,
-      area: '0.0.0.21',
       cost: 100,
       ensure: :present,
       provider: :quagga,
-      name: '1.1.1.1/32',
+      name: '0.0.0.21 1.1.1.1/32',
       substitute: '1.1.1.0/24',
     )
   end
@@ -48,11 +47,10 @@ router ospf
       it "should return range '0.0.0.21 1.1.2.0/24'" do
         expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
           advertise: :true,
-          area: '0.0.0.21',
           cost: :absent,
           ensure: :present,
           provider: :quagga,
-          name: '1.1.2.0/24',
+          name: '0.0.0.21 1.1.2.0/24',
           substitute: :absent,
         })
       end
@@ -60,11 +58,10 @@ router ospf
       it "should return range '0.0.0.21 1.1.1.1/32'" do
         expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
           advertise: :false,
-          area: '0.0.0.21',
           cost: 100,
           ensure: :present,
           provider: :quagga,
-          name: '1.1.1.1/32',
+          name: '0.0.0.21 1.1.1.1/32',
           substitute: '1.1.1.0/24',
         })
       end
@@ -77,7 +74,7 @@ router ospf
 
       let(:resources) do
         {
-          '0.0.0.21' => Puppet::Type.type(:quagga_ospf_area_range).new(
+          '0.0.0.21 1.1.1.1/32' => Puppet::Type.type(:quagga_ospf_area_range).new(
             title: '0.0.0.21 1.1.1.1/32',
             provider: provider
           )

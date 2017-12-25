@@ -15,10 +15,9 @@ Puppet::Type.type(:quagga_ospf_area_range).provide :quagga do
         substitute = m[:substitute].nil? ? :absent : m[:substitute]
         hash = {
           advertise: advertise,
-          area: m[:area],
           cost: cost,
           ensure: :present,
-          name: m[:range],
+          name: "#{m[:area]} #{m[:range]}",
           provider: self.name,
           substitute: substitute,
         }
@@ -46,8 +45,7 @@ Puppet::Type.type(:quagga_ospf_area_range).provide :quagga do
 
   def create
     template = self.class.instance_variable_get('@template')
-    area = @resource[:area]
-    range = @resource[:name]
+    area, range = @resource[:name].split(/\s+/)
     advertise = @resource[:advertise]
 
     debug 'Creating the resource %{resource}' % {resource: @resource.to_hash.inspect }
@@ -71,10 +69,12 @@ Puppet::Type.type(:quagga_ospf_area_range).provide :quagga do
   def destroy
     debug 'Destroying the resource %{resource}.' % { resource: @property_hash.inspect }
 
+    area, range = @property_hash[:name].split(/\s+/)
+
     cmds = []
     cmds << 'configure terminal'
     cmds << 'router ospf'
-    cmds << 'no area %{area} range %{range}' % { area: @property_hash[:area], range: @property_hash[:name] }
+    cmds << 'no area %{area} range %{range}' % { area: area, range: range }
     cmds << 'end'
     cmds << 'write memory'
     vtysh(cmds.reduce([]) { |commands, command| commands << '-c' << command })
