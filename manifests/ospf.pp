@@ -42,6 +42,10 @@ class quagga::ospf (
       }
     }
 
+  resources { 'quagga_ospf_area_range':
+    purge =>  true,
+  }
+
     $areas.each |String $area_name, Hash $area| {
       quagga::ospf::area {$area_name:
         * => $area
