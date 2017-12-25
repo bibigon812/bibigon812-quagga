@@ -43,7 +43,7 @@ class quagga::ospf (
     }
 
     $areas.each |String $area_name, Hash $area| {
-      quagga_ospf_area {$area_name:
+      quagga::ospf::area {$area_name:
         * => $area
       }
     }
