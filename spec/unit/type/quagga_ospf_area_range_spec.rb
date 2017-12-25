@@ -24,12 +24,12 @@ describe Puppet::Type.type(:quagga_ospf_area_range) do
     described_class.unprovide(:quagga_ospf_area_range)
   end
 
-  it 'should have :area and :range be its namevar' do
-    expect(described_class.key_attributes).to eq([:area, :range])
+  it 'should have :area and :name be its namevar' do
+    expect(described_class.key_attributes).to eq([:area, :name])
   end
 
   describe 'when validating attributes' do
-    [:area, :range, :advertise, :provider].each do |param|
+    [:area, :name, :advertise, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end

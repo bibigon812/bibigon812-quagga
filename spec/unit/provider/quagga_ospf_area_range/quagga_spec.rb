@@ -20,7 +20,7 @@ router ospf
       cost: 100,
       ensure: :present,
       provider: :quagga,
-      range: '1.1.1.1/32',
+      name: '1.1.1.1/32',
       substitute: '1.1.1.0/24',
     )
   end
@@ -52,7 +52,7 @@ router ospf
           cost: :absent,
           ensure: :present,
           provider: :quagga,
-          range: '1.1.2.0/24',
+          name: '1.1.2.0/24',
           substitute: :absent,
         })
       end
@@ -64,7 +64,7 @@ router ospf
           cost: 100,
           ensure: :present,
           provider: :quagga,
-          range: '1.1.1.1/32',
+          name: '1.1.1.1/32',
           substitute: '1.1.1.0/24',
         })
       end

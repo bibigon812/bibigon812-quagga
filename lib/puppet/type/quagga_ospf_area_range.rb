@@ -4,7 +4,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
 
       Examples:
 
-        ospf_area_range { '0.0.0.0 10.0.0.0/24':
+        ospf_area_name { '0.0.0.0 10.0.0.0/24':
           cost       => 100,
           advertise  => true,
           substitute => '10.0.0.0/8',
@@ -13,7 +13,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
 
   def self.title_patterns
     [
-      [ /\A(\S+)\s+(\S+)\Z/, [ [:area], [:range] ] ],
+      [ /\A(\S+)\s+(\S+)\Z/, [ [:area], [:name] ] ],
     ]
   end
 
@@ -27,7 +27,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
     newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\Z/)
   end
 
-  newparam(:range, namevar: true) do
+  newparam(:name, namevar: true) do
     desc "Contains a CIDR, ex. '10.0.0.0/24'"
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
@@ -36,7 +36,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   end
 
   newparam(:advertise) do
-    desc 'Advertise this range. Defaults to `true`'
+    desc 'Advertise this name. Defaults to `true`'
 
     defaultto(:true)
     newvalues(:false, :true)
@@ -53,7 +53,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   end
 
   newproperty(:substitute) do
-    desc 'Network prefix to be announced instead of range'
+    desc 'Network prefix to be announced instead of name'
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
 
@@ -62,13 +62,5 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
 
   autorequire(:quagga_ospf_area) do
     [ self[:area] ]
-  end
-
-  def name
-    "#{self[:area]} #{self[:range]}"
-  end
-
-  def name=(value)
-    self[:area], self[:range] = value.split(/\s+/)
   end
 end
