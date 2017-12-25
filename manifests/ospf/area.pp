@@ -6,7 +6,7 @@ define quagga::ospf::area (
   Optional[String[1]] $access_list_import = undef,
   Optional[String[1]] $prefix_list_export = undef,
   Optional[String[1]] $prefix_list_import = undef,
-  Array[Stdlib::Compat::Ipv4] $networks = [],
+  Array[String[1]] $networks = [],
   Hash $ranges = {},
 ) {
   quagga_ospf_area { $name:
