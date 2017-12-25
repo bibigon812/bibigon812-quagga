@@ -13,6 +13,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
 
   def self.title_patterns
     [
+      [ /\A(\S+)\Z/, [ [:name] ] ],
       [ /\A(\S+)\s+(\S+)\Z/, [ [:area], [:name] ] ],
     ]
   end
