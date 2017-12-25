@@ -86,7 +86,7 @@ Puppet::Type.type(:quagga_ospf_area_range).provide :quagga do
     @property_hash.clear
   end
 
-  def flash
+  def flush
     destroy
     create
   end
