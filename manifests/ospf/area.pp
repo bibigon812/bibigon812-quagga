@@ -22,7 +22,8 @@ define quagga::ospf::area (
 
   $ranges.each |String[1] $range_name, Hash $range_opts| {
     quagga_ospf_area_range { "${name} ${range_name}":
-      * =>  $range_opts,
+      ensure => $ensure,
+      *      => $range_opts,
     }
   }
 }
