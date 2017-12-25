@@ -6,6 +6,11 @@ Puppet::Type.type(:quagga_ospf_area_range).provide :quagga do
   commands vtysh: 'vtysh'
   mk_resource_methods
 
+  def initialize(value)
+    super(value)
+    @changed = false
+  end
+
   def self.instances
     providers = []
     vtysh('-c', 'show running-config').split(/\n/).collect do |line|
@@ -67,8 +72,6 @@ Puppet::Type.type(:quagga_ospf_area_range).provide :quagga do
   end
 
   def destroy
-    return if @property_hash.empty?
-
     debug 'Destroying the resource %{resource}.' % { resource: @property_hash.inspect }
 
     area, range = @property_hash[:name].split(/\s+/)
@@ -85,8 +88,16 @@ Puppet::Type.type(:quagga_ospf_area_range).provide :quagga do
   end
 
   def flush
-    destroy
-    create
+    if @changed
+      destroy
+      create
+    end
+  end
+
+  %w{advertise cost substitute}.each do |property|
+    define_method "#{property}=" do
+      @changed = true
+    end
   end
 end
 
