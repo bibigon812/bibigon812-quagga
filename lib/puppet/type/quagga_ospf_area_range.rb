@@ -36,7 +36,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   end
 
   newparam(:advertise) do
-    desc 'Advertise this name. Defaults to `true`'
+    desc 'Advertise this range. Defaults to `true`'
 
     defaultto(:true)
     newvalues(:false, :true)
@@ -53,7 +53,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   end
 
   newproperty(:substitute) do
-    desc 'Network prefix to be announced instead of name'
+    desc 'Network prefix to be announced instead of range'
 
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
 
