@@ -329,6 +329,9 @@ quagga::ospf::areas:
     networks:
       - 172.16.0.0/24
       - 192.168.0.0/24
+    ranges:
+      1.1.1.1/32:
+        substitute: 1.1.1.0/24
   0.0.0.1:
     networks:
       - 172.16.1.0/24
@@ -415,6 +418,11 @@ quagga::pim::interfaces:
 - `router`: OSPF router options. See the type [`quagga_ospf_router`](#quagga_ospf_router).
 - `areas`: OSPF area options. See the type [`quagga_ospf_area`](#quagga_ospf_area).
 - `interfaces`: OSPF parameters of interfaces. See the type [`quagga_ospf_interface`](#quagga_ospf_interface).
+
+#### quagga::ospf::area
+
+- See [`quagga_ospf_area`](#quagga_ospf_area).
+- `ranges`: OSPF ranges. See [`quagga_ospf_area_range`](#quagga_ospf_area_range).
 
 #### quagga::pim
 
@@ -731,6 +739,19 @@ quagga_ospf_area { '0.0.0.0':
 - `networks`: enable routing on an IP network. Defaults to `[]`.
 - `auth`: enable authentication on this area: `false`, `true`, `message-digest`: Defaults to `false`.
 - `stub`: . configure the area to be a stub area: `false`, `true`, `no-summary`: Defaults to `false`.
+
+#### qugga_ospf_area_range
+
+```puppet
+quagga_ospf_area_range { '0.0.0.0 10.0.0.0/8':
+  substitute: '10.0.0.0/8',
+}
+```
+
+- `name`: contains an OSPF area id and range.
+- `advertise`: Advertise this range. Defaults to `true`.
+- `cost`: User specified metric for this range.
+- `substitute`: Network prefix to be announced instead of range.
 
 #### quagga_prefix_list
 
