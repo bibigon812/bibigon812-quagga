@@ -29,6 +29,7 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   end
 
   newproperty(:cost) do
+    desc 'User specified metric for this range'
     validate do |value|
       if value != :absent and (not value.is_a?(Integer) or value < 0 or value > 16777215)
         fail "Invalid value '#{value}'. Allowed values are '0-16777215'"
