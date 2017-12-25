@@ -90,5 +90,9 @@ Puppet::Type.type(:quagga_ospf_area_range).provide :quagga do
     destroy
     create
   end
+
+  def name
+    "#{area} #{range}"
+  end
 end
 
