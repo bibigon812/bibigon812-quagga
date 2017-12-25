@@ -67,4 +67,8 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   def name
     "#{self[:area]} #{self[:range]}"
   end
+
+  def name=(value)
+    self[:area], self[:range] = value.split(/\s+/)
+  end
 end
