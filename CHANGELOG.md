@@ -1,3 +1,9 @@
+## [4.2.1] - 2018-01-30
+
+### Fixed
+
+- the ipv6 prefix validation of a quagga_prefix_list 
+
 ## [4.2.0] - 2017-12-25
 
 ### Added
