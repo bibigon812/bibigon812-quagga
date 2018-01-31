@@ -24,6 +24,8 @@ ip prefix-list ADVERTISED_ROUTES seq 1000 deny 0.0.0.0/0 le 32
 ip prefix-list AS_LOCAL seq 10 permit 1.1.1.0/24
 ip prefix-list DEFAULT_ROUTE seq 10 permit 0.0.0.0/0
 !
+ipv6 prefix-list ipv6_advertised_prefixes seq 10 permit 2001:db8::/48
+!
 ip as-path access-list AS100 permit _100$
 ip as-path access-list AS100 permit _100_
 ip as-path access-list FROM_AS200 permit _200$
@@ -32,7 +34,7 @@ ip as-path access-list THROUGH_AS300 permit _300_
     end
 
     it 'should return a resource' do
-      expect(described_class.instances.size).to eq(5)
+      expect(described_class.instances.size).to eq(6)
     end
 
     it 'should return the resource \'ABCD 5\'' do
@@ -71,6 +73,19 @@ ip as-path access-list THROUGH_AS300 permit _300_
           :action   => :deny,
           :prefix   => '0.0.0.0/0',
           :proto    => :ip,
+      })
+    end
+
+    it 'should return the resource \'ipv6_advertised_prefixes\'' do
+      expect(described_class.instances[5].instance_variable_get('@property_hash')).to eq({
+          ensure: :present,
+          name: 'ipv6_advertised_prefixes 10',
+          ge: :absent,
+          le: :absent,
+          provider: :quagga,
+          action: :permit,
+          prefix: '2001:db8::/48',
+          proto: :ipv6,
       })
     end
   end
