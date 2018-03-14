@@ -240,4 +240,14 @@ describe Puppet::Type.type(:quagga_bgp_peer) do
       expect(described_class.new(:name => '192.168.1.1', :update_source => '10.0.0.2')[:update_source]).to eq('10.0.0.2')
     end
   end
+
+  describe 'password' do
+    it 'should support string as a value' do
+      expect { described_class.new(name: '192.168.1.1', password: 'QWRF$345!#@$') }.to_not raise_error
+    end
+
+    it 'should contain QWRF$345!#@$' do
+      expect(described_class.new(:name => '192.168.1.1', password: 'QWRF$345!#@$')[:password]).to eq('QWRF$345!#@$')
+    end
+  end
 end
