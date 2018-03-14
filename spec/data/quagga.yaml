@@ -131,6 +131,7 @@ quagga::bgp::peers:
         next_hop_self: true
   10.0.0.2:
     peer_group: INTERNAL
+    password: QWRF$345!#@$
     address_families:
       ipv4_unicast:
         peer_group: INTERNAL
