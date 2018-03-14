@@ -1,3 +1,9 @@
+## [Unreleased] - 2018-03-14
+
+### Added
+
+- password supporting for bgp sessions
+
 ## [4.2.2] - 2018-01-31
 
 ### Fixed

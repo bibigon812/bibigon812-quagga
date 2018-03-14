@@ -242,6 +242,7 @@ quagga::bgp::peers:
         default_originate: true
   INTERNAL:
     remote_as: 65000
+    password: QWRF$345!#@$
     update_source: 10.0.0.1
     address_families:
       ipv4_unicast:
@@ -535,6 +536,7 @@ quagga_bgp_peer { '192.168.1.1':
 quagga_bgp_peer { 'internal_peers':
     ensure     => present,
     local_as   => 65000,
+    password   => 'QWRF$345!#@$',
     peer_group => true,
     remote_as  => 65000,
 }
@@ -544,6 +546,7 @@ quagga_bgp_peer { 'internal_peers':
 - `ensure`: manage the state of this BGP neighbor: `absent`, `present`: Defaults to `present`.
 - `local_as`: specify a local-as number.
 - `passive`: don't send open messages to this neighbor. Defaults to `false`.
+- `password`: set a password.
 - `peer_group`: member of the peer-group.
 - `remote_as`: specify a BGP neighbor AS.
 - `shutdown`: administratively shut down this neighbor. Defaults to `false`.
