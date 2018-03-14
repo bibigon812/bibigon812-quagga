@@ -7,6 +7,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
         quagga_bgp_peer { '192.168.1.1':
             ensure     => present,
             peer_group => 'internal_peers',
+            passwword  => 'QWRF$345!#@$',
         }
 
         quagga_bgp_peer { 'internal_peers':
@@ -86,6 +87,12 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\Z/)
     newvalues(/\A\h+:[\h:]+\Z/)
     newvalues(/\A#{interface}\Z/)
+  end
+
+  newproperty(:password) do
+    desc 'Set a password'
+
+    defaultto(:absent)
   end
 
   autorequire(:quagga_bgp_router) do
