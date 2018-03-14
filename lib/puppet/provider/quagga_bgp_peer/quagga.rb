@@ -27,6 +27,12 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
       :template => 'neighbor <%= name %> passive',
       :type => :boolean,
     },
+    password: {
+      default: :absent,
+      regexp: /\A\sneighbor\s\S+\spassword\s(\S+)\Z/,
+      template: 'neighbor <%= name %> password<% unless value.nil? %> <%= value %><% end %>',
+      type: :string,
+    },
     :shutdown => {
       :default => :false,
       :regexp => /\A\sneighbor\s\S+\sshutdown\Z/,

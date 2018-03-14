@@ -14,6 +14,7 @@ describe Puppet::Type.type(:quagga_bgp_peer).provider(:quagga) do
       :local_as      => :absent,
       :name          => 'INTERNAL',
       :passive       => :false,
+      password: 'QWRF$345!#@$',
       :peer_group    => :true,
       :provider      => :quagga,
       :remote_as     => 65000,
@@ -37,6 +38,7 @@ router bgp 65000
  neighbor INTERNAL update-source 172.16.32.103
  neighbor INTERNAL activate
  neighbor INTERNAL next-hop-self
+ neighbor INTERNAL password QWRF$345!#@$
  neighbor INTERNAL soft-reconfiguration inbound
  neighbor RR peer-group
  neighbor RR remote-as 65000
@@ -79,6 +81,7 @@ router bgp 65000
  neighbor INTERNAL remote-as 65000
  no neighbor INTERNAL activate
  neighbor INTERNAL allowas-in 1
+ neighbor INTERNAL password QWRF$345!#@$
  neighbor INTERNAL update-source 172.16.32.103
  neighbor INTERNAL next-hop-self
  neighbor INTERNAL soft-reconfiguration inbound
@@ -138,6 +141,7 @@ end
         :local_as      => :absent,
         :name          => 'INTERNAL',
         :passive       => :false,
+        password: 'QWRF$345!#@$',
         :peer_group    => :true,
         :provider      => :quagga,
         :remote_as     => 65000,
@@ -152,6 +156,7 @@ end
         :local_as      => :absent,
         :name          => 'RR',
         :passive       => :false,
+        password: :absent,
         :peer_group    => :true,
         :provider      => :quagga,
         :remote_as     => 65000,
@@ -166,6 +171,7 @@ end
         :local_as      => :absent,
         :name          => 'RR_WEAK',
         :passive       => :false,
+        password: :absent,
         :peer_group    => :true,
         :provider      => :quagga,
         :remote_as     => 65000,
@@ -180,6 +186,7 @@ end
         :local_as      => :absent,
         :name          => '172.16.32.108',
         :passive       => :false,
+        password: :absent,
         :peer_group    => 'INTERNAL',
         :provider      => :quagga,
         :remote_as     => :absent,
@@ -194,6 +201,7 @@ end
         :local_as      => :absent,
         :name          => '1a03:d000:20a0::91',
         :passive       => :false,
+        password: :absent,
         :peer_group    => :false,
         :provider      => :quagga,
         :remote_as     => 31113,
@@ -233,6 +241,7 @@ end
         :local_as      => :absent,
         :name          => 'INTERNAL',
         :passive       => :false,
+        password: 'QWRF$345!#@$',
         :peer_group    => :true,
         :provider      => :quagga,
         :remote_as     => 65000,
@@ -247,6 +256,7 @@ end
         :local_as      => :absent,
         :name          => 'RR',
         :passive       => :false,
+        password: :absent,
         :peer_group    => :true,
         :provider      => :quagga,
         :remote_as     => 65000,
@@ -261,6 +271,7 @@ end
         :local_as      => :absent,
         :name          => 'RR_WEAK',
         :passive       => :false,
+        password: :absent,
         :peer_group    => :true,
         :provider      => :quagga,
         :remote_as     => 65000,
@@ -275,6 +286,7 @@ end
         :local_as      => :absent,
         :name          => '172.16.32.108',
         :passive       => :false,
+        password: :absent,
         :peer_group    => 'INTERNAL',
         :provider      => :quagga,
         :remote_as     => :absent,
@@ -289,6 +301,7 @@ end
         :local_as      => :absent,
         :name          => '1a03:d000:20a0::91',
         :passive       => :false,
+        password: :absent,
         :peer_group    => :false,
         :provider      => :quagga,
         :remote_as     => 31113,
@@ -326,6 +339,7 @@ end
     it 'should has all values' do
       resource[:ensure] = :present
       resource[:name] = 'INTERNAL'
+      resource[:password] = 'QWRF$345!#@$'
       resource[:remote_as] = 65000
       resource[:update_source] = '172.16.32.103'
       provider.expects(:vtysh).with([
@@ -333,6 +347,7 @@ end
         '-c', 'router bgp 65000',
         '-c', 'neighbor INTERNAL peer-group',
         '-c', 'neighbor INTERNAL remote-as 65000',
+        '-c', 'neighbor INTERNAL password QWRF$345!#@$',
         '-c', 'neighbor INTERNAL update-source 172.16.32.103',
         '-c', 'end',
         '-c', 'write memory',
