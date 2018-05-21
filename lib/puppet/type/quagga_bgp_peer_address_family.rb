@@ -210,7 +210,7 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
         .map { |resource| resource[:name] }
     end
 
-    reqs.fletten
+    reqs.flatten
   end
 
   autosubscribe(:quagga_route_map) do
