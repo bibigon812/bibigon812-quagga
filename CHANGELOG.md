@@ -1,3 +1,13 @@
+## [4.3.1] - 2018-05-21
+
+### Fixed
+
+- the error:
+
+```
+Error: Failed to apply catalog: undefined method `fletten' for []:Array
+```
+
 ## [4.3.0] - 2018-03-14
 
 ### Added
