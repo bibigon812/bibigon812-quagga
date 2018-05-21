@@ -12,3 +12,4 @@ end
 
 gem 'puppet', '~> 4.10.0'
 gem 'facter'
+gem 'nokogiri', '~> 1.8.2'
