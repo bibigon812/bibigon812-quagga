@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_logging) do
-  @doc = %q{This type provides the capabilities to manage logging within puppet.
+  @doc = %q(This type provides the capabilities to manage logging within puppet.
 
     Examples:
 
@@ -12,17 +12,17 @@ Puppet::Type.newtype(:quagga_logging) do
         facility => 'local7',
         level    => 'warnings',
       }
-  }
+  )
 
   ensurable
 
   newparam(:name) do
-    desc %q{Specifies a backend name of the logging system. The values are:
+    desc %q(Specifies a backend name of the logging system. The values are:
         - file /path/to/file
         - monitor
         - stdout
         - syslog
-    }
+    )
 
     newvalues('file', 'monitor', 'stdout', 'syslog')
   end
@@ -55,11 +55,11 @@ Puppet::Type.newtype(:quagga_logging) do
   # end
 
   newproperty(:filename) do
-    desc %q{Specifies the filename for file messages.}
+    desc 'Specifies the filename for file messages.'
   end
 
   newproperty(:level) do
-    desc %q{Specifies the logging level. The values are:
+    desc %q(Specifies the logging level. The values are:
         - alerts
         - critical
         - debugging
@@ -68,16 +68,16 @@ Puppet::Type.newtype(:quagga_logging) do
         - informational
         - notifications
         - warnings
-    }
+    )
 
     newvalues(:alerts, :critical, :debugging, :emergencies, :errors, :informational, :notifications, :warnings)
   end
 
   autorequire(:package) do
-    %w{quagga}
+    %w[quagga]
   end
 
   autorequire(:service) do
-    %w{zebra}
+    %w[zebra]
   end
 end

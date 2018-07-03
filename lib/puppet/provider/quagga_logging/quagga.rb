@@ -1,5 +1,5 @@
 Puppet::Type.type(:quagga_logging).provide :quagga do
-  @doc = %q{Manages quagga logging parameters.}
+  @doc = 'Manages quagga logging parameters.'
 
   mk_resource_methods
 
@@ -17,12 +17,11 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
     store = {}
 
     vtysh('-c', 'show running-config').split(%r{\n}).collect do |line|
-      find = true if not find and %r{\Alog\s} =~ line
-      find = false if find and not %r{\Alog\s} =~ line
+      find = true if !find && (/\Alog\s/ =~ line)
+      find = false if find && !(/\Alog\s/ =~ line)
       next unless find
 
-      %r{\Alog\s(?<name>(?:file\s(?<filename>\S+)|monitor|stdout|syslog))(?:\s(?<level>\S+))?\Z}.match(line) do |m|
-
+      /\Alog\s(?<name>(?:file\s(?<filename>\S+)|monitor|stdout|syslog))(?:\s(?<level>\S+))?\Z/.match(line) do |m|
         hash = {
           ensure:   :present,
           provider: self.name,
@@ -36,7 +35,7 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
         end
 
         if m[:level].nil?
-          if name == 'monitor'
+          if hash[:name] == 'monitor'
             hash[:level] = :debugging
           else
             hash[:level] = :errors
@@ -45,7 +44,7 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
           hash[:level] = m[:level].to_sym
         end
 
-        debug 'Instantiated quagga_logging: %{hash}' % { hash: store.inspect }
+        debug "Instantiated quagga_logging: #{hash.inspect}"
         providers << new(hash)
       end
     end
@@ -55,8 +54,8 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.keys.each do |name|
-      if provider = providers.find{ |provider| provider.name == name }
+    resources.each_key do |name|
+      if provider = providers.find{ |prov| prov.name == name }
         resources[name].provider = provider
       end
     end
@@ -71,31 +70,31 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
   end
 
   def flush
-    cmds = []
-    cmds << 'configure terminal'
+    commands = []
+    commands << 'configure terminal'
 
     if exists?
 
-      cmd = %w{log}
-      cmd << @property_hash[:name]
+      command = %w[log]
+      command << @property_hash[:name]
 
       if @property_hash[:name] == 'file'
-        cmd << filename
+        command << filename
       end
 
-      cmd << level unless level == :absent
+      command << level unless level == :absent
 
-      cmds << cmd.join(' ')
+      commands << command.join(' ')
 
     else
 
-      cmds << 'no log %{name}' % { name: name }
+      commands << "no log #{@property_hash[:name]}"
     end
 
-    cmds << 'end'
-    cmds << 'write memory'
+    commands << 'end'
+    commands << 'write memory'
 
-    vtysh(cmds.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(commands.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
 
     @property_flush.clear
   end
