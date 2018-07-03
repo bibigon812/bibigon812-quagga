@@ -60,6 +60,9 @@ quagga::service_file_manage: true
 quagga::packages:
   quagga:
     ensure: "present"
+quagga::logging::backend: "syslog"
+quagga::logging::filename:
+quagga::logging::level: "errors"
 quagga::zebra::agentx: false
 quagga::zebra::hostname: "%{::facts.networking.fqdn}"
 quagga::zebra::global_opts: {}
