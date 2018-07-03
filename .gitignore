@@ -1,8 +1,9 @@
-.bundle/
-.git/
-.vagrant/
-junit/
-log/
-pkg/
-vendor/
-spec/fixtures/
+/.bundle/
+/.git/
+/.vagrant/
+/junit/
+/log/
+/pkg/
+/vendor/
+/spec/fixtures/
+/Gemfile.lock
