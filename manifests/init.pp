@@ -1,3 +1,19 @@
+# @summary Manages common option of quagga services
+# @api public
+# @param default_owner
+#   Specifies the default owner of quagga files.
+# @param default_group
+#   Specifies the default group of quagga files.
+# @param default_mode
+#   Specifies the default mode of quagga files.
+# @param default_content
+#   Specifies the default content of quagga files.
+# @param service_file
+#   The system configuration file
+# @param service_file_manage
+#   Enable or disable manage the system configuration file
+# @param packages
+#   Specifies which packages will be installed
 class quagga (
   String $default_owner,
   String $default_group,
@@ -23,6 +39,7 @@ class quagga (
     require => Package[keys($packages)]
   }
 
+  contain quagga::logging
   contain quagga::zebra
   contain quagga::bgp
   contain quagga::ospf
