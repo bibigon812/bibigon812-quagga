@@ -33,7 +33,18 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
           :template => 'bgp router-id<% unless value.nil? %> <%= value %><% end %>',
           :type     => :string,
       },
+      :keepalive => {
+          :default  => 3,
+          :type     => :fixnum,
+      },
+      :holdtime => {
+          :default  => 9,
+          :type     => :fixnum,
+      },
   }
+
+  @timers_regexp = /\A\stimers\sbgp\s(\d+)\s(\d+)\Z/
+  @timers_template = 'timers bgp <%= keepalive %> <%= holdtime %>'
 
   def initialize(value)
     super(value)
@@ -90,7 +101,13 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
         break
 
       elsif found_bgp
+        if line =~ @timers_regexp
+          hash[:keepalive] = $1.to_i
+          hash[:holdtime] = $2.to_i
+          next
+        end
         @resource_map.each do |property, options|
+          next unless options[:regexp]
           if line =~ options[:regexp]
             value = $1
 
@@ -146,13 +163,17 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
+    custom_timers = false
+
     cmds = []
     cmds << 'configure terminal'
     cmds << 'router bgp %{as_number}' % { :as_number => as_number }
 
     resource_map.each do |property, options|
       if @resource[property] and @resource[property] != options[:default]
-        if @resource[property] == :true
+        if [:keepalive, :holdtime].include? property
+          custom_timers = true
+        elsif @resource[property] == :true
           cmds << ERB.new(options[:template]).result(binding)
 
         elsif @resource[property] == :false
@@ -168,6 +189,12 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
           cmds << ERB.new(options[:template]).result(binding)
         end
       end
+    end
+
+    if custom_timers
+      keepalive = @resource[:keepalive] || resource_map[:keepalive][:default]
+      holdtime = @resource[:holdtime] || resource_map[:holdtime][:default]
+      cmds << ERB.new(self.class.instance_variable_get('@timers_template')).result(binding)
     end
 
     cmds << 'end'
@@ -207,12 +234,17 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
 
     resource_map = self.class.instance_variable_get('@resource_map')
 
+    custom_timers = false
+
     cmds = []
     cmds << 'configure terminal'
     cmds << 'router bgp %{as_number}' % { :as_number => as_number }
 
     @property_flush.each do |property, v|
-      if v == :absent or v == :false
+      if [:keepalive, :holdtime].include? property
+        custom_timers = true
+
+      elsif v == :absent or v == :false
         cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
 
       elsif [:true, 'true'].include?(v) and [:symbol, :string].include?(resource_map[property][:type])
@@ -235,6 +267,12 @@ Puppet::Type.type(:quagga_bgp_router).provide :quagga do
         value = v
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       end
+    end
+
+    if custom_timers
+      keepalive = @property_flush[:keepalive] || @property_hash[:keepalive] || resource_map[:keepalive][:default]
+      holdtime = @property_flush[:holdtime] || @property_hash[:holdtime] || resource_map[:holdtime][:default]
+      cmds << ERB.new(self.class.instance_variable_get('@timers_template')).result(binding)
     end
 
     cmds << 'end'
