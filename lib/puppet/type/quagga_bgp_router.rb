@@ -12,6 +12,8 @@ Puppet::Type.newtype(:quagga_bgp_router) do
             default_ipv4_unicast     => false,
             default_local_preference => 100,
             router_id                => '192.168.1.1',
+            keepalive                => 3,
+            holdtime                 => 9,
         }
   }
 
@@ -95,6 +97,30 @@ Puppet::Type.newtype(:quagga_bgp_router) do
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
 
     newvalues(re)
+  end
+
+  newproperty(:keepalive) do
+    desc 'Default BGP keepalive interval.'
+    defaultto(3)
+
+    validate do |value|
+      fail "Invalid value '#{value}'. It is not an Integer" unless value.is_a?(Integer)
+      fail "Invalid value '#{value}'. Valid values are 0-65535" unless value >= 0 and value <= 65535
+    end
+  end
+
+  newproperty(:holdtime) do
+    desc 'Default BGP holdtime.'
+    defaultto(9)
+
+    validate do |value|
+      fail "Invalid value '#{value}'. It is not an Integer" unless value.is_a?(Integer)
+      fail "Invalid value '#{value}'. Valid values are 0-65535" unless value >= 0 and value <= 65535
+    end
+  end
+
+  validate do
+    fail "keepalive must be 0 or at least three times greater than holdtime" if value(:keepalive) != 0 and value(:keepalive) > value(:holdtime) / 3
   end
 
   autorequire(:package) do

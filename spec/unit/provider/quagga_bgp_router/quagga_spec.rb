@@ -24,6 +24,7 @@ router bgp 65000
  bgp graceful-restart stalepath-time 300
  bgp graceful-restart restart-time 300
  bgp network import-check
+ timers bgp 4 12
  network 172.16.32.0/24
  neighbor INTERNAL peer-group
  neighbor INTERNAL remote-as 197888
@@ -65,7 +66,9 @@ router bgp 65000
           default_ipv4_unicast: :false,
           default_local_preference: 100,
           ensure: :present,
+          holdtime: 12,
           import_check: :true,
+          keepalive: 4,
           name: 'bgp',
           provider: :quagga,
           redistribute: [],

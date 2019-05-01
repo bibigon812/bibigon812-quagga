@@ -32,7 +32,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
     end
 
     [:as_number, :import_check, :default_ipv4_unicast, :default_local_preference,
-     :router_id,].each do |property|
+     :router_id, :keepalive, :holdtime].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
@@ -210,6 +210,32 @@ describe Puppet::Type.type(:quagga_bgp_router) do
 
     it 'should contain 1.1.1.1' do
       expect(described_class.new(:name => 'bgp', :router_id => '1.1.1.1')[:router_id]).to eq('1.1.1.1')
+    end
+  end
+
+  describe 'keepalive/holdtime', type: :type do
+    it 'should support 0/0 as a value' do
+      expect { described_class.new(:name => 'bgp', :keepalive => 0, :holdtime => 0) }.to_not raise_error
+    end
+
+    it 'should support 2/6 as a value' do
+      expect { described_class.new(:name => 'bgp', :keepalive => 2, :holdtime => 6) }.to_not raise_error
+    end
+
+    it 'should not support 3/8 as a value' do
+      expect { described_class.new(:name => 'bgp', :keepalive => 3, :holdtime => 8) }.to raise_error(Puppet::Error, /keepalive must be 0/)
+    end
+
+    it 'should default to 3/9' do
+      expect(described_class.new(:name => 'bgp')).to satisfy { |t| t[:keepalive] == 3 && t[:holdtime] == 9 }
+    end
+
+    it 'should contain 0/0' do
+      expect(described_class.new(:name => 'bgp', :keepalive => 0, :holdtime => 0)).to satisfy { |t| t[:keepalive] == 0 && t[:holdtime] == 0 }
+    end
+
+    it 'should contain 2/6' do
+      expect(described_class.new(:name => 'bgp', :keepalive => 2, :holdtime => 6)).to satisfy { |t| t[:keepalive] == 2 && t[:holdtime] == 6 }
     end
   end
 end

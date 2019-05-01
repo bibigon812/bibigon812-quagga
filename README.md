@@ -201,6 +201,8 @@ quagga::bgp::router:
   default_ipv4_unicast: false
   import_check: true
   router_id: 10.0.0.1
+  keepalive: 3
+  holdtime: 9
 ```
 
 ### BGP Address Families
@@ -491,6 +493,8 @@ quagga_bgp_router { 'bgp':
     default_local_preference => 100,
     redistribute             => [ 'ospf route-map BGP_FROM_OSPF', ],
     router_id                => '192.168.1.1',
+    keepalive                => 3,
+    holdtime                 => 9,
 }
 ```
 
@@ -502,6 +506,8 @@ quagga_bgp_router { 'bgp':
 - `default_local_preference`: default local preference. Defaults to `100`.
 - `redistribute`: redistribute information from another routing protocol.
 - `router_id`: override configured router identifier.
+- `keepalive`: the default bgp peer keepalive interval. Defaults to `3`.
+- `holdtime`: the default bgp peer holdtime. Defaults to `9`.
 
 #### quagga_bgp_address_family
 
