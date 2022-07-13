@@ -20,10 +20,10 @@ class quagga::ospf (
       false => 'absent'
     }
 
-    file_line {'ospf_agentx':
+    file_line { 'ospf_agentx':
       ensure => $agentx_ensure,
       path   => $config_file,
-      line   => 'agentx'
+      line   => 'agentx',
     }
 
     if $service_manage {
@@ -32,23 +32,23 @@ class quagga::ospf (
       }
     }
 
-    quagga_ospf_router {'ospf':
-      * => $router
+    quagga_ospf_router { 'ospf':
+      * => $router,
     }
 
     $interfaces.each |String $interface_name, Hash $interface| {
-      quagga_ospf_interface {$interface_name:
-        * => $interface
+      quagga_ospf_interface { $interface_name:
+        * => $interface,
       }
     }
 
-  resources { 'quagga_ospf_area_range':
-    purge =>  true,
-  }
+    resources { 'quagga_ospf_area_range':
+      purge => true,
+    }
 
     $areas.each |String $area_name, Hash $area| {
-      quagga::ospf::area {$area_name:
-        * => $area
+      quagga::ospf::area { $area_name:
+        * => $area,
       }
     }
   }

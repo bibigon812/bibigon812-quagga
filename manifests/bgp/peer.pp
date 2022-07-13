@@ -13,7 +13,7 @@ define quagga::bgp::peer (
     fail('You must include the quagga::bgp base class before using any quagga::bgp defined resources.')
   }
 
-  quagga_bgp_peer {$name:
+  quagga_bgp_peer { $name:
     ensure        => $ensure,
     local_as      => $local_as,
     remote_as     => $remote_as,
@@ -25,7 +25,7 @@ define quagga::bgp::peer (
   }
 
   $address_families.each |String $address_family_name, Hash $address_family| {
-    quagga_bgp_peer_address_family {"${name} ${address_family_name}":
+    quagga_bgp_peer_address_family { "${name} ${address_family_name}":
       *       => $address_family,
       require => Quagga_bgp_peer[$name],
     }

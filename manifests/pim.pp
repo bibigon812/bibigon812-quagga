@@ -19,10 +19,10 @@ class quagga::pim (
       false => 'absent'
     }
 
-    file_line {'pim_agentx':
+    file_line { 'pim_agentx':
       ensure => $agentx_ensure,
       path   => $config_file,
-      line   => 'agentx'
+      line   => 'agentx',
     }
 
     if $service_manage {
@@ -31,13 +31,13 @@ class quagga::pim (
       }
     }
 
-    quagga_pim_router {'pim':
-      * => $router
+    quagga_pim_router { 'pim':
+      * => $router,
     }
 
     $interfaces.each |String $interface_name, Hash $interface| {
-      quagga_pim_interface {$interface_name:
-        * => $interface
+      quagga_pim_interface { $interface_name:
+        * => $interface,
       }
     }
   }

@@ -14,7 +14,7 @@ class quagga::logging (
     'errors',
     'informational',
     'notifications',
-    'warnings'
+    'warnings',
   ]                              $level,
 ) {
   quagga_logging { $backend:

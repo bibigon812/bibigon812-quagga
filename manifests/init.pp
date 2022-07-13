@@ -24,8 +24,8 @@ class quagga (
   Hash $packages,
 ) {
   $packages.each |String $package_name, Hash $package| {
-    package {$package_name:
-      * => $package
+    package { $package_name:
+      * => $package,
     }
   }
 
@@ -36,7 +36,7 @@ class quagga (
     content => $default_content,
     replace => false,
     ensure  => present,
-    require => Package[keys($packages)]
+    require => Package[keys($packages)],
   }
 
   contain quagga::logging
@@ -46,12 +46,12 @@ class quagga (
   contain quagga::pim
 
   if $service_file_manage {
-    file {$service_file:
+    file { $service_file:
       owner   => 'root',
       group   => 'root',
       mode    => '0644',
       replace => true,
-      content => epp('quagga/quagga.sysconfig.epp')
+      content => epp('quagga/quagga.sysconfig.epp'),
     }
   }
 }
