@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "puppet.puppet-vscode",
+    "rebornix.Ruby",
+    "codezombiech.gitignore",
+		"redhat.vscode-yaml"
+  ]
+}
