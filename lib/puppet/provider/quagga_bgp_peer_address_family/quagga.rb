@@ -101,7 +101,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     config = vtysh('-c', 'show running-config')
     config.split(%r{\n}).map do |line|
       # Skipping comments
-      next if line.start_with?(%r{\A!})
+      next if %r{\A!}.match?(line) # rubocop:disable Performance/StartWith
 
       # Found the router bgp
       if line =~ %r{\Arouter\sbgp\s(\d+)\Z}
