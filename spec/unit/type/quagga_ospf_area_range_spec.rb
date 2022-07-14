@@ -55,7 +55,7 @@ describe Puppet::Type.type(:quagga_ospf_area_range) do
       end
 
       it 'does not support other values' do
-        expect { described_class.new(title: '0.0.0.0 192.168.0.0/24', ensure: :nachos) }.to raise_error
+        expect { described_class.new(title: '0.0.0.0 192.168.0.0/24', ensure: :nachos) }.to raise_error(Puppet::Error)
       end
     end
   end
