@@ -5,7 +5,7 @@ Puppet::Type.newtype(:quagga_global) do
   #   desc 'Router instance name'
   # end
 
-  newparam(:hostname, :namevar => true) do
+  newparam(:hostname, namevar: true) do
     desc 'Router hostname.'
   end
 
@@ -37,26 +37,26 @@ Puppet::Type.newtype(:quagga_global) do
     end
   end
 
-  newproperty(:ip_forwarding, :boolean => true) do
+  newproperty(:ip_forwarding, boolean: true) do
     desc 'Enable IP forwarding.'
     defaultto(:false)
     newvalues(:true, :false)
   end
 
-  newproperty(:ipv6_forwarding, :boolean => true) do
+  newproperty(:ipv6_forwarding, boolean: true) do
     desc 'Enable IPv6 forwarding.'
     defaultto(:false)
     newvalues(:true, :false)
   end
 
-  newproperty(:line_vty, :boolean => true) do
+  newproperty(:line_vty, boolean: true) do
     desc 'Enter vty configuration mode.'
 
     defaultto(:true)
     newvalues(:true, :false)
   end
 
-  newproperty(:service_password_encryption, :boolean => true) do
+  newproperty(:service_password_encryption, boolean: true) do
     desc 'Encrypt passwords.'
 
     defaultto(:false)
@@ -64,10 +64,10 @@ Puppet::Type.newtype(:quagga_global) do
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra}
+    ['zebra']
   end
 end

@@ -2,51 +2,51 @@ Puppet::Type.type(:quagga_global).provide :quagga do
   @doc = 'Manages quagga router settings'
 
   @resource_map = {
-    :hostname => {
-      :regexp => /\Ahostname\s(.*)\Z/,
-      :template => 'hostname<% unless value.nil? %> <%= value %><% end %>',
-      :type => :string,
-      :default => :absent,
+    hostname: {
+      regexp: %r{\Ahostname\s(.*)\Z},
+      template: 'hostname<% unless value.nil? %> <%= value %><% end %>',
+      type: :string,
+      default: :absent,
     },
-    :password => {
-      :regexp => /\Apassword\s(?:\d\s)?(.*)\Z/,
-      :template => 'password<% unless value.nil? %><% if encrypted %> 8<% end %> <%= value %><% end %>',
-      :type => :string,
-      :default => :absent,
+    password: {
+      regexp: %r{\Apassword\s(?:\d\s)?(.*)\Z},
+      template: 'password<% unless value.nil? %><% if encrypted %> 8<% end %> <%= value %><% end %>',
+      type: :string,
+      default: :absent,
     },
-    :enable_password => {
-      :regexp => /\Aenable\spassword\s(?:\d\s)?(.*)\Z/,
-      :template => 'enable password<% unless value.nil? %><% if encrypted %> 8<% end %> <%= value %><% end %>',
-      :type => :string,
-      :default => :absent,
+    enable_password: {
+      regexp: %r{\Aenable\spassword\s(?:\d\s)?(.*)\Z},
+      template: 'enable password<% unless value.nil? %><% if encrypted %> 8<% end %> <%= value %><% end %>',
+      type: :string,
+      default: :absent,
     },
-    :line_vty => {
-      :regexp => /\Aline\svty\Z/,
-      :template => 'line vty',
-      :type => :boolean,
-      :default => :true,
+    line_vty: {
+      regexp: %r{\Aline\svty\Z},
+      template: 'line vty',
+      type: :boolean,
+      default: :true,
     },
-    :ip_forwarding => {
-        :regexp => /\Aip\sforwarding\Z/,
-        :template => 'ip forwarding',
-        :type => :boolean,
-        :default => :false,
+    ip_forwarding: {
+      regexp: %r{\Aip\sforwarding\Z},
+        template: 'ip forwarding',
+        type: :boolean,
+        default: :false,
     },
-    :ipv6_forwarding => {
-        :regexp => /\Aipv6\sforwarding\Z/,
-        :template => 'ipv6 forwarding',
-        :type => :boolean,
-        :default => :false,
+    ipv6_forwarding: {
+      regexp: %r{\Aipv6\sforwarding\Z},
+        template: 'ipv6 forwarding',
+        type: :boolean,
+        default: :false,
     },
-    :service_password_encryption => {
-      :regexp => /\Aservice\spassword-encryption\Z/,
-      :template => 'service password-encryption',
-      :type => :boolean,
-      :default => :false,
+    service_password_encryption: {
+      regexp: %r{\Aservice\spassword-encryption\Z},
+      template: 'service password-encryption',
+      type: :boolean,
+      default: :false,
     }
   }
 
-  commands :vtysh => 'vtysh'
+  commands vtysh: 'vtysh'
 
   def initialize(value)
     super(value)
@@ -62,35 +62,34 @@ Puppet::Type.type(:quagga_global).provide :quagga do
     end
 
     config = vtysh('-c', 'show running-config')
-    config.split(/\n/).collect do |line|
+    config.split(%r{\n}).map do |line|
       # comment
-      next if line =~ /\A!\Z/
+      next if %r{\A!\Z}.match?(line)
 
       @resource_map.each do |property, options|
-        if line =~ options[:regexp]
-          value = $1
+        next unless line =~ options[:regexp]
+        value = Regexp.last_match(1)
 
-          if value.nil?
-            hash[property] = :true
-          else
-            case options[:type]
-              when :boolean
-                hash[property] = :true
+        hash[property] = if value.nil?
+                           :true
+                         else
+                           case options[:type]
+                           when :boolean
+                             :true
 
-              when :fixnum
-                hash[property] = value.to_i
+                           when :fixnum
+                             value.to_i
 
-              when :symbol
-                hash[property] = value.to_sym
+                           when :symbol
+                             value.to_sym
 
-              else
-                hash[property] = value
+                           else
+                             value
 
-            end
-          end
+                           end
+                         end
 
-          break
-        end
+        break
       end
     end
 
@@ -113,9 +112,9 @@ Puppet::Type.type(:quagga_global).provide :quagga do
     cmds << 'configure terminal'
 
     @property_flush.each do |property, v|
-      if v == :false or v == :absent
+      if (v == :false) || (v == :absent)
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-      elsif v == :true and resource_map[property][:type] == :symbol
+      elsif (v == :true) && (resource_map[property][:type] == :symbol)
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       elsif v == :true
@@ -131,14 +130,13 @@ Puppet::Type.type(:quagga_global).provide :quagga do
 
     cmds << 'end'
     cmds << 'write memory'
-    unless @property_flush.empty?
-      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-      @property_flush.clear
-    end
+    return if @property_flush.empty?
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
+    @property_flush.clear
   end
 
-  @resource_map.keys.each do |property|
-    define_method "#{property}" do
+  @resource_map.each_key do |property|
+    define_method property.to_s do
       @property_hash[property] || :absent
     end
 

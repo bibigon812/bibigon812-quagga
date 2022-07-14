@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_ospf_area_range) do
-  @doc = %q{
+  @doc = "
     This type provides the capabilities to manage ospf area range within puppet.
 
       Examples:
@@ -9,16 +9,16 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
           advertise  => true,
           substitute => '10.0.0.0/8',
         }
-  }
+  "
 
   ensurable
 
   newparam(:name, namevar: true) do
     desc "Contains an OSPF area id and CIDR, ex. '0.0.0.0 10.0.0.0/24'"
 
-    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
+    block = %r{\d{,2}|1\d{2}|2[0-4]\d|25[0-5]}
 
-    newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\s#{block}\.#{block}\.#{block}\.#{block}\/(?:[1-2]?[0-9]|3[0-2])\Z/)
+    newvalues(%r{\A#{block}\.#{block}\.#{block}\.#{block}\s#{block}\.#{block}\.#{block}\.#{block}/(?:[1-2]?[0-9]|3[0-2])\Z})
   end
 
   newparam(:advertise) do
@@ -31,8 +31,8 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   newproperty(:cost) do
     desc 'User specified metric for this range'
     validate do |value|
-      if value != :absent and (not value.is_a?(Integer) or value < 0 or value > 16777215)
-        fail "Invalid value '#{value}'. Allowed values are '0-16777215'"
+      if (value != :absent) && (!value.is_a?(Integer) || (value < 0) || (value > 16_777_215))
+        raise "Invalid value '#{value}'. Allowed values are '0-16777215'"
       end
     end
 
@@ -42,12 +42,12 @@ Puppet::Type.newtype(:quagga_ospf_area_range) do
   newproperty(:substitute) do
     desc 'Network prefix to be announced instead of range'
 
-    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
+    block = %r{\d{,2}|1\d{2}|2[0-4]\d|25[0-5]}
 
-    newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\/(?:[1-2]?[0-9]|3[0-2])\Z/)
+    newvalues(%r{\A#{block}\.#{block}\.#{block}\.#{block}/(?:[1-2]?[0-9]|3[0-2])\Z})
   end
 
   autorequire(:quagga_ospf_area) do
-    [ self[:name].split(/\s+/)[0] ]
+    [ self[:name].split(%r{\s+})[0] ]
   end
 end

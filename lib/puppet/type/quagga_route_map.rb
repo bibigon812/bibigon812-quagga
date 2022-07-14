@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_route_map) do
-  @doc = %q{
+  @doc = "
     This type provides the capability to manage route-map within puppet.
 
       Example:
@@ -17,14 +17,14 @@ Puppet::Type.newtype(:quagga_route_map) do
                 'community none',
             ],
         }
-  }
+  "
 
   ensurable
 
-  newparam(:name, :namevar => true) do
+  newparam(:name, namevar: true) do
     desc 'Contains a name and a sequence of the route-map.'
 
-    newvalues(/\A[[:alpha:]][\w-]+\s\d+\Z/)
+    newvalues(%r{\A[[:alpha:]][\w-]+\s\d+\Z})
   end
 
   newproperty(:action) do
@@ -34,27 +34,27 @@ Puppet::Type.newtype(:quagga_route_map) do
     newvalues(:deny, :permit)
   end
 
-  newproperty(:match, :array_matching => :all) do
+  newproperty(:match, array_matching: :all) do
     desc 'Match values from routing table.'
 
     defaultto([])
-    newvalues(/\Aas-path\s(\w+)\Z/)
-    newvalues(/\Acommunity\s(\w+)(\s(exact-match))?\Z/)
-    newvalues(/\Aextcommunity\s(\w+)\Z/)
-    newvalues(/\Ainterface\s(\w[\w\.:]+)\Z/)
-    newvalues(/\Aip\s(address|next-hop|route-source)\s(\d+)\Z/)
-    newvalues(/\Aip\s(address|next-hop|route-source)\s(\w[\w-]+)\Z/)
-    newvalues(/\Aip\s(address|next-hop|route-source)\sprefix-list\s(\w[\w-]+)\Z/)
-    newvalues(/\Aipv6\s(address|next-hop)\s(\w[\w-]+)\Z/)
-    newvalues(/\Aipv6\s(address|next-hop)\sprefix-list\s(\w[\w-]+)\Z/)
-    newvalues(/\Alocal-preference\s(\d+)\Z/)
-    newvalues(/\Ametric\s(\d+)\Z/)
-    newvalues(/\Aorigin\s(egp|igp|incomplete)\Z/)
-    newvalues(/\Apeer\s(\d+\.\d+\.\d+\.\d+)\Z/)
-    newvalues(/\Apeer\s([\d:]+)\Z/)
-    newvalues(/\Apeer\slocal\Z/)
-    newvalues(/\Aprobability\s(\d+)\Z/)
-    newvalues(/\Atag\s(\d+)\Z/)
+    newvalues(%r{\Aas-path\s(\w+)\Z})
+    newvalues(%r{\Acommunity\s(\w+)(\s(exact-match))?\Z})
+    newvalues(%r{\Aextcommunity\s(\w+)\Z})
+    newvalues(%r{\Ainterface\s(\w[\w\.:]+)\Z})
+    newvalues(%r{\Aip\s(address|next-hop|route-source)\s(\d+)\Z})
+    newvalues(%r{\Aip\s(address|next-hop|route-source)\s(\w[\w-]+)\Z})
+    newvalues(%r{\Aip\s(address|next-hop|route-source)\sprefix-list\s(\w[\w-]+)\Z})
+    newvalues(%r{\Aipv6\s(address|next-hop)\s(\w[\w-]+)\Z})
+    newvalues(%r{\Aipv6\s(address|next-hop)\sprefix-list\s(\w[\w-]+)\Z})
+    newvalues(%r{\Alocal-preference\s(\d+)\Z})
+    newvalues(%r{\Ametric\s(\d+)\Z})
+    newvalues(%r{\Aorigin\s(egp|igp|incomplete)\Z})
+    newvalues(%r{\Apeer\s(\d+\.\d+\.\d+\.\d+)\Z})
+    newvalues(%r{\Apeer\s([\d:]+)\Z})
+    newvalues(%r{\Apeer\slocal\Z})
+    newvalues(%r{\Aprobability\s(\d+)\Z})
+    newvalues(%r{\Atag\s(\d+)\Z})
 
     def insync?(is)
       @should.each do |value|
@@ -78,34 +78,34 @@ Puppet::Type.newtype(:quagga_route_map) do
 
     defaultto(:absent)
     newvalues(:absent)
-    newvalues(/\Agoto\s(\d+)\Z/)
-    newvalues(/\Anext\Z/)
+    newvalues(%r{\Agoto\s(\d+)\Z})
+    newvalues(%r{\Anext\Z})
   end
 
-  newproperty(:set, :array_matching => :all) do
+  newproperty(:set, array_matching: :all) do
     desc 'Set values in destination routing protocol.'
 
-    newvalues(/\Aaggregator\sas\s(\d+)\Z/)
-    newvalues(/\Aas-path\sexclude(\s(\d+))+\Z/)
-    newvalues(/\Aas-path\sprepend(\s(\d+))+\Z/)
-    newvalues(/\Aas-path\sprepend\slast-as\s(\d+)\Z/)
-    newvalues(/\Aatomic-aggregate\Z/)
-    newvalues(/\Acomm-list\s(\d+|\w[\w-]+)\sdelete\Z/)
-    newvalues(/\Acommunity(\s(\d+:\d+))+(\sadditive)?\Z/)
-    newvalues(/\Acommunity\snone\Z/)
-    newvalues(/\Aforwarding-address\s([\d:]+)\Z/)
-    newvalues(/\Aip\snext-hop\s((\d+\.\d+\.\d+\.\d+)|peer-address)\Z/)
-    newvalues(/\Aipv6\snext-hop\s(global|local)\s([\d:]+)\Z/)
-    newvalues(/\Aipv6\snext-hop\speer-address\Z/)
-    newvalues(/\Alocal-preference\s(\d+)\Z/)
-    newvalues(/\Ametric\s(\+|-)?(rtt|\d+)\Z/)
-    newvalues(/\Ametric-type\stype-(1|2)\Z/)
-    newvalues(/\Aorigin\s(egp|igp|incomplete)\Z/)
-    newvalues(/\Aoriginator-id\s(\d+\.\d+\.\d+\.\d+)\Z/)
-    newvalues(/\Asrc\s(\d+\.\d+\.\d+\.\d+)\Z/)
-    newvalues(/\Atag\s(\d+)\Z/)
-    newvalues(/\Avpn4\snext-hop\s(\d+\.\d+\.\d+\.\d+)\Z/)
-    newvalues(/\Aweight\s(\d+)\Z/)
+    newvalues(%r{\Aaggregator\sas\s(\d+)\Z})
+    newvalues(%r{\Aas-path\sexclude(\s(\d+))+\Z})
+    newvalues(%r{\Aas-path\sprepend(\s(\d+))+\Z})
+    newvalues(%r{\Aas-path\sprepend\slast-as\s(\d+)\Z})
+    newvalues(%r{\Aatomic-aggregate\Z})
+    newvalues(%r{\Acomm-list\s(\d+|\w[\w-]+)\sdelete\Z})
+    newvalues(%r{\Acommunity(\s(\d+:\d+))+(\sadditive)?\Z})
+    newvalues(%r{\Acommunity\snone\Z})
+    newvalues(%r{\Aforwarding-address\s([\d:]+)\Z})
+    newvalues(%r{\Aip\snext-hop\s((\d+\.\d+\.\d+\.\d+)|peer-address)\Z})
+    newvalues(%r{\Aipv6\snext-hop\s(global|local)\s([\d:]+)\Z})
+    newvalues(%r{\Aipv6\snext-hop\speer-address\Z})
+    newvalues(%r{\Alocal-preference\s(\d+)\Z})
+    newvalues(%r{\Ametric\s(\+|-)?(rtt|\d+)\Z})
+    newvalues(%r{\Ametric-type\stype-(1|2)\Z})
+    newvalues(%r{\Aorigin\s(egp|igp|incomplete)\Z})
+    newvalues(%r{\Aoriginator-id\s(\d+\.\d+\.\d+\.\d+)\Z})
+    newvalues(%r{\Asrc\s(\d+\.\d+\.\d+\.\d+)\Z})
+    newvalues(%r{\Atag\s(\d+)\Z})
+    newvalues(%r{\Avpn4\snext-hop\s(\d+\.\d+\.\d+\.\d+)\Z})
+    newvalues(%r{\Aweight\s(\d+)\Z})
 
     def insync?(is)
       @should.each do |value|
@@ -127,10 +127,10 @@ Puppet::Type.newtype(:quagga_route_map) do
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra bgpd}
+    ['zebra', 'bgpd']
   end
 end

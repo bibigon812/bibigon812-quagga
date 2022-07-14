@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_bgp_peer) do
-  @doc = %q{
+  @doc = "
     This type provides the capability to manage bgp neighbor within puppet.
 
       Examples:
@@ -16,16 +16,16 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
             peer_group => true,
             remote_as  => 65000,
         }
-  }
+  "
 
   ensurable
 
   newparam(:name) do
     desc 'The neighbor IP address or a peer-group name.'
 
-    newvalues(/\A(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\Z/)
-    newvalues(/\A[\h:]+\Z/)
-    newvalues(/\A\w+\Z/)
+    newvalues(%r{\A(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\.(\d{,2}|1\d{2}|2[0-4]\d|25[0-5])\Z})
+    newvalues(%r{\A[\h:]+\Z})
+    newvalues(%r{\A\w+\Z})
   end
 
   newproperty(:local_as) do
@@ -35,13 +35,13 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
 
     validate do |value|
       unless value == :absent
-        fail "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
-        fail "Invalid value \"#{value}\", valid values are 1-4294967295" unless value >= 1 and value <= 4294967295
+        raise "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
+        raise "Invalid value \"#{value}\", valid values are 1-4294967295" unless (value >= 1) && (value <= 4_294_967_295)
       end
     end
   end
 
-  newproperty(:passive, :boolean => true) do
+  newproperty(:passive, boolean: true) do
     desc 'Don\'t send open messages to this neighbor.'
 
     defaultto(:false)
@@ -51,10 +51,10 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   newproperty(:peer_group) do
     desc 'Member of the peer-group.'
 
-    defaultto { resource[:name] =~ /\.|:/ ? :false : :true }
+    defaultto { %r{\.|:}.match?(resource[:name]) ? :false : :true }
 
     newvalues(:false, :true)
-    newvalues(/\A[[:alpha:]]\w+\Z/)
+    newvalues(%r{\A[[:alpha:]]\w+\Z})
   end
 
   newproperty(:remote_as) do
@@ -64,13 +64,13 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
 
     validate do |value|
       unless value == :absent
-        fail "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
-        fail "Invalid value \"#{value}\", valid values are 1-4294967295" unless value >= 1 and value <= 4294967295
+        raise "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
+        raise "Invalid value \"#{value}\", valid values are 1-4294967295" unless (value >= 1) && (value <= 4_294_967_295)
       end
     end
   end
 
-  newproperty(:shutdown, :boolean => true) do
+  newproperty(:shutdown, boolean: true) do
     desc 'Administratively shut down this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
@@ -79,14 +79,14 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   newproperty(:update_source) do
     desc 'Source of routing updates.'
 
-    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
-    interface = /[[:alpha:]]\w+(\.\d+(:\d+)?)?/
+    block = %r{\d{,2}|1\d{2}|2[0-4]\d|25[0-5]}
+    interface = %r{[[:alpha:]]\w+(\.\d+(:\d+)?)?}
 
     defaultto(:absent)
     newvalues(:absent)
-    newvalues(/\A#{block}\.#{block}\.#{block}\.#{block}\Z/)
-    newvalues(/\A\h+:[\h:]+\Z/)
-    newvalues(/\A#{interface}\Z/)
+    newvalues(%r{\A#{block}\.#{block}\.#{block}\.#{block}\Z})
+    newvalues(%r{\A\h+:[\h:]+\Z})
+    newvalues(%r{\A#{interface}\Z})
   end
 
   newproperty(:password) do
@@ -96,7 +96,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   autorequire(:quagga_bgp_router) do
-    %w{bgp}
+    ['bgp']
   end
 
   autorequire(:quagga_bgp_peer) do
@@ -108,10 +108,10 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra bgpd}
+    ['zebra', 'bgpd']
   end
 end

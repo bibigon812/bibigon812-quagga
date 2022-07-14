@@ -1,8 +1,11 @@
 {
   "recommendations": [
     "puppet.puppet-vscode",
-    "rebornix.Ruby",
+    "rebornix.ruby",
     "codezombiech.gitignore",
-		"redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "eamodio.gitlens",
+    "davidanson.vscode-markdownlint",
+    "Gruntfuggly.todo-tree"
   ]
 }

@@ -2,69 +2,69 @@ Puppet::Type.type(:quagga_ospf_interface).provide :quagga do
   @doc = 'Manages quagga interface parameters'
 
   @resource_map = {
-    :auth => {
-      :regexp => /\A\sip\sospf\sauthentication\s(message-digest)\Z/,
-      :template => 'ip ospf authentication<% unless value.nil? %> <%= value %><% end %>',
-      :type => :string,
-      :default => :absent
+    auth: {
+      regexp: %r{\A\sip\sospf\sauthentication\s(message-digest)\Z},
+      template: 'ip ospf authentication<% unless value.nil? %> <%= value %><% end %>',
+      type: :string,
+      default: :absent
     },
-    :message_digest_key => {
-      :regexp => /\A\sip\sospf\smessage-digest-key\s(.*)\Z/,
-      :template => 'ip ospf message-digest-key<% unless value.nil? %> <%= value %><% end %>',
-      :type => :string,
-      :default => :absent
+    message_digest_key: {
+      regexp: %r{\A\sip\sospf\smessage-digest-key\s(.*)\Z},
+      template: 'ip ospf message-digest-key<% unless value.nil? %> <%= value %><% end %>',
+      type: :string,
+      default: :absent
     },
-    :cost => {
-      :regexp => /\A\sip\sospf\scost\s(\d+)\Z/,
-      :template => 'ip ospf cost<% unless value.nil? %> <%= value %><% end %>',
-      :type => :fixnum,
-      :default => :absent
+    cost: {
+      regexp: %r{\A\sip\sospf\scost\s(\d+)\Z},
+      template: 'ip ospf cost<% unless value.nil? %> <%= value %><% end %>',
+      type: :fixnum,
+      default: :absent
     },
-    :dead_interval => {
-      :regexp => /\A\sip\sospf\sdead-interval\s(\d+)\Z/,
-      :template => 'ip ospf dead-interval<% unless value.nil? %> <%= value %><% end %>',
-      :type => :fixnum,
-      :default => 40
+    dead_interval: {
+      regexp: %r{\A\sip\sospf\sdead-interval\s(\d+)\Z},
+      template: 'ip ospf dead-interval<% unless value.nil? %> <%= value %><% end %>',
+      type: :fixnum,
+      default: 40
     },
-    :hello_interval => {
-      :regexp => /\A\sip\sospf\shello-interval\s(\d+)\Z/,
-      :template => 'ip ospf hello-interval<% unless value.nil? %> <%= value %><% end %>',
-      :type => :fixnum,
-      :default => 10
+    hello_interval: {
+      regexp: %r{\A\sip\sospf\shello-interval\s(\d+)\Z},
+      template: 'ip ospf hello-interval<% unless value.nil? %> <%= value %><% end %>',
+      type: :fixnum,
+      default: 10
     },
-    :mtu_ignore => {
-      :regexp => /\A\sip\sospf\smtu-ignore\Z/,
-      :template => 'ip ospf mtu-ignore',
-      :type => :boolean,
-      :default => :false
+    mtu_ignore: {
+      regexp: %r{\A\sip\sospf\smtu-ignore\Z},
+      template: 'ip ospf mtu-ignore',
+      type: :boolean,
+      default: :false
     },
-    :network => {
-      :regexp => /\A\sip\sospf\snetwork\s([\w-]+)\Z/,
-      :template => 'ip ospf network<% unless value.nil? %> <%= value %><% end %>',
-      :type => :string,
-      :default => :absent
+    network: {
+      regexp: %r{\A\sip\sospf\snetwork\s([\w-]+)\Z},
+      template: 'ip ospf network<% unless value.nil? %> <%= value %><% end %>',
+      type: :string,
+      default: :absent
     },
-    :priority => {
-      :regexp => /\A\sip\sospf\spriority\s(\d+)\Z/,
-      :template => 'ip ospf priority<% unless value.nil? %> <%= value %><% end %>',
-      :type => :fixnum,
-      :default => 1
+    priority: {
+      regexp: %r{\A\sip\sospf\spriority\s(\d+)\Z},
+      template: 'ip ospf priority<% unless value.nil? %> <%= value %><% end %>',
+      type: :fixnum,
+      default: 1
     },
-    :retransmit_interval => {
-      :regexp => /\A\sip\sospf\sretransmit-interval\s(\d+)\Z/,
-      :template => 'ip ospf retransmit-interval<% unless value.nil? %> <%= value %><% end %>',
-      :type => :fixnum,
-      :default => 5
+    retransmit_interval: {
+      regexp: %r{\A\sip\sospf\sretransmit-interval\s(\d+)\Z},
+      template: 'ip ospf retransmit-interval<% unless value.nil? %> <%= value %><% end %>',
+      type: :fixnum,
+      default: 5
     },
-    :transmit_delay => {
-      :regexp => /\A\sip\sospf\stransmit-delay\s(\d+)\Z/,
-      :template => 'ip ospf transmit-delay<% unless value.nil? %> <%= value %><% end %>',
-      :type => :fixnum,
-      :default => 1
+    transmit_delay: {
+      regexp: %r{\A\sip\sospf\stransmit-delay\s(\d+)\Z},
+      template: 'ip ospf transmit-delay<% unless value.nil? %> <%= value %><% end %>',
+      type: :fixnum,
+      default: 1
     }
   }
 
-  commands :vtysh => 'vtysh'
+  commands vtysh: 'vtysh'
 
   def initialize(value)
     super(value)
@@ -79,12 +79,12 @@ Puppet::Type.type(:quagga_ospf_interface).provide :quagga do
     interface = {}
 
     config = vtysh('-c', 'show running-config')
-    config.split(/\n/).collect do |line|
+    config.split(%r{\n}).map do |line|
       # skip comments
-      next if line =~ /\A!\Z/
+      next if %r{\A!\Z}.match?(line)
 
-      if line =~ /\Ainterface\s([\w\d\.]+)\Z/
-        name = $1
+      if line =~ %r{\Ainterface\s([\w\d\.]+)\Z}
+        name = Regexp.last_match(1)
         found_interface = true
 
         unless interface.empty?
@@ -93,41 +93,41 @@ Puppet::Type.type(:quagga_ospf_interface).provide :quagga do
         end
 
         interface = {
-          :name => name,
-          :provider => self.name,
+          name: name,
+          provider: self.name,
         }
 
         @resource_map.each do |property, options|
-          if options[:type] == :array or options[:type] == :hash
-            interface[property] = options[:default].clone
-          else
-            interface[property] = options[:default]
-          end
+          interface[property] = if (options[:type] == :array) || (options[:type] == :hash)
+                                  options[:default].clone
+                                else
+                                  options[:default]
+                                end
         end
-      elsif line =~ /\A\w/ and found_interface
+      elsif line =~ (%r{\A\w}) && found_interface
         found_interface = false
       elsif found_interface
         @resource_map.each do |property, options|
-          if line =~ /\A\sshutdown\Z/
+          if %r{\A\sshutdown\Z}.match?(line)
             interface[:enable] = :false
           elsif line =~ options[:regexp]
-            value = $1
+            value = Regexp.last_match(1)
 
             if value.nil?
               interface[property] = :true
             else
               case options[:type]
-                when :array
-                  interface[property] << value
+              when :array
+                interface[property] << value
 
-                when :fixnum
-                  interface[property] = value.to_i
+              when :fixnum
+                interface[property] = value.to_i
 
-                when :boolean
-                  interface[property] = :true
+              when :boolean
+                interface[property] = :true
 
-                else
-                  interface[property] = value
+              else
+                interface[property] = value
 
               end
             end
@@ -148,22 +148,20 @@ Puppet::Type.type(:quagga_ospf_interface).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.keys.each do |name|
-      if provider = providers.find { |provider| provider.name == name }
+    resources.each_key do |name|
+      if (provider = providers.find { |providerx| providerx.name == name })
         resources[name].provider = provider
       end
     end
   end
 
-  def create
-  end
+  def create; end
 
   def exists?
     true
   end
 
-  def destroy
-  end
+  def destroy; end
 
   def flush
     resource_map = self.class.instance_variable_get('@resource_map')
@@ -176,9 +174,9 @@ Puppet::Type.type(:quagga_ospf_interface).provide :quagga do
     cmds << "interface #{name}"
 
     @property_flush.each do |property, v|
-      if v == :false or v == :absent
+      if (v == :false) || (v == :absent)
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-      elsif v == :true and resource_map[property][:type] == :symbol
+      elsif (v == :true) && (resource_map[property][:type] == :symbol)
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       elsif v == :true
@@ -201,14 +199,13 @@ Puppet::Type.type(:quagga_ospf_interface).provide :quagga do
 
     cmds << 'end'
     cmds << 'write memory'
-    unless @property_flush.empty?
-      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-      @property_flush.clear
-    end
+    return if @property_flush.empty?
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
+    @property_flush.clear
   end
 
-  @resource_map.keys.each do |property|
-    define_method "#{property}" do
+  @resource_map.each_key do |property|
+    define_method property.to_s do
       @property_hash[property] || :absent
     end
 

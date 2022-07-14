@@ -14,17 +14,16 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
     providers = []
     hash = {}
     find = false
-    store = {}
 
-    vtysh('-c', 'show running-config').split(%r{\n}).collect do |line|
-      find = true if !find && (/\Alog\s/ =~ line)
-      find = false if find && !(/\Alog\s/ =~ line)
+    vtysh('-c', 'show running-config').split(%r{\n}).map do |line|
+      find = true if !find && (%r{\Alog\s} =~ line)
+      find = false if find && !(%r{\Alog\s} =~ line)
       next unless find
 
-      /\Alog\s(?<name>(?:file\s(?<filename>\S+)|monitor|stdout|syslog))(?:\s(?<level>\S+))?\Z/.match(line) do |m|
+      %r{\Alog\s(?<name>(?:file\s(?<filename>\S+)|monitor|stdout|syslog))(?:\s(?<level>\S+))?\Z}.match(line) do |m|
         hash = {
           ensure:   :present,
-          provider: self.name,
+          provider: name,
         }
 
         if m[:filename].nil?
@@ -34,15 +33,15 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
           hash[:filename] = m[:filename]
         end
 
-        if m[:level].nil?
-          if hash[:name] == 'monitor'
-            hash[:level] = :debugging
-          else
-            hash[:level] = :errors
-          end
-        else
-          hash[:level] = m[:level].to_sym
-        end
+        hash[:level] = if m[:level].nil?
+                         if hash[:name] == 'monitor'
+                           :debugging
+                         else
+                           :errors
+                         end
+                       else
+                         m[:level].to_sym
+                       end
 
         debug "Instantiated quagga_logging: #{hash.inspect}"
         providers << new(hash)
@@ -55,7 +54,7 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
   def self.prefetch(resources)
     providers = instances
     resources.each_key do |name|
-      if provider = providers.find{ |prov| prov.name == name }
+      if (provider = providers.find { |prov| prov.name == name })
         resources[name].provider = provider
       end
     end
@@ -75,7 +74,7 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
 
     if exists?
 
-      command = %w[log]
+      command = ['log']
       command << @property_hash[:name]
 
       if @property_hash[:name] == 'file'
@@ -94,7 +93,7 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
     commands << 'end'
     commands << 'write memory'
 
-    vtysh(commands.reduce([]) { |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(commands.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
 
     @property_flush.clear
   end
@@ -104,7 +103,7 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
   end
 
   [:filename, :level].each do |property|
-    define_method "#{property}" do
+    define_method property.to_s do
       @property_hash[property] || :absent
     end
 

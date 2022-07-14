@@ -2,65 +2,65 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
   @doc = 'Manages ospf parameters using quagga'
 
   @resource_map = {
-    :router_id => {
-      :regexp => /\A\sospf\srouter-id\s(.*)\Z/,
-      :template => 'ospf router-id<% unless value.nil? %> <%= value %><% end %>',
-      :type => :string,
-      :default => :absent,
+    router_id: {
+      regexp: %r{\A\sospf\srouter-id\s(.*)\Z},
+      template: 'ospf router-id<% unless value.nil? %> <%= value %><% end %>',
+      type: :string,
+      default: :absent,
     },
-    :opaque => {
-      :regexp => /\A\scapability\sopaque\Z/,
-      :template => 'capability opaque',
-      :type => :boolean,
-      :default => :false,
+    opaque: {
+      regexp: %r{\A\scapability\sopaque\Z},
+      template: 'capability opaque',
+      type: :boolean,
+      default: :false,
     },
-    :rfc1583 => {
-      :regexp => /\A\scompatible\srfc1583\Z/,
-      :template => 'compatible rfc1583',
-      :type => :boolean,
-      :default => :false,
+    rfc1583: {
+      regexp: %r{\A\scompatible\srfc1583\Z},
+      template: 'compatible rfc1583',
+      type: :boolean,
+      default: :false,
     },
-    :abr_type => {
-      :regexp => /\A\sospf\sabr-type\s(\w+)\Z/,
-      :template => 'ospf abr-type<% unless value.nil? %> <%= value %><% end %>',
-      :type => :symbol,
-      :default => :cisco,
+    abr_type: {
+      regexp: %r{\A\sospf\sabr-type\s(\w+)\Z},
+      template: 'ospf abr-type<% unless value.nil? %> <%= value %><% end %>',
+      type: :symbol,
+      default: :cisco,
     },
-    :log_adjacency_changes => {
-      :regexp => /\A\slog-adjacency-changes(?:\s(detail))?\Z/,
-      :template => 'log-adjacency-changes<% unless value.nil? %> <%= value %><% end %>',
-      :type => :symbol,
-      :default => :false,
+    log_adjacency_changes: {
+      regexp: %r{\A\slog-adjacency-changes(?:\s(detail))?\Z},
+      template: 'log-adjacency-changes<% unless value.nil? %> <%= value %><% end %>',
+      type: :symbol,
+      default: :false,
     },
-    :redistribute => {
-        :regexp => /\A\sredistribute\s(.+)\Z/,
-        :template => 'redistribute <%= value %>',
-        :type => :array,
-        :default => [],
+    redistribute: {
+      regexp: %r{\A\sredistribute\s(.+)\Z},
+        template: 'redistribute <%= value %>',
+        type: :array,
+        default: [],
     },
-    :default_originate => {
-        :regexp => /\A\sdefault-information\soriginate\s(.+)\Z/,
-        :template => 'default-information originate<% unless value.nil? %> <%= value %><% end %>',
-        :type => :string,
-        :default => :false,
+    default_originate: {
+      regexp: %r{\A\sdefault-information\soriginate\s(.+)\Z},
+        template: 'default-information originate<% unless value.nil? %> <%= value %><% end %>',
+        type: :string,
+        default: :false,
     },
-    :passive_interfaces => {
-      :regexp => /\A\spassive-interface\s(.+)\Z/,
-      :template => 'passive-interface <%= value %>',
-      :type => :array,
-      :default => [],
+    passive_interfaces: {
+      regexp: %r{\A\spassive-interface\s(.+)\Z},
+      template: 'passive-interface <%= value %>',
+      type: :array,
+      default: [],
     },
     distribute_list: {
-      regexp: /\A\sdistribute-list\s(.+)\Z/,
+      regexp: %r{\A\sdistribute-list\s(.+)\Z},
       template: 'distribute-list <%= value %>',
       type: :array,
       default: [],
     },
   }
 
-  commands :vtysh => 'vtysh'
+  commands vtysh: 'vtysh'
 
-  def initialize value={}
+  def initialize(value = {})
     super(value)
     @property_flush = {}
   end
@@ -71,52 +71,51 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
     providers = []
     hash = {}
     config = vtysh('-c', 'show running-config')
-    config.split(/\n/).collect do |line|
+    config.split(%r{\n}).map do |line|
       line.chomp!
 
       # skip comments
-      next if line =~ /\A!\Z/
-      if line =~ /\Arouter ospf\Z/
+      next if %r{\A!\Z}.match?(line)
+      if %r{\Arouter ospf\Z}.match?(line)
         found_section = true
 
         hash = {
-          :ensure => :present,
-          :name   => 'ospf',
+          ensure: :present,
+          name: 'ospf',
         }
 
         @resource_map.each do |property, options|
-          if options[:type] == :array or options[:type] == :hash
-            hash[property] = options[:default].clone
-          else
-            hash[property] = options[:default]
-          end
+          hash[property] = if (options[:type] == :array) || (options[:type] == :hash)
+                             options[:default].clone
+                           else
+                             options[:default]
+                           end
         end
-      elsif line =~ /\A\w/ and found_section
+      elsif line =~ (%r{\A\w}) && found_section
         break
       elsif found_section
         @resource_map.each do |property, options|
-          if line =~ options[:regexp]
-            value = $1
+          next unless line =~ options[:regexp]
+          value = Regexp.last_match(1)
 
-            if value.nil?
+          if value.nil?
+            hash[property] = :true
+          else
+            case options[:type]
+            when :array
+              hash[property] << value
+
+            when :boolean
               hash[property] = :true
+
+            when :symbol
+              hash[property] = value.tr('-', '_').to_sym
+
+            when :fixnum
+              hash[property] = value.to_i
+
             else
-              case options[:type]
-                when :array
-                  hash[property] << value
-
-                when :boolean
-                  hash[property] = :true
-
-                when :symbol
-                  hash[property] = value.gsub(/-/, '_').to_sym
-
-                when :fixnum
-                  hash[property] = value.to_i
-
-                else
-                  hash[property] = value
-              end
+              hash[property] = value
             end
           end
         end
@@ -129,8 +128,8 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.keys.each do |name|
-      if provider = providers.find { |provider| provider.name == name }
+    resources.each_key do |name|
+      if (provider = providers.find { |providerx| providerx.name == name })
         resources[name].provider = provider
       end
     end
@@ -146,12 +145,12 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
     cmds << 'router ospf'
 
     resource_map.each do |property, options|
-      if @resource[property] and @resource[property] != options[:default]
+      if @resource[property] && (@resource[property] != options[:default])
         if @resource[property] == :true
           cmds << ERB.new(options[:template]).result(binding)
 
         elsif @resource[property] == :false
-          cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
+          cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
 
         elsif options[:type] == :array
           @resource[property].each do |value|
@@ -168,7 +167,7 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
   end
 
   def destroy
@@ -180,7 +179,7 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
 
     @property_hash.clear
   end
@@ -199,20 +198,20 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
     cmds << 'router ospf'
 
     @property_flush.each do |property, v|
-      if v == :false or v == :absent
+      if (v == :false) || (v == :absent)
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-      elsif v == :true and [:symbol, :string].include?(resource_map[property][:type])
+      elsif (v == :true) && [:symbol, :string].include?(resource_map[property][:type])
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       elsif v == :true
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       elsif resource_map[property][:type] == :array
-        (@property_hash[property] - v).each do |v|
-          if property == :redistribute
-            value = v.split(/\s+/).first
-          else
-            value = v
-          end
+        (@property_hash[property] - v).each do |vx|
+          value = if property == :redistribute
+                    vx.split(%r{\s+}).first
+                  else
+                    vx
+                  end
 
           cmds << "no  #{ERB.new(resource_map[property][:template]).result(binding)}"
         end
@@ -231,14 +230,13 @@ Puppet::Type.type(:quagga_ospf_router).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    unless @property_flush.empty?
-      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-      @property_flush.clear
-    end
+    return if @property_flush.empty?
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
+    @property_flush.clear
   end
 
-  @resource_map.keys.each do |property|
-    define_method "#{property}" do
+  @resource_map.each_key do |property|
+    define_method property.to_s do
       @property_hash[property] || :absent
     end
 

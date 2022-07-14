@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_ospf_router).provider(:quagga) do
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -42,36 +42,36 @@ ip prefix-list ADVERTISED-PREFIXES seq 10 permit 195.131.0.0/16
 ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(1)
     end
 
-    it 'should return the resource ospf' do
+    it 'returns the resource ospf' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :abr_type => :cisco,
-        :default_originate => 'always metric 100 metric-type 1 route-map ABCD',
-        :ensure => :present,
-        :name => 'ospf',
-        :opaque => :false,
-        :passive_interfaces => [
+                                                                                           abr_type: :cisco,
+        default_originate: 'always metric 100 metric-type 1 route-map ABCD',
+        ensure: :present,
+        name: 'ospf',
+        opaque: :false,
+        passive_interfaces: [
           'eth0',
           'eth1 1.1.1.1',
           'default',
         ],
-        :redistribute => [
-            'kernel route-map KERNEL',
-            'connected route-map CONNECTED',
-            'static route-map STATIC',
-            'rip route-map RIP',
+        redistribute: [
+          'kernel route-map KERNEL',
+          'connected route-map CONNECTED',
+          'static route-map STATIC',
+          'rip route-map RIP',
         ],
-        :rfc1583 => :false,
-        :router_id => '10.255.78.4',
-        :log_adjacency_changes => :false,
+        rfc1583: :false,
+        router_id: '10.255.78.4',
+        log_adjacency_changes: :false,
         distribute_list: [
           'QEWR out static',
           'QWER out isis',
         ]
-      })
+                                                                                         })
     end
   end
 
@@ -79,7 +79,7 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
     before :each do
       described_class.expects(:vtysh).with(
           '-c', 'show running-config'
-      ).returns '!
+        ).returns '!
  address-family ipv6
  network 2a04:6d40:1:ffff::/64
  exit-address-family
@@ -90,7 +90,7 @@ ip prefix-list ADVERTISED-PREFIXES seq 10 permit 195.131.0.0/16
 ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
     end
 
-    it 'should not return a resource' do
+    it 'does not return a resource' do
       expect(described_class.instances.size).to eq(0)
     end
   end

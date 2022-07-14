@@ -2,15 +2,15 @@ Puppet::Type.type(:quagga_pim_router).provide :quagga do
   @doc = 'Manages quagga PIM router settings'
 
   @resource_map = {
-    :ip_multicast_routing => {
-        :regexp => /\Aip\smulticast-routing\Z/,
-        :template => 'ip multicast-routing',
-        :type => :boolean,
-        :default => :false,
+    ip_multicast_routing: {
+      regexp: %r{\Aip\smulticast-routing\Z},
+        template: 'ip multicast-routing',
+        type: :boolean,
+        default: :false,
     }
   }
 
-  commands :vtysh => 'vtysh'
+  commands vtysh: 'vtysh'
 
   def initialize(value)
     super(value)
@@ -21,7 +21,7 @@ Puppet::Type.type(:quagga_pim_router).provide :quagga do
     debug '[instances]'
 
     hash = {
-      :name => 'pim'
+      name: 'pim'
     }
 
     @resource_map.each do |property, options|
@@ -29,35 +29,34 @@ Puppet::Type.type(:quagga_pim_router).provide :quagga do
     end
 
     config = vtysh('-c', 'show running-config')
-    config.split(/\n/).collect do |line|
+    config.split(%r{\n}).map do |line|
       # comment
-      next if line =~ /\A!\Z/
+      next if %r{\A!\Z}.match?(line)
 
       @resource_map.each do |property, options|
-        if line =~ options[:regexp]
-          value = $1
+        next unless line =~ options[:regexp]
+        value = Regexp.last_match(1)
 
-          if value.nil?
-            hash[property] = :true
-          else
-            case options[:type]
-              when :boolean
-                hash[property] = :true
+        hash[property] = if value.nil?
+                           :true
+                         else
+                           case options[:type]
+                           when :boolean
+                             :true
 
-              when :fixnum
-                hash[property] = value.to_i
+                           when :fixnum
+                             value.to_i
 
-              when :symbol
-                hash[property] = value.to_sym
+                           when :symbol
+                             value.to_sym
 
-              else
-                hash[property] = value
+                           else
+                             value
 
-            end
-          end
+                           end
+                         end
 
-          break
-        end
+        break
       end
     end
 
@@ -78,9 +77,9 @@ Puppet::Type.type(:quagga_pim_router).provide :quagga do
     cmds << 'configure terminal'
 
     @property_flush.each do |property, v|
-      if v == :false or v == :absent
+      if (v == :false) || (v == :absent)
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
-      elsif v == :true and resource_map[property][:type] == :symbol
+      elsif (v == :true) && (resource_map[property][:type] == :symbol)
         cmds << "no #{ERB.new(resource_map[property][:template]).result(binding)}"
         cmds << ERB.new(resource_map[property][:template]).result(binding)
       elsif v == :true
@@ -96,14 +95,13 @@ Puppet::Type.type(:quagga_pim_router).provide :quagga do
 
     cmds << 'end'
     cmds << 'write memory'
-    unless @property_flush.empty?
-      vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
-      @property_flush.clear
-    end
+    return if @property_flush.empty?
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
+    @property_flush.clear
   end
 
-  @resource_map.keys.each do |property|
-    define_method "#{property}" do
+  @resource_map.each_key do |property|
+    define_method property.to_s do
       @property_hash[property] || :absent
     end
 

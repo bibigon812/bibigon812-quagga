@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_bgp_address_family) do
-  @doc = %q{
+  @doc = "
     This type provides capabilities to manage Quagga bgp address family parameters.
 
       Examples:
@@ -10,35 +10,35 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
           maximum_ibgp_paths => 2,
           networks           => ['192.168.0.0/24', '172.16.0.0/24',],
         }
-  }
+  "
 
   ensurable
 
-  newparam(:name, :namevar => true) do
+  newparam(:name, namevar: true) do
     desc 'The Address family.'
-    newvalues(/\Aipv4_(unicast|multicast)\Z/)
-    newvalues(/\Aipv6_unicast\Z/)
+    newvalues(%r{\Aipv4_(unicast|multicast)\Z})
+    newvalues(%r{\Aipv6_unicast\Z})
   end
 
   newproperty(:aggregate_address, array_matching: :all) do
     desc 'Configure BGP aggregate entries.'
 
     defaultto([])
-    newvalues(/\A(\d+\.\d+\.\d+\.\d+\/\d+)(\sas-set)?(\ssummary-only)?\Z/)
-    newvalues(/\A([\h:\/]+)(\ssummary-only)?\Z/)
+    newvalues(%r{\A(\d+\.\d+\.\d+\.\d+/\d+)(\sas-set)?(\ssummary-only)?\Z})
+    newvalues(%r{\A([\h:/]+)(\ssummary-only)?\Z})
 
     validate do |value|
       super(value)
 
-      v = value.split(/\s/).first
-      proto, _ = resource[:name].split(/_/)
+      v = value.split(%r{\s}).first
+      proto, = resource[:name].split(%r{_})
 
       begin
         ip = IPAddr.new(v)
-        fail "Invalid value '#{value}'. The IP address must be a v4." if proto == 'ipv4' and ip.ipv6?
-        fail "Invalid value '#{value}'. The IP address must be a v6." if proto == 'ipv6' and ip.ipv4?
+        raise "Invalid value '#{value}'. The IP address must be a v4." if (proto == 'ipv4') && ip.ipv6?
+        raise "Invalid value '#{value}'. The IP address must be a v6." if (proto == 'ipv6') && ip.ipv4?
       rescue
-        fail "Invalid value #{value}. The IP address '#{v}' is invalid."
+        raise "Invalid value #{value}. The IP address '#{v}' is invalid."
       end
     end
 
@@ -58,7 +58,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       value.inspect
     end
 
-    def is_to_s(value)
+    def to_s?(value)
       value.inspect
     end
 
@@ -71,25 +71,25 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     desc 'Forward packets over multiple paths.'
 
     defaultto(1)
-    newvalues(/\A\d+\Z/)
+    newvalues(%r{\A\d+\Z})
 
     validate do |value|
       super(value)
 
       v = Integer(value)
-      proto, type = resource[:name].split(/_/)
+      proto, type = resource[:name].split(%r{_})
 
-      fail "Invalid value '#{value}'. Valid values are 1-255." unless v >= 1 and v <= 255
-      fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
-      fail "Invalid value '#{value}'. The ipv6 does not support multipath." if proto == 'ipv6' and v > 1
+      raise "Invalid value '#{value}'. Valid values are 1-255." unless (v >= 1) && (v <= 255)
+      raise "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if (proto == 'ipv4') && (type == 'multicast') && (v > 1)
+      raise "Invalid value '#{value}'. The ipv6 does not support multipath." if (proto == 'ipv6') && (v > 1)
     end
 
     munge do |value|
       case value
-        when String
-          value.to_i
-        else
-          value
+      when String
+        value.to_i
+      else
+        value
       end
     end
   end
@@ -98,17 +98,17 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     desc 'Forward packets over multiple paths.'
 
     defaultto(1)
-    newvalues(/\A\d+\Z/)
+    newvalues(%r{\A\d+\Z})
 
     validate do |value|
       super(value)
 
       v = Integer(value)
-      proto, type = resource[:name].split(/_/)
+      proto, type = resource[:name].split(%r{_})
 
-      fail "Invalid value '#{value}'. Valid values are 1-255." unless v >= 1 and v <= 255
-      fail "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if proto == 'ipv4' and type == 'multicast' and v > 1
-      fail "Invalid value '#{value}'. The ipv6 does not support multipath." if proto == 'ipv6' and v > 1
+      raise "Invalid value '#{value}'. Valid values are 1-255." unless (v >= 1) && (v <= 255)
+      raise "Invalid value '#{value}'. The ipv4 multicast does not support multipath." if (proto == 'ipv4') && (type == 'multicast') && (v > 1)
+      raise "Invalid value '#{value}'. The ipv6 does not support multipath." if (proto == 'ipv6') && (v > 1)
     end
 
     munge do |value|
@@ -120,23 +120,23 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     desc 'Specify a network to announce via BGP.'
 
     defaultto([])
-    newvalues(/\A[\h\.:]+\/\d+\Z/)
+    newvalues(%r{\A[\h\.:]+/\d+\Z})
 
     validate do |value|
       super(value)
 
-      proto, type = resource[:name].split(/_/)
+      proto, type = resource[:name].split(%r{_})
 
       begin
         ip = IPAddr.new(value)
 
-        fail "Invalid value '#{value}'. The IP address must be a v4." if proto == 'ipv4' and not ip.ipv4?
-        fail "Invalid value '#{value}'. The IP address must be a v6." if proto == 'ipv6' and not ip.ipv6?
+        raise "Invalid value '#{value}'. The IP address must be a v4." if (proto == 'ipv4') && !ip.ipv4?
+        raise "Invalid value '#{value}'. The IP address must be a v6." if (proto == 'ipv6') && !ip.ipv6?
 
-        fail "Invalid value '#{value}'. It is not an unicast IP address." if proto == 'ipv4' and type == 'unicast' and IPAddr.new('224.0.0.0/4').include?(ip)
-        fail "Invalid value '#{value}'. It is not an multicast IP address." if proto == 'ipv4' and type == 'multicast' and not IPAddr.new('224.0.0.0/4').include?(ip)
+        raise "Invalid value '#{value}'. It is not an unicast IP address." if (proto == 'ipv4') && (type == 'unicast') && IPAddr.new('224.0.0.0/4').include?(ip)
+        raise "Invalid value '#{value}'. It is not an multicast IP address." if (proto == 'ipv4') && (type == 'multicast') && !IPAddr.new('224.0.0.0/4').include?(ip)
       rescue
-        fail "Invalid value '#{value}'. The IP address '#{value}' is invalid."
+        raise "Invalid value '#{value}'. The IP address '#{value}' is invalid."
       end
     end
 
@@ -156,7 +156,7 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
       value.inspect
     end
 
-    def is_to_s(value)
+    def to_s?(value)
       value.inspect
     end
 
@@ -166,14 +166,14 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
   end
 
   autorequire(:quagga_bgp_router) do
-    %w{bgp}
+    ['bgp']
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra bgpd}
+    ['zebra', 'bgpd']
   end
 end

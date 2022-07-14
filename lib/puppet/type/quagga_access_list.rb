@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_access_list) do
-  @doc = %q{
+  @doc = "
     This type provides the capability to manage BGP community-list within puppet.
 
       Examples:
@@ -33,7 +33,7 @@ Puppet::Type.newtype(:quagga_access_list) do
           'deny any',
         ]
       }
-  }
+  "
 
   ensurable do
     defaultvalues
@@ -43,9 +43,9 @@ Puppet::Type.newtype(:quagga_access_list) do
   newparam(:name, namevar: true) do
     desc 'The number of this access list.'
 
-    newvalues(/\A(1|\d{2}|1[3-9]\d{2})\Z/)
-    newvalues(/\A(1\d{2}|2[0-6]\d{2})\Z/)
-    newvalues(/\A[\w-]+\Z/)
+    newvalues(%r{\A(1|\d{2}|1[3-9]\d{2})\Z})
+    newvalues(%r{\A(1\d{2}|2[0-6]\d{2})\Z})
+    newvalues(%r{\A[\w-]+\Z})
   end
 
   newproperty(:remark) do
@@ -58,27 +58,20 @@ Puppet::Type.newtype(:quagga_access_list) do
     defaultto []
 
     validate do |value|
-      if /\A(1|\d{2}|1[3-9]\d{2})\Z/ =~ resource[:name]
-        case value
-        when /\A(deny|permit)\s(\d{1,3}\.){3}\d{1,3}(\s(\d{1,3}\.){3}\d{1,3})?\Z/
-        when /\A(deny|permit)\sany\Z/
-        else
-          fail "Invalid value '#{value}' of the standard access-list rule."
-        end
-
-      elsif /\A(1\d{2}|2[0-6]\d{2})\Z/ =~ resource[:name]
-        case value
-        when /\A(deny|permit)\sip\s(any|(host|(\d{1,3}\.){3}\d{1,3})\s(\d{1,3}\.){3}\d{1,3})\s(any|(host|(\d{1,3}\.){3}\d{1,3})\s(\d{1,3}\.){3}\d{1,3})\Z/
-        else
-          fail "Invalid value '#{value}' of the extanded access-list rule."
-        end
-      elsif /\A[\w-]+\Z/ =~ resource[:name]
-        case value
-        when /\A(deny|permit)\s(\d{1,3}\.){3}\d{1,3}\/\d{1,2}(\sexact-match)?\Z/
-        when /\A(deny|permit)\sany\Z/
-        else
-          fail "Invalid value '#{value}' of the zebra access-list rule."
-        end
+      if %r{\A(1|\d{2}|1[3-9]\d{2})\Z}.match?(resource[:name])
+        raise "Invalid value '#{value}' of the standard access-list rule." unless value.match(Regexp.union(
+          %r{\A(deny|permit)\s(\d{1,3}\.){3}\d{1,3}(\s(\d{1,3}\.){3}\d{1,3})?\Z},
+          %r{\A(deny|permit)\sany\Z},
+        ))
+      elsif %r{\A(1\d{2}|2[0-6]\d{2})\Z}.match?(resource[:name])
+        raise "Invalid value '#{value}' of the extanded access-list rule." unless value.match?(
+          %r{\A(deny|permit)\sip\s(any|(host|(\d{1,3}\.){3}\d{1,3})\s(\d{1,3}\.){3}\d{1,3})\s(any|(host|(\d{1,3}\.){3}\d{1,3})\s(\d{1,3}\.){3}\d{1,3})\Z},
+        )
+      elsif %r{\A[\w-]+\Z}.match?(resource[:name])
+        raise "Invalid value '#{value}' of the zebra access-list rule." unless value.match(Regexp.union(
+            %r{\A(deny|permit)\s(\d{1,3}\.){3}\d{1,3}/\d{1,2}(\sexact-match)?\Z},
+            %r{\A(deny|permit)\sany\Z},
+          ))
       end
     end
 
@@ -92,10 +85,10 @@ Puppet::Type.newtype(:quagga_access_list) do
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra}
+    ['zebra']
   end
 end

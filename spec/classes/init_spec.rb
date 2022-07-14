@@ -3,13 +3,13 @@ require 'spec_helper'
 describe 'quagga' do
   let(:hiera_config) { 'spec/data/hiera.yaml' }
   let(:title) { 'quagga' }
-  let(:facts) {
+  let(:facts) do
     {
-      :networking => {
-        :fqdn => 'router-1.sandbox.local'
+      networking: {
+        fqdn: 'router-1.sandbox.local'
       }
     }
-  }
+  end
   let(:environment) { 'production' }
 
   it { is_expected.to compile }

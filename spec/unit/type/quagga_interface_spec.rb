@@ -1,11 +1,13 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_interface) do
-  let :providerclass  do
+  let :providerclass do
     described_class.provide(:fake_quagga_provider) do
       attr_accessor :property_hash
       def create; end
+
       def destroy; end
+
       def exists?
         get(:ensure) == :present
       end
@@ -13,7 +15,7 @@ describe Puppet::Type.type(:quagga_interface) do
     end
   end
 
-  let(:zebra) { Puppet::Type.type(:service).new(:name => 'zebra') }
+  let(:zebra) { Puppet::Type.type(:service).new(name: 'zebra') }
   let(:catalog) { Puppet::Resource::Catalog.new }
 
   before :each do
@@ -24,19 +26,19 @@ describe Puppet::Type.type(:quagga_interface) do
     described_class.unprovide(:quagga_interface)
   end
 
-  it 'should have :name be its namevar' do
+  it 'has :name be its namevar' do
     expect(described_class.key_attributes).to eq([:name])
   end
 
   describe 'when validating attributes' do
     [:name, :provider].each do |param|
-      it "should have a #{param} parameter" do
+      it "has a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end
     end
 
-    [ :bandwidth, :link_detect, ].each do |property|
-      it "should have a #{property} property" do
+    [ :bandwidth, :link_detect ].each do |property|
+      it "has a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
     end
@@ -44,83 +46,83 @@ describe Puppet::Type.type(:quagga_interface) do
 
   describe 'when validating values' do
     describe 'ip_address' do
-      it 'should support 10.0.0.1/24 as a value' do
-        expect { described_class.new(:name => 'foo', :ip_address => '10.0.0.1/24') }.to_not raise_error
+      it 'supports 10.0.0.1/24 as a value' do
+        expect { described_class.new(name: 'foo', ip_address: '10.0.0.1/24') }.not_to raise_error
       end
 
-      it 'should not support 500.0.0.1/24 as a value' do
-        expect { described_class.new(:name => 'foo', :ip_address => '500.0.0.1/24') }.to raise_error Puppet::Error, /Not a valid ip address/
+      it 'does not support 500.0.0.1/24 as a value' do
+        expect { described_class.new(name: 'foo', ip_address: '500.0.0.1/24') }.to raise_error Puppet::Error, %r{Not a valid ip address}
       end
 
-      it 'should not support 10.0.0.1 as a value' do
-        expect { described_class.new(:name => 'foo', :ip_address => '10.0.0.1') }.to raise_error Puppet::Error, /Prefix length is not specified/
+      it 'does not support 10.0.0.1 as a value' do
+        expect { described_class.new(name: 'foo', ip_address: '10.0.0.1') }.to raise_error Puppet::Error, %r{Prefix length is not specified}
       end
 
-      it 'should contain 10.0.0.1' do
-        expect(described_class.new(:name => 'foo', :ip_address => '10.0.0.1/24')[:ip_address]).to eq(['10.0.0.1/24'])
+      it 'contains 10.0.0.1' do
+        expect(described_class.new(name: 'foo', ip_address: '10.0.0.1/24')[:ip_address]).to eq(['10.0.0.1/24'])
       end
     end
 
     [ :link_detect ].each do |property|
-      describe "#{property}" do
-        it 'should support true as a value' do
-          expect { described_class.new(:name => 'foo', property => true) }.to_not raise_error
+      describe property.to_s do
+        it 'supports true as a value' do
+          expect { described_class.new(name: 'foo', property => true) }.not_to raise_error
         end
 
-        it 'should support :true as a value' do
-          expect { described_class.new(:name => 'foo', property => :true) }.to_not raise_error
+        it 'supports :true as a value' do
+          expect { described_class.new(name: 'foo', property => :true) }.not_to raise_error
         end
 
-        it 'should support :true as a value' do
-          expect { described_class.new(:name => 'foo', property => 'true') }.to_not raise_error
+        it 'supports "xtrue" as a value' do
+          expect { described_class.new(name: 'foo', property => 'true') }.not_to raise_error
         end
 
-        it 'should support false as a value' do
-          expect { described_class.new(:name => 'foo', property => false) }.to_not raise_error
+        it 'supports false as a value' do
+          expect { described_class.new(name: 'foo', property => false) }.not_to raise_error
         end
 
-        it 'should support :false as a value' do
-          expect { described_class.new(:name => 'foo', property => :false) }.to_not raise_error
+        it 'supports :false as a value' do
+          expect { described_class.new(name: 'foo', property => :false) }.not_to raise_error
         end
 
-        it 'should support :false as a value' do
-          expect { described_class.new(:name => 'foo', property => 'false') }.to_not raise_error
+        it 'supports "false" as a value' do
+          expect { described_class.new(name: 'foo', property => 'false') }.not_to raise_error
         end
 
-        it 'should not support foo as a value' do
-          expect { described_class.new(:name => 'foo', property => :disabled) }.to raise_error Puppet::Error, /Invalid value/
+        it 'does not support foo as a value' do
+          expect { described_class.new(name: 'foo', property => :disabled) }.to raise_error Puppet::Error, %r{Invalid value}
         end
 
-        it 'should contain enabled' do
-          expect(described_class.new(:name => 'foo', property => 'true')[property]).to eq(:true)
+        it 'contains enabled when passed string "true"' do
+          expect(described_class.new(name: 'foo', property => 'true')[property]).to eq(:true)
         end
 
-        it 'should contain enabled' do
-          expect(described_class.new(:name => 'foo', property => :true)[property]).to eq(:true)
+        it 'contains enabled when passed symbol :true' do
+          expect(described_class.new(name: 'foo', property => :true)[property]).to eq(:true)
         end
 
-        it 'should contain enabled' do
-          expect(described_class.new(:name => 'foo', property => true)[property]).to eq(:true)
+        it 'contains enabled when passed value true' do
+          expect(described_class.new(name: 'foo', property => true)[property]).to eq(:true)
         end
 
-        it 'should contain disabled' do
-          expect(described_class.new(:name => 'foo', property => 'false')[property]).to eq(:false)
+        it 'contains disabled when passed string "false"' do
+          expect(described_class.new(name: 'foo', property => 'false')[property]).to eq(:false)
         end
 
-        it 'should contain disabled' do
-          expect(described_class.new(:name => 'foo', property => :false)[property]).to eq(:false)
+        it 'contains disabled when passed symbol :false' do
+          expect(described_class.new(name: 'foo', property => :false)[property]).to eq(:false)
         end
 
-        it 'should contain disabled' do
-          expect(described_class.new(:name => 'foo', property => false)[property]).to eq(:false)
+        it 'contains disabled when passed value false' do
+          expect(described_class.new(name: 'foo', property => false)[property]).to eq(:false)
         end
       end
     end
   end
 
   describe 'when autorequiring' do
-    it 'should require zebra service' do
-      interface = described_class.new(:name => 'eth0')
+    it 'requires zebra service' do
+      interface = described_class.new(name: 'eth0')
       catalog.add_resource zebra
       catalog.add_resource interface
       reqs = interface.autorequire

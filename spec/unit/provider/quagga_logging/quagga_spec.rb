@@ -40,13 +40,13 @@ log facility local7'
   end
 
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -58,36 +58,36 @@ log facility local7'
       ).returns output
     end
 
-    it 'should return 3 resources' do
+    it 'returns 3 resources' do
       expect(described_class.instances.size).to eq(3)
     end
 
-    it "should return quagga_logging 'file' resource" do
+    it "returns quagga_logging 'file' resource" do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        ensure: :present,
+                                                                                           ensure: :present,
         provider: :quagga,
         name: 'file',
         filename: '/tmp/file.log',
         level: :warnings,
-      })
+                                                                                         })
     end
 
-    it "should return quagga_logging 'stdout' resource" do
+    it "returns quagga_logging 'stdout' resource" do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        ensure: :present,
+                                                                                           ensure: :present,
         provider: :quagga,
         name: 'stdout',
         level: :errors,
-      })
+                                                                                         })
     end
 
-    it "should return quagga_logging 'syslog' resource" do
+    it "returns quagga_logging 'syslog' resource" do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        ensure: :present,
+                                                                                           ensure: :present,
         provider: :quagga,
         name: 'syslog',
         level: :errors,
-      })
+                                                                                         })
     end
   end
 
@@ -101,10 +101,10 @@ log facility local7'
     before :each do
       described_class.stubs(:vtysh).with(
           '-c', 'show running-config'
-      ).returns output
+        ).returns output
     end
 
-    it 'should find provider for resource' do
+    it 'finds provider for resource' do
       described_class.prefetch(resources)
       expect(resources.values.first.provider).to eq(described_class.instances[0])
     end
@@ -115,7 +115,7 @@ log facility local7'
   #     provider.stubs(:exists?).returns(false)
   #   end
 
-  #   it 'should has all values' do
+  #   it 'has all values' do
   #     resource[:name] = 'file'
   #     resource[:ensure] = :present
   #     resource[:filename] = '/tmp/file.log'
@@ -125,7 +125,7 @@ log facility local7'
   #     expect(provider.class_variable_get(@property_hash)[:ensure]).to eq(:present)
   #   end
 
-  #   it 'should has facility' do
+  #   it 'has facility' do
   #     resource[:ensure] = :present
   #     resource[:name] = 'syslog'
   #     resource[:facility] = :local7
@@ -135,34 +135,34 @@ log facility local7'
   #   end
   # end
   describe '#flush' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(true)
       provider1.stubs(:exists?).returns(true)
     end
 
-    it 'should update all values for quagga_logging file' do
+    it 'updates all values for quagga_logging file' do
       resource[:ensure] = :present
       provider.filename = '/tmp/file1.log'
       provider.level = :errors
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'log file /tmp/file1.log errors',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'log file /tmp/file1.log errors',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.flush
     end
 
-    it 'should update facility value for quagga_logging syslog' do
+    it 'updates facility value for quagga_logging syslog' do
       resource[:ensure] = :present
       provider1.filename = '/tmp/file1.log'
       provider1.level = :errors
       provider1.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'log syslog errors',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                       '-c', 'configure terminal',
+                                       '-c', 'log syslog errors',
+                                       '-c', 'end',
+                                       '-c', 'write memory'
+                                     ])
       provider1.flush
     end
   end

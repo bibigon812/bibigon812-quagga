@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_prefix_list) do
-  @doc = %q{
+  @doc = "
     This type provides the capability to manage prefix-lists within puppet.
 
       Example:
@@ -12,14 +12,14 @@ Puppet::Type.newtype(:quagga_prefix_list) do
           prefix      => '224.0.0.0/4',
           proto       => 'ip',
         }
-  }
+  "
 
   ensurable
 
-  newparam(:name, :namevar => true) do
+  newparam(:name, namevar: true) do
     desc 'The name of the prefix-list.'
 
-    newvalues(/\A[\w-]+\s\d+\Z/)
+    newvalues(%r{\A[\w-]+\s\d+\Z})
   end
 
   newproperty(:action) do
@@ -34,8 +34,8 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
     validate do |value|
       return if value == :absent
-      fail "Invalid value. '#{value}' is not an Integer" unless value.is_a?(Integer)
-      fail 'Invalid value. Maximum prefix length: 1-32' unless value >= 1 and value <= 32
+      raise "Invalid value. '#{value}' is not an Integer" unless value.is_a?(Integer)
+      raise 'Invalid value. Maximum prefix length: 1-32' unless (value >= 1) && (value <= 32)
     end
   end
 
@@ -45,14 +45,14 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
     validate do |value|
       return if value == :absent
-      fail "Invalid value. '#{value}' is not an Integer" unless value.is_a?(Integer)
-      fail 'Invalid value. Maximum prefix length: 1-32' unless value >= 1 and value <= 32
+      raise "Invalid value. '#{value}' is not an Integer" unless value.is_a?(Integer)
+      raise 'Invalid value. Maximum prefix length: 1-32' unless (value >= 1) && (value <= 32)
     end
   end
 
   newproperty(:prefix) do
     desc 'The IP prefix `<network>/<length>`.'
-    newvalues(/\A([\h\.:\/]+|any)\Z/)
+    newvalues(%r{\A([\h\.:/]+|any)\Z})
   end
 
   newproperty(:proto) do
@@ -60,20 +60,20 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
     newvalues(:ip, :ipv6)
 
-    defaultto {
+    defaultto do
       if @resource[:prefix].nil?
         :ip
       else
         @resource[:prefix].to_s.include?(':') ? :ipv6 : :ip
       end
-    }
+    end
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra}
+    ['zebra']
   end
 end

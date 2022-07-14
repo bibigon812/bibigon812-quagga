@@ -1,32 +1,32 @@
 Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   @doc = 'Manages bgp address family using quagga.'
 
-  commands :vtysh => 'vtysh'
+  commands vtysh: 'vtysh'
 
   @resource_map = {
-      :aggregate_address => {
-          :default  => [],
-          :regexp   => /\A\saggregate-address\s(.+)\Z/,
-          :template => 'aggregate-address<% unless value.nil? %> <%= value %><% end %>',
-          :type     => :array,
+    aggregate_address: {
+      default: [],
+        regexp: %r{\A\saggregate-address\s(.+)\Z},
+        template: 'aggregate-address<% unless value.nil? %> <%= value %><% end %>',
+        type: :array,
+    },
+      maximum_ebgp_paths: {
+        default: 1,
+          regexp: %r{\A\smaximum-paths\s(\d+)\Z},
+          template: 'maximum-paths<% unless value.nil? %> <%= value %><% end %>',
+          type: :fixnum,
       },
-      :maximum_ebgp_paths => {
-          :default  => 1,
-          :regexp   => /\A\smaximum-paths\s(\d+)\Z/,
-          :template => 'maximum-paths<% unless value.nil? %> <%= value %><% end %>',
-          :type     => :fixnum,
+      maximum_ibgp_paths: {
+        default: 1,
+          regexp: %r{\A\smaximum-paths\sibgp\s(\d+)\Z},
+          template: 'maximum-paths ibgp<% unless value.nil? %> <%= value %><% end %>',
+          type: :fixnum,
       },
-      :maximum_ibgp_paths => {
-          :default  => 1,
-          :regexp   => /\A\smaximum-paths\sibgp\s(\d+)\Z/,
-          :template => 'maximum-paths ibgp<% unless value.nil? %> <%= value %><% end %>',
-          :type     => :fixnum,
-      },
-      :networks => {
-          :default  => [],
-          :regexp   => /\A\snetwork\s(.+)\Z/,
-          :template => 'network<% unless value.nil? %> <%= value %><% end %>',
-          :type     => :array,
+      networks: {
+        default: [],
+          regexp: %r{\A\snetwork\s(.+)\Z},
+          template: 'network<% unless value.nil? %> <%= value %><% end %>',
+          type: :array,
       }
   }
 
@@ -39,85 +39,82 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     as = ''
 
     config = vtysh('-c', 'show running-config')
-    config.split(/\n/).collect do |line|
+    config.split(%r{\n}).map do |line|
       # Skip comments
-      next if line =~ /\A!/
+      next if line.start_with?(%r{\A!})
 
       # Found the router bgp
-      if line =~ /\Arouter\sbgp\s(\d+)\Z/
-        as = $1
+      if line =~ %r{\Arouter\sbgp\s(\d+)\Z}
+        as = Regexp.last_match(1)
         found_router = true
 
         hash = {
-            :ensure   => :present,
-            :name     => "#{proto}_#{type}",
-            :provider => self.name,
+          ensure: :present,
+            name: "#{proto}_#{type}",
+            provider: name,
         }
 
         # Add default values
         @resource_map.each do |property, options|
-          if options.has_key?(:default)
-            if [:array, :hash].include?(options[:type])
-              hash[property] = options[:default].clone
-            else
-              hash[property] = options[:default]
-            end
-          end
+          next unless options.key?(:default)
+          hash[property] = if [:array, :hash].include?(options[:type])
+                             options[:default].clone
+                           else
+                             options[:default]
+                           end
         end
 
       # Found the address family
-      elsif found_router and line =~ /\A\saddress-family\s(ipv4|ipv6)(?:\s(multicast))?\Z/
-        proto = $1
-        type = $2.nil? ? 'unicast' : $2
+      elsif found_router && line =~ (%r{\A\saddress-family\s(ipv4|ipv6)(?:\s(multicast))?\Z})
+        proto = Regexp.last_match(1)
+        type = Regexp.last_match(2).nil? ? 'unicast' : Regexp.last_match(2)
 
         debug 'Instantiated the bgp address family %{address_family}.' % {
-          :address_family => hash[:name]
+          address_family: hash[:name]
         }
 
         providers << new(hash)
 
         # Create new address family
         hash = {
-            :ensure   => :present,
-            :name     => "#{proto}_#{type}",
-            :provider => self.name,
+          ensure: :present,
+            name: "#{proto}_#{type}",
+            provider: name,
         }
 
         # Add default values
         @resource_map.each do |property, options|
-          if options.has_key?(:default)
-            if [:array, :hash].include?(options[:type])
-              hash[property] = options[:default].clone
-            else
-              hash[property] = options[:default]
-            end
-          end
+          next unless options.key?(:default)
+          hash[property] = if [:array, :hash].include?(options[:type])
+                             options[:default].clone
+                           else
+                             options[:default]
+                           end
         end
 
-      elsif found_router and line =~ /\A\w/
+      elsif found_router && line =~ (%r{\A\w})
         # Exit from the router bgp
         break
 
       # Inside the router bgp
       elsif found_router
         @resource_map.each do |property, options|
-          if line =~ options[:regexp]
-            value = $1
+          next unless line =~ options[:regexp]
+          value = Regexp.last_match(1)
 
-            if value.nil?
-              hash[property] = :true
+          if value.nil?
+            hash[property] = :true
 
+          else
+            case options[:type]
+            when :array
+              hash[property] << value
+            when :fixnum
+              hash[property] = value.to_i
+            when :symbol
+              hash[property] = value.tr('-', '_').to_sym
             else
-              case options[:type]
-              when :array
-                hash[property] << value
-              when :fixnum
-                hash[property] = value.to_i
-              when :symbol
-                hash[property] = value.gsub(/-/, '_').to_sym
-              else
-                hash[property] = value
-              end
+              hash[property] = value
             end
           end
         end
@@ -126,7 +123,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
 
     unless hash.empty?
       debug 'Instantiated the bgp address family %{address_family}.' % {
-        :address_family => hash[:name]
+        address_family: hash[:name]
       }
 
       providers << new(hash)
@@ -138,25 +135,25 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   def self.prefetch(resources)
     debug '[prefetch]'
     providers = instances
-    resources.keys.each do |name|
-      if provider = providers.find{ |provider| provider.name == name }
+    resources.each_key do |name|
+      if (provider = providers.find { |providerx| providerx.name == name })
         resources[name].provider = provider
       end
     end
   end
 
   def create
-    proto, type = @resource[:name].split(/_/)
+    proto, type = @resource[:name].split(%r{_})
 
-    debug 'Creating the bgp address family %{name}' % { :name => address_family(proto, type) }
+    debug 'Creating the bgp address family %{name}' % { name: address_family(proto, type) }
 
     as_number = get_as_number
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
+    cmds << 'router bgp %{as_number}' % { as_number: as_number }
     cmds << 'address-family %{address_family}' % {
-      :address_family => address_family(proto, type)
+      address_family: address_family(proto, type)
     }
 
     resource_map = self.class.instance_variable_get('@resource_map')
@@ -166,7 +163,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
           cmds << ERB.new(options[:template]).result(binding)
 
         elsif @resource == :false
-          cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
+          cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
 
         elsif options[:type] == :array
           @resource[property].each do |value|
@@ -183,53 +180,52 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
 
     @property_hash[:ensure] = :present
   end
 
   def destroy
-    proto, type = @resource[:name].split(/_/)
+    proto, type = @resource[:name].split(%r{_})
 
-    debug 'Destroying the bgp address family %{address_family}' % { :address_family => address_family(proto, type) }
+    debug 'Destroying the bgp address family %{address_family}' % { address_family: address_family(proto, type) }
 
     as_number = get_as_number
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
+    cmds << 'router bgp %{as_number}' % { as_number: as_number }
     cmds << 'address-family %{address_family}' % {
-      :address_family => address_family(proto, type)
+      address_family: address_family(proto, type)
     }
 
     resource_map = self.class.instance_variable_get('@resource_map')
     resource_map.each do |property, options|
-      unless @property_hash[property] == options[:default]
+      next if @property_hash[property] == options[:default]
 
-        case options[:type]
-          when :array
-            @property_hash[property].each do |value|
-              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
-            end
-
-          when :boolean
-            if @property_hash[property] == :true
-              cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
-            else
-              cmds << ERB.new(options[:template]).result(binding)
-            end
-
-          else
-            value = @property_hash[property]
-            cmds << 'no %{command}' % { :command => ERB.new(options[:template]).result(binding) }
+      case options[:type]
+      when :array
+        @property_hash[property].each do |value|
+          cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
         end
+
+      when :boolean
+        cmds << if @property_hash[property] == :true
+                  'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
+                else
+                  ERB.new(options[:template]).result(binding)
+                end
+
+      else
+        value = @property_hash[property]
+        cmds << 'no %{command}' % { command: ERB.new(options[:template]).result(binding) }
       end
     end
 
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
 
     @property_hash.clear
   end
@@ -241,34 +237,34 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   def flush
     return if @property_flush.empty?
 
-    proto, type = @resource[:name].split(/_/)
+    proto, type = @resource[:name].split(%r{_})
 
-    debug 'Flushing the bgp address family %{address_family}' % { :address_family => address_family(proto, type) }
+    debug 'Flushing the bgp address family %{address_family}' % { address_family: address_family(proto, type) }
 
     as_number = get_as_number
 
     cmds = []
     cmds << 'configure terminal'
-    cmds << 'router bgp %{as_number}' % { :as_number => as_number }
+    cmds << 'router bgp %{as_number}' % { as_number: as_number }
     cmds << 'address-family %{address_family}' % {
-      :address_family => address_family(proto, type)
+      address_family: address_family(proto, type)
     }
 
     resource_map = self.class.instance_variable_get('@resource_map')
     @property_flush.each do |property, v|
-      if v == :absent or v == :false
-        cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
+      if (v == :absent) || (v == :false)
+        cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
 
-      elsif (v == :true or v == 'true') and [:symbol, :string].include?(resource_map[property][:type])
-        cmds << 'no %{command}' % { :comand => ERB.new(resource_map[property][:template]).result(binding) }
+      elsif ((v == :true) || (v == 'true')) && [:symbol, :string].include?(resource_map[property][:type])
+        cmds << 'no %{command}' % { comand: ERB.new(resource_map[property][:template]).result(binding) }
         cmds << ERB.new(resource_map[property][:template]).result(binding)
 
       elsif v == :true
         cmds << ERB.new(resource_map[property][:template]).result(binding)
 
-      elsif resource_map[property][:type]  == :array
+      elsif resource_map[property][:type] == :array
         (@property_hash[property] - v).each do |value|
-          cmds << 'no %{command}' % { :command => ERB.new(resource_map[property][:template]).result(binding) }
+          cmds << 'no %{command}' % { command: ERB.new(resource_map[property][:template]).result(binding) }
         end
 
         (v - @property_hash[property]).each do |value|
@@ -284,7 +280,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
     cmds << 'end'
     cmds << 'write memory'
 
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
 
     @property_hash = resource.to_hash
     @property_flush.clear
@@ -297,7 +293,7 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   end
 
   @resource_map.each_key do |property|
-    define_method "#{property}" do
+    define_method property.to_s do
       @property_hash[property] || :absent
     end
 
@@ -307,16 +303,18 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   end
 
   private
+
   def get_as_number
     if @as_number.nil?
       begin
-        vtysh('-c', 'show running-config').split(/\n/).collect.each do |line|
-          if line =~ /\Arouter\sbgp\s(\d+)\Z/
-            @as_number = Integer($1)
+        vtysh('-c', 'show running-config').split(%r{\n}).collect.each do |line|
+          if line =~ %r{\Arouter\sbgp\s(\d+)\Z}
+            @as_number = Integer(Regexp.last_match(1))
             break
           end
         end
       rescue
+        # do nothing
       end
     end
 

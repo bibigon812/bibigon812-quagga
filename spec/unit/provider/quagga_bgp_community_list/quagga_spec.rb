@@ -7,17 +7,17 @@ describe Puppet::Type.type(:quagga_bgp_community_list).provider(:quagga) do
 
   let(:resource) do
     Puppet::Type.type(:quagga_bgp_community_list).new(
-      :provider => provider,
-      :title    => '100',
+      provider: provider,
+      title: '100',
     )
   end
 
   let(:provider) do
     described_class.new(
-      :ensure   => :present,
-      :name     => '100',
-      :provider => :quagga,
-      :rules    => ['permit 65000:101', 'permit 65000:102', 'permit 65000:103',],
+      ensure: :present,
+      name: '100',
+      provider: :quagga,
+      rules: ['permit 65000:101', 'permit 65000:102', 'permit 65000:103'],
     )
   end
 
@@ -39,13 +39,13 @@ end
   end
 
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -57,44 +57,44 @@ end
       ).returns output
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(4)
     end
 
-    it 'should return the resource community-list' do
+    it 'returns the resource community-list for instance 0' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => '100',
-        :provider => :quagga,
-        :rules => ['permit 65000:31133',],
-      })
+                                                                                           ensure: :present,
+        name: '100',
+        provider: :quagga,
+        rules: ['permit 65000:31133'],
+                                                                                         })
     end
 
-    it 'should return the resource community-list' do
+    it 'returns the resource community-list for instance 1' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => '300',
-        :provider => :quagga,
-        :rules => ['permit 65000:50952', 'permit 65000:31500', 'permit 65000:6939',],
-      })
+                                                                                           ensure: :present,
+        name: '300',
+        provider: :quagga,
+        rules: ['permit 65000:50952', 'permit 65000:31500', 'permit 65000:6939'],
+                                                                                         })
     end
 
-    it 'should return the resource community-list' do
+    it 'returns the resource community-list for instance 2' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :ensure => :present,
-        :name => '500',
-        :provider => :quagga,
-        :rules => ['permit 65000:8359', 'permit 65000:12695',],
-      })
+                                                                                           ensure: :present,
+        name: '500',
+        provider: :quagga,
+        rules: ['permit 65000:8359', 'permit 65000:12695'],
+                                                                                         })
     end
 
-    it 'should return the resource community-list' do
+    it 'returns the resource community-list for instance 3' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-        ensure: :present,
+                                                                                           ensure: :present,
         name: '501',
         provider: :quagga,
-        rules: ['permit 64513:2_.*_64515:1',],
-      })
+        rules: ['permit 64513:2_.*_64515:1'],
+                                                                                         })
     end
   end
 
@@ -108,49 +108,49 @@ end
     before :each do
       described_class.stubs(:vtysh).with(
           '-c', 'show running-config'
-      ).returns output
+        ).returns output
     end
 
-    it 'should find provider for resource' do
+    it 'finds provider for resource' do
       described_class.prefetch(resources)
       expect(resources.values.first.provider).to eq(described_class.instances[0])
     end
   end
 
   describe '#create' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(false)
     end
 
-    it 'should has all rules' do
+    it 'has all rules' do
       resource[:ensure] = :present
-      resource[:rules] = ['permit 65000:101', 'permit 65000:102', 'permit 65000:103',]
+      resource[:rules] = ['permit 65000:101', 'permit 65000:102', 'permit 65000:103']
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'ip community-list 100 permit 65000:101',
-        '-c', 'ip community-list 100 permit 65000:102',
-        '-c', 'ip community-list 100 permit 65000:103',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'ip community-list 100 permit 65000:101',
+                                      '-c', 'ip community-list 100 permit 65000:102',
+                                      '-c', 'ip community-list 100 permit 65000:103',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.create
     end
   end
 
   describe '#destroy' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(true)
     end
 
-    it 'should has all rules' do
+    it 'has all rules' do
       resource[:ensure] = :present
-      resource[:rules] = ['permit 65000:101', 'permit 65000:102', 'permit 65000:103',]
+      resource[:rules] = ['permit 65000:101', 'permit 65000:102', 'permit 65000:103']
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'no ip community-list 100',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'no ip community-list 100',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.destroy
     end
   end

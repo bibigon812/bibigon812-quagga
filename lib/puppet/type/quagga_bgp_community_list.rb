@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_bgp_community_list) do
-  @doc = %q{
+  @doc = "
     This type provides the capability to manage BGP community-list within puppet.
 
       Examples:
@@ -11,27 +11,27 @@ Puppet::Type.newtype(:quagga_bgp_community_list) do
                 'permit 65000:31500',
             ],
         }
-  }
+  "
 
   ensurable
 
   newparam(:name) do
     desc 'Community list number.'
 
-    newvalues(/^\d+$/)
+    newvalues(%r{^\d+$})
 
     validate do |value|
       value_i = value.to_i
-      if value_i < 1 or value_i > 500
+      if (value_i < 1) || (value_i > 500)
         raise ArgumentError, 'Community list number: 1-500.'
       end
     end
   end
 
-  newproperty(:rules, :array_matching => :all) do
+  newproperty(:rules, array_matching: :all) do
     desc 'Set actions of this community list.'
 
-    newvalues(/\A(deny|permit)\s\^?[_,\d\.\\\*\+\-\[\]\(\)\{\}\|\?:]+\$?\Z/)
+    newvalues(%r{\A(deny|permit)\s\^?[_,\d\.\\\*\+\-\[\]\(\)\{\}\|\?:]+\$?\Z})
 
     def should_to_s(value = @should)
       if value
@@ -43,10 +43,10 @@ Puppet::Type.newtype(:quagga_bgp_community_list) do
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra bgpd}
+    ['zebra', 'bgpd']
   end
 end

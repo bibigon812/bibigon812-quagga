@@ -3,23 +3,23 @@ require 'spec_helper'
 describe Puppet::Type.type(:quagga_bgp_peer).provider(:quagga) do
   let(:resource) do
     Puppet::Type.type(:quagga_bgp_peer).new(
-      :provider => provider,
-      :title    => 'INTERNAL',
+      provider: provider,
+      title: 'INTERNAL',
     )
   end
 
   let(:provider) do
     described_class.new(
-      :ensure        => :present,
-      :local_as      => :absent,
-      :name          => 'INTERNAL',
-      :passive       => :false,
+      ensure: :present,
+      local_as: :absent,
+      name: 'INTERNAL',
+      passive: :false,
       password: 'QWRF$345!#@$',
-      :peer_group    => :true,
-      :provider      => :quagga,
-      :remote_as     => 65000,
-      :shutdown      => :false,
-      :update_source => '172.16.32.103',
+      peer_group: :true,
+      provider: :quagga,
+      remote_as: 65_000,
+      shutdown: :false,
+      update_source: '172.16.32.103',
     )
   end
 
@@ -113,13 +113,13 @@ end
   end
 
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'methods' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -131,83 +131,83 @@ end
       ).returns output_wo_default_ipv4_unicast
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(5)
     end
 
-    it 'should return the INTERNAL resource' do
+    it 'returns the INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => 'INTERNAL',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: 'INTERNAL',
+        passive: :false,
         password: 'QWRF$345!#@$',
-        :peer_group    => :true,
-        :provider      => :quagga,
-        :remote_as     => 65000,
-        :shutdown      => :false,
-        :update_source => '172.16.32.103',
-      })
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65_000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
+                                                                                         })
     end
 
-    it 'should return the RR resource' do
+    it 'returns the RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => 'RR',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: 'RR',
+        passive: :false,
         password: :absent,
-        :peer_group    => :true,
-        :provider      => :quagga,
-        :remote_as     => 65000,
-        :shutdown      => :false,
-        :update_source => '172.16.32.103',
-      })
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65_000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
+                                                                                         })
     end
 
-    it 'should return the RR_WEAK resource' do
+    it 'returns the RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => 'RR_WEAK',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: 'RR_WEAK',
+        passive: :false,
         password: :absent,
-        :peer_group    => :true,
-        :provider      => :quagga,
-        :remote_as     => 65000,
-        :shutdown      => :false,
-        :update_source => '172.16.32.103',
-      })
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65_000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
+                                                                                         })
     end
 
-    it 'should return the 172.16.32.108 resource' do
+    it 'returns the 172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => '172.16.32.108',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: '172.16.32.108',
+        passive: :false,
         password: :absent,
-        :peer_group    => 'INTERNAL',
-        :provider      => :quagga,
-        :remote_as     => :absent,
-        :shutdown      => :true,
-        :update_source => :absent,
-      })
+        peer_group: 'INTERNAL',
+        provider: :quagga,
+        remote_as: :absent,
+        shutdown: :true,
+        update_source: :absent,
+                                                                                         })
     end
 
-    it 'should return the 1a03:d000:20a0::91 resource' do
+    it 'returns the 1a03:d000:20a0::91 resource' do
       expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => '1a03:d000:20a0::91',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: '1a03:d000:20a0::91',
+        passive: :false,
         password: :absent,
-        :peer_group    => :false,
-        :provider      => :quagga,
-        :remote_as     => 31113,
-        :shutdown      => :false,
-        :update_source => '1a03:d000:20a0::92',
-      })
+        peer_group: :false,
+        provider: :quagga,
+        remote_as: 31_113,
+        shutdown: :false,
+        update_source: '1a03:d000:20a0::92',
+                                                                                         })
     end
   end
 
@@ -215,11 +215,11 @@ end
     before :each do
       described_class.expects(:vtysh).with(
           '-c', 'show running-config'
-      ).returns '!
+        ).returns '!
 !'
     end
 
-    it 'should not return a resource' do
+    it 'does not return a resource' do
       expect(described_class.instances.size).to eq(0)
     end
   end
@@ -228,86 +228,86 @@ end
     before :each do
       described_class.expects(:vtysh).with(
           '-c', 'show running-config'
-      ).returns output_w_default_ipv4_unicast
+        ).returns output_w_default_ipv4_unicast
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(5)
     end
 
-    it 'should return the INTERNAL resource' do
+    it 'returns the INTERNAL resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => 'INTERNAL',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: 'INTERNAL',
+        passive: :false,
         password: 'QWRF$345!#@$',
-        :peer_group    => :true,
-        :provider      => :quagga,
-        :remote_as     => 65000,
-        :shutdown      => :false,
-        :update_source => '172.16.32.103',
-      })
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65_000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
+                                                                                         })
     end
 
-    it 'should return the RR resource' do
+    it 'returns the RR resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => 'RR',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: 'RR',
+        passive: :false,
         password: :absent,
-        :peer_group    => :true,
-        :provider      => :quagga,
-        :remote_as     => 65000,
-        :shutdown      => :false,
-        :update_source => '172.16.32.103',
-      })
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65_000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
+                                                                                         })
     end
 
-    it 'should return the RR_WEAK resource' do
+    it 'returns the RR_WEAK resource' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => 'RR_WEAK',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: 'RR_WEAK',
+        passive: :false,
         password: :absent,
-        :peer_group    => :true,
-        :provider      => :quagga,
-        :remote_as     => 65000,
-        :shutdown      => :false,
-        :update_source => '172.16.32.103',
-      })
+        peer_group: :true,
+        provider: :quagga,
+        remote_as: 65_000,
+        shutdown: :false,
+        update_source: '172.16.32.103',
+                                                                                         })
     end
 
-    it 'should return the 172.16.32.108 resource' do
+    it 'returns the 172.16.32.108 resource' do
       expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => '172.16.32.108',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: '172.16.32.108',
+        passive: :false,
         password: :absent,
-        :peer_group    => 'INTERNAL',
-        :provider      => :quagga,
-        :remote_as     => :absent,
-        :shutdown      => :true,
-        :update_source => :absent,
-      })
+        peer_group: 'INTERNAL',
+        provider: :quagga,
+        remote_as: :absent,
+        shutdown: :true,
+        update_source: :absent,
+                                                                                         })
     end
 
-    it 'should return the 1a03:d000:20a0::91 resource' do
+    it 'returns the 1a03:d000:20a0::91 resource' do
       expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-        :ensure        => :present,
-        :local_as      => :absent,
-        :name          => '1a03:d000:20a0::91',
-        :passive       => :false,
+                                                                                           ensure: :present,
+        local_as: :absent,
+        name: '1a03:d000:20a0::91',
+        passive: :false,
         password: :absent,
-        :peer_group    => :false,
-        :provider      => :quagga,
-        :remote_as     => 31113,
-        :shutdown      => :false,
-        :update_source => '1a03:d000:20a0::92',
-      })
+        peer_group: :false,
+        provider: :quagga,
+        remote_as: 31_113,
+        shutdown: :false,
+        update_source: '1a03:d000:20a0::92',
+                                                                                         })
     end
   end
 
@@ -321,100 +321,100 @@ end
     before :each do
       described_class.stubs(:vtysh).with(
           '-c', 'show running-config'
-      ).returns output_wo_default_ipv4_unicast
+        ).returns output_wo_default_ipv4_unicast
     end
 
-    it 'should find provider for resource' do
+    it 'finds provider for resource' do
       described_class.prefetch(resources)
       expect(resources.values.first.provider).to eq(described_class.instances[0])
     end
   end
 
   describe '#create' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(false)
-      provider.stubs(:get_as_number).returns(65000)
+      provider.stubs(:get_as_number).returns(65_000)
     end
 
-    it 'should has all values' do
+    it 'has all values' do
       resource[:ensure] = :present
       resource[:name] = 'INTERNAL'
       resource[:password] = 'QWRF$345!#@$'
-      resource[:remote_as] = 65000
+      resource[:remote_as] = 65_000
       resource[:update_source] = '172.16.32.103'
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'router bgp 65000',
-        '-c', 'neighbor INTERNAL peer-group',
-        '-c', 'neighbor INTERNAL remote-as 65000',
-        '-c', 'neighbor INTERNAL password QWRF$345!#@$',
-        '-c', 'neighbor INTERNAL update-source 172.16.32.103',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'router bgp 65000',
+                                      '-c', 'neighbor INTERNAL peer-group',
+                                      '-c', 'neighbor INTERNAL remote-as 65000',
+                                      '-c', 'neighbor INTERNAL password QWRF$345!#@$',
+                                      '-c', 'neighbor INTERNAL update-source 172.16.32.103',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.create
     end
   end
 
   describe '#destroy' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65000)
+      provider.stubs(:get_as_number).returns(65_000)
     end
 
-    it 'should has all values' do
+    it 'has all values' do
       resource[:ensure] = :present
       resource[:name] = 'INTERNAL'
-      resource[:remote_as] = 65000
+      resource[:remote_as] = 65_000
       resource[:update_source] = '172.16.32.103'
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'router bgp 65000',
-        '-c', 'no neighbor INTERNAL',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'router bgp 65000',
+                                      '-c', 'no neighbor INTERNAL',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.destroy
     end
   end
 
   describe '#flush' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65000)
+      provider.stubs(:get_as_number).returns(65_000)
     end
 
-    it 'should update passive, shutdown and update_source' do
+    it 'updates passive, shutdown and update_source' do
       resource[:ensure] = :present
       provider.passive = :true
       provider.shutdown = :true
       provider.update_source = '172.16.32.104'
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'router bgp 65000',
-        '-c', 'neighbor INTERNAL passive',
-        '-c', 'neighbor INTERNAL shutdown',
-        '-c', 'neighbor INTERNAL update-source 172.16.32.104',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'router bgp 65000',
+                                      '-c', 'neighbor INTERNAL passive',
+                                      '-c', 'neighbor INTERNAL shutdown',
+                                      '-c', 'neighbor INTERNAL update-source 172.16.32.104',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.flush
     end
 
-    it 'should remove passive and shutdown and change update_source' do
+    it 'removes passive and shutdown and change update_source' do
       resource[:ensure] = :present
       provider.passive = :false
       provider.shutdown = :false
       provider.update_source = '172.16.32.105'
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'router bgp 65000',
-        '-c', 'no neighbor INTERNAL passive',
-        '-c', 'no neighbor INTERNAL shutdown',
-        '-c', 'neighbor INTERNAL update-source 172.16.32.105',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'router bgp 65000',
+                                      '-c', 'no neighbor INTERNAL passive',
+                                      '-c', 'no neighbor INTERNAL shutdown',
+                                      '-c', 'neighbor INTERNAL update-source 172.16.32.105',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.flush
     end
   end
