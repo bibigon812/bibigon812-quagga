@@ -50,7 +50,7 @@ router bgp 197888
 router ospf
  area 0.0.15.211 default-cost 100
  area 0.10.10.10 export-list ACCESS_LIST_EXPORT
- area 0.10.10.10 import-list ACCESS_LIST_IPMORT
+ area 0.10.10.10 import-list ACCESS_LIST_IMPORT
  area 0.10.10.10 filter-list prefix PREFIX_LIST_IMPORT in
  area 0.10.10.10 filter-list prefix PREFIX_LIST_EXPORT out
  area 0.10.10.10 stub no-summary
@@ -98,7 +98,7 @@ ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
         {
           access_list_export: 'ACCESS_LIST_EXPORT',
-          access_list_import: 'ACCESS_LIST_IPMORT',
+          access_list_import: 'ACCESS_LIST_IMPORT',
           ensure: :present,
           name: '0.10.10.10',
           networks: ['192.168.1.0/24', '192.168.2.0/24'],
