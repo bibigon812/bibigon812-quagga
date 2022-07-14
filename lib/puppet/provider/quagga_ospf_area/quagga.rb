@@ -62,7 +62,7 @@ Puppet::Type.type(:quagga_ospf_area).provide :quagga do
     hash = {}
     found_router = false
     config = vtysh('-c', 'show running-config')
-    config.split(%r{\n}).map do |line|
+    config.split("\n").map do |line|
       next if %r{\A!\Z}.match?(line)
 
       if %r{\Arouter ospf\Z}.match?(line)
