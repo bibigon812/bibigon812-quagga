@@ -1,3 +1,8 @@
+# @summary Manage a quagga route-map
+#
+# @param rules the route-map definition
+#
+# @see quagga_route_map
 define quagga::route_map (
   Hash $rules = {},
 ) {

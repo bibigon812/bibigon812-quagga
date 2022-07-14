@@ -1,3 +1,8 @@
+# @summary manage a Quagga prefix list
+#
+# @param rules Prefix list definition
+#
+# @see quagga_prefix_list
 define quagga::prefix_list (
   Hash $rules = {},
 ) {

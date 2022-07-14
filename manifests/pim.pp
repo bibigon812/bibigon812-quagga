@@ -1,3 +1,16 @@
+#
+# @summary Manage Quagga Protocol Independent Multicasting (PIM)
+#
+# @param agentx manage the SNMP agentx for PIM
+# @param config_file configuration file of the PIM servie
+# @param config_file_manage enable management of the PIM service setting file.
+# @param service_name the name of the PIM service.
+# @param service_enable  enable the PIM service.
+# @param service_manage enable management of the PIM service.
+# @param service_ensure the state of the PIM Service.
+# @param service_opts service start options.
+# @param router PIM router options. See the type [`quagga_pim_router`](#quagga_pim_router).
+# @param interfaces OSPF parameters of interfaces. See the type [`quagga_pim_interface`](#quagga_pim_interface).
 class quagga::pim (
   Boolean $agentx,
   String $config_file,

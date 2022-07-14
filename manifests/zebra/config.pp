@@ -1,3 +1,4 @@
+# @api private
 class quagga::zebra::config {
   if $quagga::zebra::config_file_manage {
     file { $quagga::zebra::config_file: }

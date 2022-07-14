@@ -1,3 +1,4 @@
+# @api private
 class quagga::bgp::service {
   if $quagga::bgp::service_manage {
     service { $quagga::bgp::service_name:

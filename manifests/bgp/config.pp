@@ -1,3 +1,4 @@
+# @api private
 class quagga::bgp::config {
   if $quagga::bgp::config_file_manage {
     file { $quagga::bgp::config_file: }

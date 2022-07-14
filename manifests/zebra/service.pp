@@ -1,3 +1,4 @@
+# @api private
 class quagga::zebra::service {
   if $quagga::zebra::service_manage {
     service { $quagga::zebra::service_name:

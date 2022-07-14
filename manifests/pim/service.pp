@@ -1,3 +1,4 @@
+# @api private
 class quagga::pim::service {
   if $quagga::pim::service_manage {
     service { $quagga::pim::service_name:

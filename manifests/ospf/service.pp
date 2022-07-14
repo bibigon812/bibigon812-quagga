@@ -1,3 +1,4 @@
+# @api private
 class quagga::ospf::service {
   if $quagga::ospf::service_manage {
     service { $quagga::ospf::service_name:

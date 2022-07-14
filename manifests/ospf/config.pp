@@ -1,3 +1,4 @@
+# @api private
 class quagga::ospf::config {
   if $quagga::ospf::config_file_manage {
     file { $quagga::ospf::config_file: }

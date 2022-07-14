@@ -9,9 +9,9 @@
 # @param default_content
 #   Specifies the default content of quagga files.
 # @param service_file
-#   The system configuration file
+#   The system configuration file on the filesyustem
 # @param service_file_manage
-#   Enable or disable manage the system configuration file
+#   Enable or disable management of the system configuration file
 # @param packages
 #   Specifies which packages will be installed
 class quagga (

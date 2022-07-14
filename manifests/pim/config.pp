@@ -1,3 +1,4 @@
+# @api private
 class quagga::pim::config {
   if $quagga::pim::config_file_manage {
     file { $quagga::pim::config_file: }

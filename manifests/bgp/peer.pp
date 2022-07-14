@@ -1,3 +1,5 @@
+# @summary wrapper for quagga_bgp_peer and quagga_bgp_peer_address_family
+# @api private
 define quagga::bgp::peer (
   Optional[Integer[1, 4294967295]] $local_as = undef,
   Optional[Integer[1, 4294967295]] $remote_as = undef,
