@@ -39,15 +39,9 @@ log syslog
 log facility local7'
   end
 
-  describe 'instances' do
-    it 'has an instance method' do
-      expect(described_class).to respond_to :instances
-    end
-  end
-
-  describe 'prefetch' do
-    it 'has a prefetch method' do
-      expect(described_class).to respond_to :prefetch
+  [:instances, :prefetch].each do |method|
+    it "responds to the class method #{method}" do
+      expect(described_class).to respond_to(method)
     end
   end
 
