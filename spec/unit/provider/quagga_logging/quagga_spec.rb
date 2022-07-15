@@ -104,30 +104,23 @@ log facility local7'
     end
   end
 
-  # describe '#create' do
-  #   before do
-  #     provider.stubs(:exists?).returns(false)
-  #   end
+  describe '#create' do
+    before :each do
+      provider.stubs(:exists?).returns(false)
+    end
 
-  #   it 'has all values' do
-  #     resource[:name] = 'file'
-  #     resource[:ensure] = :present
-  #     resource[:filename] = '/tmp/file.log'
-  #     resource[:level] = :warnings
+    it 'has all values' do
+      resource[:name] = 'file'
+      resource[:ensure] = :present
+      resource[:filename] = '/tmp/file.log'
+      resource[:level] = :warnings
 
-  #     provider.create
-  #     expect(provider.class_variable_get(@property_hash)[:ensure]).to eq(:present)
-  #   end
-
-  #   it 'has facility' do
-  #     resource[:ensure] = :present
-  #     resource[:name] = 'syslog'
-  #     resource[:facility] = :local7
-
-  #     provider.create
-  #     expect(provider.class_variable_get(@property_hash)[:ensure]).to eq(:present)
-  #   end
-  # end
+      provider.create
+      expect(provider.get(:ensure)).to eq(:present)
+      expect(provider.get(:name)).to eq('file')
+    end
+  end
+  
   describe '#flush' do
     before(:each) do
       provider.stubs(:exists?).returns(true)
