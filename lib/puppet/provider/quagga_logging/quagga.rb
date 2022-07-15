@@ -27,9 +27,9 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
         }
 
         if m[:filename].nil?
-          hash[:name] = m[:name]
+          hash[:name] = m[:name].to_sym
         else
-          hash[:name]     = 'file'
+          hash[:name]     = :file
           hash[:filename] = m[:filename]
         end
 
@@ -61,19 +61,30 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
   end
 
   def create
+    Puppet.debug "Creating the logging method #{@resource[:name]}"
+
+    @property_hash[:name] = @resource[:name]
     @property_hash[:ensure] = :present
+    @property_hash[:level] = @resource[:level]
+    @property_hash[:filename] = @resource[:filename]
+
+    @property_flush = @property_hash
   end
 
   def destroy
+    name = @property_hash[:name]
+    Puppet.debug "Destroying the logging method #{name}"
     @property_hash[:ensure] = :absent
+    @property_flush = @property_hash
   end
 
   def flush
+    return if @property_flush.empty?
+    Puppet.debug "Flushing #{@property_hash[:name]}"
     commands = []
     commands << 'configure terminal'
 
     if exists?
-
       command = ['log']
       command << @property_hash[:name]
 
@@ -95,6 +106,7 @@ Puppet::Type.type(:quagga_logging).provide :quagga do
 
     vtysh(commands.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
 
+    @property_hash = @resource.to_hash
     @property_flush.clear
   end
 

@@ -106,7 +106,7 @@ log facility local7'
 
   describe '#create' do
     before :each do
-      provider.stubs(:exists?).returns(false)
+      provider.stubs(:exists?).returns(true)
     end
 
     it 'has all values' do
@@ -117,40 +117,73 @@ log facility local7'
 
       provider.create
       expect(provider.get(:ensure)).to eq(:present)
-      expect(provider.get(:name)).to eq('file')
+      expect(provider.get(:name)).to eq(:file)
     end
   end
-  
+
   describe '#flush' do
-    before(:each) do
-      provider.stubs(:exists?).returns(true)
-      provider1.stubs(:exists?).returns(true)
+    context 'with no existing config' do
+      let(:resource) do
+        Puppet::Type.type(:quagga_logging).new(
+          provider: described_class.name,
+          name:     'syslog',
+        )
+      end
+      let(:provider) do
+        described_class.new(
+          name:     'syslog',
+          provider: :quagga,
+          filename: '/tmp/file.log',
+          level:    :warnings,
+        )
+      end
+
+      it 'creates the instance' do
+        resource[:ensure] = :present
+        provider.stubs(:exists?).returns(true)
+        provider.expects(:vtysh).with(
+          [
+            '-c', 'configure terminal',
+            '-c', 'log syslog warnings',
+            '-c', 'end',
+            '-c', 'write memory'
+          ],
+        )
+        provider.flush
+      end
     end
 
-    it 'updates all values for quagga_logging file' do
-      resource[:ensure] = :present
-      provider.filename = '/tmp/file1.log'
-      provider.level = :errors
-      provider.expects(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'log file /tmp/file1.log errors',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
-      provider.flush
-    end
+    context 'with existing config' do
+      before(:each) do
+        provider.stubs(:exists?).returns(true)
+        provider1.stubs(:exists?).returns(true)
+      end
 
-    it 'updates facility value for quagga_logging syslog' do
-      resource[:ensure] = :present
-      provider1.filename = '/tmp/file1.log'
-      provider1.level = :errors
-      provider1.expects(:vtysh).with([
-                                       '-c', 'configure terminal',
-                                       '-c', 'log syslog errors',
-                                       '-c', 'end',
-                                       '-c', 'write memory'
-                                     ])
-      provider1.flush
+      it 'updates all values for quagga_logging file' do
+        resource[:ensure] = :present
+        provider.filename = '/tmp/file1.log'
+        provider.level = :errors
+        provider.expects(:vtysh).with([
+                                        '-c', 'configure terminal',
+                                        '-c', 'log file /tmp/file1.log errors',
+                                        '-c', 'end',
+                                        '-c', 'write memory'
+                                      ])
+        provider.flush
+      end
+
+      it 'updates facility value for quagga_logging syslog' do
+        resource[:ensure] = :present
+        provider1.filename = '/tmp/file1.log'
+        provider1.level = :errors
+        provider1.expects(:vtysh).with([
+                                         '-c', 'configure terminal',
+                                         '-c', 'log syslog errors',
+                                         '-c', 'end',
+                                         '-c', 'write memory'
+                                       ])
+        provider1.flush
+      end
     end
   end
 end
