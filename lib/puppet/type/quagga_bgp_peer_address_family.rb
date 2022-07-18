@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
-  @doc = %q{
+  @doc = "
     This type provides capabilities to manage Quagga bgp address family parameters.
 
       Examples:
@@ -23,33 +23,33 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
             send_community         => 'both',
             soft_reconfiguration   => 'inbound',
         }
-  }
+  "
 
-  feature :refreshable, 'The provider can clean a bgp session.', :methods => [:clear]
+  feature :refreshable, 'The provider can clean a bgp session.', methods: [:clear]
 
   ensurable
 
-  newparam(:name, :namevar => true) do
+  newparam(:name, namevar: true) do
     desc 'Contains a bgp peer name and an address family.'
 
-    newvalues(/\A[\d\.]+\sipv4_(unicast|multicast)\Z/)
-    newvalues(/\A[\h:]+\sipv6_unicast\Z/)
-    newvalues(/\A\w+\sipv4_(unicast|multicast)\Z/)
-    newvalues(/\A\w+\sipv6_unicast\Z/)
+    newvalues(%r{\A[\d\.]+\sipv4_(unicast|multicast)\Z})
+    newvalues(%r{\A[\h:]+\sipv6_unicast\Z})
+    newvalues(%r{\A\w+\sipv4_(unicast|multicast)\Z})
+    newvalues(%r{\A\w+\sipv6_unicast\Z})
   end
 
   newproperty(:peer_group) do
     desc 'Member of the peer-group.'
 
     defaultto do
-      resource[:name] =~ /(\.|:)/ ? :false : :true
+      %r{(\.|:)}.match?(resource[:name]) ? :false : :true
     end
 
     newvalues(:false, :true)
-    newvalues(/\A[[:alpha:]]\w+\Z/)
+    newvalues(%r{\A[[:alpha:]]\w+\Z})
   end
 
-  newproperty(:activate, :boolean => true) do
+  newproperty(:activate, boolean: true) do
     desc 'Enable the Address Family for this Neighbor.'
 
     defaultto :false
@@ -62,26 +62,26 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
 
     validate do |value|
       unless value == :absent
-        fail "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
-        fail "Invalid value \"#{value}\", valid values are 1-4294967295" unless value >= 1 and value <= 4294967295
+        raise "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
+        raise "Invalid value \"#{value}\", valid values are 1-4294967295" unless (value >= 1) && (value <= 4_294_967_295)
       end
     end
   end
 
-  newproperty(:default_originate, :boolean => true) do
+  newproperty(:default_originate, boolean: true) do
     desc 'Originate default route to this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
 
     validate do |value|
       super(value)
-      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
-        fail 'Invalid command for a peer-group member.' if value == :true
+      unless resource[:peer_group].nil? || [:true, :false].include?(resource[:peer_group])
+        raise 'Invalid command for a peer-group member.' if value == :true
       end
     end
   end
 
-  newproperty(:next_hop_self, :boolean => true) do
+  newproperty(:next_hop_self, boolean: true) do
     desc 'Disable the next hop calculation for this neighbor.'
     defaultto(:false)
     newvalues(:false, :true)
@@ -91,19 +91,19 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'Filter updates from this neighbor.'
     defaultto(:absent)
     newvalues(:absent)
-    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+    newvalues(%r{\A[[:alpha:]][\w-]+\Z})
   end
 
   newproperty(:prefix_list_out) do
     desc 'Filter updates to this neighbor.'
     defaultto(:absent)
     newvalues(:absent)
-    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+    newvalues(%r{\A[[:alpha:]][\w-]+\Z})
 
     validate do |value|
       super(value)
-      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
-        fail 'Invalid command for a peer-group member.' unless value == :absent
+      unless resource[:peer_group].nil? || [:true, :false].include?(resource[:peer_group])
+        raise 'Invalid command for a peer-group member.' unless value == :absent
       end
     end
   end
@@ -112,19 +112,19 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'Apply map to routes coming from a Route-Server client.'
     defaultto(:absent)
     newvalues(:absent)
-    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+    newvalues(%r{\A[[:alpha:]][\w-]+\Z})
   end
 
   newproperty(:route_map_import) do
     desc 'Apply map to routes going into a Route-Server client\'s table.'
     defaultto(:absent)
     newvalues(:absent)
-    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+    newvalues(%r{\A[[:alpha:]][\w-]+\Z})
 
     validate do |value|
       super(value)
-      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
-        fail 'Invalid command for a peer-group member.' unless value == :absent
+      unless resource[:peer_group].nil? || [:true, :false].include?(resource[:peer_group])
+        raise 'Invalid command for a peer-group member.' unless value == :absent
       end
     end
   end
@@ -133,71 +133,71 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     desc 'Apply map to incoming routes.'
     defaultto(:absent)
     newvalues(:absent)
-    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+    newvalues(%r{\A[[:alpha:]][\w-]+\Z})
   end
 
   newproperty(:route_map_out) do
     desc 'Apply map to outbound routes.'
     defaultto(:absent)
     newvalues(:absent)
-    newvalues(/\A[[:alpha:]][\w-]+\Z/)
+    newvalues(%r{\A[[:alpha:]][\w-]+\Z})
 
     validate do |value|
       super(value)
-      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
-        fail 'Invalid command for a peer-group member.' unless value == :absent
+      unless resource[:peer_group].nil? || [:true, :false].include?(resource[:peer_group])
+        raise 'Invalid command for a peer-group member.' unless value == :absent
       end
     end
   end
 
-  newproperty(:route_reflector_client, :boolean => true) do
+  newproperty(:route_reflector_client, boolean: true) do
     desc 'Configure a neighbor as Route Reflector client.'
     defaultto(:false)
     newvalues(:false, :true)
 
     validate do |value|
       super(value)
-      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
-        fail 'Invalid command for a peer-group member.' if value == :true
+      unless resource[:peer_group].nil? || [:true, :false].include?(resource[:peer_group])
+        raise 'Invalid command for a peer-group member.' if value == :true
       end
     end
   end
 
-  newproperty(:route_server_client, :boolean => true) do
+  newproperty(:route_server_client, boolean: true) do
     desc 'Configure a neighbor as Route Server client.'
     defaultto(:false)
     newvalues(:false, :true)
 
     validate do |value|
       super(value)
-      unless resource[:peer_group].nil? or [:true, :false].include?(resource[:peer_group])
-        fail 'Invalid command for a peer-group member.' if value == :true
+      unless resource[:peer_group].nil? || [:true, :false].include?(resource[:peer_group])
+        raise 'Invalid command for a peer-group member.' if value == :true
       end
     end
   end
 
   autorequire(:quagga_bgp_router) do
-    %w{bgp}
+    ['bgp']
   end
 
   autorequire(:quagga_bgp_peer) do
-    [ "#{self[:name].split(/\s/).first}" ]
+    [ self[:name].split(%r{\s}).first.to_s ]
   end
 
   autorequire(:quagga_bgp_peer_address_family) do
     if [:false, :true].include?(self[:peer_group])
       []
     else
-      [ "#{self[:peer_group]} #{self[:name].split(/\s/).last}" ]
+      [ "#{self[:peer_group]} #{self[:name].split(%r{\s}).last}" ]
     end
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra bgpd}
+    ['zebra', 'bgpd']
   end
 
   autosubscribe(:quagga_prefix_list) do
@@ -206,8 +206,8 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     [:prefix_list_in, :prefix_list_out].each do |prefix_list|
       next if self[prefix_list] == :absent
       reqs << catalog.resources.select { |resource| resource.type == :quagga_prefix_list }
-        .select { |resource| resource[:name].start_with? "#{self[prefix_list]} " }
-        .map { |resource| resource[:name] }
+                     .select { |resource| resource[:name].start_with? "#{self[prefix_list]} " }
+                     .map { |resource| resource[:name] }
     end
 
     reqs.flatten
@@ -219,8 +219,8 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
     [:route_map_export, :route_map_import, :route_map_in, :route_map_out].each do |route_map|
       next if self[route_map] == :absent
       reqs << catalog.resources.select { |resource| resource.type == :quagga_route_map }
-        .select { |resource| resource[:name].start_with? "#{self[route_map]} " }
-        .map { |resource| resource[:name] }
+                     .select { |resource| resource[:name].start_with? "#{self[route_map]} " }
+                     .map { |resource| resource[:name] }
     end
 
     reqs.flatten

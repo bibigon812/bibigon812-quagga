@@ -1,10 +1,15 @@
+# @summary Manage a quagga route-map
+#
+# @param rules the route-map definition
+#
+# @see quagga_route_map
 define quagga::route_map (
   Hash $rules = {},
 ) {
-  $rules.reduce({}) |Hash $rules, Tuple[Integer, Hash] $rule| {
+  $rules.reduce( {}) |Hash $rules, Tuple[Integer, Hash] $rule| {
     merge($rules, { "${name} ${rule[0]}" => $rule[1] })
   }.each |String $route_map_name, Hash $route_map| {
-    quagga_route_map {$route_map_name:
+    quagga_route_map { $route_map_name:
       * => $route_map,
     }
   }

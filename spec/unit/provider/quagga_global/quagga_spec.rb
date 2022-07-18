@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_global).provider(:quagga) do
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -28,21 +28,21 @@ line vty
 end'
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(1)
     end
 
-    it 'should return the resource `quagga_system`' do
+    it 'returns the resource `quagga_system`' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :name => 'router-1.sandbox.local',
-        :hostname => 'router-1.sandbox.local',
-        :ip_forwarding => :true,
-        :ipv6_forwarding => :true,
-        :password => :absent,
-        :enable_password => :absent,
-        :line_vty => :true,
-        :service_password_encryption => :false,
-      })
+                                                                                           name: 'router-1.sandbox.local',
+        hostname: 'router-1.sandbox.local',
+        ip_forwarding: :true,
+        ipv6_forwarding: :true,
+        password: :absent,
+        enable_password: :absent,
+        line_vty: :true,
+        service_password_encryption: :false,
+                                                                                         })
     end
   end
 end

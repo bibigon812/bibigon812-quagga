@@ -3,22 +3,22 @@ require 'ipaddr'
 Puppet::Type.newtype(:quagga_interface) do
   @doc = 'This type provides the capabilities to manage Quagga interface parameters'
 
-  feature :enableable, "The provider can enable and disable the interface", :methods => [:disable, :enable, :enabled?]
+  feature :enableable, 'The provider can enable and disable the interface', methods: [:disable, :enable, :enabled?]
 
-  newproperty(:enable, :required_features => :enableable) do
-     desc 'Whether the interface should be enabled or not.'
+  newproperty(:enable, required_features: :enableable) do
+    desc 'Whether the interface should be enabled or not.'
 
-     newvalue(:true) do
-       provider.enable
-     end
+    newvalue(:true) do
+      provider.enable
+    end
 
-     newvalue(:false) do
-       provider.disable
-     end
+    newvalue(:false) do
+      provider.disable
+    end
 
-     def retrieve
-       provider.enabled?
-     end
+    def retrieve
+      provider.enabled?
+    end
   end
 
   ensurable do
@@ -26,7 +26,7 @@ Puppet::Type.newtype(:quagga_interface) do
     defaultto(:present)
   end
 
-  newparam(:name, :namevar => true) do
+  newparam(:name, namevar: true) do
     desc 'The network interface name'
   end
 
@@ -35,16 +35,16 @@ Puppet::Type.newtype(:quagga_interface) do
     defaultto(:absent)
   end
 
-  newproperty(:ip_address, :array_matching => :all) do
+  newproperty(:ip_address, array_matching: :all) do
     desc 'The IP address.'
 
     validate do |value|
       begin
         IPAddr.new value
       rescue
-        fail "Not a valid ip address '#{value}'"
+        raise "Not a valid ip address '#{value}'"
       end
-      fail "Prefix length is not specified '#{value}'" unless value.include?('/')
+      raise "Prefix length is not specified '#{value}'" unless value.include?('/')
     end
 
     def insync?(is)
@@ -74,7 +74,7 @@ Puppet::Type.newtype(:quagga_interface) do
     defaultto([])
   end
 
-  newproperty(:link_detect, :boolean => true) do
+  newproperty(:link_detect, boolean: true) do
     desc 'Enable link state detection.'
 
     defaultto(:false)
@@ -88,17 +88,17 @@ Puppet::Type.newtype(:quagga_interface) do
 
     validate do |value|
       unless value == :absent
-        fail "Interface bandwidth '#{value}' is not an Integer" unless value.is_a?(Integer)
-        fail "Interface bandwidth '#{value}' must be between 1-10000000" unless value >= 1 and value <= 10000000
+        raise "Interface bandwidth '#{value}' is not an Integer" unless value.is_a?(Integer)
+        raise "Interface bandwidth '#{value}' must be between 1-10000000" unless (value >= 1) && (value <= 10_000_000)
       end
     end
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra}
+    ['zebra']
   end
 end

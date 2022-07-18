@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_bgp_as_path) do
-  @doc = %q{
+  @doc = "
     This type provides the capabilities to manage BGP as-path access-list within puppet.
 
       Examples:
@@ -11,19 +11,19 @@ Puppet::Type.newtype(:quagga_bgp_as_path) do
                 'permit _100_',
             ],
         }
-  }
+  "
 
   ensurable
 
   newparam(:name) do
     desc 'The name of the as-path access-list.'
-    newvalues(/\A\w+\Z/)
+    newvalues(%r{\A\w+\Z})
   end
 
-  newproperty(:rules, :array_matching => :all) do
+  newproperty(:rules, array_matching: :all) do
     desc 'Set actions of this ap-path list.'
 
-    newvalues(/\A(permit|deny)\s\^?[_,\d\.\\\*\+\-\[\]\(\)\{\}\|\?]+\$?\Z/)
+    newvalues(%r{\A(permit|deny)\s\^?[_,\d\.\\\*\+\-\[\]\(\)\{\}\|\?]+\$?\Z})
 
     def should_to_s(newvalue = @should)
       if newvalue
@@ -35,10 +35,10 @@ Puppet::Type.newtype(:quagga_bgp_as_path) do
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra bgpd}
+    ['zebra', 'bgpd']
   end
 end

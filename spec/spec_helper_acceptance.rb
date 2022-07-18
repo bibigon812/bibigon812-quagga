@@ -12,8 +12,8 @@ RSpec.configure do |c|
   # Configure all nodes in nodeset
   c.before :suite do
     hosts.each do |host|
-      copy_module_to(host, :source => module_root, :module_name => 'quagga')
-      on host, puppet('module install puppetlabs-stdlib'), {:acceptable_exit_codes => [0]}
+      copy_module_to(host, source: module_root, module_name: 'quagga')
+      on host, puppet('module install puppetlabs-stdlib'), { acceptable_exit_codes: [0] }
     end
   end
 end

@@ -7,17 +7,17 @@ describe Puppet::Type.type(:quagga_bgp_as_path).provider(:quagga) do
 
   let(:resource) do
     Puppet::Type.type(:quagga_bgp_as_path).new(
-      :provider => provider,
-      :title    => 'FROM_AS100',
+      provider: provider,
+      title: 'FROM_AS100',
     )
   end
 
   let(:provider) do
     described_class.new(
-      :ensure   => :present,
-      :name     => 'FROM_AS100',
-      :provider => :quagga,
-      :rules    => ['permit _100$ _100_', 'permit _90_', 'permit _90$',],
+      ensure: :present,
+      name: 'FROM_AS100',
+      provider: :quagga,
+      rules: ['permit _100$ _100_', 'permit _90_', 'permit _90$'],
     )
   end
 
@@ -37,13 +37,13 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
   end
 
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -55,26 +55,26 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
       ).returns output
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(8)
     end
 
-    it 'should return the resource ospf' do
+    it 'returns the resource ospf for instance 0' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-          :ensure   => :present,
-          :name     => 'FROM_AS100',
-          :provider => :quagga,
-          :rules    => ['permit _100$', 'permit _100_', 'permit _90_', 'permit _90$',],
-      })
+                                                                                           ensure: :present,
+          name: 'FROM_AS100',
+          provider: :quagga,
+          rules: ['permit _100$', 'permit _100_', 'permit _90_', 'permit _90$'],
+                                                                                         })
     end
 
-    it 'should return the resource ospf' do
+    it 'returns the resource ospf for instance 1' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-          :ensure   => :present,
-          :name     => 'FROM_AS20764',
-          :provider => :quagga,
-          :rules    => ['permit _20764$',],
-      })
+                                                                                           ensure: :present,
+          name: 'FROM_AS20764',
+          provider: :quagga,
+          rules: ['permit _20764$'],
+                                                                                         })
     end
   end
 
@@ -88,48 +88,48 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     before :each do
       described_class.stubs(:vtysh).with(
           '-c', 'show running-config'
-      ).returns output
+        ).returns output
     end
 
-    it 'should find provider for resource' do
+    it 'finds provider for resource' do
       described_class.prefetch(resources)
       expect(resources.values.first.provider).to eq(described_class.instances[0])
     end
   end
 
   describe '#create' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(false)
     end
 
-    it 'should has all rules' do
+    it 'has all rules' do
       resource[:ensure] = :present
-      resource[:rules] = ['permit _100$', 'permit _100_',]
+      resource[:rules] = ['permit _100$', 'permit _100_']
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'ip as-path access-list FROM_AS100 permit _100$',
-        '-c', 'ip as-path access-list FROM_AS100 permit _100_',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'ip as-path access-list FROM_AS100 permit _100$',
+                                      '-c', 'ip as-path access-list FROM_AS100 permit _100_',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.create
     end
   end
 
   describe '#destroy' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(true)
     end
 
-    it 'should has all rules' do
+    it 'has all rules' do
       resource[:ensure] = :present
-      resource[:rules] = ['permit _100$', 'permit _100_',]
+      resource[:rules] = ['permit _100$', 'permit _100_']
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'no ip as-path access-list FROM_AS100',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'no ip as-path access-list FROM_AS100',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.destroy
     end
   end

@@ -1,11 +1,13 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_ospf_area) do
-  let :providerclass  do
+  let :providerclass do
     described_class.provide(:fake_quagga_provider) do
       attr_accessor :property_hash
       def create; end
+
       def destroy; end
+
       def exists?
         get(:ensure) == :present
       end
@@ -13,7 +15,7 @@ describe Puppet::Type.type(:quagga_ospf_area) do
     end
   end
 
-  let(:router) { Puppet::Type.type(:quagga_ospf_router).new(:name => 'ospf') }
+  let(:router) { Puppet::Type.type(:quagga_ospf_router).new(name: 'ospf') }
   let(:catalog) { Puppet::Resource::Catalog.new }
 
   before :each do
@@ -24,20 +26,20 @@ describe Puppet::Type.type(:quagga_ospf_area) do
     described_class.unprovide(:quagga_ospf_area)
   end
 
-  it 'should have :name be its namevar' do
+  it 'has :name be its namevar' do
     expect(described_class.key_attributes).to eq([:name])
   end
 
   describe 'when validating attributes' do
     [:name, :provider].each do |param|
-      it "should have a #{param} parameter" do
+      it "has a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end
     end
 
     [:access_list_export, :access_list_import, :prefix_list_export,
-      :prefix_list_import, :networks ].each do |property|
-      it "should have a #{property} property" do
+     :prefix_list_import, :networks ].each do |property|
+      it "has a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
     end
@@ -45,138 +47,137 @@ describe Puppet::Type.type(:quagga_ospf_area) do
 
   describe 'when validating values' do
     describe 'ensure' do
-      it 'should support present as a value' do
-        expect { described_class.new(:name => '0.0.0.0', :ensure => :present) }.to_not raise_error
+      it 'supports present as a value' do
+        expect { described_class.new(name: '0.0.0.0', ensure: :present) }.not_to raise_error
       end
 
-      it 'should support absent as a value' do
-        expect { described_class.new(:name => '0.0.0.0', :ensure => :absent) }.to_not raise_error
+      it 'supports absent as a value' do
+        expect { described_class.new(name: '0.0.0.0', ensure: :absent) }.not_to raise_error
       end
 
-      it 'should not support other values' do
-        expect { described_class.new(:name => '0.0.0.0', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+      it 'does not support other values' do
+        expect { described_class.new(name: '0.0.0.0', ensure: :foo) }.to raise_error(Puppet::Error, %r{Invalid value})
       end
     end
   end
 
   describe 'auth' do
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :auth => true) }.to_not raise_error
+    it 'supports true as a value' do
+      expect { described_class.new(name: '0.0.0.0', auth: true) }.not_to raise_error
     end
 
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :auth => false) }.to_not raise_error
+    it 'supports false as a value' do
+      expect { described_class.new(name: '0.0.0.0', auth: false) }.not_to raise_error
     end
 
-    it 'should support message-digest as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :auth => "message-digest") }.to_not raise_error
+    it 'supports message-digest as a value' do
+      expect { described_class.new(name: '0.0.0.0', auth: 'message-digest') }.not_to raise_error
     end
 
-    it 'should contain :true' do
-      expect(described_class.new(name: '0.0.0.0', :auth => true)[:auth]).to eq(:true)
+    it 'contains :true' do
+      expect(described_class.new(name: '0.0.0.0', auth: true)[:auth]).to eq(:true)
     end
 
-    it 'should contain :false' do
-      expect(described_class.new(name: '0.0.0.0', :auth => false)[:auth]).to eq(:false)
+    it 'contains :false' do
+      expect(described_class.new(name: '0.0.0.0', auth: false)[:auth]).to eq(:false)
     end
 
-    it 'should contain :message-digest' do
-      expect(described_class.new(name: '0.0.0.0', :auth => 'message-digest')[:auth]).to eq(:"message-digest")
+    it 'contains :message-digest' do
+      expect(described_class.new(name: '0.0.0.0', auth: 'message-digest')[:auth]).to eq(:"message-digest")
     end
 
-    it 'should not support foo as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :auth => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+    it 'does not support foo as a value' do
+      expect { described_class.new(name: '0.0.0.0', auth: :foo) }.to raise_error(Puppet::Error, %r{Invalid value})
     end
   end
 
-  describe "stub" do
-    it 'should support true as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => true) }.to_not raise_error
+  describe 'stub' do
+    it 'supports true as a value' do
+      expect { described_class.new(name: '0.0.0.0', stub: true) }.not_to raise_error
     end
 
-    it 'should support false as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => false) }.to_not raise_error
+    it 'supports false as a value' do
+      expect { described_class.new(name: '0.0.0.0', stub: false) }.not_to raise_error
     end
 
-    it 'should support no-summary as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => "no-summary") }.to_not raise_error
+    it 'supports no-summary as a value' do
+      expect { described_class.new(name: '0.0.0.0', stub: 'no-summary') }.not_to raise_error
     end
 
-    it 'should contain :true' do
-      expect(described_class.new(name: '0.0.0.0', :stub => true)[:stub]).to eq(:true)
+    it 'contains :true' do
+      expect(described_class.new(name: '0.0.0.0', stub: true)[:stub]).to eq(:true)
     end
 
-    it 'should contain :false' do
-      expect(described_class.new(name: '0.0.0.0', :stub => false)[:stub]).to eq(:false)
+    it 'contains :false' do
+      expect(described_class.new(name: '0.0.0.0', stub: false)[:stub]).to eq(:false)
     end
 
-    it 'should contain :no-summary' do
-      expect(described_class.new(name: '0.0.0.0', :stub => 'no-summary')[:stub]).to eq(:"no-summary")
+    it 'contains :no-summary' do
+      expect(described_class.new(name: '0.0.0.0', stub: 'no-summary')[:stub]).to eq(:"no-summary")
     end
 
-
-    it 'should not support foo as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :stub => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+    it 'does not support foo as a value' do
+      expect { described_class.new(name: '0.0.0.0', stub: :foo) }.to raise_error(Puppet::Error, %r{Invalid value})
     end
   end
 
   [:access_list_export, :access_list_import, :prefix_list_export, :prefix_list_import].each do |property|
-    describe "#{property}" do
-      it 'should support LIST-import as a value' do
-        expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => 'LIST-import') }.to_not raise_error
+    describe property.to_s do
+      it 'supports LIST-import as a value' do
+        expect { described_class.new(name: '0.0.0.0', prefix_list_import: 'LIST-import') }.not_to raise_error
       end
 
-      it 'should support :list_import as a value' do
-        expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => :list_import) }.to_not raise_error
+      it 'supports :list_import as a value' do
+        expect { described_class.new(name: '0.0.0.0', prefix_list_import: :list_import) }.not_to raise_error
       end
 
-      it 'should not support @list-import as a value' do
-        expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => '@list-import') }.to raise_error Puppet::Error, /Invalid value/
+      it 'does not support @list-import as a value' do
+        expect { described_class.new(name: '0.0.0.0', prefix_list_import: '@list-import') }.to raise_error Puppet::Error, %r{Invalid value}
       end
 
-      it 'should not support -list-import as a value' do
-        expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => '-list-import') }.to raise_error Puppet::Error, /Invalid value/
+      it 'does not support -list-import as a value' do
+        expect { described_class.new(name: '0.0.0.0', prefix_list_import: '-list-import') }.to raise_error Puppet::Error, %r{Invalid value}
       end
 
-      it 'should not support 9-list-import as a value' do
-        expect { described_class.new(:name => '0.0.0.0', :prefix_list_import => '9-list-import') }.to raise_error Puppet::Error, /Invalid value/
+      it 'does not support 9-list-import as a value' do
+        expect { described_class.new(name: '0.0.0.0', prefix_list_import: '9-list-import') }.to raise_error Puppet::Error, %r{Invalid value}
       end
 
-      it 'should contain list-import' do
-        expect(described_class.new(:name => '0.0.0.0', :prefix_list_import => 'list-import')[:prefix_list_import]).to eq('list-import')
+      it 'contains list-import' do
+        expect(described_class.new(name: '0.0.0.0', prefix_list_import: 'list-import')[:prefix_list_import]).to eq('list-import')
       end
     end
   end
 
   describe 'networks' do
-    it 'should support 10.0.0.0/24 as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :networks => '10.0.0.0/24') }.to_not raise_error
+    it 'supports 10.0.0.0/24 as a value' do
+      expect { described_class.new(name: '0.0.0.0', networks: '10.0.0.0/24') }.not_to raise_error
     end
 
-    it 'should support 10.255.255.0/24 as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :networks => %w{10.255.255.0/24 192.168.0.0/16}) }.to_not raise_error
+    it 'supports 10.255.255.0/24 as a value' do
+      expect { described_class.new(name: '0.0.0.0', networks: ['10.255.255.0/24', '192.168.0.0/16']) }.not_to raise_error
     end
 
-    it 'should not support 10.256.0.0/24 as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :networks => '10.256.0.0/24') }.to raise_error Puppet::Error, /Not a valid network address/
+    it 'does not support 10.256.0.0/24 as a value' do
+      expect { described_class.new(name: '0.0.0.0', networks: '10.256.0.0/24') }.to raise_error Puppet::Error, %r{Not a valid network address}
     end
 
-    it 'should not support 10.255.0.0 as a value' do
-      expect { described_class.new(:name => '0.0.0.0', :networks => '10.255.0.0') }.to raise_error Puppet::Error, /Prefix length is not specified/
+    it 'does not support 10.255.0.0 as a value' do
+      expect { described_class.new(name: '0.0.0.0', networks: '10.255.0.0') }.to raise_error Puppet::Error, %r{Prefix length is not specified}
     end
 
-    it 'should contain [ \'10.255.255.0/24\' ]' do
-      expect(described_class.new(:name => '0.0.0.0', :networks => '10.255.255.0/24')[:networks]).to eq(%w{10.255.255.0/24})
+    it 'contains [ \'10.255.255.0/24\' ]' do
+      expect(described_class.new(name: '0.0.0.0', networks: '10.255.255.0/24')[:networks]).to eq(['10.255.255.0/24'])
     end
 
-    it 'should contain [ \'10.255.255.0/24\', \'192.168.0.0/16\' ]' do
-      expect(described_class.new(:name => '0.0.0.0', :networks => %w{10.255.255.0/24 192.168.0.0/16})[:networks]).to eq(%w{10.255.255.0/24 192.168.0.0/16})
+    it 'contains [ \'10.255.255.0/24\', \'192.168.0.0/16\' ]' do
+      expect(described_class.new(name: '0.0.0.0', networks: ['10.255.255.0/24', '192.168.0.0/16'])[:networks]).to eq(['10.255.255.0/24', '192.168.0.0/16'])
     end
   end
 
   describe 'when autorequiring' do
-    it 'should require quagga_ospf_reoute resource' do
-      area = described_class.new(:name => '0.0.0.0', :stub => true)
+    it 'requires quagga_ospf_reoute resource' do
+      area = described_class.new(name: '0.0.0.0', stub: true)
       catalog.add_resource router
       catalog.add_resource area
       reqs = area.autorequire

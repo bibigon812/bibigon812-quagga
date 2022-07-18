@@ -7,18 +7,18 @@ describe Puppet::Type.type(:quagga_bgp_address_family).provider(:quagga) do
 
   let(:resource) do
     Puppet::Type.type(:quagga_bgp_address_family).new(
-      :provider => provider,
-      :title    => :ipv4_unicast
+      provider: provider,
+      title: :ipv4_unicast,
     )
   end
 
   let(:provider) do
     described_class.new(
-      :aggregate_address  => ['192.168.0.0/24 summary-only', '10.0.0.0/24'],
-      :maximum_ebgp_paths => 2,
-      :maximum_ibgp_paths => 10,
-      :name               => 'ipv4_unicast',
-      :networks           => ['10.0.0.0/8', '192.168.0.0/16'],
+      aggregate_address: ['192.168.0.0/24 summary-only', '10.0.0.0/24'],
+      maximum_ebgp_paths: 2,
+      maximum_ibgp_paths: 10,
+      name: 'ipv4_unicast',
+      networks: ['10.0.0.0/8', '192.168.0.0/16'],
     )
   end
 
@@ -67,11 +67,11 @@ end'
   end
 
   describe 'instance' do
-    it 'should have an instances method' do
+    it 'has an instances method' do
       expect(described_class).to respond_to :instances
     end
 
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -80,35 +80,35 @@ end'
     before :each do
       described_class.expects(:vtysh).with(
           '-c', 'show running-config'
-      ).returns output
+        ).returns output
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(2)
     end
 
-    it 'should return the :ipv4_unicast resource' do
+    it 'returns the :ipv4_unicast resource' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :aggregate_address  => [],
-        :ensure             => :present,
-        :maximum_ebgp_paths => 4,
-        :maximum_ibgp_paths => 4,
-        :name               => 'ipv4_unicast',
-        :networks           => ['172.16.32.0/24',],
-        :provider           => :quagga,
-      })
+                                                                                           aggregate_address: [],
+        ensure: :present,
+        maximum_ebgp_paths: 4,
+        maximum_ibgp_paths: 4,
+        name: 'ipv4_unicast',
+        networks: ['172.16.32.0/24'],
+        provider: :quagga,
+                                                                                         })
     end
 
-    it 'should return the :ipv6_unicast resource' do
+    it 'returns the :ipv6_unicast resource' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :aggregate_address  => [],
-        :ensure             => :present,
-        :maximum_ebgp_paths => 1,
-        :maximum_ibgp_paths => 1,
-        :name               => 'ipv6_unicast',
-        :networks           => ['1a04:6d40::/48',],
-        :provider           => :quagga,
-      })
+                                                                                           aggregate_address: [],
+        ensure: :present,
+        maximum_ebgp_paths: 1,
+        maximum_ibgp_paths: 1,
+        name: 'ipv6_unicast',
+        networks: ['1a04:6d40::/48'],
+        provider: :quagga,
+                                                                                         })
     end
   end
 
@@ -119,101 +119,100 @@ end'
       }
     end
 
-
     before :each do
       described_class.stubs(:vtysh).with(
           '-c', 'show running-config'
-      ).returns output
+        ).returns output
     end
 
-    it 'should find provider for resource' do
+    it 'finds provider for resource' do
       described_class.prefetch(resources)
       expect(resources.values.first.provider).to eq(described_class.instances[0])
     end
   end
 
   describe '#create' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(false)
-      provider.stubs(:get_as_number).returns(65000)
+      provider.stubs(:get_as_number).returns(65_000)
     end
 
-    it 'should has all values' do
+    it 'has all values' do
       resource[:ensure] = :present
       resource[:aggregate_address] = ['192.168.0.0/24 summary-only', '10.0.0.0/24']
       resource[:maximum_ebgp_paths] = 2
       resource[:maximum_ibgp_paths] = 10
       resource[:networks] = ['10.0.0.0/8', '192.168.0.0/16']
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'router bgp 65000',
-        '-c', 'address-family ipv4 unicast',
-        '-c', 'aggregate-address 192.168.0.0/24 summary-only',
-        '-c', 'aggregate-address 10.0.0.0/24',
-        '-c', 'maximum-paths 2',
-        '-c', 'maximum-paths ibgp 10',
-        '-c', 'network 10.0.0.0/8',
-        '-c', 'network 192.168.0.0/16',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'router bgp 65000',
+                                      '-c', 'address-family ipv4 unicast',
+                                      '-c', 'aggregate-address 192.168.0.0/24 summary-only',
+                                      '-c', 'aggregate-address 10.0.0.0/24',
+                                      '-c', 'maximum-paths 2',
+                                      '-c', 'maximum-paths ibgp 10',
+                                      '-c', 'network 10.0.0.0/8',
+                                      '-c', 'network 192.168.0.0/16',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.create
     end
   end
 
   describe '#destroy' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65000)
+      provider.stubs(:get_as_number).returns(65_000)
     end
 
-    it 'should has all values' do
+    it 'has all values' do
       resource[:ensure] = :present
       resource[:aggregate_address] = ['192.168.0.0/24 summary-only', '10.0.0.0/24']
       resource[:maximum_ebgp_paths] = 2
       resource[:maximum_ibgp_paths] = 10
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'router bgp 65000',
-        '-c', 'address-family ipv4 unicast',
-        '-c', 'no aggregate-address 192.168.0.0/24 summary-only',
-        '-c', 'no aggregate-address 10.0.0.0/24',
-        '-c', 'no maximum-paths 2',
-        '-c', 'no maximum-paths ibgp 10',
-        '-c', 'no network 10.0.0.0/8',
-        '-c', 'no network 192.168.0.0/16',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'router bgp 65000',
+                                      '-c', 'address-family ipv4 unicast',
+                                      '-c', 'no aggregate-address 192.168.0.0/24 summary-only',
+                                      '-c', 'no aggregate-address 10.0.0.0/24',
+                                      '-c', 'no maximum-paths 2',
+                                      '-c', 'no maximum-paths ibgp 10',
+                                      '-c', 'no network 10.0.0.0/8',
+                                      '-c', 'no network 192.168.0.0/16',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.destroy
     end
   end
 
   describe '#flush' do
-    before do
+    before(:each) do
       provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65000)
+      provider.stubs(:get_as_number).returns(65_000)
     end
 
-    it 'should has all values' do
+    it 'has all values' do
       resource[:ensure] = :present
       provider.aggregate_address = ['172.16.0.0/24', '192.168.0.0/24 summary-only']
       provider.maximum_ebgp_paths = 5
       provider.maximum_ibgp_paths = 8
       provider.networks = ['172.16.0.0/12', '192.168.0.0/16']
       provider.expects(:vtysh).with([
-        '-c', 'configure terminal',
-        '-c', 'router bgp 65000',
-        '-c', 'address-family ipv4 unicast',
-        '-c', 'no aggregate-address 10.0.0.0/24',
-        '-c', 'aggregate-address 172.16.0.0/24',
-        '-c', 'maximum-paths 5',
-        '-c', 'maximum-paths ibgp 8',
-        '-c', 'no network 10.0.0.0/8',
-        '-c', 'network 172.16.0.0/12',
-        '-c', 'end',
-        '-c', 'write memory',
-      ])
+                                      '-c', 'configure terminal',
+                                      '-c', 'router bgp 65000',
+                                      '-c', 'address-family ipv4 unicast',
+                                      '-c', 'no aggregate-address 10.0.0.0/24',
+                                      '-c', 'aggregate-address 172.16.0.0/24',
+                                      '-c', 'maximum-paths 5',
+                                      '-c', 'maximum-paths ibgp 8',
+                                      '-c', 'no network 10.0.0.0/8',
+                                      '-c', 'network 172.16.0.0/12',
+                                      '-c', 'end',
+                                      '-c', 'write memory'
+                                    ])
       provider.flush
     end
   end

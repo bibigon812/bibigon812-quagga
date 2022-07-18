@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_ospf_area).provider(:quagga) do
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -50,7 +50,7 @@ router bgp 197888
 router ospf
  area 0.0.15.211 default-cost 100
  area 0.10.10.10 export-list ACCESS_LIST_EXPORT
- area 0.10.10.10 import-list ACCESS_LIST_IPMORT
+ area 0.10.10.10 import-list ACCESS_LIST_IMPORT
  area 0.10.10.10 filter-list prefix PREFIX_LIST_IMPORT in
  area 0.10.10.10 filter-list prefix PREFIX_LIST_EXPORT out
  area 0.10.10.10 stub no-summary
@@ -73,38 +73,42 @@ ip prefix-list ADVERTISED-PREFIXES seq 10 permit 195.131.0.0/16
 ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(2)
     end
 
-    it 'should return the first resource' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        :access_list_export => :absent,
-        :access_list_import => :absent,
-        :ensure => :present,
-        :name => '0.0.15.211',
-        :networks => %w{10.255.1.0/24 10.255.2.0/24 10.255.3.0/24},
-        :prefix_list_export => :absent,
-        :prefix_list_import => :absent,
-        :auth => :false,
-        :stub => :false,
-        :provider => :quagga,
-      })
+    it 'returns the first resource' do
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+        {
+          access_list_export: :absent,
+          access_list_import: :absent,
+          ensure: :present,
+          name: '0.0.15.211',
+          networks: ['10.255.1.0/24', '10.255.2.0/24', '10.255.3.0/24'],
+          prefix_list_export: :absent,
+          prefix_list_import: :absent,
+          auth: :false,
+          stub: :false,
+          provider: :quagga,
+        },
+      )
     end
 
-    it 'should return the second resource' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        :access_list_export => 'ACCESS_LIST_EXPORT',
-        :access_list_import => 'ACCESS_LIST_IPMORT',
-        :ensure => :present,
-        :name => '0.10.10.10',
-        :networks => %w{192.168.1.0/24 192.168.2.0/24},
-        :prefix_list_export => 'PREFIX_LIST_EXPORT',
-        :prefix_list_import => 'PREFIX_LIST_IMPORT',
-        :auth => 'message-digest',
-        :stub => 'no-summary',
-        :provider => :quagga,
-      })
+    it 'returns the second resource' do
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          access_list_export: 'ACCESS_LIST_EXPORT',
+          access_list_import: 'ACCESS_LIST_IMPORT',
+          ensure: :present,
+          name: '0.10.10.10',
+          networks: ['192.168.1.0/24', '192.168.2.0/24'],
+          prefix_list_export: 'PREFIX_LIST_EXPORT',
+          prefix_list_import: 'PREFIX_LIST_IMPORT',
+          auth: 'message-digest',
+          stub: 'no-summary',
+          provider: :quagga,
+        },
+      )
     end
   end
 end

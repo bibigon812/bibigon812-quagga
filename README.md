@@ -395,7 +395,7 @@ quagga::pim::interfaces:
 #### quagga::bgp
 
 - `agentx`: enable agentx. Defaults to `false`.
-- `config_file`: configuration file if the BGP service.
+- `config_file`: configuration file of the BGP service.
 - `config_file_manage`: enable management of the BGP service setting file.
 - `service_name`: the name of the BGP service.
 - `service_enable`: enable the BGP service.
@@ -411,7 +411,7 @@ quagga::pim::interfaces:
 #### quagga::ospf
 
 - `agentx`: enable agentx. Defaults to `false`.
-- `config_file`: configuration file if the OSPF service.
+- `config_file`: configuration file of the OSPF service.
 - `config_file_manage`: enable management of the OSPF service setting file.
 - `service_name`: the name of the OSPF service.
 - `service_enable`: enable the OSPF service.
@@ -430,7 +430,7 @@ quagga::pim::interfaces:
 #### quagga::pim
 
 - `agentx`: enable agentx. Defaults to `false`.
-- `config_file`: configuration file if the PIM service.
+- `config_file`: configuration file of the PIM service.
 - `config_file_manage`: enable management of the PIM service setting file.
 - `service_name`: the name of the PIM service.
 - `service_enable`: enable the PIM service.

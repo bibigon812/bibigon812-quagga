@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:quagga_ospf_router) do
-  @doc = %q{
+  @doc = "
     This type provides the capabilities to manage ospf router within puppet.
 
       Examples:
@@ -12,14 +12,14 @@ Puppet::Type.newtype(:quagga_ospf_router) do
             ],
             router_id => '10.0.0.1',
         }
-  }
+  "
 
   ensurable
 
-  newparam(:name, :namevar => true) do
+  newparam(:name, namevar: true) do
     desc 'OSPF router instance.'
 
-    munge do |value|
+    munge do |_value|
       'ospf'
     end
   end
@@ -36,33 +36,33 @@ Puppet::Type.newtype(:quagga_ospf_router) do
 
     defaultto(:false)
     newvalues(:true, :false)
-    newvalues(/\Aalways(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
+    newvalues(%r{\Aalways(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z})
 
     munge do |value|
       case value
-        when String
-          value.gsub(/\smetric-type\s2/, '')
-        else
-          value
+      when String
+        value.gsub(%r{\smetric-type\s2}, '')
+      else
+        value
       end
     end
   end
 
-  newproperty(:opaque, :boolean => true) do
+  newproperty(:opaque, boolean: true) do
     desc 'Enable the Opaque-LSA capability (rfc2370).'
 
     defaultto(:false)
     newvalues(:true, :false)
   end
 
-  newproperty(:redistribute, :array_matching => :all) do
+  newproperty(:redistribute, array_matching: :all) do
     desc 'Redistribute information from another routing protocol.'
 
     defaultto([])
-    newvalues(/\A(babel|bgp|connected|isis|kernel|rip|static)(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z/)
+    newvalues(%r{\A(babel|bgp|connected|isis|kernel|rip|static)(\smetric\s\d+)?(\smetric-type\s[1-2])?(\sroute-map\s\w+)?\Z})
 
     munge do |value|
-      value.gsub(/\smetric-type\s2/, '')
+      value.gsub(%r{\smetric-type\s2}, '')
     end
 
     def insync?(is)
@@ -82,7 +82,7 @@ Puppet::Type.newtype(:quagga_ospf_router) do
     end
   end
 
-  newproperty(:rfc1583, :boolean => true) do
+  newproperty(:rfc1583, boolean: true) do
     desc 'Enable the RFC1583Compatibility flag.'
 
     defaultto(:false)
@@ -92,8 +92,8 @@ Puppet::Type.newtype(:quagga_ospf_router) do
   newproperty(:router_id) do
     desc 'OSPF process router id'
 
-    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
-    re = /\A#{block}\.#{block}\.#{block}\.#{block}\Z/
+    block = %r{\d{,2}|1\d{2}|2[0-4]\d|25[0-5]}
+    re = %r{\A#{block}\.#{block}\.#{block}\.#{block}\Z}
 
     defaultto(:absent)
     newvalues(:absent)
@@ -107,11 +107,11 @@ Puppet::Type.newtype(:quagga_ospf_router) do
     newvalues(:true, :false, :detail)
   end
 
-  newproperty(:passive_interfaces, :array_matching => :all) do
+  newproperty(:passive_interfaces, array_matching: :all) do
     desc 'Suppress routing updates on interfaces.'
 
     defaultto([])
-    newvalues(/\A(default|[[:alpha:]]+\w+(?:\s\d+\.\d+\.\d+\.\d+)?)\Z/)
+    newvalues(%r{\A(default|[[:alpha:]]+\w+(?:\s\d+\.\d+\.\d+\.\d+)?)\Z})
 
     def insync?(is)
       @should.each do |value|
@@ -134,7 +134,7 @@ Puppet::Type.newtype(:quagga_ospf_router) do
     desc 'Filter networks in routing updates.'
 
     defaultto []
-    newvalues(/\A\w+\sout\s(babel|bgp|connected|isis|kernel|rip|static)\Z/)
+    newvalues(%r{\A\w+\sout\s(babel|bgp|connected|isis|kernel|rip|static)\Z})
 
     def insync?(is)
       @should.each do |value|
@@ -154,18 +154,18 @@ Puppet::Type.newtype(:quagga_ospf_router) do
   end
 
   autorequire(:package) do
-    %w{quagga}
+    ['quagga']
   end
 
   autorequire(:service) do
-    %w{zebra ospfd}
+    ['zebra', 'ospfd']
   end
 
   autorequire(:quagga_access_list) do
     reqs = []
 
     self[:distribute_list].each do |list|
-      reqs << list.split(/\s/).first
+      reqs << list.split(%r{\s}).first
     end
 
     reqs

@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_prefix_list).provider(:quagga) do
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -33,52 +33,52 @@ ip as-path access-list THROUGH_AS300 permit _300_
 !'
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(6)
     end
 
-    it 'should return the resource \'ABCD 5\'' do
+    it 'returns the resource \'ABCD 5\'' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-          :ensure   => :present,
-          :name     => 'ABCD 5',
-          :ge       => :absent,
-          :le       => :absent,
-          :provider => :quagga,
-          :action   => :permit,
-          :prefix   => 'any',
-          :proto    => :ip,
-      })
+                                                                                           ensure: :present,
+          name: 'ABCD 5',
+          ge: :absent,
+          le: :absent,
+          provider: :quagga,
+          action: :permit,
+          prefix: 'any',
+          proto: :ip,
+                                                                                         })
     end
 
-    it 'should return the resource \'ADVERTISED_ROUTES 10\'' do
+    it 'returns the resource \'ADVERTISED_ROUTES 10\'' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-          :ensure   => :present,
-          :name     => 'ADVERTISED_ROUTES 10',
-          :ge       => :absent,
-          :le       => :absent,
-          :provider => :quagga,
-          :action   => :permit,
-          :prefix   => '1.1.1.0/24',
-          :proto    => :ip,
-      })
+                                                                                           ensure: :present,
+          name: 'ADVERTISED_ROUTES 10',
+          ge: :absent,
+          le: :absent,
+          provider: :quagga,
+          action: :permit,
+          prefix: '1.1.1.0/24',
+          proto: :ip,
+                                                                                         })
     end
 
-    it 'should return the resource \'ADVERTISED_ROUTES 1000\'' do
+    it 'returns the resource \'ADVERTISED_ROUTES 1000\'' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-          :ensure   => :present,
-          :name     => 'ADVERTISED_ROUTES 1000',
-          :ge       => :absent,
-          :le       => 32,
-          :provider => :quagga,
-          :action   => :deny,
-          :prefix   => '0.0.0.0/0',
-          :proto    => :ip,
-      })
+                                                                                           ensure: :present,
+          name: 'ADVERTISED_ROUTES 1000',
+          ge: :absent,
+          le: 32,
+          provider: :quagga,
+          action: :deny,
+          prefix: '0.0.0.0/0',
+          proto: :ip,
+                                                                                         })
     end
 
-    it 'should return the resource \'ipv6_advertised_prefixes\'' do
+    it 'returns the resource \'ipv6_advertised_prefixes\'' do
       expect(described_class.instances[5].instance_variable_get('@property_hash')).to eq({
-          ensure: :present,
+                                                                                           ensure: :present,
           name: 'ipv6_advertised_prefixes 10',
           ge: :absent,
           le: :absent,
@@ -86,7 +86,7 @@ ip as-path access-list THROUGH_AS300 permit _300_
           action: :permit,
           prefix: '2001:db8::/48',
           proto: :ipv6,
-      })
+                                                                                         })
     end
   end
 end

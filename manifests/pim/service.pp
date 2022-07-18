@@ -1,9 +1,10 @@
+# @api private
 class quagga::pim::service {
   if $quagga::pim::service_manage {
-    service {$quagga::pim::service_name:
+    service { $quagga::pim::service_name:
       ensure    => $quagga::pim::service_ensure,
       enable    => $quagga::pim::service_enable,
-      subscribe => Package[keys($quagga::packages)]
+      subscribe => Package[keys($quagga::packages)],
     }
   }
 }

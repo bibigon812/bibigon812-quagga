@@ -15,14 +15,13 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
     found_community_list = false
 
     config = vtysh('-c', 'show running-config')
-    config.split(/\n/).collect do |line|
+    config.split(%r{\n}).map do |line|
+      next if %r{\A!\Z}.match?(line)
 
-      next if line =~ /\A!\Z/
-
-      if line =~ /\Aip\scommunity-list\s(\d+)\s(deny|permit)\s(.+)\Z/
-        name = $1
-        action = $2
-        rule = $3.strip
+      if line =~ %r{\Aip\scommunity-list\s(\d+)\s(deny|permit)\s(.+)\Z}
+        name = Regexp.last_match(1)
+        action = Regexp.last_match(2)
+        rule = Regexp.last_match(3).strip
         found_community_list = true
 
         if name != previous_name
@@ -44,7 +43,7 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
         hash[:rules] << "#{action} #{rule}"
 
         previous_name = name
-      elsif line =~ /\A\w/ and found_community_list
+      elsif line =~ (%r{\A\w}) && found_community_list
         break
       end
     end
@@ -62,8 +61,8 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
 
   def self.prefetch(resources)
     providers = instances
-    resources.keys.each do |name|
-      if provider = providers.find { |provider| provider.name == name }
+    resources.each_key do |name|
+      if (provider = providers.find { |providerx| providerx.name == name })
         resources[name].provider = provider
       end
     end
@@ -71,7 +70,7 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
 
   def create
     debug 'Creating the bgp community list %{name}.' % {
-      :name => @resource[:name],
+      name: @resource[:name],
     }
 
     cmds = []
@@ -86,7 +85,7 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
 
     cmds << 'end'
     cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
 
     @property_hash[:ensure] = :present
   end
@@ -99,11 +98,11 @@ Puppet::Type.type(:quagga_bgp_community_list).provide :quagga do
     cmds = []
     cmds << 'configure terminal'
 
-    cmds << 'no ip community-list %{name}' % { :name => @property_hash[:name], }
+    cmds << 'no ip community-list %{name}' % { name: @property_hash[:name], }
 
     cmds << 'end'
     cmds << 'write memory'
-    vtysh(cmds.reduce([]){ |cmds, cmd| cmds << '-c' << cmd })
+    vtysh(cmds.reduce([]) { |cmdsx, cmd| cmdsx << '-c' << cmd })
 
     @property_hash.clear
   end

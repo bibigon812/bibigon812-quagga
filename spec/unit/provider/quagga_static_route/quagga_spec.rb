@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_static_route).provider(:quagga) do
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -34,41 +34,41 @@ line vty
 end'
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(3)
     end
 
-    it 'should return the resource `quagga_statis_route`' do
+    it 'returns the resource `quagga_statis_route` for instance 0' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        distance: :absent,
+                                                                                           distance: :absent,
         ensure: :present,
         nexthop: '10.1.2.1',
         option: :blackhole,
         prefix: '10.0.0.0/8',
         provider: :quagga,
-      })
+                                                                                         })
     end
 
-    it 'should return the resource `quagga_statis_route`' do
+    it 'returns the resource `quagga_statis_route` for instance 1' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        distance: :absent,
+                                                                                           distance: :absent,
         ensure: :present,
         nexthop: '10.1.1.1',
         option: :absent,
         prefix: '10.0.0.0/8',
         provider: :quagga,
-      })
+                                                                                         })
     end
 
-    it 'should return the resource `quagga_statis_route`' do
+    it 'returns the resource `quagga_statis_route` for instance 2' do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        distance: 250,
+                                                                                           distance: 250,
         ensure: :present,
         nexthop: 'Null0',
         option: :absent,
         prefix: '10.0.0.0/8',
         provider: :quagga,
-      })
+                                                                                         })
     end
   end
 
@@ -76,15 +76,15 @@ end'
     described_class.new(
         ensure:   :present,
         provider: :iproute2,
-    )
+      )
   end
 
   let(:catalog) { Puppet::Resource::Catalog.new }
 
   describe 'prefetch' do
     before :each do
-      described_class.stubs(:vtysh).with('-c', 'show running-config').
-          returns <<-EOS
+      described_class.stubs(:vtysh).with('-c', 'show running-config')
+                     .returns <<-EOS
 ip route 172.16.3.0/24 Null0
 ip route 172.16.3.0/24 172.16.0.4
 ip route 172.16.3.0/24 172.16.0.5 blackhole
@@ -95,9 +95,9 @@ EOS
     context 'network_route \'172.16.3.0/24\'' do
       let(:resources) do
         hash = {}
-          %w{Null0 172.16.0.4 172.16.0.5 172.16.0.6}.each do |nexthop|
-            hash["172.16.3.0/24 #{nexthop}"] = Puppet::Type.type(:quagga_static_route).new(title: "172.16.3.0/24 #{nexthop}")
-          end
+        ['Null0', '172.16.0.4', '172.16.0.5', '172.16.0.6'].each do |nexthop|
+          hash["172.16.3.0/24 #{nexthop}"] = Puppet::Type.type(:quagga_static_route).new(title: "172.16.3.0/24 #{nexthop}")
+        end
         hash
       end
 

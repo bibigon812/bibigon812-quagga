@@ -33,13 +33,13 @@ access-list 100 deny any any
   end
 
   describe 'instances' do
-    it 'should have an instance method' do
+    it 'has an instance method' do
       expect(described_class).to respond_to :instances
     end
   end
 
   describe 'prefetch' do
-    it 'should have a prefetch method' do
+    it 'has a prefetch method' do
       expect(described_class).to respond_to :prefetch
     end
   end
@@ -51,28 +51,28 @@ access-list 100 deny any any
       ).returns output
     end
 
-    it 'should return a resource' do
+    it 'returns a resource' do
       expect(described_class.instances.size).to eq(2)
     end
 
-    it 'should return the resource standard access-list' do
+    it 'returns the resource standard access-list' do
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-        ensure:   :present,
+                                                                                           ensure:   :present,
         name:     '1',
         provider: :quagga,
         remark:   'IP Standard access list',
-        rules:    ['permit 127.0.0.1', 'deny any',],
-      })
+        rules:    ['permit 127.0.0.1', 'deny any'],
+                                                                                         })
     end
 
-    it 'should return the resource extended access-list' do
+    it 'returns the resource extended access-list' do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        ensure:   :present,
+                                                                                           ensure:   :present,
         name:     '100',
         provider: :quagga,
         remark:   'IP Extended access list',
-        rules:    ['permit 192.168.0.0 0.0.0.255 any', 'deny any any',],
-      })
+        rules:    ['permit 192.168.0.0 0.0.0.255 any', 'deny any any'],
+                                                                                         })
     end
   end
 
@@ -86,10 +86,10 @@ access-list 100 deny any any
     before :each do
       described_class.stubs(:vtysh).with(
           '-c', 'show running-config'
-      ).returns output
+        ).returns output
     end
 
-    it 'should find provider for resource' do
+    it 'finds provider for resource' do
       described_class.prefetch(resources)
       expect(resources.values.first.provider).to eq(described_class.instances[0])
     end
