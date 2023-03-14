@@ -14,6 +14,8 @@
 #   Enable or disable management of the system configuration file
 # @param packages
 #   Specifies which packages will be installed
+# @param config_dir
+#   Directory in which the quagga configuration files reside
 class quagga (
   String $default_owner,
   String $default_group,
@@ -22,6 +24,7 @@ class quagga (
   String $service_file,
   Boolean $service_file_manage,
   Hash $packages,
+  Stdlib::AbsolutePath $config_dir = '/etc/quagga',
 ) {
   $packages.each |String $package_name, Hash $package| {
     package { $package_name:

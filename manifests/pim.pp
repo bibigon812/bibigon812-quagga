@@ -13,7 +13,6 @@
 # @param interfaces OSPF parameters of interfaces. See the type [`quagga_pim_interface`](#quagga_pim_interface).
 class quagga::pim (
   Boolean $agentx,
-  String $config_file,
   Boolean $config_file_manage,
   String $service_name,
   Boolean $service_enable,
@@ -21,7 +20,8 @@ class quagga::pim (
   Enum['running', 'stopped'] $service_ensure,
   String $service_opts,
   Hash $router,
-  Hash $interfaces
+  Hash $interfaces,
+  Stdlib::Unixpath $config_file               = "${quagga::config_dir}/pimd.conf",
 ) {
   include quagga::pim::config
   include quagga::pim::service

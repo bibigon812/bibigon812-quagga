@@ -49,7 +49,6 @@
 # @see quagga_bgp_address_family
 class quagga::bgp (
   Boolean $agentx,
-  String $config_file,
   Boolean $config_file_manage,
   String $service_name,
   Boolean $service_enable,
@@ -61,6 +60,7 @@ class quagga::bgp (
   Hash $as_paths,
   Hash $community_lists,
   Hash $address_families,
+  Stdlib::Unixpath $config_file               = "${quagga::config_dir}/bgpd.conf",
 ) {
   include quagga::bgp::config
   include quagga::bgp::service

@@ -39,7 +39,6 @@
 #
 class quagga::ospf (
   Boolean $agentx,
-  String $config_file,
   Boolean $config_file_manage,
   String $service_name,
   Boolean $service_enable,
@@ -49,6 +48,7 @@ class quagga::ospf (
   Hash $interfaces,
   Hash $router,
   Hash $areas,
+  Stdlib::Unixpath $config_file              = "${quagga::config_dir}/ospfd.conf",
 ) {
   include quagga::ospf::config
   include quagga::ospf::service
