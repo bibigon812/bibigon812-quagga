@@ -60,7 +60,7 @@ log facility local7'
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
                                                                                            ensure: :present,
         provider: :quagga,
-        name: 'file',
+        name: :file,
         filename: '/tmp/file.log',
         level: :warnings,
                                                                                          })
@@ -68,20 +68,20 @@ log facility local7'
 
     it "returns quagga_logging 'stdout' resource" do
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
+        ensure: :present,
         provider: :quagga,
-        name: 'stdout',
+        name: :stdout,
         level: :errors,
-                                                                                         })
+      })
     end
 
     it "returns quagga_logging 'syslog' resource" do
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
+        ensure: :present,
         provider: :quagga,
-        name: 'syslog',
+        name: :syslog,
         level: :errors,
-                                                                                         })
+      })
     end
   end
 
@@ -125,22 +125,25 @@ log facility local7'
     context 'with no existing config' do
       let(:resource) do
         Puppet::Type.type(:quagga_logging).new(
-          provider: described_class.name,
+          provider: provider,
           name:     'syslog',
+          level:    :warnings,
         )
       end
       let(:provider) do
         described_class.new(
           name:     'syslog',
           provider: :quagga,
-          filename: '/tmp/file.log',
           level:    :warnings,
         )
+      end
+      before(:each) do
+        provider.stubs(:exists?).returns(true)
+        provider.level = :warnings
       end
 
       it 'creates the instance' do
         resource[:ensure] = :present
-        provider.stubs(:exists?).returns(true)
         provider.expects(:vtysh).with(
           [
             '-c', 'configure terminal',
@@ -154,6 +157,13 @@ log facility local7'
     end
 
     context 'with existing config' do
+      let(:resource1) do
+        Puppet::Type.type(:quagga_logging).new(
+          provider: provider1,
+          name:     :syslog,
+          ensure:   :present,
+        )
+      end
       before(:each) do
         provider.stubs(:exists?).returns(true)
         provider1.stubs(:exists?).returns(true)
@@ -173,7 +183,7 @@ log facility local7'
       end
 
       it 'updates facility value for quagga_logging syslog' do
-        resource[:ensure] = :present
+        _resource = resource1
         provider1.filename = '/tmp/file1.log'
         provider1.level = :errors
         provider1.expects(:vtysh).with([
