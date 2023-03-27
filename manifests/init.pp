@@ -25,6 +25,7 @@ class quagga (
   Boolean $service_file_manage,
   Hash $packages,
   Stdlib::AbsolutePath $config_dir = '/etc/quagga',
+  Boolean $frr_mode_enable         = false,
 ) {
   $packages.each |String $package_name, Hash $package| {
     package { $package_name:
@@ -49,12 +50,28 @@ class quagga (
   contain quagga::pim
 
   if $service_file_manage {
-    file { $service_file:
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      replace => true,
-      content => epp('quagga/quagga.sysconfig.epp'),
+    if $frr_mode_enable {
+      $frr_daemons_config = {
+        'bgpd_enable' => $quagga::bgp::service_enable,
+        'ospfd_enable' => $quagga::ospf::service_enable,
+        'pimd_enable' => $quagga::pim::service_enable,
+      }
+      file { "${config_dir}/daemons":
+        ensure  => 'file',
+        owner   => $default_owner,
+        group   => $default_group,
+        mode    => '0750',
+        replace => true,
+        content => epp('quagga/frr.daemons.epp', $frr_daemons_config),
+      }
+    } else {
+      file { $service_file:
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0644',
+        replace => true,
+        content => epp('quagga/quagga.sysconfig.epp'),
+      }
     }
   }
 }

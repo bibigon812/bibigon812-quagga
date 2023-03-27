@@ -38,4 +38,32 @@ ZEBRA_OPTS="-P 0"
   it { is_expected.to contain_file('/etc/quagga/bgpd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
   it { is_expected.to contain_file('/etc/quagga/ospfd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
   it { is_expected.to contain_file('/etc/quagga/pimd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
+
+  context 'frr mode is enabled' do
+    let(:params) do
+      {
+        default_owner: 'frr',
+        default_group: 'frr',
+        frr_mode_enable: true,
+        config_dir: '/etc/frr',
+      }
+    end
+
+    it 'does not contain quagga sysconfig' do
+      is_expected.not_to contain_file('/etc/sysconfig/quagga')
+    end
+
+    it 'configures the frr daemons' do
+      is_expected.to contain_file('/etc/frr/daemons').with(
+        ensure: 'file',
+        owner: 'frr',
+        group: 'frr',
+        mode: '0750',
+      )
+      content = catalogue.resource('file', "#{params[:config_dir]}/daemons").send(:parameters)[:content]
+      expect(content).to match(%r{^bgpd=yes$})
+      expect(content).to match(%r{^pimd=yes$})
+      expect(content).to match(%r{^ospfd=yes$})
+    end
+  end
 end
