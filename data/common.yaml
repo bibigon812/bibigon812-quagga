@@ -36,19 +36,10 @@ lookup_options:
   quagga::bgp::peer::address_families:
     merge:
       strategy: deep
-  quagga::ospf::interfaces:
+  quagga::ospf_settings:
     merge:
       strategy: deep
-  quagga::ospf::router:
-    merge:
-      strategy: deep
-  quagga::ospf::areas:
-    merge:
-      strategy: deep
-  quagga::pim::router:
-    merge:
-      strategy: deep
-  quagga::pim::interfaces:
+  quagga::pim_settings:
     merge:
       strategy: deep
 quagga::default_owner: "quagga"
@@ -62,49 +53,53 @@ quagga::packages:
 quagga::logging::backend: "syslog"
 quagga::logging::filename:
 quagga::logging::level: "errors"
-quagga::zebra::agentx: false
-quagga::zebra::hostname: "%{::facts.networking.fqdn}"
-quagga::zebra::global_opts: {}
-quagga::zebra::interfaces: {}
-quagga::zebra::prefix_lists: {}
-quagga::zebra::route_maps: {}
-quagga::zebra::routes: {}
-quagga::zebra::access_lists: {}
-quagga::zebra::config_file_manage: true
-quagga::zebra::service_name: "zebra"
-quagga::zebra::service_enable: true
-quagga::zebra::service_manage: true
-quagga::zebra::service_ensure: "running"
-quagga::zebra::service_opts: "-P 0"
-quagga::pim::config_file_manage: true
-quagga::pim::service_name: "pimd"
-quagga::pim::service_enable: true
-quagga::pim::service_manage: true
-quagga::pim::service_ensure: "running"
-quagga::pim::service_opts: "-P 0"
-quagga::pim::agentx: false
-quagga::pim::router: {}
-quagga::pim::interfaces: {}
-quagga::bgp::agentx: false
-quagga::bgp::config_file_manage: true
-quagga::bgp::service_name: "bgpd"
-quagga::bgp::service_enable: true
-quagga::bgp::service_manage: true
-quagga::bgp::service_ensure: "running"
-quagga::bgp::service_opts: "-P 0"
-quagga::bgp::router: {}
-quagga::bgp::peers: {}
-quagga::bgp::as_paths: {}
-quagga::bgp::community_lists: {}
-quagga::bgp::address_families: {}
-quagga::ospf::agentx: false
-quagga::ospf::config_file_manage: true
-quagga::ospf::service_name: "ospfd"
-quagga::ospf::service_enable: true
-quagga::ospf::service_manage: true
-quagga::ospf::service_ensure: "running"
-quagga::ospf::service_opts: "-P 0"
-quagga::ospf::interfaces: {}
-quagga::ospf::router:
-  router_id: "%{::facts.networking.ip}"
-quagga::ospf::areas: {}
+quagga::zebra_settings:
+  agentx: false
+  hostname: "%{::facts.networking.fqdn}"
+  global_opts: {}
+  interfaces: {}
+  prefix_lists: {}
+  route_maps: {}
+  routes: {}
+  access_lists: {}
+  config_file_manage: true
+  service_name: "zebra"
+  service_enable: true
+  service_manage: true
+  service_ensure: "running"
+  service_opts: "-P 0"
+quagga::pim_settings:
+  config_file_manage: true
+  service_name: "pimd"
+  service_enable: true
+  service_manage: true
+  service_ensure: "running"
+  service_opts: "-P 0"
+  agentx: false
+  router: {}
+  interfaces: {}
+quagga::bgp_settings:
+  agentx: false
+  config_file_manage: true
+  service_name: "bgpd"
+  service_enable: true
+  service_manage: true
+  service_ensure: "running"
+  service_opts: "-P 0"
+  router: {}
+  peers: {}
+  as_paths: {}
+  community_lists: {}
+  address_families: {}
+quagga::ospf_settings:
+  agentx: false
+  config_file_manage: true
+  service_name: "ospfd"
+  service_enable: true
+  service_manage: true
+  service_ensure: "running"
+  service_opts: "-P 0"
+  interfaces: {}
+  router:
+    router_id: "%{::facts.networking.ip}"
+  areas: {}

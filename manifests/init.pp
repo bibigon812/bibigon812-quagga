@@ -16,6 +16,16 @@
 #   Specifies which packages will be installed
 # @param config_dir
 #   Directory in which the quagga configuration files reside
+# @param frr_mode_enable
+#   Indicates whether this is a quagga or FRRouting based system
+# @param pim
+#   Hash containing all of the pim daemon configuration directives
+# @param ospf
+#   Hash containing all of the ospf daemon configuration directives
+# @param bgp
+#   Hash containing all of the bgp daemon configuration directives
+# @param zebra
+#   Hash containing all of the zebra daemon configuration directives
 class quagga (
   String $default_owner,
   String $default_group,
@@ -24,6 +34,10 @@ class quagga (
   String $service_file,
   Boolean $service_file_manage,
   Hash $packages,
+  Quagga::Pim $pim_settings,
+  Quagga::Ospf $ospf_settings,
+  Quagga::Bgp $bgp_settings,
+  Quagga::Zebra $zebra_settings,
   Stdlib::AbsolutePath $config_dir = '/etc/quagga',
   Boolean $frr_mode_enable         = false,
 ) {
@@ -44,10 +58,44 @@ class quagga (
   }
 
   contain quagga::logging
-  contain quagga::zebra
-  contain quagga::bgp
-  contain quagga::ospf
+
+  if $frr_mode_enable {
+    $pim_params = $pim_settings + {
+      'service_name' => 'frr',
+    }
+    $ospf_params = $ospf_settings + {
+      'service_name' => 'frr',
+    }
+    $bgp_params = $bgp_settings + {
+      'service_name' => 'frr',
+    }
+    $zebra_params = $zebra_settings + {
+      'service_name' => 'frr',
+    }
+  } else {
+    $pim_params = $pim_settings
+    $ospf_params = $ospf_settings
+    $bgp_params = $bgp_settings
+    $zebra_params = $zebra_settings
+  }
+
+  # Child class inclusions
+  class { 'quagga::pim':
+    * => $pim_params,
+  }
   contain quagga::pim
+  class { 'quagga::ospf':
+    * => $ospf_params,
+  }
+  contain quagga::ospf
+  class { 'quagga::bgp':
+    * => $bgp_params,
+  }
+  contain quagga::bgp
+  class { 'quagga::zebra':
+    * => $zebra_params,
+  }
+  contain quagga::zebra
 
   if $service_file_manage {
     if $frr_mode_enable {
@@ -63,6 +111,11 @@ class quagga (
         mode    => '0750',
         replace => true,
         content => epp('quagga/frr.daemons.epp', $frr_daemons_config),
+      }
+      service { 'frr':
+        ensure    => 'running',
+        enable    => true,
+        subscribe => Package[keys($quagga::packages)],
       }
     } else {
       file { $service_file:

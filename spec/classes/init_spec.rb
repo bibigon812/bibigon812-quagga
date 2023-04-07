@@ -6,7 +6,8 @@ describe 'quagga' do
   let(:facts) do
     {
       networking: {
-        fqdn: 'router-1.sandbox.local'
+        fqdn: 'router-1.sandbox.local',
+        ip: '172.24.128.1',
       }
     }
   end

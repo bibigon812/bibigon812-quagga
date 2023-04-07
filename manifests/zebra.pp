@@ -37,6 +37,12 @@
 # @param service_opts service startup options
 class quagga::zebra (
   Boolean $agentx,
+  Boolean $config_file_manage,
+  String $service_name,
+  Boolean $service_enable,
+  Boolean $service_manage,
+  Enum['running', 'stopped'] $service_ensure,
+  String $service_opts,
   String $hostname,
   Hash $global_opts,
   Hash $interfaces,
@@ -44,12 +50,6 @@ class quagga::zebra (
   Hash $route_maps,
   Hash $routes,
   Hash $access_lists,
-  Boolean $config_file_manage,
-  String $service_name,
-  Boolean $service_enable,
-  Boolean $service_manage,
-  Enum['running', 'stopped'] $service_ensure,
-  String $service_opts,
   Stdlib::Unixpath $config_file               = "${quagga::config_dir}/zebra.conf",
 ) {
   include quagga::zebra::config
