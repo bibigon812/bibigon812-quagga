@@ -47,6 +47,10 @@ ZEBRA_OPTS="-P 0"
         default_group: 'frr',
         frr_mode_enable: true,
         config_dir: '/etc/frr',
+        packages: {
+          'frr' => { ensure: 'latest' },
+          'frr-pythontools' => { ensure: 'latest' },
+        },
       }
     end
 
@@ -65,6 +69,18 @@ ZEBRA_OPTS="-P 0"
       expect(content).to match(%r{^bgpd=yes$})
       expect(content).to match(%r{^pimd=yes$})
       expect(content).to match(%r{^ospfd=yes$})
+    end
+
+    it 'configures the frr service' do
+      is_expected.to contain_service('frr').with(
+        ensure: 'running',
+        enable: true,
+        subscribe: [
+          'File[/etc/frr/daemons]',
+          'Package[frr]',
+          'Package[frr-pythontools]',
+        ],
+      )
     end
   end
 end

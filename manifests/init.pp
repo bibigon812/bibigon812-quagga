@@ -18,13 +18,13 @@
 #   Directory in which the quagga configuration files reside
 # @param frr_mode_enable
 #   Indicates whether this is a quagga or FRRouting based system
-# @param pim
+# @param pim_settings
 #   Hash containing all of the pim daemon configuration directives
-# @param ospf
+# @param ospf_settings
 #   Hash containing all of the ospf daemon configuration directives
-# @param bgp
+# @param bgp_settings
 #   Hash containing all of the bgp daemon configuration directives
-# @param zebra
+# @param zebra_settings
 #   Hash containing all of the zebra daemon configuration directives
 class quagga (
   String $default_owner,
@@ -115,7 +115,10 @@ class quagga (
       service { 'frr':
         ensure    => 'running',
         enable    => true,
-        subscribe => Package[keys($quagga::packages)],
+        subscribe => [
+          File["${config_dir}/daemons"],
+          Package[keys($quagga::packages)],
+        ],
       }
     } else {
       file { $service_file:
