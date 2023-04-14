@@ -115,7 +115,7 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
   def self.prefetch(resources)
     providers = instances
     resources.each_key do |name|
-      if provider == providers.find { |providerx| providerx.name == name }
+      if (provider = providers.find { |providerx| providerx.name == name })
         resources[name].provider = provider
       end
     end
