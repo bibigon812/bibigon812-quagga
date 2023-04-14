@@ -131,9 +131,15 @@ Puppet::Type.type(:quagga_interface).provide :quagga do
     cmds << "interface #{@resource[:name]}"
 
     resource_map.each do |property, options|
-      if @resource[property] && ((resource[property].is_a?(Array) && !resource[property].empty?) || (@resource[property] != :absent))
-        value = @resource[property]
-        cmds << ERB.new(resource_map[property][:template]).result(binding)
+      if @resource[property] && ((@resource[property].is_a?(Array) && !@resource[property].empty?) || (@resource[property] != :absent))
+        if options[:type] == :array
+          @resource[property].each do |value|
+            cmds << ERB.new(resource_map[property][:template]).result(binding)
+          end
+        else
+          value = @resource[property]
+          cmds << ERB.new(resource_map[property][:template]).result(binding)
+        end
       end
     end
 
