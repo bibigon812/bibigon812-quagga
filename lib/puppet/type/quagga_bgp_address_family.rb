@@ -165,6 +165,37 @@ Puppet::Type.newtype(:quagga_bgp_address_family) do
     end
   end
 
+  newproperty(:redistribute, array_matching: :all) do
+    desc 'Redistribute information from another routing protocol.'
+
+    defaultto([])
+    newvalues(%r{\A(babel|connected|isis|kernel|ospf|rip|static)(\smetric\s\d+)?(\sroute-map\s\w+)?\Z})
+
+    def insync?(is)
+      @should.each do |value|
+        return false unless is.include?(value)
+      end
+
+      is.each do |value|
+        return false unless @should.include?(value)
+      end
+
+      true
+    end
+
+    def to_s?(value)
+      value.inspect
+    end
+
+    def should_to_s(value)
+      value.inspect
+    end
+
+    def change_to_s(is, should)
+      "removing #{(is - should).inspect}, adding #{(should - is).inspect}."
+    end
+  end
+
   autorequire(:quagga_bgp_router) do
     ['bgp']
   end

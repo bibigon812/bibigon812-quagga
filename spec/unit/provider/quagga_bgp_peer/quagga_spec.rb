@@ -45,6 +45,7 @@ router bgp 65000
  neighbor RR update-source 172.16.32.103
  neighbor RR activate
  neighbor RR next-hop-self
+ neighbor RR ebgp-multihop 2
  neighbor RR_WEAK peer-group
  neighbor RR_WEAK remote-as 65000
  neighbor RR_WEAK update-source 172.16.32.103
@@ -89,6 +90,7 @@ router bgp 65000
  neighbor RR remote-as 65000
  neighbor RR update-source 172.16.32.103
  neighbor RR next-hop-self
+ neighbor RR ebgp-multihop 2
  neighbor RR_WEAK peer-group
  neighbor RR_WEAK remote-as 65000
  neighbor RR_WEAK update-source 172.16.32.103
@@ -136,78 +138,93 @@ end
     end
 
     it 'returns the INTERNAL resource' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: 'INTERNAL',
-        passive: :false,
-        password: 'QWRF$345!#@$',
-        peer_group: :true,
-        provider: :quagga,
-        remote_as: 65_000,
-        shutdown: :false,
-        update_source: '172.16.32.103',
-                                                                                         })
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: 'INTERNAL',
+          passive: :false,
+          password: 'QWRF$345!#@$',
+          peer_group: :true,
+          provider: :quagga,
+          remote_as: 65_000,
+          shutdown: :false,
+          update_source: '172.16.32.103',
+          ebgp_multihop: :absent,
+        },
+      )
     end
 
     it 'returns the RR resource' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: 'RR',
-        passive: :false,
-        password: :absent,
-        peer_group: :true,
-        provider: :quagga,
-        remote_as: 65_000,
-        shutdown: :false,
-        update_source: '172.16.32.103',
-                                                                                         })
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: 'RR',
+          passive: :false,
+          password: :absent,
+          peer_group: :true,
+          provider: :quagga,
+          remote_as: 65_000,
+          shutdown: :false,
+          update_source: '172.16.32.103',
+          ebgp_multihop: 2,
+        },
+      )
     end
 
     it 'returns the RR_WEAK resource' do
-      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: 'RR_WEAK',
-        passive: :false,
-        password: :absent,
-        peer_group: :true,
-        provider: :quagga,
-        remote_as: 65_000,
-        shutdown: :false,
-        update_source: '172.16.32.103',
-                                                                                         })
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: 'RR_WEAK',
+          passive: :false,
+          password: :absent,
+          peer_group: :true,
+          provider: :quagga,
+          remote_as: 65_000,
+          shutdown: :false,
+          update_source: '172.16.32.103',
+          ebgp_multihop: :absent,
+        },
+      )
     end
 
     it 'returns the 172.16.32.108 resource' do
-      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: '172.16.32.108',
-        passive: :false,
-        password: :absent,
-        peer_group: 'INTERNAL',
-        provider: :quagga,
-        remote_as: :absent,
-        shutdown: :true,
-        update_source: :absent,
-                                                                                         })
+      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: '172.16.32.108',
+          passive: :false,
+          password: :absent,
+          peer_group: 'INTERNAL',
+          provider: :quagga,
+          remote_as: :absent,
+          shutdown: :true,
+          update_source: :absent,
+          ebgp_multihop: :absent,
+        },
+      )
     end
 
     it 'returns the 1a03:d000:20a0::91 resource' do
-      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: '1a03:d000:20a0::91',
-        passive: :false,
-        password: :absent,
-        peer_group: :false,
-        provider: :quagga,
-        remote_as: 31_113,
-        shutdown: :false,
-        update_source: '1a03:d000:20a0::92',
-                                                                                         })
+      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: '1a03:d000:20a0::91',
+          passive: :false,
+          password: :absent,
+          peer_group: :false,
+          provider: :quagga,
+          remote_as: 31_113,
+          shutdown: :false,
+          update_source: '1a03:d000:20a0::92',
+          ebgp_multihop: :absent,
+        },
+      )
     end
   end
 
@@ -247,6 +264,7 @@ end
         remote_as: 65_000,
         shutdown: :false,
         update_source: '172.16.32.103',
+        ebgp_multihop: :absent,
                                                                                          })
     end
 
@@ -262,6 +280,7 @@ end
         remote_as: 65_000,
         shutdown: :false,
         update_source: '172.16.32.103',
+        ebgp_multihop: 2,
                                                                                          })
     end
 
@@ -277,6 +296,7 @@ end
         remote_as: 65_000,
         shutdown: :false,
         update_source: '172.16.32.103',
+        ebgp_multihop: :absent,
                                                                                          })
     end
 
@@ -292,6 +312,7 @@ end
         remote_as: :absent,
         shutdown: :true,
         update_source: :absent,
+        ebgp_multihop: :absent,
                                                                                          })
     end
 
@@ -307,6 +328,7 @@ end
         remote_as: 31_113,
         shutdown: :false,
         update_source: '1a03:d000:20a0::92',
+        ebgp_multihop: :absent,
                                                                                          })
     end
   end

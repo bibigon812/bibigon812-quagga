@@ -67,21 +67,25 @@ log facility local7'
     end
 
     it "returns quagga_logging 'stdout' resource" do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-        ensure: :present,
-        provider: :quagga,
-        name: :stdout,
-        level: :errors,
-      })
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          provider: :quagga,
+          name: :stdout,
+          level: :errors,
+        },
+      )
     end
 
     it "returns quagga_logging 'syslog' resource" do
-      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-        ensure: :present,
-        provider: :quagga,
-        name: :syslog,
-        level: :errors,
-      })
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          provider: :quagga,
+          name: :syslog,
+          level: :errors,
+        },
+      )
     end
   end
 
@@ -137,6 +141,7 @@ log facility local7'
           level:    :warnings,
         )
       end
+
       before(:each) do
         provider.stubs(:exists?).returns(true)
         provider.level = :warnings
@@ -164,6 +169,7 @@ log facility local7'
           ensure:   :present,
         )
       end
+
       before(:each) do
         provider.stubs(:exists?).returns(true)
         provider1.stubs(:exists?).returns(true)

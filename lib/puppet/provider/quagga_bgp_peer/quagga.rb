@@ -45,6 +45,12 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
       template: 'neighbor <%= name %> update-source<% unless value.nil? %> <%= value %><% end %>',
       type: :string,
     },
+    ebgp_multihop: {
+      default: :absent,
+      regexp: %r{\A\sneighbor\s\S+\sebgp-multihop\s(\d+)\Z},
+      template: 'neighbor <%= name %> update-source<% unless value.nil? %> <%= value %><% end %>',
+      type: :fixnum,
+    },
   }
 
   def initialize(value)

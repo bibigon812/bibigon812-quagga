@@ -19,6 +19,10 @@ describe Puppet::Type.type(:quagga_bgp_address_family).provider(:quagga) do
       maximum_ibgp_paths: 10,
       name: 'ipv4_unicast',
       networks: ['10.0.0.0/8', '192.168.0.0/16'],
+      redistribute: [
+        'connected',
+        'ospf metric 30 route-map OSPF_BGP',
+      ],
     )
   end
 
@@ -61,6 +65,7 @@ router bgp 197888
  network 1a04:6d40::/48
  neighbor 1a03:d000:20a0::91 activate
  neighbor 1a03:d000:20a0::91 allowas-in 1
+ redistribute connected
  exit-address-family
 !
 end'
@@ -77,7 +82,7 @@ end'
   end
 
   context 'running-config without default ipv4-unicast' do
-    before :each do
+    before(:each) do
       described_class.expects(:vtysh).with(
           '-c', 'show running-config'
         ).returns output
@@ -88,27 +93,35 @@ end'
     end
 
     it 'returns the :ipv4_unicast resource' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-                                                                                           aggregate_address: [],
-        ensure: :present,
-        maximum_ebgp_paths: 4,
-        maximum_ibgp_paths: 4,
-        name: 'ipv4_unicast',
-        networks: ['172.16.32.0/24'],
-        provider: :quagga,
-                                                                                         })
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          aggregate_address: [],
+          ensure: :present,
+          maximum_ebgp_paths: 4,
+          maximum_ibgp_paths: 4,
+          name: 'ipv4_unicast',
+          networks: ['172.16.32.0/24'],
+          provider: :quagga,
+          redistribute: [],
+        },
+      )
     end
 
     it 'returns the :ipv6_unicast resource' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-                                                                                           aggregate_address: [],
-        ensure: :present,
-        maximum_ebgp_paths: 1,
-        maximum_ibgp_paths: 1,
-        name: 'ipv6_unicast',
-        networks: ['1a04:6d40::/48'],
-        provider: :quagga,
-                                                                                         })
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+        {
+          aggregate_address: [],
+          ensure: :present,
+          maximum_ebgp_paths: 1,
+          maximum_ibgp_paths: 1,
+          name: 'ipv6_unicast',
+          networks: ['1a04:6d40::/48'],
+          provider: :quagga,
+          redistribute: [
+            'connected',
+          ],
+        },
+      )
     end
   end
 
@@ -119,7 +132,7 @@ end'
       }
     end
 
-    before :each do
+    before(:each) do
       described_class.stubs(:vtysh).with(
           '-c', 'show running-config'
         ).returns output
@@ -143,6 +156,10 @@ end'
       resource[:maximum_ebgp_paths] = 2
       resource[:maximum_ibgp_paths] = 10
       resource[:networks] = ['10.0.0.0/8', '192.168.0.0/16']
+      resource[:redistribute] = [
+        'connected',
+        'ospf metric 30 route-map OSPF_BGP',
+      ]
       provider.expects(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
@@ -153,6 +170,8 @@ end'
                                       '-c', 'maximum-paths ibgp 10',
                                       '-c', 'network 10.0.0.0/8',
                                       '-c', 'network 192.168.0.0/16',
+                                      '-c', 'redistribute connected',
+                                      '-c', 'redistribute ospf metric 30 route-map OSPF_BGP',
                                       '-c', 'end',
                                       '-c', 'write memory'
                                     ])
@@ -168,9 +187,8 @@ end'
 
     it 'has all values' do
       resource[:ensure] = :present
-      resource[:aggregate_address] = ['192.168.0.0/24 summary-only', '10.0.0.0/24']
-      resource[:maximum_ebgp_paths] = 2
-      resource[:maximum_ibgp_paths] = 10
+      # These entries cannot be set here - they have to be part of the
+      # initialization
       provider.expects(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
@@ -181,6 +199,8 @@ end'
                                       '-c', 'no maximum-paths ibgp 10',
                                       '-c', 'no network 10.0.0.0/8',
                                       '-c', 'no network 192.168.0.0/16',
+                                      '-c', 'no redistribute connected',
+                                      '-c', 'no redistribute ospf metric 30 route-map OSPF_BGP',
                                       '-c', 'end',
                                       '-c', 'write memory'
                                     ])
@@ -200,6 +220,7 @@ end'
       provider.maximum_ebgp_paths = 5
       provider.maximum_ibgp_paths = 8
       provider.networks = ['172.16.0.0/12', '192.168.0.0/16']
+      provider.redistribute = ['ospf metric 30 route-map OSPF_BGP', 'kernel route-map KERNEL_BGP']
       provider.expects(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
@@ -210,6 +231,8 @@ end'
                                       '-c', 'maximum-paths ibgp 8',
                                       '-c', 'no network 10.0.0.0/8',
                                       '-c', 'network 172.16.0.0/12',
+                                      '-c', 'no redistribute connected',
+                                      '-c', 'redistribute kernel route-map KERNEL_BGP',
                                       '-c', 'end',
                                       '-c', 'write memory'
                                     ])

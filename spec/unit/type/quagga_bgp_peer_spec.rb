@@ -243,6 +243,27 @@ describe Puppet::Type.type(:quagga_bgp_peer) do
     end
   end
 
+  describe 'ebgp_multihop' do
+    it 'supports 2 as a value' do
+      expect { described_class.new(name: '192.168.1.1', ebgp_multihop: 2) }.not_to raise_error
+    end
+
+    it 'contains 2 when set' do
+      expect(described_class.new(name: '192.168.1.1', ebgp_multihop: 2)[:ebgp_multihop]).to eq(2)
+    end
+
+    [
+      '0bond0',
+      '10.256.0.1',
+      -1,
+      256,
+    ].each do |invalid_value|
+      it "does not support #{invalid_value} as a value" do
+        expect { described_class.new(name: '192.168.1.1', ebgp_multihop: invalid_value) }.to raise_error(Puppet::Error, %r{Invalid value})
+      end
+    end
+  end
+
   describe 'password' do
     it 'supports string as a value' do
       expect { described_class.new(name: '192.168.1.1', password: 'QWRF$345!#@$') }.not_to raise_error

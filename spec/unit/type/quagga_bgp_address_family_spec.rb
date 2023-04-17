@@ -162,4 +162,26 @@ describe Puppet::Type.type(:quagga_bgp_address_family) do
       expect(described_class.new(name: 'ipv6_unicast', networks: '2a00::/64')[:networks]).to eq(['2a00::/64'])
     end
   end
+
+  describe 'redistribute' do
+    it 'supports \'ospf\' as a value' do
+      expect { described_class.new(name: 'ipv4_unicast', redistribute: 'ospf') }.not_to raise_error
+    end
+
+    it 'supports \'connected route-map QWER\' as a value' do
+      expect { described_class.new(name: 'ipv4_unicast', redistribute: 'connected route-map QWER') }.not_to raise_error
+    end
+
+    it 'does not support \'ospf\' as a value' do
+      expect { described_class.new(name: 'ipv4_unicast', redistribute: 'bgp') }.to raise_error Puppet::Error, %r{Invalid value}
+    end
+
+    it 'does not support \'kernel metric 100 metric-type 3 route-map QWER\' as a value' do
+      expect { described_class.new(name: 'ipv4_unicast', redistribute: 'kernel metric 100 metric-type 3 route-map QWER') }.to raise_error Puppet::Error, %r{Invalid value}
+    end
+
+    it 'contains \'connected metric 100 metric-type 2 route-map QWER\'' do
+      expect(described_class.new(name: 'ipv4_unicast', redistribute: 'connected metric 100 route-map QWER')[:redistribute]).to eq(['connected metric 100 route-map QWER'])
+    end
+  end
 end
