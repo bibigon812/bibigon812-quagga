@@ -17,6 +17,7 @@ class quagga::pim (
   String $service_name,
   Boolean $service_enable,
   Boolean $service_manage,
+  Boolean $frr_mode_enable,
   Enum['running', 'stopped'] $service_ensure,
   String $service_opts,
   Hash $router,

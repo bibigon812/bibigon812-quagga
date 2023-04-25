@@ -7,7 +7,7 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
         quagga_bgp_peer { '192.168.1.1':
             ensure     => present,
             peer_group => 'internal_peers',
-            passwword  => 'QWRF$345!#@$',
+            password  => 'QWRF$345!#@$',
         }
 
         quagga_bgp_peer { 'internal_peers':
@@ -71,6 +71,19 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
     end
   end
 
+  newproperty(:ebgp_multihop) do
+    desc 'Number of allowed hops to remote BGP peer'
+
+    validate do |value|
+      unless value == :absent
+        raise "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
+        raise "Invalid value \"#{value}\", valid values are 1-4294967295" unless (value >= 1) && (value <= 255)
+      end
+    end
+
+    defaultto(:absent)
+  end
+
   newproperty(:shutdown, boolean: true) do
     desc 'Administratively shut down this neighbor.'
     defaultto(:false)
@@ -92,19 +105,6 @@ Puppet::Type.newtype(:quagga_bgp_peer) do
 
   newproperty(:password) do
     desc 'Set a password'
-
-    defaultto(:absent)
-  end
-
-  newproperty(:ebgp_multihop) do
-    desc 'Number of allowed hops to remote BGP peer'
-
-    validate do |value|
-      unless value == :absent
-        raise "Invalid value \"#{value}\", valid value is an Integer" unless value.is_a?(Integer)
-        raise "Invalid value \"#{value}\", valid values are 1-4294967295" unless (value >= 1) && (value <= 255)
-      end
-    end
 
     defaultto(:absent)
   end

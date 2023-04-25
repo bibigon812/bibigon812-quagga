@@ -81,19 +81,23 @@ class quagga (
 
   # Child class inclusions
   class { 'quagga::pim':
-    * => $pim_params,
+    frr_mode_enable => $frr_mode_enable,
+    *               => $pim_params,
   }
   contain quagga::pim
   class { 'quagga::ospf':
-    * => $ospf_params,
+    frr_mode_enable => $frr_mode_enable,
+    *               => $ospf_params,
   }
   contain quagga::ospf
   class { 'quagga::bgp':
-    * => $bgp_params,
+    frr_mode_enable => $frr_mode_enable,
+    *               => $bgp_params,
   }
   contain quagga::bgp
   class { 'quagga::zebra':
-    * => $zebra_params,
+    frr_mode_enable => $frr_mode_enable,
+    *               => $zebra_params,
   }
   contain quagga::zebra
 
