@@ -128,9 +128,9 @@ end
 
   context 'running-config without default ipv4-unicast' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns output_wo_default_ipv4_unicast
+      ).and_return output_wo_default_ipv4_unicast
     end
 
     it 'returns a resource' do
@@ -230,9 +230,9 @@ end
 
   context 'running-config without bgp' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns '!
+        ).and_return '!
 !'
     end
 
@@ -243,9 +243,9 @@ end
 
   context 'running-config with default ipv4-unicast' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output_w_default_ipv4_unicast
+        ).and_return output_w_default_ipv4_unicast
     end
 
     it 'returns a resource' do
@@ -341,9 +341,9 @@ end
     end
 
     before :each do
-      described_class.stubs(:vtysh).with(
+      allow(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output_wo_default_ipv4_unicast
+        ).and_return output_wo_default_ipv4_unicast
     end
 
     it 'finds provider for resource' do
@@ -354,8 +354,8 @@ end
 
   describe '#create' do
     before(:each) do
-      provider.stubs(:exists?).returns(false)
-      provider.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(false)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'has all values' do
@@ -364,7 +364,7 @@ end
       resource[:password] = 'QWRF$345!#@$'
       resource[:remote_as] = 65_000
       resource[:update_source] = '172.16.32.103'
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'neighbor INTERNAL peer-group',
@@ -380,8 +380,8 @@ end
 
   describe '#destroy' do
     before(:each) do
-      provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(true)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'has all values' do
@@ -389,7 +389,7 @@ end
       resource[:name] = 'INTERNAL'
       resource[:remote_as] = 65_000
       resource[:update_source] = '172.16.32.103'
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'no neighbor INTERNAL',
@@ -402,8 +402,8 @@ end
 
   describe '#flush' do
     before(:each) do
-      provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(true)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'updates passive, shutdown and update_source' do
@@ -411,7 +411,7 @@ end
       provider.passive = :true
       provider.shutdown = :true
       provider.update_source = '172.16.32.104'
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'neighbor INTERNAL passive',
@@ -428,7 +428,7 @@ end
       provider.passive = :false
       provider.shutdown = :false
       provider.update_source = '172.16.32.105'
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'no neighbor INTERNAL passive',

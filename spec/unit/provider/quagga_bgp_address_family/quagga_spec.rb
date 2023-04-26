@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_bgp_address_family).provider(:quagga) do
   before :each do
-    described_class.stubs(:commands).with(:vtysh).returns('/usr/bin/vtysh')
+    allow(described_class).to receive(:commands).with(:vtysh).and_return('/usr/bin/vtysh')
   end
 
   let(:resource) do
@@ -83,9 +83,9 @@ end'
 
   context 'running-config without default ipv4-unicast' do
     before(:each) do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output
+        ).and_return(output)
     end
 
     it 'returns a resource' do
@@ -133,9 +133,9 @@ end'
     end
 
     before(:each) do
-      described_class.stubs(:vtysh).with(
+      allow(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output
+        ).and_return(output)
     end
 
     it 'finds provider for resource' do
@@ -146,8 +146,8 @@ end'
 
   describe '#create' do
     before(:each) do
-      provider.stubs(:exists?).returns(false)
-      provider.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(false)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'has all values' do
@@ -160,7 +160,7 @@ end'
         'connected',
         'ospf metric 30 route-map OSPF_BGP',
       ]
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'address-family ipv4 unicast',
@@ -181,15 +181,15 @@ end'
 
   describe '#destroy' do
     before(:each) do
-      provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(true)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'has all values' do
       resource[:ensure] = :present
       # These entries cannot be set here - they have to be part of the
       # initialization
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'address-family ipv4 unicast',
@@ -210,8 +210,8 @@ end'
 
   describe '#flush' do
     before(:each) do
-      provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(true)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'has all values' do
@@ -221,7 +221,7 @@ end'
       provider.maximum_ibgp_paths = 8
       provider.networks = ['172.16.0.0/12', '192.168.0.0/16']
       provider.redistribute = ['ospf metric 30 route-map OSPF_BGP', 'kernel route-map KERNEL_BGP']
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'address-family ipv4 unicast',

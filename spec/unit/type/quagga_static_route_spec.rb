@@ -16,7 +16,7 @@ describe Puppet::Type.type(:quagga_static_route) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_static_route).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_static_route)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   after :each do

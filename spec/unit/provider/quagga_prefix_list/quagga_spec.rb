@@ -15,22 +15,26 @@ describe Puppet::Type.type(:quagga_prefix_list).provider(:quagga) do
 
   context 'running-config' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns '!
-ip prefix-list ABCD seq 5 permit any
-ip prefix-list ADVERTISED_ROUTES seq 10 permit 1.1.1.0/24
-ip prefix-list ADVERTISED_ROUTES seq 1000 deny 0.0.0.0/0 le 32
-ip prefix-list AS_LOCAL seq 10 permit 1.1.1.0/24
-ip prefix-list DEFAULT_ROUTE seq 10 permit 0.0.0.0/0
-!
-ipv6 prefix-list ipv6_advertised_prefixes seq 10 permit 2001:db8::/48
-!
-ip as-path access-list AS100 permit _100$
-ip as-path access-list AS100 permit _100_
-ip as-path access-list FROM_AS200 permit _200$
-ip as-path access-list THROUGH_AS300 permit _300_
-!'
+      ).and_return(
+        <<~EOS
+        !
+        ip prefix-list ABCD seq 5 permit any
+        ip prefix-list ADVERTISED_ROUTES seq 10 permit 1.1.1.0/24
+        ip prefix-list ADVERTISED_ROUTES seq 1000 deny 0.0.0.0/0 le 32
+        ip prefix-list AS_LOCAL seq 10 permit 1.1.1.0/24
+        ip prefix-list DEFAULT_ROUTE seq 10 permit 0.0.0.0/0
+        !
+        ipv6 prefix-list ipv6_advertised_prefixes seq 10 permit 2001:db8::/48
+        !
+        ip as-path access-list AS100 permit _100$
+        ip as-path access-list AS100 permit _100_
+        ip as-path access-list FROM_AS200 permit _200$
+        ip as-path access-list THROUGH_AS300 permit _300_
+        !
+        EOS
+      )
     end
 
     it 'returns a resource' do

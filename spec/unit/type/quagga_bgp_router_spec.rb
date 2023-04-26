@@ -20,7 +20,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_bgp_router).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_bgp_router)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   it 'has :name be its namevar' do

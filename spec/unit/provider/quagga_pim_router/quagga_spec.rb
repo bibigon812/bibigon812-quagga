@@ -15,19 +15,23 @@ describe Puppet::Type.type(:quagga_pim_router).provider(:quagga) do
 
   context 'running-config' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns '!
-hostname router-1.sandbox.local
-!
-ip forwarding
-ipv6 forwarding
-!
-ip multicast-routing
-!
-line vty
-!
-end'
+      ).and_return(
+        <<~EOS
+        !
+        hostname router-1.sandbox.local
+        !
+        ip forwarding
+        ipv6 forwarding
+        !
+        ip multicast-routing
+        !
+        line vty
+        !
+        end
+        EOS
+      )
     end
 
     it 'returns a resource' do

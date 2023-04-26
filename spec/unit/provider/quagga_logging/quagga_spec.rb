@@ -47,9 +47,9 @@ log facility local7'
 
   context 'running-config' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns output
+      ).and_return(output)
     end
 
     it 'returns 3 resources' do
@@ -97,9 +97,9 @@ log facility local7'
     end
 
     before :each do
-      described_class.stubs(:vtysh).with(
+      allow(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output
+        ).and_return output
     end
 
     it 'finds provider for resource' do
@@ -110,7 +110,7 @@ log facility local7'
 
   describe '#create' do
     before :each do
-      provider.stubs(:exists?).returns(true)
+      allow(provider).to receive(:exists?).and_return(true)
     end
 
     it 'has all values' do
@@ -143,13 +143,13 @@ log facility local7'
       end
 
       before(:each) do
-        provider.stubs(:exists?).returns(true)
+        allow(provider).to receive(:exists?).and_return(true)
         provider.level = :warnings
       end
 
       it 'creates the instance' do
         resource[:ensure] = :present
-        provider.expects(:vtysh).with(
+        expect(provider).to receive(:vtysh).with(
           [
             '-c', 'configure terminal',
             '-c', 'log syslog warnings',
@@ -171,15 +171,15 @@ log facility local7'
       end
 
       before(:each) do
-        provider.stubs(:exists?).returns(true)
-        provider1.stubs(:exists?).returns(true)
+        allow(provider).to receive(:exists?).and_return(true)
+        allow(provider1).to receive(:exists?).and_return(true)
       end
 
       it 'updates all values for quagga_logging file' do
         resource[:ensure] = :present
         provider.filename = '/tmp/file1.log'
         provider.level = :errors
-        provider.expects(:vtysh).with([
+        expect(provider).to receive(:vtysh).with([
                                         '-c', 'configure terminal',
                                         '-c', 'log file /tmp/file1.log errors',
                                         '-c', 'end',
@@ -192,7 +192,7 @@ log facility local7'
         _resource = resource1
         provider1.filename = '/tmp/file1.log'
         provider1.level = :errors
-        provider1.expects(:vtysh).with([
+        expect(provider1).to receive(:vtysh).with([
                                          '-c', 'configure terminal',
                                          '-c', 'log syslog errors',
                                          '-c', 'end',

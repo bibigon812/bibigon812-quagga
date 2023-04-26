@@ -15,62 +15,66 @@ describe Puppet::Type.type(:quagga_ospf_area).provider(:quagga) do
 
   context 'running-config' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns '!
-router bgp 197888
- bgp router-id 172.16.32.103
- bgp network import-check
- network 195.131.0.0/24
- redistribute connected metric 100 route-map ABCD
- neighbor INTERNAL peer-group
- neighbor INTERNAL remote-as 197888
- neighbor INTERNAL update-source 172.16.32.103
- neighbor INTERNAL next-hop-self
- neighbor INTERNAL soft-reconfiguration inbound
- neighbor INTERNAL allowas-in 1
- neighbor RR peer-group
- neighbor RR remote-as 197888
- neighbor RR update-source 172.16.32.103
- neighbor RR next-hop-self
- neighbor RR_WEAK peer-group
- neighbor RR_WEAK remote-as 197888
- neighbor RR_WEAK update-source 172.16.32.103
- neighbor RR_WEAK next-hop-self
- neighbor RR_WEAK route-map RR_WEAK_out out
- neighbor 172.16.32.108 peer-group INTERNAL
- neighbor 172.16.32.108 shutdown
- maximum-paths 4
- maximum-paths ibgp 4
-!
- address-family ipv6
- exit-address-family
- exit
-!
-router ospf
- area 0.0.15.211 default-cost 100
- area 0.10.10.10 export-list ACCESS_LIST_EXPORT
- area 0.10.10.10 import-list ACCESS_LIST_IMPORT
- area 0.10.10.10 filter-list prefix PREFIX_LIST_IMPORT in
- area 0.10.10.10 filter-list prefix PREFIX_LIST_EXPORT out
- area 0.10.10.10 stub no-summary
- area 0.10.10.10 authentication message-digest
- default-information originate always metric 100 metric-type 1 route-map ABCD
- ospf router-id 10.255.78.4
- redistribute kernel route-map KERNEL
- redistribute connected route-map CONNECTED
- redistribute static route-map STATIC
- redistribute rip route-map RIP
- network 10.255.1.0/24 area 0.0.15.211
- network 10.255.2.0/24 area 0.0.15.211
- network 10.255.3.0/24 area 0.0.15.211
- network 192.168.1.0/24 area 0.10.10.10
- network 192.168.2.0/24 area 0.10.10.10
-!
-ip route 0.0.0.0/0 10.255.1.2 254
-!
-ip prefix-list ADVERTISED-PREFIXES seq 10 permit 195.131.0.0/16
-ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32'
+      ).and_return(
+        <<~EOS
+        !
+        router bgp 197888
+         bgp router-id 172.16.32.103
+         bgp network import-check
+         network 195.131.0.0/24
+         redistribute connected metric 100 route-map ABCD
+         neighbor INTERNAL peer-group
+         neighbor INTERNAL remote-as 197888
+         neighbor INTERNAL update-source 172.16.32.103
+         neighbor INTERNAL next-hop-self
+         neighbor INTERNAL soft-reconfiguration inbound
+         neighbor INTERNAL allowas-in 1
+         neighbor RR peer-group
+         neighbor RR remote-as 197888
+         neighbor RR update-source 172.16.32.103
+         neighbor RR next-hop-self
+         neighbor RR_WEAK peer-group
+         neighbor RR_WEAK remote-as 197888
+         neighbor RR_WEAK update-source 172.16.32.103
+         neighbor RR_WEAK next-hop-self
+         neighbor RR_WEAK route-map RR_WEAK_out out
+         neighbor 172.16.32.108 peer-group INTERNAL
+         neighbor 172.16.32.108 shutdown
+         maximum-paths 4
+         maximum-paths ibgp 4
+        !
+         address-family ipv6
+         exit-address-family
+         exit
+        !
+        router ospf
+         area 0.0.15.211 default-cost 100
+         area 0.10.10.10 export-list ACCESS_LIST_EXPORT
+         area 0.10.10.10 import-list ACCESS_LIST_IMPORT
+         area 0.10.10.10 filter-list prefix PREFIX_LIST_IMPORT in
+         area 0.10.10.10 filter-list prefix PREFIX_LIST_EXPORT out
+         area 0.10.10.10 stub no-summary
+         area 0.10.10.10 authentication message-digest
+         default-information originate always metric 100 metric-type 1 route-map ABCD
+         ospf router-id 10.255.78.4
+         redistribute kernel route-map KERNEL
+         redistribute connected route-map CONNECTED
+         redistribute static route-map STATIC
+         redistribute rip route-map RIP
+         network 10.255.1.0/24 area 0.0.15.211
+         network 10.255.2.0/24 area 0.0.15.211
+         network 10.255.3.0/24 area 0.0.15.211
+         network 192.168.1.0/24 area 0.10.10.10
+         network 192.168.2.0/24 area 0.10.10.10
+        !
+        ip route 0.0.0.0/0 10.255.1.2 254
+        !
+        ip prefix-list ADVERTISED-PREFIXES seq 10 permit 195.131.0.0/16
+        ip prefix-list CONNECTED-NETWORKS seq 20 permit 195.131.0.0/28 le 32
+        EOS
+      )
     end
 
     it 'returns a resource' do

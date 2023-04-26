@@ -14,24 +14,28 @@ describe Puppet::Type.type(:quagga_static_route).provider(:quagga) do
   end
 
   context 'running-config' do
-    before :each do
-      described_class.expects(:vtysh).with(
+    before(:each) do
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns '!
-hostname router-1.sandbox.local
-!
-ip forwarding
-ipv6 forwarding
-!
-ip multicast-routing
-!
-ip route 10.0.0.0/8 10.1.2.1 blackhole
-ip route 10.0.0.0/8 10.1.1.1
-ip route 10.0.0.0/8 Null0 250
-!
-line vty
-!
-end'
+      ).and_return(
+        <<~EOS
+        !
+        hostname router-1.sandbox.local
+        !
+        ip forwarding
+        ipv6 forwarding
+        !
+        ip multicast-routing
+        !
+        ip route 10.0.0.0/8 10.1.2.1 blackhole
+        ip route 10.0.0.0/8 10.1.1.1
+        ip route 10.0.0.0/8 Null0 250
+        !
+        line vty
+        !
+        end
+        EOS
+      )
     end
 
     it 'returns a resource' do
@@ -82,14 +86,15 @@ end'
   let(:catalog) { Puppet::Resource::Catalog.new }
 
   describe 'prefetch' do
-    before :each do
-      described_class.stubs(:vtysh).with('-c', 'show running-config')
-                     .returns <<-EOS
-ip route 172.16.3.0/24 Null0
-ip route 172.16.3.0/24 172.16.0.4
-ip route 172.16.3.0/24 172.16.0.5 blackhole
-ip route 172.16.3.0/24 172.16.0.6 250
-EOS
+    before(:each) do
+      allow(described_class).to receive(:vtysh).with('-c', 'show running-config').and_return(
+        <<~EOS
+        ip route 172.16.3.0/24 Null0
+        ip route 172.16.3.0/24 172.16.0.4
+        ip route 172.16.3.0/24 172.16.0.5 blackhole
+        ip route 172.16.3.0/24 172.16.0.6 250
+        EOS
+      )
     end
 
     context 'network_route \'172.16.3.0/24\'' do

@@ -19,7 +19,7 @@ describe Puppet::Type.type(:quagga_ospf_area) do
   let(:catalog) { Puppet::Resource::Catalog.new }
 
   before :each do
-    Puppet::Type.type(:quagga_ospf_area).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_ospf_area)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   after :each do

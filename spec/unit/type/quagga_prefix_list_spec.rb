@@ -16,7 +16,7 @@ describe Puppet::Type.type(:quagga_prefix_list) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_prefix_list).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_prefix_list)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   after :each do

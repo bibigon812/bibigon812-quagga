@@ -16,7 +16,7 @@ describe Puppet::Type.type(:quagga_bgp_peer) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_bgp_peer).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_bgp_peer)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   after :each do

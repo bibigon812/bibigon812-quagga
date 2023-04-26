@@ -16,7 +16,7 @@ describe Puppet::Type.type(:quagga_access_list) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_access_list).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_access_list)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   after :each do

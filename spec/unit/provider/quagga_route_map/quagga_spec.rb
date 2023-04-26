@@ -15,22 +15,26 @@ describe Puppet::Type.type(:quagga_route_map).provider(:quagga) do
 
   context 'running-config' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns '!
-route-map CONNECTED permit 500
- match ip address prefix-list CONNECTED_NETWORKS
-!
-route-map AS8631_out permit 10
- match origin igp
- set community 1:1 2:2 additive
- set extcommunity rt 100:1
- set metric +10
-!
-route-map AS8631_out permit 20
- match origin igp
- set community 0:6697 additive
-!'
+      ).and_return(
+        <<~EOS
+        !
+        route-map CONNECTED permit 500
+         match ip address prefix-list CONNECTED_NETWORKS
+        !
+        route-map AS8631_out permit 10
+         match origin igp
+         set community 1:1 2:2 additive
+         set extcommunity rt 100:1
+         set metric +10
+        !
+        route-map AS8631_out permit 20
+         match origin igp
+         set community 0:6697 additive
+        !
+        EOS
+      )
     end
 
     it 'returns a resource' do

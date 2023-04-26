@@ -19,7 +19,7 @@ Puppet::Type.newtype(:quagga_prefix_list) do
   newparam(:name, namevar: true) do
     desc 'The name of the prefix-list.'
 
-    # newvalues(%r{\A[\w-]+\s\d+\Z})
+    newvalues(%r{\A[\w-]+\s\d+\Z})
   end
 
   newproperty(:action) do
@@ -52,7 +52,7 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
   newproperty(:prefix) do
     desc 'The IP prefix `<network>/<length>`.'
-    # newvalues(%r{\A([\h\.:/]+|any)\Z})
+    newvalues(%r{\A([\h\.:/]+|any)\Z})
   end
 
   newproperty(:proto) do

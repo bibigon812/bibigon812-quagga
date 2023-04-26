@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_bgp_as_path).provider(:quagga) do
   before :each do
-    described_class.stubs(:commands).with(:vtysh).returns('/usr/bin/vtysh')
+    allow(described_class).to receive(:commands).with(:vtysh).and_return('/usr/bin/vtysh')
   end
 
   let(:resource) do
@@ -50,9 +50,9 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
 
   context 'running-config' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns output
+      ).and_return(output)
     end
 
     it 'returns a resource' do
@@ -86,9 +86,9 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     end
 
     before :each do
-      described_class.stubs(:vtysh).with(
+      allow(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output
+        ).and_return(output)
     end
 
     it 'finds provider for resource' do
@@ -99,13 +99,13 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
 
   describe '#create' do
     before(:each) do
-      provider.stubs(:exists?).returns(false)
+      allow(provider).to receive(:exists?).and_return(false)
     end
 
     it 'has all rules' do
       resource[:ensure] = :present
       resource[:rules] = ['permit _100$', 'permit _100_']
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'ip as-path access-list FROM_AS100 permit _100$',
                                       '-c', 'ip as-path access-list FROM_AS100 permit _100_',
@@ -118,13 +118,13 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
 
   describe '#destroy' do
     before(:each) do
-      provider.stubs(:exists?).returns(true)
+      allow(provider).to receive(:exists?).and_return(true)
     end
 
     it 'has all rules' do
       resource[:ensure] = :present
       resource[:rules] = ['permit _100$', 'permit _100_']
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'no ip as-path access-list FROM_AS100',
                                       '-c', 'end',

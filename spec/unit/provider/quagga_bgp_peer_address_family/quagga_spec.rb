@@ -147,9 +147,9 @@ end'
 
   context 'running-config without default ipv4-unicast' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output_wo_default_ipv4_unicast
+        ).and_return(output_wo_default_ipv4_unicast)
     end
 
     it 'returns 5 resources' do
@@ -264,9 +264,9 @@ end'
 
   context 'running-config with default ipv4-unicast' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output_w_default_ipv4_unicast
+        ).and_return(output_w_default_ipv4_unicast)
     end
 
     it 'returns 5 resources' do
@@ -387,9 +387,9 @@ end'
     end
 
     before :each do
-      described_class.stubs(:vtysh).with(
+      allow(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output_wo_default_ipv4_unicast
+        ).and_return output_wo_default_ipv4_unicast
     end
 
     it 'finds provider for resource' do
@@ -400,8 +400,8 @@ end'
 
   describe '#create' do
     before(:each) do
-      provider.stubs(:exists?).returns(false)
-      provider.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(false)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'has all values' do
@@ -420,7 +420,7 @@ end'
       resource[:route_map_out]          = 'ROUTE_MAP_OUT'
       resource[:route_reflector_client] = :true
       resource[:route_server_client]    = :true
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'address-family ipv6',
@@ -445,7 +445,7 @@ end'
     it 'has `activate`' do
       resource[:activate]               = :true
       resource[:ensure]                 = :present
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'address-family ipv6',
@@ -459,14 +459,14 @@ end'
 
   describe '#destroy' do
     before(:each) do
-      provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65_000)
-      provider1.stubs(:exists?).returns(true)
-      provider1.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(true)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
+      allow(provider1).to receive(:exists?).and_return(true)
+      allow(provider1).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'has all values' do
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'address-family ipv6',
@@ -489,7 +489,7 @@ end'
     end
 
     it 'removes peer-group' do
-      provider1.expects(:vtysh).with([
+      expect(provider1).to receive(:vtysh).with([
                                        '-c', 'configure terminal',
                                        '-c', 'router bgp 65000',
                                        '-c', 'address-family ipv6',
@@ -504,8 +504,8 @@ end'
 
   describe '#flush' do
     before(:each) do
-      provider.stubs(:exists?).returns(true)
-      provider.stubs(:get_as_number).returns(65_000)
+      allow(provider).to receive(:exists?).and_return(true)
+      allow(provider).to receive(:get_as_number).and_return(65_000)
     end
 
     it 'updates all values except `activate`' do
@@ -523,7 +523,7 @@ end'
       provider.route_map_out          = :absent
       provider.route_reflector_client = :false
       provider.route_server_client    = :false
-      provider.expects(:vtysh).with([
+      expect(provider).to receive(:vtysh).with([
                                       '-c', 'configure terminal',
                                       '-c', 'router bgp 65000',
                                       '-c', 'address-family ipv6',
