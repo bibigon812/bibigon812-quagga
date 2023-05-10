@@ -253,83 +253,93 @@ end
     end
 
     it 'returns the INTERNAL resource' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: 'INTERNAL',
-        passive: :false,
-        password: 'QWRF$345!#@$',
-        peer_group: :true,
-        provider: :quagga,
-        remote_as: 65_000,
-        shutdown: :false,
-        update_source: '172.16.32.103',
-        ebgp_multihop: :absent,
-                                                                                         })
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: 'INTERNAL',
+          passive: :false,
+          password: 'QWRF$345!#@$',
+          peer_group: :true,
+          provider: :quagga,
+          remote_as: 65_000,
+          shutdown: :false,
+          update_source: '172.16.32.103',
+          ebgp_multihop: :absent,
+        },
+      )
     end
 
     it 'returns the RR resource' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: 'RR',
-        passive: :false,
-        password: :absent,
-        peer_group: :true,
-        provider: :quagga,
-        remote_as: 65_000,
-        shutdown: :false,
-        update_source: '172.16.32.103',
-        ebgp_multihop: 2,
-                                                                                         })
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: 'RR',
+          passive: :false,
+          password: :absent,
+          peer_group: :true,
+          provider: :quagga,
+          remote_as: 65_000,
+          shutdown: :false,
+          update_source: '172.16.32.103',
+          ebgp_multihop: 2,
+        },
+      )
     end
 
     it 'returns the RR_WEAK resource' do
-      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: 'RR_WEAK',
-        passive: :false,
-        password: :absent,
-        peer_group: :true,
-        provider: :quagga,
-        remote_as: 65_000,
-        shutdown: :false,
-        update_source: '172.16.32.103',
-        ebgp_multihop: :absent,
-                                                                                         })
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: 'RR_WEAK',
+          passive: :false,
+          password: :absent,
+          peer_group: :true,
+          provider: :quagga,
+          remote_as: 65_000,
+          shutdown: :false,
+          update_source: '172.16.32.103',
+          ebgp_multihop: :absent,
+        },
+      )
     end
 
     it 'returns the 172.16.32.108 resource' do
-      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: '172.16.32.108',
-        passive: :false,
-        password: :absent,
-        peer_group: 'INTERNAL',
-        provider: :quagga,
-        remote_as: :absent,
-        shutdown: :true,
-        update_source: :absent,
-        ebgp_multihop: :absent,
-                                                                                         })
+      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: '172.16.32.108',
+          passive: :false,
+          password: :absent,
+          peer_group: 'INTERNAL',
+          provider: :quagga,
+          remote_as: :absent,
+          shutdown: :true,
+          update_source: :absent,
+          ebgp_multihop: :absent,
+        },
+      )
     end
 
     it 'returns the 1a03:d000:20a0::91 resource' do
-      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        local_as: :absent,
-        name: '1a03:d000:20a0::91',
-        passive: :false,
-        password: :absent,
-        peer_group: :false,
-        provider: :quagga,
-        remote_as: 31_113,
-        shutdown: :false,
-        update_source: '1a03:d000:20a0::92',
-        ebgp_multihop: :absent,
-                                                                                         })
+      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          local_as: :absent,
+          name: '1a03:d000:20a0::91',
+          passive: :false,
+          password: :absent,
+          peer_group: :false,
+          provider: :quagga,
+          remote_as: 31_113,
+          shutdown: :false,
+          update_source: '1a03:d000:20a0::92',
+          ebgp_multihop: :absent,
+        },
+      )
     end
   end
 
@@ -364,16 +374,18 @@ end
       resource[:password] = 'QWRF$345!#@$'
       resource[:remote_as] = 65_000
       resource[:update_source] = '172.16.32.103'
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'neighbor INTERNAL peer-group',
-                                      '-c', 'neighbor INTERNAL remote-as 65000',
-                                      '-c', 'neighbor INTERNAL password QWRF$345!#@$',
-                                      '-c', 'neighbor INTERNAL update-source 172.16.32.103',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'neighbor INTERNAL peer-group',
+          '-c', 'neighbor INTERNAL remote-as 65000',
+          '-c', 'neighbor INTERNAL password QWRF$345!#@$',
+          '-c', 'neighbor INTERNAL update-source 172.16.32.103',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.create
     end
   end
@@ -389,13 +401,15 @@ end
       resource[:name] = 'INTERNAL'
       resource[:remote_as] = 65_000
       resource[:update_source] = '172.16.32.103'
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'no neighbor INTERNAL',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'no neighbor INTERNAL',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.destroy
     end
   end
@@ -411,15 +425,17 @@ end
       provider.passive = :true
       provider.shutdown = :true
       provider.update_source = '172.16.32.104'
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'neighbor INTERNAL passive',
-                                      '-c', 'neighbor INTERNAL shutdown',
-                                      '-c', 'neighbor INTERNAL update-source 172.16.32.104',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'neighbor INTERNAL passive',
+          '-c', 'neighbor INTERNAL shutdown',
+          '-c', 'neighbor INTERNAL update-source 172.16.32.104',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.flush
     end
 
@@ -428,15 +444,17 @@ end
       provider.passive = :false
       provider.shutdown = :false
       provider.update_source = '172.16.32.105'
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'no neighbor INTERNAL passive',
-                                      '-c', 'no neighbor INTERNAL shutdown',
-                                      '-c', 'neighbor INTERNAL update-source 172.16.32.105',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'no neighbor INTERNAL passive',
+          '-c', 'no neighbor INTERNAL shutdown',
+          '-c', 'neighbor INTERNAL update-source 172.16.32.105',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.flush
     end
   end

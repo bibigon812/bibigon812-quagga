@@ -45,25 +45,29 @@ router ospf
       end
 
       it "returns range '0.0.0.21 1.1.2.0/24'" do
-        expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-                                                                                             advertise: :true,
-          cost: :absent,
-          ensure: :present,
-          provider: :quagga,
-          name: '0.0.0.21 1.1.2.0/24',
-          substitute: :absent,
-                                                                                           })
+        expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+          {
+            advertise: :true,
+            cost: :absent,
+            ensure: :present,
+            provider: :quagga,
+            name: '0.0.0.21 1.1.2.0/24',
+            substitute: :absent,
+          },
+        )
       end
 
       it "returns range '0.0.0.21 1.1.1.1/32'" do
-        expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-                                                                                             advertise: :false,
-          cost: 100,
-          ensure: :present,
-          provider: :quagga,
-          name: '0.0.0.21 1.1.1.1/32',
-          substitute: '1.1.1.0/24',
-                                                                                           })
+        expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+          {
+            advertise: :false,
+            cost: 100,
+            ensure: :present,
+            provider: :quagga,
+            name: '0.0.0.21 1.1.1.1/32',
+            substitute: '1.1.1.0/24',
+          },
+        )
       end
     end
 
@@ -104,13 +108,15 @@ router ospf
 
       it do
         resource[:ensure] = :present
-        expect(provider).to receive(:vtysh).with([
-                                        '-c', 'configure terminal',
-                                        '-c', 'router ospf',
-                                        '-c', 'area 0.0.0.21 range 1.1.1.1/32 substitute 1.1.1.0/24',
-                                        '-c', 'end',
-                                        '-c', 'write memory'
-                                      ])
+        expect(provider).to receive(:vtysh).with(
+          [
+            '-c', 'configure terminal',
+            '-c', 'router ospf',
+            '-c', 'area 0.0.0.21 range 1.1.1.1/32 substitute 1.1.1.0/24',
+            '-c', 'end',
+            '-c', 'write memory'
+          ],
+        )
         provider.create
       end
     end
@@ -122,13 +128,15 @@ router ospf
 
       it do
         resource[:ensure] = :present
-        expect(provider).to receive(:vtysh).with([
-                                        '-c', 'configure terminal',
-                                        '-c', 'router ospf',
-                                        '-c', 'no area 0.0.0.21 range 1.1.1.1/32',
-                                        '-c', 'end',
-                                        '-c', 'write memory'
-                                      ])
+        expect(provider).to receive(:vtysh).with(
+          [
+            '-c', 'configure terminal',
+            '-c', 'router ospf',
+            '-c', 'no area 0.0.0.21 range 1.1.1.1/32',
+            '-c', 'end',
+            '-c', 'write memory'
+          ],
+        )
         provider.destroy
       end
     end

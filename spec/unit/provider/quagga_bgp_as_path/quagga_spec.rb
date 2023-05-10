@@ -105,13 +105,15 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     it 'has all rules' do
       resource[:ensure] = :present
       resource[:rules] = ['permit _100$', 'permit _100_']
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'ip as-path access-list FROM_AS100 permit _100$',
-                                      '-c', 'ip as-path access-list FROM_AS100 permit _100_',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'ip as-path access-list FROM_AS100 permit _100$',
+          '-c', 'ip as-path access-list FROM_AS100 permit _100_',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.create
     end
   end
@@ -124,12 +126,14 @@ ip as-path access-list THROUGH_AS6697 permit _6697_
     it 'has all rules' do
       resource[:ensure] = :present
       resource[:rules] = ['permit _100$', 'permit _100_']
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'no ip as-path access-list FROM_AS100',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'no ip as-path access-list FROM_AS100',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.destroy
     end
   end

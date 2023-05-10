@@ -18,7 +18,7 @@ describe Puppet::Type.type(:quagga_pim_router).provider(:quagga) do
       expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
       ).and_return(
-        <<~EOS
+        <<~EOS,
         !
         hostname router-1.sandbox.local
         !

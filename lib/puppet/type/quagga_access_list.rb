@@ -85,10 +85,10 @@ Puppet::Type.newtype(:quagga_access_list) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra']
+    ['zebra', 'frr']
   end
 end

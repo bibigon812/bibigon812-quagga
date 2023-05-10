@@ -18,7 +18,7 @@ describe Puppet::Type.type(:quagga_prefix_list).provider(:quagga) do
       expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
       ).and_return(
-        <<~EOS
+        <<~EOS,
         !
         ip prefix-list ABCD seq 5 permit any
         ip prefix-list ADVERTISED_ROUTES seq 10 permit 1.1.1.0/24

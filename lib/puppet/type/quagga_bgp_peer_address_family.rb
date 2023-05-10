@@ -193,11 +193,11 @@ Puppet::Type.newtype(:quagga_bgp_peer_address_family) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra', 'bgpd']
+    ['zebra', 'frr', 'bgpd']
   end
 
   autosubscribe(:quagga_prefix_list) do

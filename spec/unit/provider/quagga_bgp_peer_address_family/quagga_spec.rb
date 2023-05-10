@@ -157,108 +157,118 @@ end'
     end
 
     it 'returns the \'INTERNAL ipv4_unicast\' resource' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :true,
-        allow_as_in: 1,
-        default_originate: :false,
-        ensure: :present,
-        name: 'INTERNAL ipv4_unicast',
-        next_hop_self: :true,
-        peer_group: :true,
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: :absent,
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :true,
+          allow_as_in: 1,
+          default_originate: :false,
+          ensure: :present,
+          name: 'INTERNAL ipv4_unicast',
+          next_hop_self: :true,
+          peer_group: :true,
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: :absent,
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
 
     it 'returns the \'RR ipv4_unicast\' resource' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :false,
-        allow_as_in: :absent,
-        default_originate: :false,
-        ensure: :present,
-        name: 'RR ipv4_unicast',
-        next_hop_self: :true,
-        peer_group: :true,
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: :absent,
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :false,
+          allow_as_in: :absent,
+          default_originate: :false,
+          ensure: :present,
+          name: 'RR ipv4_unicast',
+          next_hop_self: :true,
+          peer_group: :true,
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: :absent,
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
 
     it 'returns the \'RR_WEAK ipv4_unicast\' resource' do
-      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :true,
-        allow_as_in: :absent,
-        default_originate: :false,
-        ensure: :present,
-        name: 'RR_WEAK ipv4_unicast',
-        next_hop_self: :true,
-        peer_group: :true,
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: 'RR_WEAK_out',
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :true,
+          allow_as_in: :absent,
+          default_originate: :false,
+          ensure: :present,
+          name: 'RR_WEAK ipv4_unicast',
+          next_hop_self: :true,
+          peer_group: :true,
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: 'RR_WEAK_out',
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
 
     it 'returns the \'172.16.32.108 ipv4_unicast\' resource' do
-      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :false,
-        allow_as_in: :absent,
-        default_originate: :true,
-        ensure: :present,
-        name: '172.16.32.108 ipv4_unicast',
-        next_hop_self: :false,
-        peer_group: 'INTERNAL',
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: :absent,
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :false,
+          allow_as_in: :absent,
+          default_originate: :true,
+          ensure: :present,
+          name: '172.16.32.108 ipv4_unicast',
+          next_hop_self: :false,
+          peer_group: 'INTERNAL',
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: :absent,
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
 
     it 'returns the \'2001:db8:: ipv6_unicast\' resource' do
-      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :true,
-        allow_as_in: 1,
-        default_originate: :false,
-        ensure: :present,
-        name: '2001:db8:: ipv6_unicast',
-        next_hop_self: :false,
-        peer_group: :false,
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: :absent,
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :true,
+          allow_as_in: 1,
+          default_originate: :false,
+          ensure: :present,
+          name: '2001:db8:: ipv6_unicast',
+          next_hop_self: :false,
+          peer_group: :false,
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: :absent,
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
   end
 
@@ -274,108 +284,118 @@ end'
     end
 
     it 'returns the \'INTERNAL ipv4_unicast\' resource' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :false,
-        allow_as_in: 1,
-        default_originate: :false,
-        ensure: :present,
-        name: 'INTERNAL ipv4_unicast',
-        next_hop_self: :true,
-        peer_group: :true,
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: :absent,
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :false,
+          allow_as_in: 1,
+          default_originate: :false,
+          ensure: :present,
+          name: 'INTERNAL ipv4_unicast',
+          next_hop_self: :true,
+          peer_group: :true,
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: :absent,
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
 
     it 'returns the \'RR ipv4_unicast\' resource' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :false,
-        allow_as_in: :absent,
-        default_originate: :false,
-        ensure: :present,
-        name: 'RR ipv4_unicast',
-        next_hop_self: :true,
-        peer_group: :true,
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: :absent,
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :false,
+          allow_as_in: :absent,
+          default_originate: :false,
+          ensure: :present,
+          name: 'RR ipv4_unicast',
+          next_hop_self: :true,
+          peer_group: :true,
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: :absent,
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
 
     it 'returns the \'RR_WEAK ipv4_unicast\' resource' do
-      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :false,
-        allow_as_in: :absent,
-        default_originate: :false,
-        ensure: :present,
-        name: 'RR_WEAK ipv4_unicast',
-        next_hop_self: :true,
-        peer_group: :true,
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: 'RR_WEAK_out',
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :false,
+          allow_as_in: :absent,
+          default_originate: :false,
+          ensure: :present,
+          name: 'RR_WEAK ipv4_unicast',
+          next_hop_self: :true,
+          peer_group: :true,
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: 'RR_WEAK_out',
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
 
     it 'returns the \'172.16.32.108 ipv4_unicast\' resource' do
-      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :false,
-        allow_as_in: :absent,
-        default_originate: :true,
-        ensure: :present,
-        name: '172.16.32.108 ipv4_unicast',
-        next_hop_self: :false,
-        peer_group: 'INTERNAL',
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: :absent,
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :false,
+          allow_as_in: :absent,
+          default_originate: :true,
+          ensure: :present,
+          name: '172.16.32.108 ipv4_unicast',
+          next_hop_self: :false,
+          peer_group: 'INTERNAL',
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: :absent,
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
 
     it 'returns the \'2001:db8:: ipv6_unicast\' resource' do
-      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq({
-                                                                                           activate: :true,
-        allow_as_in: 1,
-        default_originate: :false,
-        ensure: :present,
-        name: '2001:db8:: ipv6_unicast',
-        next_hop_self: :false,
-        peer_group: :false,
-        prefix_list_in: :absent,
-        prefix_list_out: :absent,
-        provider: :quagga,
-        route_map_export: :absent,
-        route_map_import: :absent,
-        route_map_in: :absent,
-        route_map_out: :absent,
-        route_reflector_client: :false,
-        route_server_client: :false,
-                                                                                         })
+      expect(described_class.instances[4].instance_variable_get('@property_hash')).to eq(
+        {
+          activate: :true,
+          allow_as_in: 1,
+          default_originate: :false,
+          ensure: :present,
+          name: '2001:db8:: ipv6_unicast',
+          next_hop_self: :false,
+          peer_group: :false,
+          prefix_list_in: :absent,
+          prefix_list_out: :absent,
+          provider: :quagga,
+          route_map_export: :absent,
+          route_map_import: :absent,
+          route_map_in: :absent,
+          route_map_out: :absent,
+          route_reflector_client: :false,
+          route_server_client: :false,
+        },
+      )
     end
   end
 
@@ -420,39 +440,43 @@ end'
       resource[:route_map_out]          = 'ROUTE_MAP_OUT'
       resource[:route_reflector_client] = :true
       resource[:route_server_client]    = :true
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'address-family ipv6',
-                                      '-c', 'neighbor 2001:db8:: activate',
-                                      '-c', 'neighbor 2001:db8:: allowas-in 1',
-                                      '-c', 'neighbor 2001:db8:: default-originate',
-                                      '-c', 'neighbor 2001:db8:: next-hop-self',
-                                      '-c', 'neighbor 2001:db8:: prefix-list PREFIX_LIST_IN in',
-                                      '-c', 'neighbor 2001:db8:: prefix-list PREFIX_LIST_OUT out',
-                                      '-c', 'neighbor 2001:db8:: route-map ROUTE_MAP_EXPORT export',
-                                      '-c', 'neighbor 2001:db8:: route-map ROUTE_MAP_IMPORT import',
-                                      '-c', 'neighbor 2001:db8:: route-map ROUTE_MAP_IN in',
-                                      '-c', 'neighbor 2001:db8:: route-map ROUTE_MAP_OUT out',
-                                      '-c', 'neighbor 2001:db8:: route-reflector-client',
-                                      '-c', 'neighbor 2001:db8:: route-server-client',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'address-family ipv6',
+          '-c', 'neighbor 2001:db8:: activate',
+          '-c', 'neighbor 2001:db8:: allowas-in 1',
+          '-c', 'neighbor 2001:db8:: default-originate',
+          '-c', 'neighbor 2001:db8:: next-hop-self',
+          '-c', 'neighbor 2001:db8:: prefix-list PREFIX_LIST_IN in',
+          '-c', 'neighbor 2001:db8:: prefix-list PREFIX_LIST_OUT out',
+          '-c', 'neighbor 2001:db8:: route-map ROUTE_MAP_EXPORT export',
+          '-c', 'neighbor 2001:db8:: route-map ROUTE_MAP_IMPORT import',
+          '-c', 'neighbor 2001:db8:: route-map ROUTE_MAP_IN in',
+          '-c', 'neighbor 2001:db8:: route-map ROUTE_MAP_OUT out',
+          '-c', 'neighbor 2001:db8:: route-reflector-client',
+          '-c', 'neighbor 2001:db8:: route-server-client',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.create
     end
 
     it 'has `activate`' do
       resource[:activate]               = :true
       resource[:ensure]                 = :present
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'address-family ipv6',
-                                      '-c', 'neighbor 2001:db8:: activate',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'address-family ipv6',
+          '-c', 'neighbor 2001:db8:: activate',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.create
     end
   end
@@ -466,38 +490,42 @@ end'
     end
 
     it 'has all values' do
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'address-family ipv6',
-                                      '-c', 'no neighbor 2001:db8:: activate',
-                                      '-c', 'no neighbor 2001:db8:: allowas-in',
-                                      '-c', 'no neighbor 2001:db8:: default-originate',
-                                      '-c', 'no neighbor 2001:db8:: next-hop-self',
-                                      '-c', 'no neighbor 2001:db8:: prefix-list PREFIX_LIST_IN in',
-                                      '-c', 'no neighbor 2001:db8:: prefix-list PREFIX_LIST_OUT out',
-                                      '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_EXPORT export',
-                                      '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_IMPORT import',
-                                      '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_IN in',
-                                      '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_OUT out',
-                                      '-c', 'no neighbor 2001:db8:: route-reflector-client',
-                                      '-c', 'no neighbor 2001:db8:: route-server-client',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'address-family ipv6',
+          '-c', 'no neighbor 2001:db8:: activate',
+          '-c', 'no neighbor 2001:db8:: allowas-in',
+          '-c', 'no neighbor 2001:db8:: default-originate',
+          '-c', 'no neighbor 2001:db8:: next-hop-self',
+          '-c', 'no neighbor 2001:db8:: prefix-list PREFIX_LIST_IN in',
+          '-c', 'no neighbor 2001:db8:: prefix-list PREFIX_LIST_OUT out',
+          '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_EXPORT export',
+          '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_IMPORT import',
+          '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_IN in',
+          '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_OUT out',
+          '-c', 'no neighbor 2001:db8:: route-reflector-client',
+          '-c', 'no neighbor 2001:db8:: route-server-client',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.destroy
     end
 
     it 'removes peer-group' do
-      expect(provider1).to receive(:vtysh).with([
-                                       '-c', 'configure terminal',
-                                       '-c', 'router bgp 65000',
-                                       '-c', 'address-family ipv6',
-                                       '-c', 'no neighbor 2001:db8:: peer-group INTERNAL',
-                                       '-c', 'no neighbor 2001:db8:: activate',
-                                       '-c', 'end',
-                                       '-c', 'write memory'
-                                     ])
+      expect(provider1).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'address-family ipv6',
+          '-c', 'no neighbor 2001:db8:: peer-group INTERNAL',
+          '-c', 'no neighbor 2001:db8:: activate',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider1.destroy
     end
   end
@@ -523,26 +551,28 @@ end'
       provider.route_map_out          = :absent
       provider.route_reflector_client = :false
       provider.route_server_client    = :false
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'address-family ipv6',
-                                      '-c', 'neighbor 2001:db8:: peer-group INTERNAL',
-                                      '-c', 'neighbor 2001:db8:: activate',
-                                      '-c', 'no neighbor 2001:db8:: allowas-in',
-                                      '-c', 'no neighbor 2001:db8:: default-originate',
-                                      '-c', 'no neighbor 2001:db8:: next-hop-self',
-                                      '-c', 'no neighbor 2001:db8:: prefix-list PREFIX_LIST_IN in',
-                                      '-c', 'no neighbor 2001:db8:: prefix-list PREFIX_LIST_OUT out',
-                                      '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_EXPORT export',
-                                      '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_IMPORT import',
-                                      '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_IN in',
-                                      '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_OUT out',
-                                      '-c', 'no neighbor 2001:db8:: route-reflector-client',
-                                      '-c', 'no neighbor 2001:db8:: route-server-client',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'address-family ipv6',
+          '-c', 'neighbor 2001:db8:: peer-group INTERNAL',
+          '-c', 'neighbor 2001:db8:: activate',
+          '-c', 'no neighbor 2001:db8:: allowas-in',
+          '-c', 'no neighbor 2001:db8:: default-originate',
+          '-c', 'no neighbor 2001:db8:: next-hop-self',
+          '-c', 'no neighbor 2001:db8:: prefix-list PREFIX_LIST_IN in',
+          '-c', 'no neighbor 2001:db8:: prefix-list PREFIX_LIST_OUT out',
+          '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_EXPORT export',
+          '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_IMPORT import',
+          '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_IN in',
+          '-c', 'no neighbor 2001:db8:: route-map ROUTE_MAP_OUT out',
+          '-c', 'no neighbor 2001:db8:: route-reflector-client',
+          '-c', 'no neighbor 2001:db8:: route-server-client',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.flush
     end
   end

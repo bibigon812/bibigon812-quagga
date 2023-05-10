@@ -18,7 +18,7 @@ describe Puppet::Type.type(:quagga_route_map).provider(:quagga) do
       expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
       ).and_return(
-        <<~EOS
+        <<~EOS,
         !
         route-map CONNECTED permit 500
          match ip address prefix-list CONNECTED_NETWORKS

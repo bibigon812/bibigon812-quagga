@@ -74,10 +74,10 @@ Puppet::Type.newtype(:quagga_logging) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra']
+    ['zebra', 'frr']
   end
 end

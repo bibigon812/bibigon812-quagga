@@ -112,10 +112,10 @@ Puppet::Type.newtype(:quagga_ospf_area) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra', 'ospfd']
+    ['zebra', 'frr', 'ospfd']
   end
 end

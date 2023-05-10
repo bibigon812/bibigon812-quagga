@@ -62,39 +62,47 @@ end
     end
 
     it 'returns the resource community-list for instance 0' do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        name: '100',
-        provider: :quagga,
-        rules: ['permit 65000:31133'],
-                                                                                         })
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          name: '100',
+          provider: :quagga,
+          rules: ['permit 65000:31133'],
+        },
+      )
     end
 
     it 'returns the resource community-list for instance 1' do
-      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        name: '300',
-        provider: :quagga,
-        rules: ['permit 65000:50952', 'permit 65000:31500', 'permit 65000:6939'],
-                                                                                         })
+      expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          name: '300',
+          provider: :quagga,
+          rules: ['permit 65000:50952', 'permit 65000:31500', 'permit 65000:6939'],
+        },
+      )
     end
 
     it 'returns the resource community-list for instance 2' do
-      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        name: '500',
-        provider: :quagga,
-        rules: ['permit 65000:8359', 'permit 65000:12695'],
-                                                                                         })
+      expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          name: '500',
+          provider: :quagga,
+          rules: ['permit 65000:8359', 'permit 65000:12695'],
+        },
+      )
     end
 
     it 'returns the resource community-list for instance 3' do
-      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        name: '501',
-        provider: :quagga,
-        rules: ['permit 64513:2_.*_64515:1'],
-                                                                                         })
+      expect(described_class.instances[3].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          name: '501',
+          provider: :quagga,
+          rules: ['permit 64513:2_.*_64515:1'],
+        },
+      )
     end
   end
 
@@ -125,14 +133,16 @@ end
     it 'has all rules' do
       resource[:ensure] = :present
       resource[:rules] = ['permit 65000:101', 'permit 65000:102', 'permit 65000:103']
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'ip community-list 100 permit 65000:101',
-                                      '-c', 'ip community-list 100 permit 65000:102',
-                                      '-c', 'ip community-list 100 permit 65000:103',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'ip community-list 100 permit 65000:101',
+          '-c', 'ip community-list 100 permit 65000:102',
+          '-c', 'ip community-list 100 permit 65000:103',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.create
     end
   end
@@ -145,12 +155,14 @@ end
     it 'has all rules' do
       resource[:ensure] = :present
       resource[:rules] = ['permit 65000:101', 'permit 65000:102', 'permit 65000:103']
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'no ip community-list 100',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'no ip community-list 100',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.destroy
     end
   end

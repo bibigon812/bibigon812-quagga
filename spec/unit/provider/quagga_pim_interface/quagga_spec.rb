@@ -18,7 +18,7 @@ describe Puppet::Type.type(:quagga_pim_interface).provider(:quagga) do
       expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
       ).and_return(
-        <<~EOS
+        <<~EOS,
         interface eth0
         !
         interface eth1

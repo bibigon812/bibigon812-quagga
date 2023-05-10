@@ -18,7 +18,7 @@ describe Puppet::Type.type(:quagga_bgp_router).provider(:quagga) do
       expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
       ).and_return(
-        <<~EOS
+        <<~EOS,
         !
         router bgp 65000
          bgp router-id 172.16.32.103

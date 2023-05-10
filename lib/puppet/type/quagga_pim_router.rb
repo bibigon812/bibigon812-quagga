@@ -16,10 +16,10 @@ Puppet::Type.newtype(:quagga_pim_router) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra', 'pimd']
+    ['zebra', 'frr', 'pimd']
   end
 end

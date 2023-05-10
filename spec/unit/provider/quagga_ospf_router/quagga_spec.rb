@@ -18,7 +18,7 @@ describe Puppet::Type.type(:quagga_ospf_router).provider(:quagga) do
       expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
       ).and_return(
-        <<~EOS
+        <<~EOS,
         !
          address-family ipv6
          network 2a04:6d40:1:ffff::/64
@@ -84,7 +84,7 @@ describe Puppet::Type.type(:quagga_ospf_router).provider(:quagga) do
       expect(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
         ).and_return(
-          <<~EOS
+          <<~EOS,
           !
            address-family ipv6
            network 2a04:6d40:1:ffff::/64

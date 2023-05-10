@@ -43,10 +43,10 @@ Puppet::Type.newtype(:quagga_bgp_community_list) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra', 'bgpd']
+    ['zebra', 'frr', 'bgpd']
   end
 end

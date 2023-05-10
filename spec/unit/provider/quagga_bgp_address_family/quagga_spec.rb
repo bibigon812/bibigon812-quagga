@@ -160,21 +160,23 @@ end'
         'connected',
         'ospf metric 30 route-map OSPF_BGP',
       ]
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'address-family ipv4 unicast',
-                                      '-c', 'aggregate-address 192.168.0.0/24 summary-only',
-                                      '-c', 'aggregate-address 10.0.0.0/24',
-                                      '-c', 'maximum-paths 2',
-                                      '-c', 'maximum-paths ibgp 10',
-                                      '-c', 'network 10.0.0.0/8',
-                                      '-c', 'network 192.168.0.0/16',
-                                      '-c', 'redistribute connected',
-                                      '-c', 'redistribute ospf metric 30 route-map OSPF_BGP',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'address-family ipv4 unicast',
+          '-c', 'aggregate-address 192.168.0.0/24 summary-only',
+          '-c', 'aggregate-address 10.0.0.0/24',
+          '-c', 'maximum-paths 2',
+          '-c', 'maximum-paths ibgp 10',
+          '-c', 'network 10.0.0.0/8',
+          '-c', 'network 192.168.0.0/16',
+          '-c', 'redistribute connected',
+          '-c', 'redistribute ospf metric 30 route-map OSPF_BGP',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.create
     end
   end
@@ -189,21 +191,23 @@ end'
       resource[:ensure] = :present
       # These entries cannot be set here - they have to be part of the
       # initialization
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'address-family ipv4 unicast',
-                                      '-c', 'no aggregate-address 192.168.0.0/24 summary-only',
-                                      '-c', 'no aggregate-address 10.0.0.0/24',
-                                      '-c', 'no maximum-paths 2',
-                                      '-c', 'no maximum-paths ibgp 10',
-                                      '-c', 'no network 10.0.0.0/8',
-                                      '-c', 'no network 192.168.0.0/16',
-                                      '-c', 'no redistribute connected',
-                                      '-c', 'no redistribute ospf metric 30 route-map OSPF_BGP',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'address-family ipv4 unicast',
+          '-c', 'no aggregate-address 192.168.0.0/24 summary-only',
+          '-c', 'no aggregate-address 10.0.0.0/24',
+          '-c', 'no maximum-paths 2',
+          '-c', 'no maximum-paths ibgp 10',
+          '-c', 'no network 10.0.0.0/8',
+          '-c', 'no network 192.168.0.0/16',
+          '-c', 'no redistribute connected',
+          '-c', 'no redistribute ospf metric 30 route-map OSPF_BGP',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.destroy
     end
   end
@@ -221,21 +225,23 @@ end'
       provider.maximum_ibgp_paths = 8
       provider.networks = ['172.16.0.0/12', '192.168.0.0/16']
       provider.redistribute = ['ospf metric 30 route-map OSPF_BGP', 'kernel route-map KERNEL_BGP']
-      expect(provider).to receive(:vtysh).with([
-                                      '-c', 'configure terminal',
-                                      '-c', 'router bgp 65000',
-                                      '-c', 'address-family ipv4 unicast',
-                                      '-c', 'no aggregate-address 10.0.0.0/24',
-                                      '-c', 'aggregate-address 172.16.0.0/24',
-                                      '-c', 'maximum-paths 5',
-                                      '-c', 'maximum-paths ibgp 8',
-                                      '-c', 'no network 10.0.0.0/8',
-                                      '-c', 'network 172.16.0.0/12',
-                                      '-c', 'no redistribute connected',
-                                      '-c', 'redistribute kernel route-map KERNEL_BGP',
-                                      '-c', 'end',
-                                      '-c', 'write memory'
-                                    ])
+      expect(provider).to receive(:vtysh).with(
+        [
+          '-c', 'configure terminal',
+          '-c', 'router bgp 65000',
+          '-c', 'address-family ipv4 unicast',
+          '-c', 'no aggregate-address 10.0.0.0/24',
+          '-c', 'aggregate-address 172.16.0.0/24',
+          '-c', 'maximum-paths 5',
+          '-c', 'maximum-paths ibgp 8',
+          '-c', 'no network 10.0.0.0/8',
+          '-c', 'network 172.16.0.0/12',
+          '-c', 'no redistribute connected',
+          '-c', 'redistribute kernel route-map KERNEL_BGP',
+          '-c', 'end',
+          '-c', 'write memory'
+        ],
+      )
       provider.flush
     end
   end

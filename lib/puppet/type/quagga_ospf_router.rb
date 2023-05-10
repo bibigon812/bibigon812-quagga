@@ -154,11 +154,11 @@ Puppet::Type.newtype(:quagga_ospf_router) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra', 'ospfd']
+    ['zebra', 'frr', 'ospfd']
   end
 
   autorequire(:quagga_access_list) do

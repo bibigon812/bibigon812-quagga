@@ -57,13 +57,15 @@ log facility local7'
     end
 
     it "returns quagga_logging 'file' resource" do
-      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
-                                                                                           ensure: :present,
-        provider: :quagga,
-        name: :file,
-        filename: '/tmp/file.log',
-        level: :warnings,
-                                                                                         })
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          ensure: :present,
+          provider: :quagga,
+          name: :file,
+          filename: '/tmp/file.log',
+          level: :warnings,
+        },
+      )
     end
 
     it "returns quagga_logging 'stdout' resource" do
@@ -179,12 +181,14 @@ log facility local7'
         resource[:ensure] = :present
         provider.filename = '/tmp/file1.log'
         provider.level = :errors
-        expect(provider).to receive(:vtysh).with([
-                                        '-c', 'configure terminal',
-                                        '-c', 'log file /tmp/file1.log errors',
-                                        '-c', 'end',
-                                        '-c', 'write memory'
-                                      ])
+        expect(provider).to receive(:vtysh).with(
+          [
+            '-c', 'configure terminal',
+            '-c', 'log file /tmp/file1.log errors',
+            '-c', 'end',
+            '-c', 'write memory'
+          ],
+        )
         provider.flush
       end
 
@@ -192,12 +196,14 @@ log facility local7'
         _resource = resource1
         provider1.filename = '/tmp/file1.log'
         provider1.level = :errors
-        expect(provider1).to receive(:vtysh).with([
-                                         '-c', 'configure terminal',
-                                         '-c', 'log syslog errors',
-                                         '-c', 'end',
-                                         '-c', 'write memory'
-                                       ])
+        expect(provider1).to receive(:vtysh).with(
+          [
+            '-c', 'configure terminal',
+            '-c', 'log syslog errors',
+            '-c', 'end',
+            '-c', 'write memory'
+          ],
+        )
         provider1.flush
       end
     end

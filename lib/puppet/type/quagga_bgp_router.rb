@@ -92,10 +92,10 @@ Puppet::Type.newtype(:quagga_bgp_router) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra', 'bgpd']
+    ['zebra', 'frr', 'bgpd']
   end
 end

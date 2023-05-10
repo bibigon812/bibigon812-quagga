@@ -18,7 +18,7 @@ describe Puppet::Type.type(:quagga_static_route).provider(:quagga) do
       expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
       ).and_return(
-        <<~EOS
+        <<~EOS,
         !
         hostname router-1.sandbox.local
         !
@@ -88,7 +88,7 @@ describe Puppet::Type.type(:quagga_static_route).provider(:quagga) do
   describe 'prefetch' do
     before(:each) do
       allow(described_class).to receive(:vtysh).with('-c', 'show running-config').and_return(
-        <<~EOS
+        <<~EOS,
         ip route 172.16.3.0/24 Null0
         ip route 172.16.3.0/24 172.16.0.4
         ip route 172.16.3.0/24 172.16.0.5 blackhole
