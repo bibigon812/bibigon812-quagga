@@ -23,32 +23,32 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     },
     passive: {
       default: :false,
-      regexp: %r{\A\sneighbor\s\S+\spassive\Z},
+      regexp: %r{\A\s+neighbor\s\S+\spassive\Z},
       template: 'neighbor <%= name %> passive',
       type: :boolean,
     },
     password: {
       default: :absent,
-      regexp: %r{\A\sneighbor\s\S+\spassword\s(\S+)\Z},
+      regexp: %r{\A\s+neighbor\s\S+\spassword\s(\S+)\Z},
       template: 'neighbor <%= name %> password<% unless value.nil? %> <%= value %><% end %>',
       type: :string,
     },
     shutdown: {
       default: :false,
-      regexp: %r{\A\sneighbor\s\S+\sshutdown\Z},
+      regexp: %r{\A\s+neighbor\s\S+\sshutdown\Z},
       template: 'neighbor <%= name %> shutdown',
       type: :boolean,
     },
     update_source: {
       default: :absent,
-      regexp: %r{\A\sneighbor\s\S+\supdate-source\s(\S+)\Z},
+      regexp: %r{\A\s+neighbor\s\S+\supdate-source\s(\S+)\Z},
       template: 'neighbor <%= name %> update-source<% unless value.nil? %> <%= value %><% end %>',
       type: :string,
     },
     ebgp_multihop: {
       default: :absent,
-      regexp: %r{\A\sneighbor\s\S+\sebgp-multihop\s(\d+)\Z},
-      template: 'neighbor <%= name %> update-source<% unless value.nil? %> <%= value %><% end %>',
+      regexp: %r{\A\s+neighbor\s\S+\sebgp-multihop\s(\d+)\Z},
+      template: 'neighbor <%= name %> ebgp-multihop<% unless value.nil? %> <%= value %><% end %>',
       type: :fixnum,
     },
   }
@@ -74,7 +74,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     config = vtysh('-c', 'show running-config')
     config.split(%r{\n}).map do |line|
       # Skip comments
-      next if %r{\A!}.match?(line) # rubocop:disable Performance/StartWith
+      next if %r{\A\s*!}.match?(line) # rubocop:disable Performance/StartWith
 
       if %r{\Arouter\sbgp\s(\d+)\Z}.match?(line)
         found_router = true
@@ -149,7 +149,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
         end
 
       # Exit
-      elsif found_router && line =~ %r{\A\w}
+      elsif found_router && line =~ %r{\Aexit\Z}
         break
       end
 

@@ -467,6 +467,7 @@ describe Puppet::Type.type(:quagga_bgp_peer).provider(:quagga) do
       resource[:password] = 'QWRF$345!#@$'
       resource[:remote_as] = 65_000
       resource[:update_source] = '172.16.32.103'
+      resource[:ebgp_multihop] = 2
       expect(provider).to receive(:vtysh).with(
         [
           '-c', 'configure terminal',
@@ -475,6 +476,7 @@ describe Puppet::Type.type(:quagga_bgp_peer).provider(:quagga) do
           '-c', 'neighbor INTERNAL remote-as 65000',
           '-c', 'neighbor INTERNAL password QWRF$345!#@$',
           '-c', 'neighbor INTERNAL update-source 172.16.32.103',
+          '-c', 'neighbor INTERNAL ebgp-multihop 2',
           '-c', 'end',
           '-c', 'write memory'
         ],
