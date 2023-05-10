@@ -27,48 +27,103 @@ describe Puppet::Type.type(:quagga_bgp_address_family).provider(:quagga) do
   end
 
   let(:output) do
-    '!
-router bgp 197888
- bgp router-id 172.16.32.103
- no bgp default ipv4-unicast
- bgp graceful-restart stalepath-time 300
- bgp graceful-restart restart-time 300
- bgp network import-check
- network 172.16.32.0/24
- neighbor INTERNAL peer-group
- neighbor INTERNAL remote-as 197888
- neighbor INTERNAL allowas-in 1
- neighbor INTERNAL update-source 172.16.32.103
- neighbor INTERNAL activate
- neighbor INTERNAL next-hop-self
- neighbor INTERNAL soft-reconfiguration inbound
- neighbor RR peer-group
- neighbor RR remote-as 197888
- neighbor RR update-source 172.16.32.103
- neighbor RR activate
- neighbor RR next-hop-self
- neighbor RR_WEAK peer-group
- neighbor RR_WEAK remote-as 197888
- neighbor RR_WEAK update-source 172.16.32.103
- neighbor RR_WEAK activate
- neighbor RR_WEAK next-hop-self
- neighbor RR_WEAK route-map RR_WEAK_out out
- neighbor 172.16.32.108 peer-group INTERNAL
- neighbor 172.16.32.108 default-originate
- neighbor 172.16.32.108 shutdown
- neighbor 1a03:d000:20a0::91 remote-as 31113
- neighbor 1a03:d000:20a0::91 update-source 1a03:d000:20a0::92
- maximum-paths 4
- maximum-paths ibgp 4
-!
- address-family ipv6
- network 1a04:6d40::/48
- neighbor 1a03:d000:20a0::91 activate
- neighbor 1a03:d000:20a0::91 allowas-in 1
- redistribute connected
- exit-address-family
-!
-end'
+    <<~EOS
+    !
+    router bgp 197888
+     bgp router-id 172.16.32.103
+     no bgp default ipv4-unicast
+     bgp graceful-restart stalepath-time 300
+     bgp graceful-restart restart-time 300
+     bgp network import-check
+     network 172.16.32.0/24
+     neighbor INTERNAL peer-group
+     neighbor INTERNAL remote-as 197888
+     neighbor INTERNAL allowas-in 1
+     neighbor INTERNAL update-source 172.16.32.103
+     neighbor INTERNAL activate
+     neighbor INTERNAL next-hop-self
+     neighbor INTERNAL soft-reconfiguration inbound
+     neighbor RR peer-group
+     neighbor RR remote-as 197888
+     neighbor RR update-source 172.16.32.103
+     neighbor RR activate
+     neighbor RR next-hop-self
+     neighbor RR_WEAK peer-group
+     neighbor RR_WEAK remote-as 197888
+     neighbor RR_WEAK update-source 172.16.32.103
+     neighbor RR_WEAK activate
+     neighbor RR_WEAK next-hop-self
+     neighbor RR_WEAK route-map RR_WEAK_out out
+     neighbor 172.16.32.108 peer-group INTERNAL
+     neighbor 172.16.32.108 default-originate
+     neighbor 172.16.32.108 shutdown
+     neighbor 1a03:d000:20a0::91 remote-as 31113
+     neighbor 1a03:d000:20a0::91 update-source 1a03:d000:20a0::92
+     maximum-paths 4
+     maximum-paths ibgp 4
+    !
+     address-family ipv6
+     network 1a04:6d40::/48
+     neighbor 1a03:d000:20a0::91 activate
+     neighbor 1a03:d000:20a0::91 allowas-in 1
+     redistribute connected
+     exit-address-family
+    !
+    end
+    EOS
+  end
+
+  let(:single_ipv4_unicast) do
+    <<~EOS
+    !
+    frr version 8.5.1
+    frr defaults traditional
+    hostname mi-bhfm1-smtp01.arden
+    log syslog errors
+    no ip forwarding
+    no ipv6 forwarding
+    no service integrated-vtysh-config
+    !
+    ip route 172.26.26.34/32 10.26.14.2 10
+    ip route 172.26.26.35/32 10.26.14.3 10
+    !
+    interface lo
+     ip address 10.255.0.4/32
+    exit
+    !
+    router bgp 11000
+     bgp router-id 10.26.14.13
+     no bgp default ipv4-unicast
+     timers bgp 10 32
+     neighbor site_routers peer-group
+     neighbor site_routers remote-as 10000
+     neighbor 172.26.26.34 peer-group site_routers
+     neighbor 172.26.26.35 peer-group site_routers
+     !
+     address-family ipv4 unicast
+      redistribute connected
+      neighbor site_routers activate
+      neighbor site_routers route-map RECIEVE_ALL in
+      neighbor site_routers route-map ANNOUNCE_ANYCAST out
+     exit-address-family
+    exit
+    !
+    ip prefix-list ANYCAST_ADDRESSES seq 5 permit 10.254.0.0/15 ge 32
+    ip prefix-list ANYCAST_ADDRESSES seq 6 permit 172.17.2.0/24 ge 32
+    ip prefix-list ANYCAST_ADDRESSES seq 50 deny 0.0.0.0/0 le 32
+    !
+    route-map ANNOUNCE_ANYCAST permit 100
+     match ip address prefix-list ANYCAST_ADDRESSES
+    exit
+    !
+    route-map ANNOUNCE_ANYCAST deny 200
+    exit
+    !
+    route-map RECIEVE_ALL permit 100
+    exit
+    !
+    end
+    EOS
   end
 
   describe 'instance' do
@@ -116,6 +171,35 @@ end'
           maximum_ibgp_paths: 1,
           name: 'ipv6_unicast',
           networks: ['1a04:6d40::/48'],
+          provider: :quagga,
+          redistribute: [
+            'connected',
+          ],
+        },
+      )
+    end
+  end
+
+  context 'running-config with redistribute connected' do
+    before(:each) do
+      expect(described_class).to receive(:vtysh).with(
+          '-c', 'show running-config'
+        ).and_return(single_ipv4_unicast)
+    end
+
+    it 'returns a resource' do
+      expect(described_class.instances.size).to eq(1)
+    end
+
+    it 'returns the :ipv4_unicast resource' do
+      expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq(
+        {
+          aggregate_address: [],
+          ensure: :present,
+          maximum_ebgp_paths: 1,
+          maximum_ibgp_paths: 1,
+          name: 'ipv4_unicast',
+          networks: [],
           provider: :quagga,
           redistribute: [
             'connected',

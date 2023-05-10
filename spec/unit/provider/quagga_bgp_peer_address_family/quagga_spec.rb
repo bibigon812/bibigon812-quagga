@@ -51,88 +51,92 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family).provider(:quagga) do
   end
 
   let(:output_wo_default_ipv4_unicast) do
-    '!
-router bgp 197888
- bgp router-id 172.16.32.103
- no bgp default ipv4-unicast
- bgp graceful-restart stalepath-time 300
- bgp graceful-restart restart-time 300
- bgp network import-check
- network 172.16.32.0/24
- neighbor INTERNAL peer-group
- neighbor INTERNAL remote-as 197888
- neighbor INTERNAL allowas-in 1
- neighbor INTERNAL update-source 172.16.32.103
- neighbor INTERNAL activate
- neighbor INTERNAL next-hop-self
- neighbor INTERNAL soft-reconfiguration inbound
- neighbor RR peer-group
- neighbor RR remote-as 197888
- neighbor RR update-source 172.16.32.103
- no neighbor RR activate
- neighbor RR next-hop-self
- neighbor RR_WEAK peer-group
- neighbor RR_WEAK remote-as 197888
- neighbor RR_WEAK update-source 172.16.32.103
- neighbor RR_WEAK activate
- neighbor RR_WEAK next-hop-self
- neighbor RR_WEAK route-map RR_WEAK_out out
- neighbor 172.16.32.108 peer-group INTERNAL
- neighbor 172.16.32.108 default-originate
- neighbor 172.16.32.108 shutdown
- neighbor 2001:db8:: remote-as 31113
- neighbor 2001:db8:: update-source 1a03:d000:20a0::92
- maximum-paths 4
- maximum-paths ibgp 4
-!
- address-family ipv6
- network 1a04:6d40::/48
- neighbor 2001:db8:: activate
- neighbor 2001:db8:: allowas-in 1
- exit-address-family
-!
-end'
+    <<~EOS
+    !
+    router bgp 197888
+     bgp router-id 172.16.32.103
+     no bgp default ipv4-unicast
+     bgp graceful-restart stalepath-time 300
+     bgp graceful-restart restart-time 300
+     bgp network import-check
+     network 172.16.32.0/24
+     neighbor INTERNAL peer-group
+     neighbor INTERNAL remote-as 197888
+     neighbor INTERNAL allowas-in 1
+     neighbor INTERNAL update-source 172.16.32.103
+     neighbor INTERNAL activate
+     neighbor INTERNAL next-hop-self
+     neighbor INTERNAL soft-reconfiguration inbound
+     neighbor RR peer-group
+     neighbor RR remote-as 197888
+     neighbor RR update-source 172.16.32.103
+     no neighbor RR activate
+     neighbor RR next-hop-self
+     neighbor RR_WEAK peer-group
+     neighbor RR_WEAK remote-as 197888
+     neighbor RR_WEAK update-source 172.16.32.103
+     neighbor RR_WEAK activate
+     neighbor RR_WEAK next-hop-self
+     neighbor RR_WEAK route-map RR_WEAK_out out
+     neighbor 172.16.32.108 peer-group INTERNAL
+     neighbor 172.16.32.108 default-originate
+     neighbor 172.16.32.108 shutdown
+     neighbor 2001:db8:: remote-as 31113
+     neighbor 2001:db8:: update-source 1a03:d000:20a0::92
+     maximum-paths 4
+     maximum-paths ibgp 4
+    !
+     address-family ipv6
+       network 1a04:6d40::/48
+       neighbor 2001:db8:: activate
+       neighbor 2001:db8:: allowas-in 1
+     exit-address-family
+    !
+    end
+    EOS
   end
 
   let(:output_w_default_ipv4_unicast) do
-    '!
-router bgp 65000
- bgp router-id 172.16.32.103
- bgp graceful-restart stalepath-time 300
- bgp graceful-restart restart-time 300
- bgp network import-check
- network 172.16.32.0/24
- neighbor INTERNAL peer-group
- neighbor INTERNAL remote-as 65000
- no neighbor INTERNAL activate
- neighbor INTERNAL allowas-in 1
- neighbor INTERNAL update-source 172.16.32.103
- neighbor INTERNAL next-hop-self
- neighbor INTERNAL soft-reconfiguration inbound
- neighbor RR peer-group
- neighbor RR remote-as 65000
- neighbor RR update-source 172.16.32.103
- neighbor RR next-hop-self
- neighbor RR_WEAK peer-group
- neighbor RR_WEAK remote-as 65000
- neighbor RR_WEAK update-source 172.16.32.103
- neighbor RR_WEAK next-hop-self
- neighbor RR_WEAK route-map RR_WEAK_out out
- neighbor 172.16.32.108 peer-group INTERNAL
- neighbor 172.16.32.108 default-originate
- neighbor 172.16.32.108 shutdown
- neighbor 2001:db8:: remote-as 31113
- neighbor 2001:db8:: update-source 1a03:d000:20a0::92
- maximum-paths 4
- maximum-paths ibgp 4
-!
- address-family ipv6
- network 1a04:6d40::/48
- neighbor 2001:db8:: activate
- neighbor 2001:db8:: allowas-in 1
- exit-address-family
-!
-end'
+    <<~EOS
+    !
+    router bgp 65000
+     bgp router-id 172.16.32.103
+     bgp graceful-restart stalepath-time 300
+     bgp graceful-restart restart-time 300
+     bgp network import-check
+     network 172.16.32.0/24
+     neighbor INTERNAL peer-group
+     neighbor INTERNAL remote-as 65000
+     no neighbor INTERNAL activate
+     neighbor INTERNAL allowas-in 1
+     neighbor INTERNAL update-source 172.16.32.103
+     neighbor INTERNAL next-hop-self
+     neighbor INTERNAL soft-reconfiguration inbound
+     neighbor RR peer-group
+     neighbor RR remote-as 65000
+     neighbor RR update-source 172.16.32.103
+     neighbor RR next-hop-self
+     neighbor RR_WEAK peer-group
+     neighbor RR_WEAK remote-as 65000
+     neighbor RR_WEAK update-source 172.16.32.103
+     neighbor RR_WEAK next-hop-self
+     neighbor RR_WEAK route-map RR_WEAK_out out
+     neighbor 172.16.32.108 peer-group INTERNAL
+     neighbor 172.16.32.108 default-originate
+     neighbor 172.16.32.108 shutdown
+     neighbor 2001:db8:: remote-as 31113
+     neighbor 2001:db8:: update-source 1a03:d000:20a0::92
+     maximum-paths 4
+     maximum-paths ibgp 4
+    !
+     address-family ipv6
+       network 1a04:6d40::/48
+       neighbor 2001:db8:: activate
+       neighbor 2001:db8:: allowas-in 1
+     exit-address-family
+    !
+    end
+    EOS
   end
 
   describe 'instance' do

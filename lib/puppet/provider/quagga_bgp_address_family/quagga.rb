@@ -6,31 +6,31 @@ Puppet::Type.type(:quagga_bgp_address_family).provide :quagga do
   @resource_map = {
     aggregate_address: {
       default: [],
-      regexp: %r{\A\saggregate-address\s(.+)\Z},
+      regexp: %r{\A\s+aggregate-address\s(.+)\Z},
       template: 'aggregate-address<% unless value.nil? %> <%= value %><% end %>',
       type: :array,
     },
     maximum_ebgp_paths: {
       default: 1,
-      regexp: %r{\A\smaximum-paths\s(\d+)\Z},
+      regexp: %r{\A\s+maximum-paths\s(\d+)\Z},
       template: 'maximum-paths<% unless value.nil? %> <%= value %><% end %>',
       type: :fixnum,
     },
     maximum_ibgp_paths: {
       default: 1,
-      regexp: %r{\A\smaximum-paths\sibgp\s(\d+)\Z},
+      regexp: %r{\A\s+maximum-paths\sibgp\s(\d+)\Z},
       template: 'maximum-paths ibgp<% unless value.nil? %> <%= value %><% end %>',
       type: :fixnum,
     },
     networks: {
       default: [],
-      regexp: %r{\A\snetwork\s(.+)\Z},
+      regexp: %r{\A\s+network\s(.+)\Z},
       template: 'network<% unless value.nil? %> <%= value %><% end %>',
       type: :array,
     },
     redistribute: {
       default: [],
-      regexp: %r{\A\sredistribute\s(.+)\Z},
+      regexp: %r{\A\s+redistribute\s(.+)\Z},
       template: 'redistribute<% unless value.nil? %> <%= value %><% end %>',
       type: :array,
     },
