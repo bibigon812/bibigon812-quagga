@@ -87,7 +87,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
           break
         end
-      elsif line =~ %r{\Aexit} && found_route_map
+      elsif line.start_with?('exit') && found_route_map
         next
       elsif line =~ %r{\A\w} && found_route_map
         break

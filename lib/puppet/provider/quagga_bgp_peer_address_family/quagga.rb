@@ -11,6 +11,7 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
       type: :string,
     },
     activate: {
+      default: :false,
       regexp: %r{\A\s+(?:(no)\s)?neighbor\s(\S+)\sactivate\Z},
       template: 'neighbor <%= name %> activate',
       type: :boolean,
@@ -91,12 +92,14 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
   def self.instances
     # TODO
     providers = []
+    hash_list = []
     hash = {}
     found_router = false
     address_family = :ipv4_unicast
     as_number = ''
     previous_peer = ''
     found_activate = false
+    ipv4_unicast_default_activate = true
 
     config = vtysh('-c', 'show running-config')
     config.split(%r{\n}).map do |line|
@@ -108,14 +111,18 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
         as_number = Regexp.last_match(1)
         found_router = true
 
+      # Found the bgp defualt originate declaration
+      elsif found_router && line =~ (%r{\A\s+no bgp default ipv4-unicast})
+        ipv4_unicast_default_activate = false
+
       # Found the address family
-      elsif found_router && line =~ (%r{\A\saddress-family\s(ipv4|ipv6)(?:\s(multicast))?\Z})
+      elsif found_router && line =~ (%r{\A\s+address-family\s(ipv4|ipv6)(?:\s(multicast))?\Z})
         proto = Regexp.last_match(1)
         type = Regexp.last_match(2)
         address_family = type.nil? ? "#{proto}_unicast" : "#{proto}_#{type}"
 
       # Exit
-      elsif found_router && line =~ (%r{\A\w})
+      elsif found_router && line =~ (%r{\Aexit})
         break
 
       elsif found_router
@@ -130,26 +137,41 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
           end
 
           unless peer == previous_peer
+            # Store the hash created on a previous pass
             unless hash.empty?
               debug 'Instantiated the bgp peer address family %{name}.' % { name: hash[:name] }
-              providers << new(hash)
+              hash_list << hash
             end
 
-            hash = {
-              activate: :false,
-              ensure: :present,
-              name: "#{peer} #{address_family}",
-              provider: name,
-            }
+            # Determine if the peer should be activated by default for this
+            # protocol
+            default_activate = if proto == 'ipv4' && ipv4_unicast_default_activate
+                                 :true
+                               else
+                                 :false
+                               end
 
-            # Add default values
-            @resource_map.each do |propertyx, optionsx|
-              next unless optionsx.key?(:default)
-              hash[propertyx] = if [:array, :hash].include?(optionsx[:type])
-                                  optionsx[:default].clone
-                                else
-                                  optionsx[:default]
-                                end
+            # hash_list.each_index { |i| p i }
+            found_hash_idx = hash_list.find_index { |p| p[:name] == "#{peer} #{address_family}" }
+            if found_hash_idx.nil?
+              hash = {
+                activate: default_activate,
+                ensure: :present,
+                name: "#{peer} #{address_family}",
+                provider: name,
+              }
+              # Add default values
+              @resource_map.each do |propertyx, optionsx|
+                next unless optionsx.key?(:default)
+                hash[propertyx] = if [:array, :hash].include?(optionsx[:type])
+                                    optionsx[:default].clone
+                                  else
+                                    optionsx[:default]
+                                  end
+              end
+            else
+              hash = hash_list[found_hash_idx]
+              hash_list.delete_at(found_hash_idx)
             end
 
             previous_peer = peer
@@ -179,8 +201,14 @@ Puppet::Type.type(:quagga_bgp_peer_address_family).provide :quagga do
     end
 
     unless hash.empty?
-      debug 'Instantiated the bgp peer address family %{name}.' % { name: hash[:name] }
-      providers << new(hash)
+      hash_list << hash
+    end
+
+    # Order the list by name for testing purposes
+    hash_list.sort! { |a, b| a[:name] <=> b[:name] }
+    hash_list.each do |h|
+      debug 'Instantiated the bgp peer address family %{name}.' % { name: h[:name] }
+      providers << new(h)
     end
 
     providers

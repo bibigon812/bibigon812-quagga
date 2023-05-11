@@ -74,7 +74,7 @@ Puppet::Type.type(:quagga_bgp_peer).provide(:quagga) do
     config = vtysh('-c', 'show running-config')
     config.split(%r{\n}).map do |line|
       # Skip comments
-      next if %r{\A\s*!}.match?(line) # rubocop:disable Performance/StartWith
+      next if %r{\A\s*!}.match?(line)
 
       if %r{\Arouter\sbgp\s(\d+)\Z}.match?(line)
         found_router = true
