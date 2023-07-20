@@ -60,7 +60,7 @@ log facility local7'
       expect(described_class.instances[0].instance_variable_get('@property_hash')).to eq({
                                                                                            ensure: :present,
         provider: :quagga,
-        name: 'file',
+        name: :file,
         filename: '/tmp/file.log',
         level: :warnings,
                                                                                          })
@@ -70,7 +70,7 @@ log facility local7'
       expect(described_class.instances[1].instance_variable_get('@property_hash')).to eq({
                                                                                            ensure: :present,
         provider: :quagga,
-        name: 'stdout',
+        name: :stdout,
         level: :errors,
                                                                                          })
     end
@@ -79,7 +79,7 @@ log facility local7'
       expect(described_class.instances[2].instance_variable_get('@property_hash')).to eq({
                                                                                            ensure: :present,
         provider: :quagga,
-        name: 'syslog',
+        name: :syslog,
         level: :errors,
                                                                                          })
     end
