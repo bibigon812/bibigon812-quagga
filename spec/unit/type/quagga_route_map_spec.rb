@@ -16,7 +16,7 @@ describe Puppet::Type.type(:quagga_route_map) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_route_map).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_route_map)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   after :each do

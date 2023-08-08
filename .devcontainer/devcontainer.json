@@ -12,8 +12,6 @@
 
 	"extensions": [
 		"puppet.puppet-vscode",
-		"rebornix.Ruby",
-		"codezombiech.gitignore",
-		"redhat.vscode-yaml"
+		"rebornix.Ruby"
 	]
 }

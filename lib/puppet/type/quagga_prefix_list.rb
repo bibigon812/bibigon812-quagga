@@ -1,18 +1,18 @@
 Puppet::Type.newtype(:quagga_prefix_list) do
-  @doc = "
-    This type provides the capability to manage prefix-lists within puppet.
+  @doc = "This type provides the capability to manage prefix-lists within puppet.
 
       Example:
 
-        quagga_prefix_list {'TEST_PREFIX_LIST 10':
-          ensure      => present,
-          action      => permit,
-          ge          => 8,
-          le          => 24,
-          prefix      => '224.0.0.0/4',
-          proto       => 'ip',
-        }
-  "
+      ```puppet
+      quagga_prefix_list { 'TEST_PREFIX_LIST 10':
+        ensure      => present,
+        action      => permit,
+        ge          => 8,
+        le          => 24,
+        prefix      => '224.0.0.0/4',
+        proto       => 'ip',
+      }
+      ```"
 
   ensurable
 
@@ -24,8 +24,8 @@ Puppet::Type.newtype(:quagga_prefix_list) do
 
   newproperty(:action) do
     desc 'The action of this rule.'
-    defaultto(:permit)
     newvalues(:deny, :permit)
+    defaultto(:permit)
   end
 
   newproperty(:ge) do
@@ -70,10 +70,10 @@ Puppet::Type.newtype(:quagga_prefix_list) do
   end
 
   autorequire(:package) do
-    ['quagga']
+    ['quagga', 'frr']
   end
 
   autorequire(:service) do
-    ['zebra']
+    ['zebra', 'frr']
   end
 end

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:quagga_access_list).provider(:quagga) do
   before :each do
-    described_class.stubs(:commands).with(:vtysh).returns('/usr/bin/vtysh')
+    allow(described_class).to receive(:commands).with(:vtysh).and_return('/usr/bin/vtysh')
   end
 
   let(:resource) do
@@ -46,9 +46,9 @@ access-list 100 deny any any
 
   context 'running-config' do
     before :each do
-      described_class.expects(:vtysh).with(
+      expect(described_class).to receive(:vtysh).with(
         '-c', 'show running-config'
-      ).returns output
+      ).and_return(output)
     end
 
     it 'returns a resource' do
@@ -84,9 +84,9 @@ access-list 100 deny any any
     end
 
     before :each do
-      described_class.stubs(:vtysh).with(
+      allow(described_class).to receive(:vtysh).with(
           '-c', 'show running-config'
-        ).returns output
+        ).and_return(output)
     end
 
     it 'finds provider for resource' do

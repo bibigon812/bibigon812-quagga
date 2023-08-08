@@ -8,7 +8,8 @@ define quagga::bgp::peer (
   Optional[Variant[Boolean, String]] $peer_group = undef,
   Boolean $shutdown = false,
   Optional[String] $update_source = undef,
-  Hash $address_families = {},
+  Optional[Integer[1,255]] $ebgp_multihop = undef,
+  Hash[String, Quagga::BgpPeerAddressFamily] $address_families = {},
   Enum['present', 'absent'] $ensure = 'present',
 ) {
   unless defined(Class['quagga::bgp']) {
@@ -24,6 +25,7 @@ define quagga::bgp::peer (
     peer_group    => $peer_group,
     shutdown      => $shutdown,
     update_source => $update_source,
+    ebgp_multihop => $ebgp_multihop,
   }
 
   $address_families.each |String $address_family_name, Hash $address_family| {

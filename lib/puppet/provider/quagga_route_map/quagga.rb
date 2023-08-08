@@ -8,18 +8,18 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
         template: 'match <%= value %>',
         type: :array,
     },
-      on_match: {
-        default: :absent,
-          regexp: %r{\A\son-match\s(.+)\Z},
-          template: 'on-match <%= value %>',
-          type: :string,
-      },
-      set: {
-        default: [],
-          regexp: %r{\A\sset\s(.+)\Z},
-          template: 'set <%= value %>',
-          type: :array,
-      },
+    on_match: {
+      default: :absent,
+      regexp: %r{\A\son-match\s(.+)\Z},
+      template: 'on-match <%= value %>',
+      type: :string,
+    },
+    set: {
+      default: [],
+      regexp: %r{\A\sset\s(.+)\Z},
+      template: 'set <%= value %>',
+      type: :array,
+    },
   }
 
   commands vtysh: 'vtysh'
@@ -54,9 +54,9 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
         hash = {
           action: action.to_sym,
-            ensure: :present,
-            name: "#{name} #{sequence}",
-            provider: self.name,
+          ensure: :present,
+          name: "#{name} #{sequence}",
+          provider: self.name,
         }
 
         # Added default values
@@ -68,7 +68,7 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
                            end
         end
 
-      elsif line =~ (%r{\A\s(match|on-match|set)}) && found_route_map
+      elsif line =~ (%r{\A\s+(match|on-match|set)}) && found_route_map
         @resource_map.each do |property, options|
           next unless line =~ options[:regexp]
           value = Regexp.last_match(1)
@@ -87,7 +87,8 @@ Puppet::Type.type(:quagga_route_map).provide :quagga do
 
           break
         end
-
+      elsif line.start_with?('exit') && found_route_map
+        next
       elsif line =~ %r{\A\w} && found_route_map
         break
       end

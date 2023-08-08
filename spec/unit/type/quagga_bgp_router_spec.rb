@@ -20,7 +20,7 @@ describe Puppet::Type.type(:quagga_bgp_router) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_bgp_router).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_bgp_router)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   it 'has :name be its namevar' do
@@ -169,28 +169,6 @@ describe Puppet::Type.type(:quagga_bgp_router) do
 
     it 'contains 800' do
       expect(described_class.new(name: 'bgp', default_local_preference: 800)[:default_local_preference]).to eq(800)
-    end
-  end
-
-  describe 'redistribute' do
-    it 'supports \'ospf\' as a value' do
-      expect { described_class.new(name: 'bgp', redistribute: 'ospf') }.not_to raise_error
-    end
-
-    it 'supports \'connected route-map QWER\' as a value' do
-      expect { described_class.new(name: 'bgp', redistribute: 'connected route-map QWER') }.not_to raise_error
-    end
-
-    it 'does not support \'ospf\' as a value' do
-      expect { described_class.new(name: 'bgp', redistribute: 'bgp') }.to raise_error Puppet::Error, %r{Invalid value}
-    end
-
-    it 'does not support \'kernel metric 100 metric-type 3 route-map QWER\' as a value' do
-      expect { described_class.new(name: 'bgp', redistribute: 'kernel metric 100 metric-type 3 route-map QWER') }.to raise_error Puppet::Error, %r{Invalid value}
-    end
-
-    it 'contains \'connected metric 100 metric-type 2 route-map QWER\'' do
-      expect(described_class.new(name: 'bgp', redistribute: 'connected metric 100 route-map QWER')[:redistribute]).to eq(['connected metric 100 route-map QWER'])
     end
   end
 

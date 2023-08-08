@@ -20,7 +20,7 @@ describe Puppet::Type.type(:quagga_bgp_peer_address_family) do
   let(:catalog) { Puppet::Resource::Catalog.new }
 
   before :each do
-    Puppet::Type.type(:quagga_bgp_peer_address_family).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_bgp_peer_address_family)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   it "has :proto, :type be it's namevar" do

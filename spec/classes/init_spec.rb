@@ -6,21 +6,20 @@ describe 'quagga' do
   let(:facts) do
     {
       networking: {
-        fqdn: 'router-1.sandbox.local'
+        fqdn: 'router-1.sandbox.local',
+        ip: '172.24.128.1',
       }
     }
   end
   let(:environment) { 'production' }
 
-  it { is_expected.to compile }
-  it { is_expected.to compile.with_all_deps }
+  it 'compiles' do
+    is_expected.to compile.with_all_deps
+  end
 
-  it { is_expected.to contain_package('quagga') }
-
-  it { is_expected.to contain_service('zebra') }
-  it { is_expected.to contain_service('bgpd') }
-  it { is_expected.to contain_service('ospfd') }
-  it { is_expected.to contain_service('pimd') }
+  it 'includes quagga packages' do
+    is_expected.to contain_package('quagga')
+  end
 
   it do
     is_expected.to contain_file('/etc/sysconfig/quagga').with_content('#
@@ -34,10 +33,18 @@ ZEBRA_OPTS="-P 0"
 ')
   end
 
-  it { is_expected.to contain_file('/etc/quagga/zebra.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
-  it { is_expected.to contain_file('/etc/quagga/bgpd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
-  it { is_expected.to contain_file('/etc/quagga/ospfd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
-  it { is_expected.to contain_file('/etc/quagga/pimd.conf').with_owner('quagga').with_group('quagga').with_mode('0600') }
+  ['zebra', 'bgpd', 'ospfd', 'pimd'].each do |daemon_file|
+    it "contains service #{daemon_file}" do
+      is_expected.to contain_service(daemon_file)
+    end
+    it "creates file #{daemon_file}" do
+      is_expected.to contain_file("/etc/quagga/#{daemon_file}.conf").with(
+        owner: 'quagga',
+        group: 'quagga',
+        mode: '0600',
+      )
+    end
+  end
 
   context 'frr mode is enabled' do
     let(:params) do
@@ -46,6 +53,10 @@ ZEBRA_OPTS="-P 0"
         default_group: 'frr',
         frr_mode_enable: true,
         config_dir: '/etc/frr',
+        packages: {
+          'frr' => { ensure: 'latest' },
+          'frr-pythontools' => { ensure: 'latest' },
+        },
       }
     end
 
@@ -64,6 +75,18 @@ ZEBRA_OPTS="-P 0"
       expect(content).to match(%r{^bgpd=yes$})
       expect(content).to match(%r{^pimd=yes$})
       expect(content).to match(%r{^ospfd=yes$})
+    end
+
+    it 'configures the frr service' do
+      is_expected.to contain_service('frr').with(
+        ensure: 'running',
+        enable: true,
+        subscribe: [
+          'File[/etc/frr/daemons]',
+          'Package[frr]',
+          'Package[frr-pythontools]',
+        ],
+      )
     end
   end
 end

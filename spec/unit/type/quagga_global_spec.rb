@@ -16,7 +16,7 @@ describe Puppet::Type.type(:quagga_global) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_global).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_global)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   after :each do

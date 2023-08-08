@@ -16,7 +16,7 @@ describe Puppet::Type.type(:quagga_bgp_community_list) do
   end
 
   before :each do
-    Puppet::Type.type(:quagga_bgp_community_list).stubs(:defaultprovider).returns providerclass
+    allow(Puppet::Type.type(:quagga_bgp_community_list)).to receive(:defaultprovider).and_return(providerclass)
   end
 
   after :each do
