@@ -55,7 +55,6 @@ quagga::default_owner: "quagga"
 quagga::default_group: "quagga"
 quagga::default_mode: "0600"
 quagga::default_content: "hostname %{::facts.networking.fqdn}\n"
-quagga::config_dir: "/etc/quagga"
 quagga::service_file_manage: true
 quagga::packages:
   quagga:
@@ -71,14 +70,12 @@ quagga::zebra::prefix_lists: {}
 quagga::zebra::route_maps: {}
 quagga::zebra::routes: {}
 quagga::zebra::access_lists: {}
-quagga::zebra::config_file: "%{lookup('quagga::config_dir')}/zebra.conf"
 quagga::zebra::config_file_manage: true
 quagga::zebra::service_name: "zebra"
 quagga::zebra::service_enable: true
 quagga::zebra::service_manage: true
 quagga::zebra::service_ensure: "running"
 quagga::zebra::service_opts: "-P 0"
-quagga::pim::config_file: "%{lookup('quagga::config_dir')}/pimd.conf"
 quagga::pim::config_file_manage: true
 quagga::pim::service_name: "pimd"
 quagga::pim::service_enable: true
@@ -89,7 +86,6 @@ quagga::pim::agentx: false
 quagga::pim::router: {}
 quagga::pim::interfaces: {}
 quagga::bgp::agentx: false
-quagga::bgp::config_file: "%{lookup('quagga::config_dir')}/bgpd.conf"
 quagga::bgp::config_file_manage: true
 quagga::bgp::service_name: "bgpd"
 quagga::bgp::service_enable: true
@@ -102,7 +98,6 @@ quagga::bgp::as_paths: {}
 quagga::bgp::community_lists: {}
 quagga::bgp::address_families: {}
 quagga::ospf::agentx: false
-quagga::ospf::config_file: "%{lookup('quagga::config_dir')}/ospfd.conf"
 quagga::ospf::config_file_manage: true
 quagga::ospf::service_name: "ospfd"
 quagga::ospf::service_enable: true

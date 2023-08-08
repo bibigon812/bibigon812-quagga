@@ -44,13 +44,13 @@ class quagga::zebra (
   Hash $route_maps,
   Hash $routes,
   Hash $access_lists,
-  String $config_file,
   Boolean $config_file_manage,
   String $service_name,
   Boolean $service_enable,
   Boolean $service_manage,
   Enum['running', 'stopped'] $service_ensure,
-  String $service_opts
+  String $service_opts,
+  Stdlib::Unixpath $config_file               = "${quagga::config_dir}/zebra.conf",
 ) {
   include quagga::zebra::config
   include quagga::zebra::service
