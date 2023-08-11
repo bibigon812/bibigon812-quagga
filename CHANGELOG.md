@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.5.0](https://github.com/bibigon812/bibigon812-quagga/compare/v4.5.0...4.3.1) - 2023-08-11
+## [4.5.0](https://github.com/bibigon812/bibigon812-quagga/compare/v4.3.1...4.5.0) - 2023-08-11
 
 ### Added
 
