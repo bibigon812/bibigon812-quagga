@@ -5,6 +5,7 @@
 ### Changed
 
 - README.md
+- pdk to version 3.0.0
 
 ## [4.5.0](https://github.com/bibigon812/bibigon812-quagga/compare/v4.3.1...v4.5.0) - 2023-08-11
 
