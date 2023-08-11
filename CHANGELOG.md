@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased](https://github.com/bibigon812/bibigon812-quagga/compare/v4.5.0...master)
+
+### Changed
+
+- README.md
+
 ## [4.5.0](https://github.com/bibigon812/bibigon812-quagga/compare/v4.3.1...v4.5.0) - 2023-08-11
 
 ### Added
